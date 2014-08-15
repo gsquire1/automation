@@ -6,8 +6,7 @@
 ###############################################################################
 
 
-import my_anturlar
-#import anturlar
+import anturlar
 import liabhar
 import re
 import sys, os
@@ -27,7 +26,7 @@ def my_first_test_case():
     Retrieve proxy device numbers on all backbone switches
     """
     print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
-    fcrinfo = my_anturlar.FcrConfig()
+    fcrinfo = anturlar.FcrConfig()
     
     #fi = my_anturlar.FabricInfo
     sw_basic_info = fcrinfo.initial_checks()
@@ -48,7 +47,7 @@ def my_first_test_case():
     
     all_ips = []
     for ip in backbone_ip:
-        my_anturlar.connect_tel_noparse(ip,'root','password')
+        anturlar.connect_tel_noparse(ip,'root','password')
         base = fcrinfo.base_check() # get the base FID number
         if base is not False:
             #f = f.FcrConfig(base) ###########NEW OBJECT FOR BASE FID
@@ -99,7 +98,7 @@ def fcr_status():
     a = fcrinfo.get_licenses()
 
 def get_fabwide_ip():
-    fcrcfg = my_anturlar.FcrConfig()
+    fcrcfg = anturlar.FcrConfig()
     fab_ip_list = list(fcrcfg.fcr_fab_wide_ip())
     print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
     return(fab_ip_list)
@@ -109,7 +108,7 @@ def change_fid(fid):
     """
         change a fid on a switch
     """
-    cons_out = my_anturlar.fos_cmd("setcontext %s" % fid)
+    cons_out = anturlar.fos_cmd("setcontext %s" % fid)
     
 
 def test_case_flow():
@@ -135,23 +134,23 @@ def genAll():
     
     """
     #### send a fos command to configure
-    capture_cmd = my_anturlar.fos_cmd("flow --control -portidmode slotport ")
-    cons_out = my_anturlar.fos_cmd("flow --show")
+    capture_cmd = anturlar.fos_cmd("flow --control -portidmode slotport ")
+    cons_out = anturlar.fos_cmd("flow --show")
 
-    si_maps = my_anturlar.maps()
+    si_maps = anturlar.maps()
     si_maps_sim = si_maps.toggle_all("off")
     
     si_maps_gen = si_maps.genAll("on")
     
-    cons_out = my_anturlar.fos_cmd("portcfgshow")
+    cons_out = anturlar.fos_cmd("portcfgshow")
     
     si_maps_sim = si_maps.toggle_all("on")
     
-    cons_out = my_anturlar.fos_cmd("portcfgshow")
-    cons_out = my_anturlar.fos_cmd("flow --show")
+    cons_out = anturlar.fos_cmd("portcfgshow")
+    cons_out = _anturlar.fos_cmd("flow --show")
 
     si_maps_gen = si_maps.genAll("on")
-    cons_out = my_anturlar.fos_cmd("flow --show")
+    cons_out = anturlar.fos_cmd("flow --show")
 
 def remove_sim():
     """
@@ -168,7 +167,7 @@ def ports_disable(portlist = "", t=1, wait=10):
      should be no reason to do more than one time
     """
     if portlist == "":
-        si = my_anturlar.SwitchInfo()
+        si = anturlar.SwitchInfo()
         portlist = si.all_ports()
     for x in range(1, t+1):
         for a in portlist:
@@ -178,8 +177,8 @@ def ge_ports():
     """
         Return a list of the ge-ports in the current FID
     """
-    si = my_anturlar.SwitchInfo()
-    capture_cmd = my_anturlar.fos_cmd("switchshow")
+    si = anturlar.SwitchInfo()
+    capture_cmd = anturlar.fos_cmd("switchshow")
     if si.am_i_director:
         ras = re.compile('\s([0-9]{1,2})\s+([a-z]{1,3}[0-9])')
         ge_ports = ras.findall(capture_cmd)
@@ -193,8 +192,8 @@ def ve_ports():
     """
         Return a list of the VE-ports in the current FID
     """
-    si = my_anturlar.SwitchInfo()
-    capture_cmd = my_anturlar.fos_cmd("switchshow")
+    si = anturlar.SwitchInfo()
+    capture_cmd = anturlar.fos_cmd("switchshow")
     if si.am_i_director:
         ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+(?:[-0-9a-f]{6})\s+(?:[-id]{2})\s+(?:[-UNG12486]{2,3})\s+(?:[_\w]{5,9})(?:\s+VE)')
         ve_ports = ras.findall(capture_cmd)
@@ -208,7 +207,7 @@ def ve_ports():
         return(ve_ports)
             
 def enable_disabled_ports():
-    si = my_anturlar.SwitchInfo()
+    si = anturlar.SwitchInfo()
     portlist = si.disabled_ports()
     print(type(portlist))
     print(portlist)
@@ -216,12 +215,12 @@ def enable_disabled_ports():
         for i in portlist:
             slot = i[0]
             port = i[1]
-            cons_out = my_anturlar.fos_cmd("portenable %a/%a" % (slot, port))  
+            cons_out = anturlar.fos_cmd("portenable %a/%a" % (slot, port))  
     else:
         for i in portlist:
             pt = i[0]
             #port = (int(pt))
-        cons_out = my_anturlar.fos_cmd("portenable %s" % pt)
+        cons_out = anturlar.fos_cmd("portenable %s" % pt)
 
 def ports_enable(portlist= "", t=1, wait=10):
     """
@@ -231,7 +230,7 @@ def ports_enable(portlist= "", t=1, wait=10):
     """
     
     if portlist == "":
-        si = my_anturlar.SwitchInfo()
+        si = anturlar.SwitchInfo()
         portlist = si.all_ports()
         print('$$$$$$$$$$$$$$$$$$$$')
         print(type(portlist))
@@ -244,11 +243,11 @@ def ports_enable(portlist= "", t=1, wait=10):
                     print(slot)
                     port = i[1]
                     print(port)
-                    cons_out = my_anturlar.fos_cmd("portenable %a/%a" % (slot, port))  
+                    cons_out = anturlar.fos_cmd("portenable %a/%a" % (slot, port))  
         else:
             for x in range(1, t+1):
                 for i in portlist:
-                    cons_out = my_anturlar.fos_cmd("portenable %i" % i)
+                    cons_out = anturlar.fos_cmd("portenable %i" % i)
                     
     else:  
         if si.am_i_director == "1":
@@ -256,11 +255,11 @@ def ports_enable(portlist= "", t=1, wait=10):
                 for i in portlist:
                     slot = i[0]
                     port = i[1]
-                    cons_out = my_anturlar.fos_cmd("portenable %a/%a" % (slot, port))
+                    cons_out = anturlar.fos_cmd("portenable %a/%a" % (slot, port))
         else:
             for x in range(1, t+1):
                 for a in portlist:
-                    cons_out = my_anturlar.fos_cmd("portenable "+a)
+                    cons_out = anturlar.fos_cmd("portenable "+a)
         
         
 def ports_toggle(portlist="", t=2, wait=10):
@@ -273,16 +272,16 @@ def ports_toggle(portlist="", t=2, wait=10):
     ####
     
     if portlist == "":
-        si = my_anturlar.SwitchInfo()
+        si = anturlar.SwitchInfo()
         portlist = si.all_ports()
     for x in range(1, t):
         for a in portlist:
-            cons_out = my_anturlar.fos_cmd("portdisable %s"%a)
+            cons_out = anturlar.fos_cmd("portdisable %s"%a)
             
         liabhar.count_down(wait)
          
         for a in portlist:
-            cons_out = my_anturlar.fos_cmd("portenable %s"%a)
+            cons_out = anturlar.fos_cmd("portenable %s"%a)
             liabhar.count_down(10)
             
         liabhar.count_down(wait)
@@ -320,13 +319,13 @@ def configdl(clear = 0):
     #### capture flow config all FIDS
     ####
     
-    sw_info = my_anturlar.SwitchInfo()
+    sw_info = anturlar.SwitchInfo()
     sw_info_ls = sw_info.ls()
     #print('$$$$$$$$$$$$$$$$$$$')
     #print(sw_info_ls)
     fid_now = sw_info.ls_now()
     
-    cons_out = my_anturlar.fos_cmd(" ")
+    cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddr
      
     
@@ -346,8 +345,8 @@ def configdl(clear = 0):
     ff.write("\n"*2)
     
     for i in sw_info_ls:
-        cons_out = my_anturlar.fos_cmd("setcontext "+i)   
-        cons_out = my_anturlar.fos_cmd("mapsconfig --show")
+        cons_out = anturlar.fos_cmd("setcontext "+i)   
+        cons_out = anturlar.fos_cmd("mapsconfig --show")
         ff.write("="*80+"\n")
         ff.write("="*80+"\n")
         ff.write("LOGICAL SWITCH :: " +i+"\n")
@@ -357,31 +356,31 @@ def configdl(clear = 0):
         ff.write("#"*80+"\n")
         ff.write("#"*80+"\n")
         
-        cons_out = my_anturlar.fos_cmd("mapspolicy --show -summary")
+        cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
         ff.write("="*80+"\n")
         ff.write(cons_out+"\n\n")
         ff.write("#"*80+"\n")
         ff.write("#"*80+"\n")
         
-        cons_out = my_anturlar.fos_cmd("flow --show")
+        cons_out = anturlar.fos_cmd("flow --show")
         ff.write("="*80+"\n")
         ff.write(cons_out+"\n\n")
         ff.write("#"*80+"\n")
         ff.write("#"*80+"\n")
         
-        cons_out = my_anturlar.fos_cmd("flow --show -ctrlcfg")
+        cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
         ff.write("="*80+"\n")
         ff.write(cons_out+"\n\n")
         ff.write("#"*80+"\n")
         ff.write("#"*80+"\n")
         
-        cons_out = my_anturlar.fos_cmd("relayconfig --show")
+        cons_out = anturlar.fos_cmd("relayconfig --show")
         ff.write("="*80+"\n")
         ff.write(cons_out+"\n\n")
         ff.write("#"*80+"\n")
         ff.write("#"*80+"\n")
         
-        cons_out = my_anturlar.fos_cmd("bottleneckmon --status")
+        cons_out = anturlar.fos_cmd("bottleneckmon --status")
         ff.write("="*80+"\n")
         ff.write(cons_out+"\n\n")
         ff.write("#"*80+"\n")
@@ -390,25 +389,25 @@ def configdl(clear = 0):
     ff.write("="*80+"\n")
     ff.write("\n"*10)
     
-    cons_out = my_anturlar.fos_cmd("setcontext %s" % fid_now)
-    cons_out = my_anturlar.fos_cmd(" ")
+    cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
+    cons_out = anturlar.fos_cmd(" ")
     configdown_cmd = "configupload -all -p ftp 10.38.38.138,ftp2,configupload_test.txt,ftp"
-    cons_out = my_anturlar.fos_cmd (configdown_cmd)
+    cons_out = anturlar.fos_cmd (configdown_cmd)
     
  
 def firmwaredownload(frmdwn ):
     """
-        use my_anturlar firmwaredownload to do testing for update to
+        use anturlar firmwaredownload to do testing for update to
         newest code
         
     """
-    f = my_anturlar.doFirmwareDownload(frmdwn)
+    f = anturlar.doFirmwareDownload(frmdwn)
     
 def clearstats():
     """
         clear all stats using the clear stats procedure in my_anturlar.py
     """
-    cs = my_anturlar.clear_stats()
+    cs = anturlar.clear_stats()
     
 def flow_all_switch():
     """
@@ -436,11 +435,11 @@ def add_remove_flow(repeat, fname, scr, dst, ingrp, egrp, feat):
         cmd_create = "%s -egrport %s " % ( cmd_create, egrp )
         
     
-    cons_out = my_anturlar.fos_cmd(cmd_create)
+    cons_out = anturlar.fos_cmd(cmd_create)
     
     while repeat > 0:
         print(repeat,"\n")
-        cons_out = my_anturlar.fos_cmd("flow --show")
+        cons_out = anturlar.fos_cmd("flow --show")
         
         repeat = repeat - 1 
     
@@ -483,8 +482,8 @@ def add_flow(fname, scr, dst, ingrp, egrp, feat):
         
     cmd_create = "%s -noactivate " % (cmd_create)
     
-    cons_out = my_anturlar.fos_cmd(cmd_create)
-    cons_out = my_anturlar.fos_cmd("")
+    cons_out = anturlar.fos_cmd(cmd_create)
+    cons_out = anturlar.fos_cmd("")
     
     #while repeat > 0:
     #    print("repeat\n")
@@ -501,9 +500,9 @@ def delete_flow( name ):
     """
     
     if name == "all":
-        cons_out = my_anturlar.fos_cmd("echo Y | flow --delete all ")
+        cons_out = anturlar.fos_cmd("echo Y | flow --delete all ")
     else:
-        cons_out = my_anturlar.fos_cmd("flow --delete %s" % name)
+        cons_out = anturlar.fos_cmd("flow --delete %s" % name)
     
     
 def mapsenable( pol, al, ml ):
@@ -517,7 +516,7 @@ def mapsenable( pol, al, ml ):
         
     """
     
-    m = my_anturlar.Maps()
+    m = anturlar.Maps()
     m.enable(pol)
     m.actions(al)
     m.email_cfg(ml)
@@ -533,7 +532,7 @@ def enable_flows( ones ):
         
     """
     
-    f = my_anturlar.FlowV()
+    f = anturlar.FlowV()
     the_names = f.flow_names()
     print(the_names)
     
@@ -542,14 +541,14 @@ def enable_flows( ones ):
             print("not enabling this one" , k)
         else:
             cmd_create = ("flow --activate %s -fea all" % k )   
-            cons_out = my_anturlar.fos_cmd(cmd_create)
+            cons_out = anturlar.fos_cmd(cmd_create)
             
 def cfgsave():
     """
         save switch config to \logs\config
     """
     
-    config = my_anturlar.configSwitch()
+    config = anturlar.configSwitch()
     configsave = config.saveSwitchInfo
     
 #def get_fcr_ipv4():
@@ -578,14 +577,14 @@ def cfgsave():
 #    return ras_result_all
 
 def get_licenses(ip):
-    my_anturlar.connect_tel_noparse(ip,'root','password')
-    sw_info = my_anturlar.SwitchInfo()
+    anturlar.connect_tel_noparse(ip,'root','password')
+    sw_info = anturlar.SwitchInfo()
     #sw_ip = sw_info.ipaddr
     sw_name = sw_info.switch_name()
     f = "%s%s%s"%("logs/Switch_Licenses/License_File_", sw_name ,".txt")
     ff = liabhar.FileStuff(f,'a+b') ###open new file or clobber old
     header = "%s%s%s%s" % ("\nLICENSE FILE \n", ip+"\n" , sw_name, "\n==============================\n\n")
-    cons_out = my_anturlar.fos_cmd("licenseshow")
+    cons_out = anturlar.fos_cmd("licenseshow")
     ff.write(header)
     ff.write(cons_out+"\n")
     ff.close()
@@ -600,7 +599,7 @@ def send_cmds(filename , loops = 1):
     fullpath = "%s%s%s" % ("logs/configs/", file ,".txt")
     print(fullpath)
     g = liabhar.FileStuff(fullpath, 'a+b')
-    cons_out = my_anturlar.fos_cmd("")
+    cons_out = anturlar.fos_cmd("")
         
     with open(filename) as fileio:
         info = fileio.readlines()
@@ -609,7 +608,7 @@ def send_cmds(filename , loops = 1):
     while loops >=1 :    
         for line in info:
             line = line.rstrip('\n')
-            cons_out = my_anturlar.fos_cmd(line)
+            cons_out = anturlar.fos_cmd(line)
             g.write(cons_out)
             g.write(" ")
             
