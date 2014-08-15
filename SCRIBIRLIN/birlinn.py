@@ -7,6 +7,7 @@
 import os,sys
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
+sys.path.append('/home/automation/lib/FCR')
 sys.path.append('/home/automation/APM')
 sys.path.append('/users/home40/gsquire')
 
