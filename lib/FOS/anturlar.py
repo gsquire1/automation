@@ -925,7 +925,7 @@ class DoSupportsave():
         capture = tn.expect(reg_ex_list, 3600)
         capture = capture[2]
         capture = capture.decode()
-        print(capture, end="")
+        print(capture, end=' ')
     
     def tracedump(self):
         if self.tr == "yes":
