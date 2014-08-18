@@ -907,6 +907,10 @@ class DoSupportsave():
         self.start()
         
     def start(self):
+        """
+         doc here
+        """
+        
         self.tracedump()
         
         capture = ""
