@@ -28,7 +28,7 @@ def my_first_test_case():
     print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
     fcrinfo = anturlar.FcrConfig()
     
-    #fi = my_anturlar.FabricInfo
+    #fi = anturlar.FabricInfo
     sw_basic_info = fcrinfo.initial_checks()
     print('\n\n'+ '='*20)
     print("FCR enabled :  %s" % sw_basic_info[0])
@@ -52,7 +52,7 @@ def my_first_test_case():
         if base is not False:
             #f = f.FcrConfig(base) ###########NEW OBJECT FOR BASE FID
             #f = fcrinfo(base) ###########NEW OBJECT FOR BASE FID
-            my_anturlar.fos_cmd("setcontext " + base)
+            anturlar.fos_cmd("setcontext " + base)
             get_proxy = fcrinfo.fcr_proxy_dev() ###########NEW OBJECT FOR BASE FID
             all_ips.extend(get_proxy)
         else:
@@ -171,7 +171,7 @@ def ports_disable(portlist = "", t=1, wait=10):
         portlist = si.all_ports()
     for x in range(1, t+1):
         for a in portlist:
-            cons_out = my_anturlar.fos_cmd("portdisable %s" % a)
+            cons_out = anturlar.fos_cmd("portdisable %s" % a)
             
 def ge_ports():
     """
@@ -405,7 +405,7 @@ def firmwaredownload(frmdwn ):
     
 def clearstats():
     """
-        clear all stats using the clear stats procedure in my_anturlar.py
+        clear all stats using the clear stats procedure in anturlar.py
     """
     cs = anturlar.clear_stats()
     
