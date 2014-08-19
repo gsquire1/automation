@@ -1,0 +1,1055 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to SQA_automation’s documentation! &mdash; SQA_automation 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="SQA_automation 1.0 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">SQA_automation 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-sqa-automation-s-documentation">
+<h1>Welcome to SQA_automation&#8217;s documentation!<a class="headerlink" href="#welcome-to-sqa-automation-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<span class="target" id="module-anturlar"></span><dl class="class">
+<dt id="anturlar.DoFirmwaredownloadChoice">
+<em class="property">class </em><tt class="descclassname">anturlar.</tt><tt class="descname">DoFirmwaredownloadChoice</tt><big>(</big><em>firmdown</em>, <em>firmup</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#DoFirmwaredownloadChoice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.DoFirmwaredownloadChoice" title="Permalink to this definition">¶</a></dt>
+<dd><p>do a firmware download to 7.3.x or 7.2.x builds depending on what
+is already on the switch</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="anturlar.DoSupportsave">
+<em class="property">class </em><tt class="descclassname">anturlar.</tt><tt class="descname">DoSupportsave</tt><big>(</big><em>ip</em>, <em>user</em>, <em>passw</em>, <em>chas_name</em>, <em>tr='yes'</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#DoSupportsave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.DoSupportsave" title="Permalink to this definition">¶</a></dt>
+<dd><p>start a supportsave on the current switch
+the ip user</p>
+<dl class="method">
+<dt id="anturlar.DoSupportsave.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#DoSupportsave.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.DoSupportsave.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>doc here</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="anturlar.FabricInfo">
+<em class="property">class </em><tt class="descclassname">anturlar.</tt><tt class="descname">FabricInfo</tt><big>(</big><em>fid=128</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>a class to return iformations about a Fabric including
+The FID is required make the class specific to the FID</p>
+<dl class="method">
+<dt id="anturlar.FabricInfo.all_info">
+<tt class="descname">all_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.all_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.all_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing at this time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.fabric_members">
+<tt class="descname">fabric_members</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.fabric_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.fabric_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the members of the current fabric</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.ipv4_list">
+<tt class="descname">ipv4_list</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.ipv4_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.ipv4_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the ipv4 address of the switches in
+the current fabric
+Return none if nothing is matched</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.ipv4_plus_fcr_list">
+<tt class="descname">ipv4_plus_fcr_list</tt><big>(</big><em>pa</em>, <em>pw</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.ipv4_plus_fcr_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.ipv4_plus_fcr_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the ipv4 plus switches attached via FCR
+Return none if nothing is matched with ipv4_list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.name">
+<tt class="descname">name</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the names of the members in the current fabric
+Return none if no match is found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.sid_numbers">
+<tt class="descname">sid_numbers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.sid_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.sid_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of the members of the current fabric
+Return none if no switches are found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.switch_count">
+<tt class="descname">switch_count</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.switch_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.switch_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of switches in the FID
+Return 0 if no match is found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.FabricInfo.zone_info">
+<tt class="descname">zone_info</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#FabricInfo.zone_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.FabricInfo.zone_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>return info all about the zones</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="anturlar.SwitchInfo">
+<em class="property">class </em><tt class="descclassname">anturlar.</tt><tt class="descname">SwitchInfo</tt><a class="reference internal" href="_modules/anturlar.html#SwitchInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to return information about a switch</p>
+<dl class="method">
+<dt id="anturlar.SwitchInfo.all_ports">
+<tt class="descname">all_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.all_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.all_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queuries switch for number of ports.
+return the port list or none if no ports in the FID
+The list will include FC and VE ports</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.all_ports_fc_only">
+<tt class="descname">all_ports_fc_only</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.all_ports_fc_only"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.all_ports_fc_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queuries switch for number of ports.
+return the port list or none if no ports in the FID
+the list will include FC ports only</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.base_check">
+<tt class="descname">base_check</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.base_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.base_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Base FID if found
+Return False if no base is found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.blade_search_8GB">
+<tt class="descname">blade_search_8GB</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.blade_search_8GB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.blade_search_8GB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse out 8GB Blades.
+This is used against non-VF switches.
+Return 0 if none are found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.blades">
+<tt class="descname">blades</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.blades"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.blades" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the list of SW blades in the switch
+includes SW BLADES and AP BLADES</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.blank_type">
+<tt class="descname">blank_type</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.blank_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.blank_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of ports that do not have a port type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.currentFID">
+<tt class="descname">currentFID</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.currentFID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.currentFID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current FID number</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.d_ports">
+<tt class="descname">d_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.d_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.d_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the D-Ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.default_switch">
+<tt class="descname">default_switch</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.default_switch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.default_switch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return default FID if found
+Return 0 if no match</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.director">
+<tt class="descname">director</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.director"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.director" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a 1 if this switch is a director</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.disabled_ports">
+<tt class="descname">disabled_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.disabled_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.disabled_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of disabled ports including Persistent disabled ports</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.e_ports">
+<tt class="descname">e_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.e_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.e_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>`   Return a list of the E-ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.ex_ports">
+<tt class="descname">ex_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.ex_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.ex_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>`   Return a list of the EX-ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.f_ports">
+<tt class="descname">f_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.f_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.f_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>`   Return a list of the F-ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.fan_count">
+<tt class="descname">fan_count</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.fan_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.fan_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>count the list of fans returned in fanshow command</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.fcr_enabled">
+<tt class="descname">fcr_enabled</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.fcr_enabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.fcr_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if FCR is enabled on the switch
+1 - yes
+0 - no</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.g_ports">
+<tt class="descname">g_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.g_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.g_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the G-ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.getLicense">
+<tt class="descname">getLicense</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.getLicense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.getLicense" title="Permalink to this definition">¶</a></dt>
+<dd><p>get a list of the license on the switch</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.loopback">
+<tt class="descname">loopback</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.loopback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.loopback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the Loopback-ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.ls">
+<tt class="descname">ls</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the logical switch numbers and return them in a list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.ls_now">
+<tt class="descname">ls_now</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.ls_now"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.ls_now" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the logical switch numbers that is currently logged in</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.n_ports">
+<tt class="descname">n_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.n_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.n_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of N-Ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.persistent_disabled_ports">
+<tt class="descname">persistent_disabled_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.persistent_disabled_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.persistent_disabled_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of disabled ports including Persistent disabled ports</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.sensor_t_f_ps">
+<tt class="descname">sensor_t_f_ps</tt><big>(</big><em>sensor_type</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.sensor_t_f_ps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.sensor_t_f_ps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of temp sensors, Fan or Power Supply from
+sensorshow commmand that report Ok
+type can be f = Fan    t = Temperature Sensor   ps = Power Supply</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.sfp_info">
+<tt class="descname">sfp_info</tt><big>(</big><em>info_type='info'</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.sfp_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.sfp_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of sfp and the optic speed
+speed or a summary
+pass summary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.sim_ports">
+<tt class="descname">sim_ports</tt><big>(</big><em>extended=True</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.sim_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.sim_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the SIM ports in the current FID</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.switch_id">
+<tt class="descname">switch_id</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.switch_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.switch_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the current switch
+does not work on AG switch</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.switch_name">
+<tt class="descname">switch_name</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.switch_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.switch_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the current switch Name from switchshow
+return the current switchname</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.switch_state">
+<tt class="descname">switch_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.switch_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.switch_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the switch state &#8216;Offline or Online&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.synchronized">
+<tt class="descname">synchronized</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.synchronized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.synchronized" title="Permalink to this definition">¶</a></dt>
+<dd><p>determine if a switch CP blades are in sync</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.temp_sensors">
+<tt class="descname">temp_sensors</tt><big>(</big><em>absent='no'</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.temp_sensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.temp_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the tempsensors with OK state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="anturlar.SwitchInfo.vf_enabled">
+<tt class="descname">vf_enabled</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#SwitchInfo.vf_enabled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.SwitchInfo.vf_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>See if switch has vf enabled
+Return VF or noVF</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="anturlar.clear_stats">
+<tt class="descclassname">anturlar.</tt><tt class="descname">clear_stats</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#clear_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.clear_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>clear the following stats on a switch
+fcrlogclear     errclear    diagclearerror -all     tracedump -R
+supportsave -R  statsclear  portlogclear        coreshow -R
+slotstatsclear    fabstatsclear   history clear</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="anturlar.doFirmwareDownload">
+<em class="property">class </em><tt class="descclassname">anturlar.</tt><tt class="descname">doFirmwareDownload</tt><big>(</big><em>firmvrsn</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#doFirmwareDownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.doFirmwareDownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>do a firmware download to 7.3.0 build of  firmware
+then close the telnet connection and
+wait 1200 seconds before closing ending the function
+Return could be</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>a message that firmware version are the same</li>
+<li>server is inaccessible</li>
+<li>the user prompt after firmware download is started</li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="anturlar.fids_check">
+<tt class="descclassname">anturlar.</tt><tt class="descname">fids_check</tt><big>(</big><em>self</em>, <em>fid</em>, <em>lscfgshow</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#fids_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.fids_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if FID given is resident on switch.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="anturlar.mem_usage">
+<tt class="descclassname">anturlar.</tt><tt class="descname">mem_usage</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#mem_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.mem_usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the top memory users on the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="anturlar.mem_usage_top20">
+<tt class="descclassname">anturlar.</tt><tt class="descname">mem_usage_top20</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/anturlar.html#mem_usage_top20"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.mem_usage_top20" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the top 20 memory users on the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="anturlar.waitForOnline">
+<tt class="descclassname">anturlar.</tt><tt class="descname">waitForOnline</tt><big>(</big><em>si</em><big>)</big><a class="reference internal" href="_modules/anturlar.html#waitForOnline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#anturlar.waitForOnline" title="Permalink to this definition">¶</a></dt>
+<dd><p>what for a switch to return to online state
+si = switch object from SwitchInfo</p>
+</dd></dl>
+
+<span class="target" id="module-fvtc_0"></span><dl class="function">
+<dt id="fvtc_0.add_flow">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">add_flow</tt><big>(</big><em>fname</em>, <em>scr</em>, <em>dst</em>, <em>ingrp</em>, <em>egrp</em>, <em>feat</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#add_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.add_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a flow from the current switch and FID
+this will add with the &#8211;noactivate option so that it is always added</p>
+<p>&#8211;should add find one of the ports on the switch and add the flow to
+that port -
+&#8211;discover which port is the same as the scrdev or dstdev and add
+&#8211; since this is a add and remove the flow test case the lun, ftype and bidir
+could be random</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.add_remove_flow">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">add_remove_flow</tt><big>(</big><em>repeat</em>, <em>fname</em>, <em>scr</em>, <em>dst</em>, <em>ingrp</em>, <em>egrp</em>, <em>feat</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#add_remove_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.add_remove_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>add and remove a flow from the current switch and FID</p>
+<p>&#8211;should add find one of the ports on the switch and add the flow to
+that port -
+&#8211;discover which port is the same as the scrdev or dstdev and add
+&#8211; since this is a add and remove the flow test case the lun, ftype and bidir
+could be random</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.change_fid">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">change_fid</tt><big>(</big><em>fid</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#change_fid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.change_fid" title="Permalink to this definition">¶</a></dt>
+<dd><p>change a fid on a switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.check_gen_all_stats">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">check_gen_all_stats</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#check_gen_all_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.check_gen_all_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>start the gen_all SIM ports test and capture the number of runs
+the percent of run, the frames generated brom IngrPort and frames
+generated to EgrPort</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.cleanup_policy">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">cleanup_policy</tt><big>(</big><em>policy_list</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#cleanup_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.cleanup_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>cleanup any user added policies, rules
+remove rules from policies and delete the policy</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.clearstats">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">clearstats</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#clearstats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.clearstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>clear all stats using the clear stats procedure in anturlar.py</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.configdl">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">configdl</tt><big>(</big><em>clear=0</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#configdl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.configdl" title="Permalink to this definition">¶</a></dt>
+<dd><p>capture any information for testing of the configdownload 
+- including mapspolicy &#8211;show</p>
+<blockquote>
+<div>mapsconfig &#8211;show
+flow &#8211;show
+flow &#8211;show -ctrlcfg
+relayconfig &#8211;show
+bottleneckmon &#8211;status</div></blockquote>
+<p>then perform configupload</p>
+<p>config upload</p>
+<p>Nimbus_______________Odin_86__:FID25:root&gt; configupload
+Protocol (scp, ftp, sftp, local) [ftp]: ftp 
+Server Name or IP Address [host]: 10.38.38.138
+User Name [user]: ftp2
+Path/Filename [&lt;home dir&gt;/config.txt]: Odin_configupload.txt
+Section (all|chassis|FID# [all]): all
+Password:</p>
+<p>or</p>
+<p>configdownload [- all ] [-p ftp | -ftp] [&#8220;host&#8221;,&#8221;user&#8221;,&#8221;path&#8221;[,&#8221;passwd&#8221;]]
+configdownload [- all ] [-p scp | -scp ] [&#8220;host&#8221;,&#8221;user&#8221;,&#8221;path&#8221;]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.delete_flow">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">delete_flow</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#delete_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.delete_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>delete flow vision flows from a switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.enable_flows">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">enable_flows</tt><big>(</big><em>ones</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#enable_flows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.enable_flows" title="Permalink to this definition">¶</a></dt>
+<dd><p>enable all fea of flows of current switch
+- get the flow names
+- enable the flows with all features</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.firmwaredownload">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">firmwaredownload</tt><big>(</big><em>frmdwn</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#firmwaredownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.firmwaredownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>use anturlar firmwaredownload to do testing for update to
+newest code</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.flow_all_switch">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">flow_all_switch</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#flow_all_switch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.flow_all_switch" title="Permalink to this definition">¶</a></dt>
+<dd><p>capture all the flow &#8211;show information
+this can go to anturlar in the FlowV class</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.flow_to_each_SIM">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">flow_to_each_SIM</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#flow_to_each_SIM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.flow_to_each_SIM" title="Permalink to this definition">¶</a></dt>
+<dd><p>find all the SIM ports in the fabric and create a flow
+from each SIM port to all the Other SIM ports</p>
+<blockquote>
+<div>Since this test case finds all the switches in the
+fabric it might not be good to run in fabric mode</div></blockquote>
+<dl class="docutils">
+<dt>steps</dt>
+<dd><ol class="first last arabic simple">
+<li>get the ip list of switches in the fabric</li>
+<li>for each switch get a list of SIM ports</li>
+<li>create a flow for each SIMport to all other SIM ports</li>
+<li>start all of the flows if not started</li>
+<li>if there are only 2 switches only send to the other switch
+if there are more than 2 switches then send to a random port which
+could also be on the same switch</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.genAll">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">genAll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#genAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.genAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>turn all ports to SIM ports and enable Flow genALL sys test</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.get_policy_rules">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">get_policy_rules</tt><big>(</big><em>p='None'</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#get_policy_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.get_policy_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the rules of a policy</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.ha_failover">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">ha_failover</tt><big>(</big><em>times=2</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#ha_failover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.ha_failover" title="Permalink to this definition">¶</a></dt>
+<dd><p>do HA failover on directors
+do hareboot on pizza box</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.ha_failover_check_adjacent">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">ha_failover_check_adjacent</tt><big>(</big><em>adjacent_ipaddr</em>, <em>times=2</em>, <em>wait=300</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#ha_failover_check_adjacent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.ha_failover_check_adjacent" title="Permalink to this definition">¶</a></dt>
+<dd><p>do HA failover on directors
+do hareboot on pizza box</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.mapscommand_list">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">mapscommand_list</tt><big>(</big><em>options='0'</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#mapscommand_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.mapscommand_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list fo the maps commands
+send true to recieve the list of options for each command
+pass the options of 0 , usage or all
+0 - or blank will use the core commands only
+usage - will use commands that will return the help list
+all   - will use commands that will function correctly</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.mapsenable">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">mapsenable</tt><big>(</big><em>pol</em>, <em>al</em>, <em>ml</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#mapsenable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.mapsenable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>enable MAPS with policy         pol</dt>
+<dd>actions list   al
+email list     ml</dd>
+</dl>
+<p>&#8211; this function will enable MAPS only if you want to
+change the policy use mapspolicy()</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.ports_disable">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">ports_disable</tt><big>(</big><em>portlist=''</em>, <em>t=1</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#ports_disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.ports_disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>port disable for the number of time passed in
+should be no reason to do more than one time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.ports_enable">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">ports_enable</tt><big>(</big><em>portlist=''</em>, <em>t=1</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#ports_enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.ports_enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>port enable for the number of time passed in
+there should be no reason for time to be more than 1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.ports_toggle">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">ports_toggle</tt><big>(</big><em>portlist=''</em>, <em>t=2</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#ports_toggle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.ports_toggle" title="Permalink to this definition">¶</a></dt>
+<dd><p>port disable / port enable for the number of times passed in</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.remove_sim">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">remove_sim</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#remove_sim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.remove_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove any SIM ports enabled on the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_01_02">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_01_02</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_01_02"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_01_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.01.02
+Title:      MAPS commands available with a license
+Feature:    MAPS CLI
+Confirm MAPS CLI function correctly with and without a license
+installed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_03_01">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_03_01</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_03_01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_03_01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.03.01
+Title:      MAPS Category Management Default thresholds
+Feature:    MAPS 
+Confirm MAPS default thresholds are set correctly</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_03_02">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_03_02</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_03_02"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_03_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.03.02
+Title:
+Feature:    Predfined Group Management
+Verify the predefined groups including only the elements
+defined for each group</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_05_01">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_05_01</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_05_01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_05_01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.05.01
+Title:
+Feature:    Environmental Events and alarms
+Objective:  Verify the Environmental events and alarms in Switch</p>
+<blockquote>
+<div>Resource Category of MAPS</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_05_02">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_05_02</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_05_02"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_05_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.05_02
+Title:      MAPS Port Health
+Feature:    MAPS
+Objective:  Verify Port Related events / alarms</p>
+<blockquote>
+<div>at this time it is configuration for testing only.</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_05_03">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_05_03</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_05_03"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_05_03" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.05.03
+Title:
+Feature:    FCIP 
+Objective:  verify the FCIP traffic events and alarms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_05_04">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_05_04</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_05_04"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_05_04" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.05.04
+Title:      Traffic Performance Events
+Feature:    MAPS
+Objective:  Verify the Traffic performance events and alarms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_05_05">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_05_05</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_05_05"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_05_05" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.05.05
+Title:      Fabric State Change
+Feature:    MAPS
+Objective:  Verify the Fabric State Change events and alarms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_06_07">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_06_07</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_06_07"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_06_07" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.06_07
+Title:      MAPS Data Base Management
+Feature:    MAPS
+Objective:  Verify</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.tc_01_01_template">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">tc_01_01_template</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#tc_01_01_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.tc_01_01_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Case   25.01.01.template
+Title:
+Feature:    Predfined Group Management
+Objective:  Verify the predefined groups including only the elements
+defined for each group</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.test_case_config">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">test_case_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#test_case_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.test_case_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get some information from the switch so config can be
+put back to the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fvtc_0.test_case_flow">
+<tt class="descclassname">fvtc_0.</tt><tt class="descname">test_case_flow</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fvtc_0.html#test_case_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fvtc_0.test_case_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the current flows on the SUT
+remove the flows
+create the same flows</p>
+</dd></dl>
+
+<span class="target" id="module-liabhar"></span><dl class="class">
+<dt id="liabhar.FileStuff">
+<em class="property">class </em><tt class="descclassname">liabhar.</tt><tt class="descname">FileStuff</tt><big>(</big><em>name</em>, <em>mode='r'</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#FileStuff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.FileStuff" title="Permalink to this definition">¶</a></dt>
+<dd><p>a simple class to open files for reading and writing</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.cls">
+<tt class="descclassname">liabhar.</tt><tt class="descname">cls</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liabhar.html#cls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>clear the screen
+valid for Linux or Windows</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.count_down">
+<tt class="descclassname">liabhar.</tt><tt class="descname">count_down</tt><big>(</big><em>stop</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#count_down"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.count_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>print to the screen a countdown timer
+pass only the amount of time to wait</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.diff_compare">
+<tt class="descclassname">liabhar.</tt><tt class="descname">diff_compare</tt><big>(</big><em>text_1</em>, <em>text_2</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#diff_compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.diff_compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>compare string text line by line
+return the differences</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.diff_ncompare">
+<tt class="descclassname">liabhar.</tt><tt class="descname">diff_ncompare</tt><big>(</big><em>text_1</em>, <em>text_2</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#diff_ncompare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.diff_ncompare" title="Permalink to this definition">¶</a></dt>
+<dd><p>compare list text line by line
+return the differences</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.email_sender">
+<tt class="descclassname">liabhar.</tt><tt class="descname">email_sender</tt><big>(</big><em>who_to</em>, <em>who_from</em>, <em>subj</em>, <em>msg_to_send</em>, <em>txtfile_path=''</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#email_sender"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.email_sender" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>send an email from your script in plain text</p>
+<p>useage is email_sender(senders_email, recipients_email,                                 subject, message , or text_file)</p>
+<p>This is a simple one time send script - - for a client with
+user interface features other choices are available including
+PyMailGUI, pymail, and PyMailCGI
+also see popmail.py for a script that can retrieve mail</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.email_sender_html">
+<tt class="descclassname">liabhar.</tt><tt class="descname">email_sender_html</tt><big>(</big><em>you</em>, <em>me</em>, <em>subj</em>, <em>html_to_send</em>, <em>htmlfile_path=''</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#email_sender_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.email_sender_html" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>send an email from your script as an HTML message</p>
+<p>useage is email_sender(senders_email, recipients_email,                                 subject, message , or text_file)</p>
+<p>This is a simple one time send script - - for a client with
+user interface features other choices are available including
+PyMailGUI, pymail, and PyMailCGI
+also see popmail.py for a script that can retrieve mail</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.platform">
+<tt class="descclassname">liabhar.</tt><tt class="descname">platform</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liabhar.html#platform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.platform" title="Permalink to this definition">¶</a></dt>
+<dd><p>print the platform</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.random_number">
+<tt class="descclassname">liabhar.</tt><tt class="descname">random_number</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/liabhar.html#random_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.random_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a random number between 0.0 and 1.0</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="liabhar.space">
+<tt class="descclassname">liabhar.</tt><tt class="descname">space</tt><big>(</big><em>a=8</em><big>)</big><a class="reference internal" href="_modules/liabhar.html#space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#liabhar.space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a number of blank lines passed to the procedure</p>
+</dd></dl>
+
+<span class="target" id="module-balla"></span><p>anturlar is floor 
+cofra is cabinet
+leabhar is a book
+balla is a wall</p>
+<span class="target" id="module-fos_gen_tc_0"></span><dl class="function">
+<dt id="fos_gen_tc_0.send_cmds">
+<tt class="descclassname">fos_gen_tc_0.</tt><tt class="descname">send_cmds</tt><big>(</big><em>filename</em>, <em>loops=1</em><big>)</big><a class="reference internal" href="_modules/fos_gen_tc_0.html#send_cmds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fos_gen_tc_0.send_cmds" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to read cmds from a file and send them to the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fos_gen_tc_0.show_vc">
+<tt class="descclassname">fos_gen_tc_0.</tt><tt class="descname">show_vc</tt><big>(</big><em>slot</em>, <em>port</em><big>)</big><a class="reference internal" href="_modules/fos_gen_tc_0.html#show_vc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fos_gen_tc_0.show_vc" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to show which VC is in use</p>
+</dd></dl>
+
+<span class="target" id="module-fcrtc_0"></span><dl class="function">
+<dt id="fcrtc_0.add_flow">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">add_flow</tt><big>(</big><em>fname</em>, <em>scr</em>, <em>dst</em>, <em>ingrp</em>, <em>egrp</em>, <em>feat</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#add_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.add_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a flow from the current switch and FID
+this will add with the &#8211;noactivate option so that it is always added</p>
+<p>&#8211;should add find one of the ports on the switch and add the flow to
+that port -
+&#8211;discover which port is the same as the scrdev or dstdev and add
+&#8211; since this is a add and remove the flow test case the lun, ftype and bidir
+could be random</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.add_remove_flow">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">add_remove_flow</tt><big>(</big><em>repeat</em>, <em>fname</em>, <em>scr</em>, <em>dst</em>, <em>ingrp</em>, <em>egrp</em>, <em>feat</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#add_remove_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.add_remove_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>add and remove a flow from the current switch and FID</p>
+<p>&#8211;should add find one of the ports on the switch and add the flow to
+that port -
+&#8211;discover which port is the same as the scrdev or dstdev and add
+&#8211; since this is a add and remove the flow test case the lun, ftype and bidir
+could be random</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.cfgsave">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">cfgsave</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#cfgsave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.cfgsave" title="Permalink to this definition">¶</a></dt>
+<dd><p>save switch config to logsconfig</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.change_fid">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">change_fid</tt><big>(</big><em>fid</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#change_fid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.change_fid" title="Permalink to this definition">¶</a></dt>
+<dd><p>change a fid on a switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.clearstats">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">clearstats</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#clearstats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.clearstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>clear all stats using the clear stats procedure in my_anturlar.py</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.configdl">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">configdl</tt><big>(</big><em>clear=0</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#configdl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.configdl" title="Permalink to this definition">¶</a></dt>
+<dd><p>capture any information for testing of the configdownload 
+- including mapspolicy &#8211;show</p>
+<blockquote>
+<div>mapsconfig &#8211;show
+flow &#8211;show
+flow &#8211;show -ctrlcfg
+relayconfig &#8211;show
+bottleneckmon &#8211;status</div></blockquote>
+<p>then perform configupload</p>
+<p>config upload</p>
+<p>Nimbus_______________Odin_86__:FID25:root&gt; configupload
+Protocol (scp, ftp, sftp, local) [ftp]: ftp 
+Server Name or IP Address [host]: 10.38.38.138
+User Name [user]: ftp2
+Path/Filename [&lt;home dir&gt;/config.txt]: Odin_configupload.txt
+Section (all|chassis|FID# [all]): all
+Password:</p>
+<p>or</p>
+<p>configdownload [- all ] [-p ftp | -ftp] [&#8220;host&#8221;,&#8221;user&#8221;,&#8221;path&#8221;[,&#8221;passwd&#8221;]]
+configdownload [- all ] [-p scp | -scp ] [&#8220;host&#8221;,&#8221;user&#8221;,&#8221;path&#8221;]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.delete_flow">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">delete_flow</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#delete_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.delete_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>delete flow vision flows from a switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.enable_flows">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">enable_flows</tt><big>(</big><em>ones</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#enable_flows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.enable_flows" title="Permalink to this definition">¶</a></dt>
+<dd><p>enable all fea of flows of current switch
+- get the flow names
+- enable the flows with all features</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.fcr_status">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">fcr_status</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#fcr_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.fcr_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve basic switch info. sys.arg(0),sys.arg(1) etc. :
+0) FCR Enabled
+1) Chassis or Pizza Box
+2) VF or not
+3) Base Configured</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.firmwaredownload">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">firmwaredownload</tt><big>(</big><em>frmdwn</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#firmwaredownload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.firmwaredownload" title="Permalink to this definition">¶</a></dt>
+<dd><p>use anturlar firmwaredownload to do testing for update to
+newest code</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.flow_all_switch">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">flow_all_switch</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#flow_all_switch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.flow_all_switch" title="Permalink to this definition">¶</a></dt>
+<dd><p>capture all the flow &#8211;show information</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.ge_ports">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">ge_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#ge_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.ge_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the ge-ports in the current FID</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.genAll">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">genAll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#genAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.genAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>turn all ports to SIM ports and enable Flow genALL sys test</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.mapsenable">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">mapsenable</tt><big>(</big><em>pol</em>, <em>al</em>, <em>ml</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#mapsenable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.mapsenable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>enable MAPS with policy         pol</dt>
+<dd>actions list   al
+email list     ml</dd>
+</dl>
+<p>&#8211; this function will enable MAPS only if you want to
+change the policy use mapspolicy()</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.my_first_test_case">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">my_first_test_case</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#my_first_test_case"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.my_first_test_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve proxy device numbers on all backbone switches</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.ports_disable">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">ports_disable</tt><big>(</big><em>portlist=''</em>, <em>t=1</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#ports_disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.ports_disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>port disable for the number of time passed in
+should be no reason to do more than one time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.ports_enable">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">ports_enable</tt><big>(</big><em>portlist=''</em>, <em>t=1</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#ports_enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.ports_enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>port enable for the number of time passed in
+there should be no reason for time to be more than 1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.ports_toggle">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">ports_toggle</tt><big>(</big><em>portlist=''</em>, <em>t=2</em>, <em>wait=10</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#ports_toggle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.ports_toggle" title="Permalink to this definition">¶</a></dt>
+<dd><p>port disable / port enable for the number of times passed in</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.remove_sim">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">remove_sim</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#remove_sim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.remove_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove any SIM ports enabled on the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.send_cmds">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">send_cmds</tt><big>(</big><em>filename</em>, <em>loops=1</em><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#send_cmds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.send_cmds" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to read cmds from a file and send them to the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.test_case_config">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">test_case_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#test_case_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.test_case_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get some information from the switch so config can be
+put back to the switch</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.test_case_flow">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">test_case_flow</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#test_case_flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.test_case_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the current flows on the SUT
+remove the flows
+create the same flows</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fcrtc_0.ve_ports">
+<tt class="descclassname">fcrtc_0.</tt><tt class="descname">ve_ports</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/fcrtc_0.html#ve_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fcrtc_0.ve_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the VE-ports in the current FID</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to SQA_automation&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">SQA_automation 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, S_M.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
