@@ -7,9 +7,12 @@
 
 import anturlar
 import liabhar
+import cofra
 import re
 import random
 import os,sys
+
+
 """
 Naming conventions --
 
@@ -1232,8 +1235,9 @@ def tc_01_01_06_07():
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
-    
-    
+    bld_map = cofra.bladeportmap_Info()
+    print("\n\n\nBLADEPORTMAP INFO ")
+    print(bld_map)
 
    
    
