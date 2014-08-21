@@ -1217,7 +1217,8 @@ def tc_01_01_06_07():
     ###########################################################################
     ####  todo -
     ####    1.   ??
-    ####
+    ####    2.  add the slot numbers - right now it is the default 0
+    ###
     ###########################################################################
     ####
     #### Steps:
@@ -1235,10 +1236,82 @@ def tc_01_01_06_07():
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
-    bld_map = cofra.bladeportmap_Info()
-    print("\n\n\nBLADEPORTMAP INFO ")
-    print(bld_map)
+    #### add the slot numbers here
+    slot_numb = 0
+    
+    bld_map = cofra.bladeportmap_Info(slot_numb)
+    print("\n\n\nBLADEPORTMAP INFO \n")
+    
+    #### count the number of ports that are in_sync
+    count_in_synce = 0
+    for i in bld_map:
+        if "In_Sync" in (i[12]):
+            count_in_synce += 1
+    
+    cont = 0
+    
+    while cont <= 10000:
+        cont +=1
+        ####  pick a port randomly
+        port_to_add_err = ((liabhar.random_number_int(count_in_synce)))
+        #### pick and err type randomly
+        pck_rndm_err = ((liabhar.random_number_int(12)))
+        chip_numb = i[8]
+        chip_id = i[11]
+        chip_port = i[4]
+        port_in_sync = i[12]
+        usr_port = i[1]
+        print("\n\n\n")
+        print("="*80)
+        print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
+        print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
+        print("@"*80)
+        
+        
+        
+        
+        ####  get the port error list
+        port_los_error = cofra.PortStats()
+        coutr_to_incr_name = port_los_error[pck_rndm_err][0]
+        try:
+            coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
+            coutr_to_incr_count += 5
+        except TypeError:
+            ras_count = re.compile('([\.\d+])([gkmt])')
+            ras_count = ras_count.findall(coutr_to_incr_count)
+            coutr_to_incr_count = float(ras_count*10)
+            
+        #### configure the db command
+        ####   db [slot/chip] stats set [chipport] [counter] [value]
+        db_cmd = "db %s/%s stats set %s %s %s" % (slot_numb, chip_numb, \
+                                                  chip_port, coutr_to_incr_name, coutr_to_incr_count)
+        
+        cmdrtn = anturlar.fos_cmd(db_cmd)
 
+    #### confirm if the port is still in_sync once errors are started
+    ####  code goes here
+        
+    ##for i in bld_map:
+    ##    if "In_Sync" in (i[12]):
+    ##        chip_numb = i[8]
+    ##        chip_id = i[11]
+    ##        chip_port = i[4]
+    ##        port_in_sync = i[12]
+    ##        usr_port = i[1]
+    ##        print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
+    ##        print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
+           
+   
+        
+        print("MY RANDOM NUMBER   %s " % port_to_add_err)
+        print("ERR COUNTER TO INCRIMENT  %s  " % coutr_to_incr_name )
+        print("ERR COUNTER TO INCRIMENT   %s " % coutr_to_incr_count)
+    
+    
+        cmdrtn = anturlar.fos_cmd("mapsdb --show all")
+        liabhar.JustSleep(10)   
+        
+        
    
    
     

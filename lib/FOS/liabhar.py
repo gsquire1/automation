@@ -363,6 +363,15 @@ def random_number():
     n = random.random() #### random.randrange also
     return n
 
+def random_number_int(x):
+    """
+    returns a random interger between 0 and the number passed in
+    
+    """
+    my_int = random_number() * x
+    y = round(my_int) - 0.5
+    y = int(y) + (y>0)
+    return(y)
 
 def space(a=8):
     """
