@@ -1242,44 +1242,71 @@ def tc_01_01_06_07():
     bld_map = cofra.bladeportmap_Info(slot_numb)
     print("\n\n\nBLADEPORTMAP INFO \n")
     
-    #### count the number of ports that are in_sync
-    count_in_synce = 0
+    #### create a list of only in_sync ports
+    #count_in_synce = 0
+    in_sync_ports = []
     for i in bld_map:
         if "In_Sync" in (i[12]):
-            count_in_synce += 1
+            
+            in_sync_ports.append(i)
     
+    
+    ###########################################################################
+    ###########################################################################
     cont = 0
     
-    while cont <= 10000:
+    while cont <= 1000:
         cont +=1
-        ####  pick a port randomly
-        port_to_add_err = ((liabhar.random_number_int(count_in_synce)))
+        
+        ####  pick a port randomly 
+        port_to_add_err = ((liabhar.random_number_int(float(len(in_sync_ports))))) - 1
+        print("\n\nPORT NUMBER TO ADD  %s  \n\n" % port_to_add_err)
+        print("THE LENGTH OF the PORT LIST  %s   \n\n" % len(in_sync_ports))
         #### pick and err type randomly
-        pck_rndm_err = ((liabhar.random_number_int(12)))
+        multiplier = float(12) #### even though we are picking a number that is
+        #### an integer the multiplier has to be a float 
+        pck_rndm_err = ((liabhar.random_number_int(multiplier))) - 1
+        #### from the list of in_sync ports get the port that cooresponds
+        #### to the number    i = in_sync_port[port_to_add_err]
+        i = in_sync_ports[port_to_add_err]
         chip_numb = i[8]
         chip_id = i[11]
         chip_port = i[4]
         port_in_sync = i[12]
         usr_port = i[1]
+        #### some debug info
         print("\n\n\n")
         print("="*80)
         print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
         print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
         print("@"*80)
-        
-        
-        
-        
         ####  get the port error list
         port_los_error = cofra.PortStats()
         coutr_to_incr_name = port_los_error[pck_rndm_err][0]
+        #coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
+
         try:
             coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
-            coutr_to_incr_count += 5
-        except TypeError:
-            ras_count = re.compile('([\.\d+])([gkmt])')
+            coutr_to_incr_count = coutr_to_incr_count + 5
+            coutr_to_incr_count += 1000
+        except ValueError:
+            #ras_count = re.compile('([\.\d+])([gkmt])')
+            #ras_count = ras_count.findall(coutr_to_incr_count)
+        
+            #print(ras_count)
+            coutr_to_incr_count = port_los_error[pck_rndm_err][1]
+            print("counter value is  %s  " % coutr_to_incr_count)
+            ras_count = re.compile('([\.\d]+)([gkmt])')
             ras_count = ras_count.findall(coutr_to_incr_count)
-            coutr_to_incr_count = float(ras_count*10)
+            print("ras count is  %s  " % ras_count )
+            print(type(ras_count))
+            current_count = float(ras_count[0])
+            print("\n\nCURRENT_COUNT  %s   " % current_count)
+            print(type(current_count))
+            coutr_to_incr_count = (float(ras_count[0])*10.0)
+            print("\n\n  %s    \n\n" % coutr_to_incr_count)
+            sys.exit
+            coutr_to_incr_count = str(coutr_to_incr_count)
             
         #### configure the db command
         ####   db [slot/chip] stats set [chipport] [counter] [value]
