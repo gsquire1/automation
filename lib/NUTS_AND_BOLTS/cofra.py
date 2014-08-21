@@ -24,6 +24,7 @@ def bladeportmap_Info(blade = 0):
     return(ras)
 
 
+
 def PortStats(counter="all", port_list = "all"):
     """
     PortStats Values
@@ -38,9 +39,9 @@ def PortStats(counter="all", port_list = "all"):
     
     #### set the list of counters to get for each port
     if "all" in counter:
-        counter_list = ['los', 'lol', 'losig', 'c3to_tx', 'c3to_rx', 'proto',\
-                        'crc', 'lr_out', 'lr_in', 'enc_out', 'enc_in',\
-                        'c3discard', 'pcserr', 'statechange' ]
+        counter_list = ['los', 'lol', 'losig', 'swtxto', 'swrxto', 'proto',\
+                        'crc', 'lrout', 'lrin', 'encout', 'encin',\
+                        'c3to', 'pcserr', 'statechange' ]
     else:
         counter_list = counter
         
@@ -52,13 +53,13 @@ def PortStats(counter="all", port_list = "all"):
     losig_count      = ["losig"]
     c3to_tx_count    = ['c3to_tx']
     c3to_rx_count    = ['c3to_rx']
-    c3_discard_count = ['c3discard']
+    c3_discard_count = ['c3to']
     proto_count      = ['proto']
     crc_geof_count   = ['crc']
-    lr_out_count     = ['lr_out']
-    lr_in_count      = ['lr_in']
-    enc_out_count    = ['enc_our']
-    enc_in_count     = ['enc_in']
+    lr_out_count     = ['lrout']
+    lr_in_count      = ['lrin']
+    enc_out_count    = ['encout']
+    enc_in_count     = ['encin']
     pcserr_count     = ['pcserr']
     st_change_count  = ['statechange']
 
@@ -94,11 +95,11 @@ def PortStats(counter="all", port_list = "all"):
         print("\nvalue of i is  %s " % i)      
         #### start of portshow command 
         
-        if i in 'lol' :
+        if i == 'lol' :
             los_count.append(ras_intr_link_fail[0][1])
             counter_list_capture.append(los_count)
 
-        elif i in 'los':
+        elif i == 'los':
             lol_count.append(ras_unknown_loss_sync[0][1])
             counter_list_capture.append(lol_count)
 
@@ -110,11 +111,11 @@ def PortStats(counter="all", port_list = "all"):
             proto_count.append(ras_proc_protoc_err[0][1])
             counter_list_capture.append(proto_count)           
             
-        elif i in "lr_out":
+        elif i in "lrout":
             lr_out_count.append(ras_Suspend_lr_out[0][1])
             counter_list_capture.append(lr_out_count)
             
-        elif i in "lr_in":
+        elif i in "lrin":
             lr_in_count.append(ras_Overrun_lr_in[0][1])
             counter_list_capture.append(lr_in_count)
             
@@ -124,7 +125,7 @@ def PortStats(counter="all", port_list = "all"):
         
         ####  start of porterrshow command
         
-        elif i in 'crc':
+        elif i == 'crc':
             crc_geof_count.append(ras_porterrshow[0][4])
             counter_list_capture.append(crc_geof_count)
         
@@ -136,15 +137,15 @@ def PortStats(counter="all", port_list = "all"):
             c3to_rx_count.append(ras_porterrshow[0][16])
             counter_list_capture.append(c3to_rx_count)
             
-        elif i == 'c3discard':
+        elif i == 'c3to':
             c3_discard_count.append(ras_porterrshow[0][9])
             counter_list_capture.append(c3_discard_count)
         
-        elif i in 'enc_in':
+        elif i in 'encin':
             enc_in_count.append(ras_porterrshow[0][2])
             counter_list_capture.append(enc_in_count)
             
-        elif i in 'enc_in':
+        elif i in 'encout':
             enc_out_count.append(ras_porterrshow[0][8])
             counter_list_capture.append(enc_out_count)
         
