@@ -1252,6 +1252,9 @@ class configSwitch(SwitchInfo):
              
     
 class FcrConfig(SwitchInfo, FabricInfo):
+    """
+    Class for FCR functions etc.
+    """
     
     def __init__(self):
         SwitchInfo.__init__(self)
