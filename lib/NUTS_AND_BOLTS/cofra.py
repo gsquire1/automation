@@ -51,8 +51,8 @@ def PortStats(counter="all", port_list = "all"):
     los_count        = ["los"]
     lol_count        = ["lol"]
     losig_count      = ["losig"]
-    c3to_tx_count    = ['c3to_tx']
-    c3to_rx_count    = ['c3to_rx']
+    c3to_tx_count    = ['swtxto']
+    c3to_rx_count    = ['swrxto']
     c3_discard_count = ['c3to']
     proto_count      = ['proto']
     crc_geof_count   = ['crc']
@@ -129,11 +129,11 @@ def PortStats(counter="all", port_list = "all"):
             crc_geof_count.append(ras_porterrshow[0][4])
             counter_list_capture.append(crc_geof_count)
         
-        elif i == 'c3to_tx':
+        elif i == 'swtxto':
             c3to_tx_count.append(ras_porterrshow[0][15])
             counter_list_capture.append(c3to_tx_count)
         
-        elif i == 'c3to_rx':
+        elif i == 'swrxto':
             c3to_rx_count.append(ras_porterrshow[0][16])
             counter_list_capture.append(c3to_rx_count)
             

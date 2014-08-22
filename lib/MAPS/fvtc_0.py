@@ -1255,7 +1255,7 @@ def tc_01_01_06_07():
     ###########################################################################
     cont = 0
     
-    while cont <= 1000:
+    while cont <= 100000:
         cont +=1
         
         ####  pick a port randomly 
@@ -1287,8 +1287,10 @@ def tc_01_01_06_07():
 
         try:
             coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
-            coutr_to_incr_count = coutr_to_incr_count + 5
-            coutr_to_incr_count += 1000
+            add_this = liabhar.random_number_int(25)
+            #coutr_to_incr_count = coutr_to_incr_count + 3
+            #coutr_to_incr_count += 21
+            coutr_to_incr_count += add_this
         except ValueError:
             #ras_count = re.compile('([\.\d+])([gkmt])')
             #ras_count = ras_count.findall(coutr_to_incr_count)
@@ -1300,14 +1302,31 @@ def tc_01_01_06_07():
             ras_count = ras_count.findall(coutr_to_incr_count)
             print("ras count is  %s  " % ras_count )
             print(type(ras_count))
-            current_count = float(ras_count[0])
+            current_count = ras_count[0][0]
+            current_multiplyer = ras_count[0][1]
+
             print("\n\nCURRENT_COUNT  %s   " % current_count)
             print(type(current_count))
-            coutr_to_incr_count = (float(ras_count[0])*10.0)
-            print("\n\n  %s    \n\n" % coutr_to_incr_count)
-            sys.exit
-            coutr_to_incr_count = str(coutr_to_incr_count)
             
+            current_count = float(current_count)
+            print("\n\nCURRENT_COUNT  %s   " % current_count)
+            print(type(current_count))
+            #coutr_to_incr_count = ((current_count * 1001) + 1000)
+            #coutr_to_incr_count = (float(ras_count[0])*10.0)
+            print("\n\nNEW COUNTER VALUE IS   %s    \n\n" % coutr_to_incr_count)
+            
+            if 'k' in current_multiplyer:
+                print('K is the multiplyer ')
+                coutr_to_incr_count = ((current_count * 1001) + 1000)
+            
+            elif 'm' in current_multiplyer:
+                coutr_to_incr_count = ((current_count * 10001) + 10000 )
+            
+            else:
+                coutr_to_incr_count = 1
+                
+            coutr_to_incr_count = int(coutr_to_incr_count)
+
         #### configure the db command
         ####   db [slot/chip] stats set [chipport] [counter] [value]
         db_cmd = "db %s/%s stats set %s %s %s" % (slot_numb, chip_numb, \
@@ -1338,7 +1357,7 @@ def tc_01_01_06_07():
         cmdrtn = anturlar.fos_cmd("mapsdb --show all")
         liabhar.JustSleep(10)   
         
-        
+###############################################################################        
    
    
     
