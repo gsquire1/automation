@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 import datetime
@@ -22,7 +22,7 @@ def bladeportmap_Info(blade = 0):
     
     
     return(ras)
-
+###############################################################################
 
 
 def PortStats(counter="all", port_list = "all"):
@@ -31,9 +31,22 @@ def PortStats(counter="all", port_list = "all"):
         los         --  Loss of Sync 
         lol         --  Link Failure
         losig       --  Loss of Signal
-        
-        
+        swtxto      --  switch tx timeout
+        swrxto      --  switch rx timeout
+        proto       --  protocal error
+        crc         --  crc with g_eof
+        lrout       --  link reset out
+        lrin        --  link reset in
+        encout      --  encoding out error
+        encin       --  encoding in error
+        c3to        --  c3 timeout discard
+        pcserr      --  pcs error ( ITW errors )
+        statechange --  statechange
         txcrd_zero  --  Port TX credit zero
+        
+        A list of all the Port Stats Values will be return by default
+        or the counter value can be passed from the list above
+        the port_list will return all ports unless pass 
         
     """
     
@@ -157,22 +170,5 @@ def PortStats(counter="all", port_list = "all"):
             pass
             
     return(counter_list_capture)
+###############################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
