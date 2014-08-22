@@ -4,7 +4,9 @@
 #### Home location is
 ####
 ###############################################################################
-
+"""
+FCR 1st test case module
+"""
 
 import anturlar
 import liabhar
@@ -21,14 +23,12 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 function_name
                                 
 """
-def my_first_test_case():
+def fab_wide_proxy_device_numbers():
     """
     Retrieve proxy device numbers on all backbone switches
     """
-    print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
+    #print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
     fcrinfo = anturlar.FcrConfig()
-    
-    #fi = anturlar.FabricInfo
     sw_basic_info = fcrinfo.initial_checks()
     print('\n\n'+ '='*20)
     print("FCR enabled :  %s" % sw_basic_info[0])
@@ -58,15 +58,11 @@ def my_first_test_case():
         else:
             get_proxy = fcrinfo.fcr_proxy_dev()
             all_ips.extend(get_proxy)
-        #all_proxy = (set(all_ips))
-        #print('ALLLLLLPPPPRRROOOOOOOXXXXYYYYYY')
-    #print(all_ips)
+
     proxy_dev = (str(all_ips))
-    f = ('logs/configs/ProxyDev_Count.txt')
+    f = ('logs/ProxyDev_Count.txt')
     ff = liabhar.FileStuff(f,'w+b') ###open new file or clobber old
-    #header = "%s%s%s%s" % ("\nLICENSE FILE \n", ip+"\n" , sw_name, "\n==============================\n\n")
-    #cons_out = fos_cmd("licenseshow")
-    ff.write(ip)
+    ff.write(proxy_dev)
     #ff.write(cons_out+"\n")
     ff.close()
     print(proxy_dev)
