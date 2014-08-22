@@ -127,7 +127,7 @@ def main():
     ####          the file is in logs/config or logs  still open question      ####
     ###############################################################################  
     #suite_name = pa.suite
-    cw_config_file_name = "%s%s%s"%("logs/configs/",pa.suite,".txt")
+    cw_config_file_name = "%s%s%s"%("ini/",pa.suite,".txt")
     fileIN = open( cw_config_file_name, 'rb')
     testcaselist = []
     print("Running the following Test Cases")
