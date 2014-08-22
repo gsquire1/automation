@@ -25,14 +25,27 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
+def tc_01_01_01_01():
+    """
+    Test Case   25.01.01.01.02
+    Title:      MAPS switch View via Web Tools
+    Feature     MAPS availability in Web Tools
+    Confirm MAPS switch view is available when a license is not installed
+    
+    Note: currently not automated
+    
+    """
+    print("at this time there this test case is not automated")
+    
+    return(0)
+###############################################################################
 
 def tc_01_01_01_02():
     """
-        Test Case   25.01.01.01.02
-        Title:      MAPS commands available with a license
-        Feature:    MAPS CLI
-        Confirm MAPS CLI function correctly with and without a license
-        installed
+    Test Case   25.01.01.01.02
+    Title:      MAPS commands available with a license
+    Feature:    MAPS CLI
+    Confirm MAPS CLI function correctly with and without a license installed
         
     """
     ###########################################################################
@@ -133,10 +146,10 @@ def tc_01_01_01_02():
 
 def tc_01_01_03_01():
     """
-        Test Case   25.01.01.03.01
-        Title:      MAPS Category Management Default thresholds
-        Feature:    MAPS 
-        Confirm MAPS default thresholds are set correctly
+    Test Case   25.01.01.03.01
+    Title:      MAPS Category Management Default thresholds
+    Feature:    MAPS 
+    Confirm MAPS default thresholds are set correctly
         
     """
     ###########################################################################
@@ -156,7 +169,7 @@ def tc_01_01_03_01():
     ####  3. compare the list
     ####  4. return any diffence as a failure
     ####
-    
+    ####
     #### start the test
     test_result = ""
     
