@@ -5,7 +5,7 @@
 ####
 ###############################################################################
 """
-FCR 1st test case module
+FCR 1st Test Case Module
 """
 
 import anturlar
@@ -25,16 +25,16 @@ GLOBAL_CONSTANT_NAME            ClassName
 """
 def fab_wide_proxy_device_numbers():
     """
-    Retrieve proxy device numbers on all backbone switches
+    Retrieve number of proxy device on all backbone switches in fabric.
     """
     #print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
     fcrinfo = anturlar.FcrConfig()
-    sw_basic_info = fcrinfo.initial_checks()
+    initial_checks = fcrinfo.sw_basic_info()
     print('\n\n'+ '='*20)
-    print("FCR enabled :  %s" % sw_basic_info[0])
-    print("Chassis :  %s" % sw_basic_info[1])
-    print("VF enabled :  %s" % sw_basic_info[2])
-    print("Base configured :  %s" % sw_basic_info[3])
+    print("FCR enabled :  %s" % initial_checks[0])
+    print("Chassis :  %s" % initial_checks[1])
+    print("VF enabled :  %s" % initial_checks[2])
+    print("Base configured :  %s" % initial_checks[3])
     print('='*20 + '\n\n')
     
     backbone_ip = fcrinfo.fcr_backbone_ip()
@@ -68,13 +68,7 @@ def fab_wide_proxy_device_numbers():
     print(proxy_dev)
     return(proxy_dev)
 
-    #f = "%s%s%s"%("logs/Switch_Licenses/License_File_", sw_name ,".txt")
-    #ff = liabhar.FileStuff(f,'a+b') ###open new file or clobber old
-    #header = "%s%s%s%s" % ("\nLICENSE FILE \n", ip+"\n" , sw_name, "\n==============================\n\n")
-    #cons_out = fos_cmd("licenseshow")
-    #ff.write(header)
-    #ff.write(cons_out+"\n")
-    #ff.close()       
+      
 
 def fcr_status():
     """
@@ -84,14 +78,15 @@ def fcr_status():
         2) VF or not
         3) Base Configured
     """
-    sw_basic_info = fcrinfo.initial_checks()
+    fcrinfo = anturlar.FcrConfig()
+    initial_checks = fcrinfo.sw_basic_info()
     print('\n\n'+ '='*20)
-    print("FCR enabled :  %s" % sw_basic_info[0])
-    print("Chassis :  %s" % sw_basic_info[1])
-    print("VF enabled :  %s" % sw_basic_info[2])
-    print("Base configured :  %s" % sw_basic_info[3])
+    print("FCR enabled :  %s" % initial_checks[0])
+    print("Chassis :  %s" % initial_checks[1])
+    print("VF enabled :  %s" % initial_checks[2])
+    print("Base configured :  %s" % initial_checks[3])
     print('='*20 + '\n\n')
-    a = fcrinfo.get_licenses()
+    #a = fcrinfo.get_licenses()
 
 def get_fabwide_ip():
     fcrcfg = anturlar.FcrConfig()

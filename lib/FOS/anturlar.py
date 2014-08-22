@@ -1253,7 +1253,7 @@ class configSwitch(SwitchInfo):
     
 class FcrConfig(SwitchInfo, FabricInfo):
     """
-    Class for FCR functions etc. Doc strings need to be added for dome of the functions.
+    Class for FCR functions etc. Doc strings need to be added for some of the functions.
     """
     
     def __init__(self):
@@ -1291,7 +1291,7 @@ class FcrConfig(SwitchInfo, FabricInfo):
         """
          
         fcrcfg = FcrConfig()
-        fcrstatus = self.initial_checks()
+        fcrstatus = self.sw_basic_info()
         if fcrstatus[3] is not False:  # Test if base config'd and if so
             base = fcrcfg.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
@@ -1309,7 +1309,7 @@ class FcrConfig(SwitchInfo, FabricInfo):
         """
          
         fcrcfg = FcrConfig()
-        fcrstatus = self.initial_checks()
+        fcrstatus = self.sw_basic_info()
         if fcrstatus[3] is not False:  # Test if base config'd and if so
             base = fcrcfg.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
@@ -1344,7 +1344,7 @@ class FcrConfig(SwitchInfo, FabricInfo):
         #print('DEVICEDEVICEDEVICE')
         #print(device_number)
         return(device_number)
-
+    
 
     def get_licenses(self):
         ip_list = self.fcr_fab_wide_ip()
@@ -1361,7 +1361,7 @@ class FcrConfig(SwitchInfo, FabricInfo):
             ff.close()
 
 
-    def initial_checks(self):
+    def sw_basic_info(self):
         """
             Retrieve FCR fabric and return info. Variable #'s:
             0) FCR Enabled
@@ -1374,12 +1374,6 @@ class FcrConfig(SwitchInfo, FabricInfo):
         director = self.director()
         vf = self.vf_enabled()
         base = self.base_check()
-        #print('\n\n'+ '='*20)
-        #print('FCR Enabled: %s\n' % fcr)
-        #print('Chassis or Pizzabox: %s\n' % director)
-        #print('VF enabled: %s\n' % vf)
-        #print('Base configured: %s\n' % base)
-        #print('='*20)
         return [fcr, director, vf, base]
 
     def ipv4_fcr(self):
@@ -1412,10 +1406,7 @@ class FcrConfig(SwitchInfo, FabricInfo):
         if not ras_result_all:
             ras_result_all = None
         return ras_result_all 
-    
-    
-    def name1(self, ):
-        pass
+
     
     def portcfgfillword(self, cfgvalue):
         """
