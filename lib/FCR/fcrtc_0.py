@@ -99,8 +99,12 @@ def ex_slots_find():
     Find slots that contain EX ports and return slot number(s).
     """
     fcri = anturlar.FcrConfig()
-    port_list = fcri.ex_ports()
+    port_list = fcri.vex_ports()
+    port_list2 = fcri.ex_ports()
+    port_list3 = fcri.disabled_ports()
     print(port_list)
+    print(port_list2)
+    print(port_list3)
     sys.exit(0)
     if self.am_i_director:
        for i in portlist:

@@ -294,11 +294,11 @@ class SwitchInfo:
         #print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP\n\n")
         if self.am_i_director :
             #ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+(FC)\s+([->\w]{6,8})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s*([->\w]{6,8})([()-:\"_\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,8})([()-:\"_=\w\s\d]*?(?=\\n))')
         else:
-            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')  
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s*([->\w]{6,14})([()-:\"_\w\s\d]*?(?=\\n))')
+            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+[FCVE]\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')  
+            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
     
@@ -582,6 +582,12 @@ class SwitchInfo:
         `   Return a list of the EX-ports in the current FID
         """
         return(self.__getportlist__("EX-Port"))
+    
+    def vex_ports(self):
+        """
+        `   Return a list of the VEX-ports in the current FID
+        """
+        return(self.__getportlist__("VEX-Port"))
       
     def d_ports(self):
         """
