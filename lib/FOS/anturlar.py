@@ -1262,12 +1262,12 @@ class FcrConfig(SwitchInfo, FabricInfo):
     
     def ex_cleanup(self):
         """
-            
+        Find all Ex-Ports on either director or pizzabox and deconfigure    
         """
         fos_cmd("switchdisable")
         portlist =  self.all_ports()
         if self.am_i_director:
-           for i in portlist:
+            for i in portlist:
                 slot = i[0]
                 port = i[1]
                 pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
@@ -1285,9 +1285,36 @@ class FcrConfig(SwitchInfo, FabricInfo):
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
     
+    def slots_with_ex_ports(self):
+        """
+        Find slots that contain EX ports and return slot number(s).
+        """
+        #fos_cmd("switchshow | grep EX")
+        portlist =  self.ex_ports()
+        print(portlist)
+        sys.exit(0)
+        if self.am_i_director:
+           for i in portlist:
+                slot = i[0]
+                port = i[1]
+                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
+                ex = pattern.search(cmd)
+                if ex:
+                    fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2") )
+        else: 
+            for i in portlist:
+                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                cmd = fos_cmd("portcfgshow %a" % i)
+                ex = pattern.search(cmd)
+                if ex:
+                    fos_cmd("portcfgexport "+i+" -a2")
+            cmd_cap = fos_cmd("switchenable")        
+            return(cmd_cap)
+    
     def fcr_backbone_ip(self):
         """
-            Runs fabricshow against backbone switches in a fabric to determine all IPs 
+        Runs fabricshow against backbone switches in a fabric to determine all IPs 
         """
          
         fcrcfg = FcrConfig()

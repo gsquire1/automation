@@ -27,16 +27,16 @@ def fab_wide_proxy_device_numbers():
     """
     Retrieve number of proxy device on all backbone switches in fabric.
     """
-    #print('\n\n\nIN MY FIRST TEST CASE\n\n\n')
+
+    #fcrinfo = anturlar.FcrConfig()
+    #initial_checks = fcrinfo.sw_basic_info()
+    #print('\n\n'+ '='*20)
+    #print("FCR enabled :  %s" % initial_checks[0])
+    #print("Chassis :  %s" % initial_checks[1])
+    #print("VF enabled :  %s" % initial_checks[2])
+    #print("Base configured :  %s" % initial_checks[3])
+    #print('='*20 + '\n\n')
     fcrinfo = anturlar.FcrConfig()
-    initial_checks = fcrinfo.sw_basic_info()
-    print('\n\n'+ '='*20)
-    print("FCR enabled :  %s" % initial_checks[0])
-    print("Chassis :  %s" % initial_checks[1])
-    print("VF enabled :  %s" % initial_checks[2])
-    print("Base configured :  %s" % initial_checks[3])
-    print('='*20 + '\n\n')
-    
     backbone_ip = fcrinfo.fcr_backbone_ip()
     print('\n\n'+ '='*20)
     bb_fab = (len(backbone_ip))
@@ -67,10 +67,9 @@ def fab_wide_proxy_device_numbers():
     ff.close()
     print(proxy_dev)
     return(proxy_dev)
+    
 
-      
-
-def fcr_status():
+def switch_status():
     """
         Retrieve basic switch info. sys.arg(0),sys.arg(1) etc. :
         0) FCR Enabled
@@ -86,6 +85,7 @@ def fcr_status():
     print("VF enabled :  %s" % initial_checks[2])
     print("Base configured :  %s" % initial_checks[3])
     print('='*20 + '\n\n')
+    return (initial_checks)
     #a = fcrinfo.get_licenses()
 
 def get_fabwide_ip():
@@ -94,7 +94,33 @@ def get_fabwide_ip():
     print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
     return(fab_ip_list)
 
-  
+def ex_slots_find():
+    """
+    Find slots that contain EX ports and return slot number(s).
+    """
+    fcri = anturlar.FcrConfig()
+    port_list = fcri.ex_ports()
+    print(port_list)
+    sys.exit(0)
+    if self.am_i_director:
+       for i in portlist:
+            slot = i[0]
+            port = i[1]
+            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+            cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
+            ex = pattern.search(cmd)
+            if ex:
+                fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2") )
+    else: 
+        for i in portlist:
+            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+            cmd = fos_cmd("portcfgshow %a" % i)
+            ex = pattern.search(cmd)
+            if ex:
+                fos_cmd("portcfgexport "+i+" -a2")
+        cmd_cap = fos_cmd("switchenable")        
+        return(cmd_cap)
+        
 def change_fid(fid):
     """
         change a fid on a switch
