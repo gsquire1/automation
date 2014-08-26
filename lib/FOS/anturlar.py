@@ -372,21 +372,30 @@ class SwitchInfo:
         for i in capture_cmd_split:
             if i[location] == porttype:
                 #### port_list.append(i[0])
-                slot_port_list = []
-                slot_port_list.append(int(i[1]))
+                #slot_port_list = []
+                #slot_port_list.append(int(i[1]))
                 if self.am_i_director:
-                    slot_port_list.append(int(i[2]))
+                    #slot_port_list.append(int(i[2]))
+                    slot_port_list = [int(i[1]), int(i[2])]
+                #port_list.append(s_p)
+                else:
+                    slot_port_list = [0, int(i[1])]
                 port_list.append(slot_port_list)
+                 
                  
             if porttype == "Persistent":
                 try:
                     if "rsistent" in i[persist_local]:
                         ####port_list.append(i[0])
-                        slot_port_list = []
-                        slot_port_list.append(int(i[1]))
+                        #slot_port_list = []
+                        #slot_port_list.append(int(i[1]))
                         if self.am_i_director:
-                            slot_port_list.append(int(i[2]))
+                            #slot_port_list.append(int(i[2]))
+                            slot_port_list = [int(i[1]), int(i[2])]
+                        else:
+                            slot_port_list = [0, int(i[1])]
                         port_list.append(slot_port_list)
+                        
                 except UnboundLocalError:
                     print("unboundlocalerror - moving on  ")
                     pass
@@ -417,8 +426,8 @@ class SwitchInfo:
             ras = re.compile('(?:\n\s+?\d+\s{0,3})(\d{0,3})')
             ras = ras.findall(capture_cmd)
             for i in ras:
-                prt = []
-                prt.append(int(i))
+                prt = [0, int(i)]
+                #prt.append(int(i))
                 ras_list.append(prt)
                  
             return(ras_list)
@@ -447,11 +456,11 @@ class SwitchInfo:
             ras = re.compile('\s?\d{1,2}\s+(\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN24816G]{2,3}\s+\w+\s+[FC]{2}') 
             ras = ras.findall(capture_cmd)
             for i in ras:
-                prt = []
-                prt.append(int(i))
+                prt = [0, int(i)]
+                #prt.append(int(i))
                 ras_list.append(prt)
                  
-            return(ras)
+            return(ras_list)
         
         return("none")
     
@@ -713,10 +722,15 @@ class SwitchInfo:
         count4 = 0
         count10 = 0
         count_other = 0
+        #print("\n\n\n\n")
+        #print(all_ports)
+        #print("@"*80)
+        
         for i in all_ports:
-            #ras = ""
+            
             slot = i[0]
             port = i[1]
+                
             capture_cmd = fos_cmd("sfpshow %s/%s " % (slot,port))
             ras = re.compile('(\d{1,2}(?=_G))')
             #ras = re.compile('Transceiver:\s+[\d\w]{16}\s+[,\d]?(\d{1,2}(?=_))')
@@ -730,11 +744,13 @@ class SwitchInfo:
             #print("\n\n\n\n")
             
             if ras != []:
-                print("\n\nSETTING THE SDFINFO info  \n")
-                print("with slot port speed %s  %s   %s : " % (slot, port, sfp_speed))
+                #print("\n\nSETTING THE SDFINFO info  \n")
+                #print("with slot port speed %s  %s   %s : " % (slot, port, sfp_speed))
                 sfp_speed = int(ras[0])
                 sfp_combine = [slot,port,sfp_speed]
                 sfpinfo.append(sfp_combine)
+                #print("\n\nSETTING THE SDFINFO info  \n")
+                #print("with slot port speed %s  %s   %s : " % (slot, port, sfp_speed))
                    
         sfp_combine = ""
         for i in sfpinfo:
@@ -750,7 +766,7 @@ class SwitchInfo:
             else:
                 count_other +=1
             
-        sfpinfo_summary = ["total", sfp_count, 16, count16, 8, count8, 4, count4, 10, count10, "other", count_other]
+        sfpinfo_summary = ["total sfp count = ", sfp_count, 16, count16, 8, count8, 4, count4, 10, count10, "other", count_other]
         
         
         
@@ -1553,6 +1569,7 @@ class Maps(SwitchInfo):
         """
             return the count for the line group passed for any of the following
             
+            ALL_PORTS
             ALL_F_PORTS         ALL_OTHER_F_PORTS       ALL_HOST_PORTS    
             ALL_TARGET_PORTS    ALL_TS                  ALL_FAN        
             ALL_PS              ALL_WWN                 ALL_SFP        
@@ -1568,15 +1585,17 @@ class Maps(SwitchInfo):
             
         #ras = re.compile("(ALL_SW_BLADES)\s+(?:\|)(Yes)\s+\|(Blade)\s+(?:\|)([0-9])\s+(?:\|)([,0-9])")
         ras = re.compile("(%s)\s+\|Yes\s+\|[ \w]+\|([0-9]+)" % group)    
-        ras = ras.search(capture_cmd)
-        
+        #ras = ras.search(capture_cmd)
+        ras = ras.findall(capture_cmd)
         if not ras:
             value = "-1"
         else:
+            print("\nTHIS IS RAS  \n")
             print(ras)
-            print(ras.group())
-        
-            value = ras.group()
+            print("\nTHIS IS RAS GROUP \n")
+            print(ras[0][1])
+                   
+            value = ras[0][1]
         return(value)
 
     def cpu_usage(self):
@@ -1646,20 +1665,49 @@ class Maps(SwitchInfo):
            and average temp of the switch using the tempshow command
            
         """
-        capture_cmd = fos_cmd("tempshow")
+        #capture_cmd = fos_cmd("tempshow")
+        #
+        #ras = re.compile("\d+\s+\w+\s+\d+\s+\d+")
+        #ras = ras.findall(capture_cmd)
+        #ras_str = str(ras)
+        #ras_str = ras_str.replace("\\t"," ")
+        #ras_str = ras_str.replace("'", "")
+        #ras_str = ras_str.replace("[", "")
+        #ras_str = ras_str.replace("]", "")
+        ##ras_str = ras_str.replace(" ", "")
+        #ras_final = " ".join(ras_str.split())
+        #
+        #ras_final = ras_final.split()
         
-        ras = re.compile("\d+\s+\w+\s+\d+\s+\d+")
-        ras = ras.findall(capture_cmd)
-        ras_str = str(ras)
-        ras_str = ras_str.replace("\\t"," ")
-        ras_str = ras_str.replace("'", "")
-        ras_str = ras_str.replace("[", "")
-        ras_str = ras_str.replace("]", "")
-        #ras_str = ras_str.replace(" ", "")
-        ras_final = " ".join(ras_str.split())
+        tempsensor_list = self.temp_sensors()
         
-        ras_final = ras_final.split()
-        return(ras_final[2])
+        highside = -1
+        lowside = 999
+        average = -1
+        count = 0
+        total = 0
+        
+        if self.am_i_director:
+            for i in tempsensor_list:
+                if int(i[3]) > highside:
+                    highside = int(i[3]) 
+                if int(i[3]) < lowside:
+                    lowside = int(i[3])
+                count = count + 1
+                total = total + int(i[3])
+        else:
+            for i in tempsensor_list:
+                if int(i[2]) > highside:
+                    highside = int(i[2]) 
+                if int(i[2]) < lowside:
+                    lowside = int(i[2])
+                count = count + 1
+                total = total + int(i[3])
+             
+        average = total / count
+        high_low_average = [ highside, lowside, average]
+        
+        return(high_low_average)
     
         
     def mem_usage(self):
