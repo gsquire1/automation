@@ -194,7 +194,7 @@ def tc_01_01_03_01():
     rule_differ = 0
     while i < loop_count:
         print("\n\ncomparing switch rule with default rule ")
-        #print("%s      %s " % (sw_rules[i], df_rules[i]))
+        print("%s      %s " % (sw_rules[i], i ))
         if sw_rules[i] not in df_rules:
             rule_differ += 1
             test_result += sw_rules[i]
@@ -228,6 +228,7 @@ def tc_01_01_03_02():
     """
     ###########################################################################
     ####  todo -
+    ####    0.   pizza box
     ####    1.   E-Port 
     ####    2.   QSFP
     ####    3.   check all other category in the group
@@ -248,7 +249,8 @@ def tc_01_01_03_02():
     ####    d. WWN - ??
     ####
     #### 3. get each SFP type
-    ####    a. sfpshow - count the id (sw) and Speed that are 16 / 10 and not 16 / 10
+    ####    a. sfpshow - count the id (sw) and Speed that are 16 / 10
+    ####                 and not 16 / 10
     ####    b. Qsfp - count ??  maybe serial number ?
     ####
     #### 4. get each Blade type
@@ -306,7 +308,9 @@ def tc_01_01_03_02():
     t1 = len(blade_count)
     
     
-    t_fports = int(pgm.logicalgroup_count("ALL_PORTS"))
+    t_fports = (pgm.logicalgroup_count("ALL_PORTS"))
+    print("ALL PORTS IS  %s  " % t_fports)
+    
     t_ofports = int(pgm.logicalgroup_count("ALL_OTHER_F_PORTS"))
     t_hostports = int(pgm.logicalgroup_count("ALL_HOST_PORTS"))
     t_targetports = int(pgm.logicalgroup_count("ALL_TARGET_PORTS"))
@@ -493,7 +497,7 @@ def tc_01_01_05_01():
     temp_ras_message  = en.ras_message_search(temp_rule_in)
     cpu_ras_message   = en.ras_message_search(cpu_rule_name)
     
-    ####  see if there is a mapsdb entry for each rule
+    ####  see if there is a mapsdb entry for each r+= 1ule
     #mem_mapsdb_confirm = en.db_search(mem_rule_name)
     #mem_mapsdb_confirm = mem_mapsdb_confirm.replace("|","")
     #mem_confirm_final = mem_mapsdb_confirm.split(" ")
@@ -540,6 +544,7 @@ def tc_01_01_05_01():
     ####
     cpu_calc    = en.cpu_usage()
     temp_status = en.temp_status()
+     
     
     ###########################################################################
     ###########################################################################
@@ -568,17 +573,21 @@ def tc_01_01_05_01():
     print("flash  ras message is   :  %s  " % flash_ras_message)
     print("cpu    ras message is   :  %s  " % cpu_ras_message)
     print("temp   ras message is   :  %s  " % temp_ras_message)
+    print("="*80)
     print("memory db message is      :  %s  " % mem_confirm)
     print("flash  db message is      :  %s  " % flash_confirm)
     print("cpu    db message is      :  %s  " % cpu_confirm)
     print("temp   db message is      :  %s  " % temp_confirm)
     print("="*80)
+    print("="*80)
+
     print("SWITCH VALUES")
-    print("calculated memory usage   :  %s  " % mem_usage )
-    print("calculated flash usage    :  %s  " % flash_usage)
-    print("calculated switch CPU     :  %s  " % cpu_calc)
-    print("calculated Temp info      :  %s  " % temp_status)
+    print("calculated memory usage           :  %s  " % mem_usage )
+    print("calculated flash usage            :  %s  " % flash_usage)
+    print("calculated switch CPU             :  %s  " % cpu_calc)
+    print("Temp Sensor info high-low-avg     :  %s  " % temp_status)
     
+
     return()
 
 def tc_01_01_05_02():
@@ -705,11 +714,14 @@ def tc_01_01_05_02():
     
     anturlar.fos_cmd("porterrshow")
     
+    print("\n\n\n\n")
+    print("***   THIS TEST CASE AUTOMATION IS CONFIGURATION ONLY   ***")
+    print("\n\n")
     print("check for maps messages") 
-    print("wait here for the user to finish")
+    print("")
     
     print("use the db command to poke for one test, \
-          use the finisar for confirmation")
+           \nuse the finisar for confirmation")
     
     
     return()
@@ -825,6 +837,7 @@ def tc_01_01_05_03():
     for cmd in cmd_list:
         anturlar.fos_cmd(cmd)
     anturlar.fos_cmd("mapspolicy --enable %s " % fcip_health_policy)
+    cmdrtn = anturlar.fos_cmd("mapspolicy --show -summary")    
         
     #### setup the actions
     anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,SW_CRITICAL,SW_MARGINAL")
@@ -832,10 +845,12 @@ def tc_01_01_05_03():
     anturlar.fos_cmd("portshow fciptunnel ")
     anturlar.fos_cmd("portshow fcipcircuit ")
     
-    print("check for maps messages") 
-    print("wait here for the user to finish")
+    print("\n\n\n")
+    print("***   THIS TEST CASE AUTOMATION IS CONFIGURATION ONLY   ***")
+    print("\n\n")
     
-    print("use the db command to poke for one test, use the finisar for confirmation")
+    print("use Anue Systems Network test equipment to Trigger events")
+    print("\n\n")
     
     
     
@@ -943,12 +958,14 @@ def tc_01_01_05_04():
     
     anturlar.fos_cmd("mapsdb --show")
     
+    
+    print("\n\n\n\n")
+    print("***   THIS TEST CASE AUTOMATION IS CONFIGURATION ONLY   ***")
+    print("\n\n")
     print("check for maps messages") 
-    print("wait here for the user to finish")
+    print("")
     
-    print("use the db command to poke for one test, \
-          use the finisar for confirmation")
-    
+    print("Run Traffic and Confirm port usage \n\n\n")
     
     
     return()
@@ -1074,16 +1091,17 @@ def tc_01_01_05_05():
     else:
         print("use the first port found for now %s  " % eports[0][0])
     
-    
+    ###########################################################################
     #### for pizza box
+    ####
     
         x = 0
         while x <= 1:
             for p in eports:
                 x += 1
-                cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+                cmdrtn = anturlar.fos_cmd("portdisable %s/%s" % (p[0],p[1]))
                 cmdrtn = anturlar.fos_cmd("sleep 3")
-                cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+                cmdrtn = anturlar.fos_cmd("portenable %s/%s " % (p[0],p[1]))
                 cmdrtn = anturlar.fos_cmd("sleep 3")
                 
     ############################################################################
@@ -1092,12 +1110,14 @@ def tc_01_01_05_05():
     ####  when the ports are enabled the fabric will reconfigure
     ############################################################################
         for p in eports:
-            cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("portdisable %s/%s " % (p[0],p[1]))
         cmdrtn = anturlar.fos_cmd("sleep 10")
         
         for p in eports:
-            cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("portenable %s/%s " % (p[0],p[1]))
     cmdrtn = anturlar.fos_cmd("sleep 60")
+    
+    
     
     ############################################################################
     ####  DID conflict
@@ -1181,7 +1201,7 @@ def tc_01_01_05_05():
     #### add and remove a zone
     ############################################################################
     z=0
-    while z < 1:
+    while z < 3:
         z += 1
         anturlar.fos_cmd('zonecreate test_maps, "124,52;86,31"')
         anturlar.fos_cmd("cfgadd %s, test_maps" % myzone)
@@ -1201,21 +1221,21 @@ def tc_01_01_05_05():
     print(myzone)
     
     
-    anturlar.fos_cmd("sleep 60")
+    anturlar.fos_cmd("sleep 600")
     
     anturlar.fos_cmd("mapsdb --show")
-    print("\n\ncheck for maps messages") 
-    print("wait here for the user to finish")
-    
-    print("use the db command to poke for one test, \
-          use the finisar for confirmation")
     
     
-    
-    
-    
-    
-    
+    print("\n\n\n\n")
+    print("***   CONFIRM the MAPS OUTPUT in section 3.2   ***")
+    print("***                                            ***")
+    print("***   Domain Change                            ***")
+    print("***   Fabric config                            ***")
+    print("***   Zone Change                              ***")
+    print("***   State Change                             ***")
+    print("***   FLOGI                                    ***")
+    print("\n\n\n") 
+        
     
     return()
 ###############################################################################   
@@ -2197,14 +2217,13 @@ def mapscommand_list(options="0"):
              "mapsconfig --emailcfg smckie@brocade.com", \
              "mapsconfig --emailcfg ", \
              "mapsconfig --actions ", \
-             "mapsconfig --testmail -subject -message ", \
              "mapsconfig --import  ", \
              "mapsconfig --deimport ", \
              "mapsconfig --enablemaps ", \
              "mapsconfig --No_purge", \
              "mapsconfig -", \
-             "mapsconfig --enableFPImon", \
-             "mapsconfig --disableFPImon", \
+             #"mapsconfig --enableFPImon", \   #### commented out because it
+             #"mapsconfig --disableFPImon", \  #### is the correct command
              "mapsconfig --help", \
              "mapspolicy --create  ", \
              "mapspolicy --", \
@@ -2751,6 +2770,9 @@ def maps_default_rule():
             defALL_D_PORTSLOSS_SYNC_D1500           |RASLOG,SNMP,EMAIL            |ALL_D_PORTS(LOSS_SYNC/DAY>1500),\
             defALL_F_PORTS_IO_PERF_IMPACT           |RASLOG,SNMP,EMAIL            |ALL_F_PORTS(DEV_LATENCY_IMPACT/NONE==IO_PERF_IMPACT),\
             defALL_F_PORTS_IO_FRAME_LOSS            |RASLOG,SNMP,EMAIL            |ALL_F_PORTS(DEV_LATENCY_IMPACT/NONE==IO_FRAME_LOSS),\
+            defALL_F_PORTS_IO_FRAME_LOSS            |RASLOG,SNMP,EMAIL            |ALL_F_PORTS(DEV_LATENCY_IMPACT/NONE==IO_FRAME_LOSS) ,\
+            defCHASSISBAD_PWR_MARG                  |SW_MARGINAL,SNMP,EMAIL       |CHASSIS(BAD_PWR/NONE>=1),\
+            defCHASSISBAD_PWR_CRIT                  |SW_CRITICAL,SNMP,EMAIL       |CHASSIS(BAD_PWR/NONE>=2),\
         "
     
     return(l) 
