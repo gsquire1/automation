@@ -251,7 +251,6 @@ class FabricInfo:
         return(r_list)
     
     
-    
 class SwitchInfo:
     """
         A class to return information about a switch
@@ -282,23 +281,17 @@ class SwitchInfo:
         
     def __sw_show_info_all_ports__(self):
         """
-            capture switchshow info and each column with regex
+            capture switchshow info for ports (port types: F,E,EX,VEX and Disabled) and each column with regex
             return the index list of ports
         """
         capture_cmd = fos_cmd("switchshow")
-        #### this regex will catch all online ports except base port
-        #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+(\d+)\s+([0-9abcdef]{6})\s+([-id]{2})\s+([UNG12486]{2,3})\s+(Online)\s+(FC)\s+([-\w]{6,8})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-        #### this regex will catch all online ports including base port and loopback
-        #print("\n\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
-        #print(self.am_i_director)
-        #print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP\n\n")
         if self.am_i_director :
             #ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+(FC)\s+([->\w]{6,8})\s+([()-:\"_\w\s\d]*?(?=\\n))')
             ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,8})([()-:\"_=\w\s\d]*?(?=\\n))')
         else:
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+[FCVE]\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')  
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FGVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
     
@@ -328,7 +321,7 @@ class SwitchInfo:
         else:
             print("\n\n NO IP FOUND \n\n")
             return (0)
-         
+
     def __getblanklist__(self):
         """
             Find the ports that are blank 
@@ -349,8 +342,7 @@ class SwitchInfo:
             port_list.append(slot_port_list)
          
         return(port_list)
-        
-         
+
     def __getportlist__(self, porttype):
         """
         `   Return a list of the porttype passed in - in the current FID
@@ -464,7 +456,6 @@ class SwitchInfo:
         
         return("none")
     
-    
     def base_check(self):
         """
             Return Base FID if found
@@ -506,8 +497,7 @@ class SwitchInfo:
             return(ras)
         else:
             return("not a director")
-            
-    
+
     def blank_type(self):
         """
             Return a list of ports that do not have a port type
@@ -668,8 +658,7 @@ class SwitchInfo:
             return(ras)
         except:
             return(0)
-    
-    
+
     def n_ports(self):
         """
             Return a list of N-Ports in the current FID
@@ -677,15 +666,13 @@ class SwitchInfo:
         """
         return(self.__getportlist__("N-Port"))
     
-
-    
     def persistent_disabled_ports(self):
         """
             Return a list of disabled ports including Persistent disabled ports
             
         """
         return(self.__getportlist__("Persistent"))
-      
+
     def sensor_t_f_ps(self,sensor_type):
         """
             Return a list of temp sensors, Fan or Power Supply from
@@ -710,7 +697,7 @@ class SwitchInfo:
             ras = ras.findall(capture_cmd)
             
         return(ras)
-        
+
     def sfp_info(self,info_type="info"):
         """
             Return a list of sfp and the optic speed
@@ -785,12 +772,7 @@ class SwitchInfo:
             return(sfpinfo_detail)
         else:
             return(sfpinfo)
-        
-        
-        
-        
-        
-    
+
     def sim_ports(self, extended = True):
         """
             Return a list of the SIM ports in the current FID
@@ -815,7 +797,6 @@ class SwitchInfo:
                     extend_list.append(index_address)
                     index_address = []
             return(extend_list)
-    
     
     def switch_state(self):
         """
@@ -890,7 +871,6 @@ class SwitchInfo:
             
         return(ras)
     
-    
     def vf_enabled(self):
         """
             See if switch has vf enabled
@@ -907,8 +887,146 @@ class SwitchInfo:
         else:
             #print("\n\n\nVF is enabled on this switch\n\n\n")
             return (True)
-   
-   
+
+
+class FcipInfo(SwitchInfo, FabricInfo):
+    """
+        A class to return information about a switch
+    """
+    global tn
+    
+    def __init__(self):
+        SwitchInfo.__init__(self)
+        FabricInfo.__init__(self)
+        #self.__director__()
+        #self.online_ports = ""
+        #self.ipaddr =  self.__myIPaddr__()    
+        #a = self.__sw_show_info_all_ports__()
+        
+    def __getportlist__(self, porttype):
+        """
+           Return a list of the porttype passed in - in the current FID
+            
+        """
+        port_list = []
+        self.__sw_show_info_all_ports__()
+        capture_cmd_split = self.online_ports
+        ras_result = capture_cmd_split.count(porttype)
+        
+        if self.am_i_director:
+            location = 8
+        else:
+            location = 7
+            
+        persist_local = location
+        persist_local += 1
+            
+        for i in capture_cmd_split:
+            if i[location] == porttype:
+                #### port_list.append(i[0])
+                #slot_port_list = []
+                #slot_port_list.append(int(i[1]))
+                if self.am_i_director:
+                    #slot_port_list.append(int(i[2]))
+                    slot_port_list = [int(i[1]), int(i[2])]
+                #port_list.append(s_p)
+                else:
+                    slot_port_list = [0, int(i[1])]
+                port_list.append(slot_port_list)
+                 
+                 
+            if porttype == "Persistent":
+                try:
+                    if "rsistent" in i[persist_local]:
+                        ####port_list.append(i[0])
+                        #slot_port_list = []
+                        #slot_port_list.append(int(i[1]))
+                        if self.am_i_director:
+                            #slot_port_list.append(int(i[2]))
+                            slot_port_list = [int(i[1]), int(i[2])]
+                        else:
+                            slot_port_list = [0, int(i[1])]
+                        port_list.append(slot_port_list)
+                        
+                except UnboundLocalError:
+                    print("unboundlocalerror - moving on  ")
+                    pass
+
+        if not ras_result:
+            ras_result = "no port found"
+        return port_list
+        
+    def __sw_show_info_ge_port_type__(self):
+        """
+            capture the switch info and each column with regexs
+            if the port type is not included in switchshow output
+            then add the port to the list
+        """
+        #tn.set_debuglevel(9)
+        capture_cmd = fos_cmd("switchshow")
+        if self.am_i_director:
+            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+        else:
+            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9a-f]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+        ras = ras.findall(capture_cmd)
+        self.online_ports = ras
+    
+    def all_ge_ports(self):
+        """
+        Capture all ge and xge ports
+        """
+        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        if self.am_i_director :
+            ras = re.compile('\s+(([0-9]{1,2}))(\s{1,2}[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+        else:
+            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+        ras = ras.findall(capture_cmd)
+        print("RASRASRASRASRAS")
+        print(ras)
+        #self.online_ports = ras
+
+        
+    def all_ge_ports_disabled(self):
+        """
+        Capture all disabled ge and xge ports
+        """
+        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        if self.am_i_director:
+            ras = re.compile('\s+(([0-9]{1,2}))(\s{1,2}[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+        else:
+            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+        ras = ras.findall(capture_cmd)
+        self.online_ports = ras
+        
+    def director(self):
+        if self.am_i_director:
+            print("I am a director")
+        else:
+            print("I am a pizza box")
+        sys.exit(0)
+        
+    def vex_ports(self):
+        """
+            Return a list of the VEX-Ports in the current FID
+        """
+        return(self.__getportlist__("VEX-Port"))
+    
+    def ex_ports(self):
+        """
+            Return a list of the EX-Ports in the current FID
+        """
+        return(self.__getportlist__("EX-Port"))
+    
+    def ge_ports(self):
+        """
+            Return a list of the ge-Ports in the current FID
+        """
+        return(self.__getportlist__("ge-Port"))
+    
+    
+
+
 
 
     
@@ -1267,12 +1385,8 @@ class configSwitch(SwitchInfo):
                 keepnext = 1
                 print("change keepnext to 1")
                 
-            
-                
-            
-                
-             
-    
+
+   
 class FcrConfig(SwitchInfo, FabricInfo):
     """
     Class for FCR functions etc. Doc strings need to be added for some of the functions.
