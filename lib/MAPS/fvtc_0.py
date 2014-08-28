@@ -1239,6 +1239,219 @@ def tc_01_01_05_05():
     
     return()
 ###############################################################################   
+
+def tc_01_01_05_06():
+    """
+        Test Case   25.01.01.05.06
+        Title:      Security Events
+        Feature:    MAPS
+        Objective:  Verify the Security Violations events and alarms
+         
+    """
+    ###########################################################################
+    ####
+    ####  todo
+    ####
+    ###########################################################################
+    ####
+    ####  Steps
+    ####   1. add security rules
+    ####   2. trigger rules
+    ####   3. confirm the rules show in MAPS
+    ####
+    ####
+    ###########################################################################
+    #### start testing
+    ####
+    #### create the object and clear stats
+    en = anturlar.Maps()
+    ####
+        
+     
+    fab_stuff = anturlar.FabricInfo(en.currentFID())
+    fabmems = fab_stuff.fabric_members()
+        
+    ###########################################################################
+    #### create security rules and policy
+    ####
+    security_policy      = "security_policy"
+    cleanup_policy(security_policy)
+
+    telnet_violation     = "sqa_telnet_violation"
+    http_violation       = "sqa_http_violaltion"
+    scc_violation        = "sqa_scc_violation"
+    dcc_violation        = "sqa_dcc_violation"
+    login_violation      = "sqa_login_violation"
+    invalid_cert         = "sqa_invalid_cert"
+    ts_out_of_sync       = "sqa_ts_out_of_sync"
+    auth_failure         = "sqa_auth_failure"
+    no_fcs_failure       = "sqa_no_fcs_failure"
+    incompat_security_db = "sqa_incompat_security_db"
+    illegal_command      = "sqa_illegal_cmd"
+    
+    telnet_violation_cmd  = "mapsrule --create sqa_telnet_violation \
+                            -group SWITCH -monitor sec_telnet \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    http_violation_cmd    = "mapsrule --create sqa_http_violation \
+                            -group SWITCH -monitor sec_http \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    scc_violation_cmd     = "mapsrule --create sqa_scc_violation \
+                            -group SWITCH -monitor sec_SCC \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    dcc_violation_cmd     = "mapsrule --create sqa_dcc_violation \
+                            -group SWITCH -monitor sec_DCC \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                                
+    login_violation_cmd   = "mapsrule --create sqa_login_violation \
+                            -group SWITCH -monitor sec_LV \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    invalid_cert_cmd      = "mapsrule --create sqa_invalid_cert \
+                            -group SWITCH -monitor sec_CERT \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    ts_out_of_sync_cmd    = "mapsrule --create sqa_ts_out_of_sync \
+                            -group SWITCH -monitor sec_TS \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+         
+    auth_failure_cmd    = "mapsrule --create sqa_auth_failure_cmd \
+                            -group SWITCH -monitor sec_auth_fail \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"    
+                             
+    no_fcs_failure_cmd    = "mapsrule --create sqa_no_fcs_failure \
+                            -group SWITCH -monitor sec_FCS \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    incompat_security_db_cmd = "mapsrule --create sqa_incompat_security_db \
+                            -group SWITCH -monitor sec_IDB \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                             
+    illegal_command_cmd   = "mapsrule --create sqa_illegal_cmd \
+                            -group SWITCH -monitor sec_CMD \
+                            -timebase min -value 0 \
+                            -action email,raslog,snmp -op g \
+                            -policy security_policy"
+                                 
+            
+    
+    ####  list of commands
+    cmd_list = [ telnet_violation_cmd, http_violation_cmd, scc_violation_cmd,\
+                 dcc_violation_cmd, login_violation_cmd, invalid_cert_cmd, \
+                 ts_out_of_sync_cmd, auth_failure_cmd, no_fcs_failure_cmd, \
+                 incompat_security_db_cmd, illegal_command_cmd ]
+    
+    ###########################################################################
+    #### setup the rules and policy for this test
+    ####
+    cmdrtn = anturlar.fos_cmd("mapspolicy --create %s " % security_policy)
+    cmdrtn = anturlar.fos_cmd("mapspolicy --show -summary")
+    for cmd in cmd_list:
+        anturlar.fos_cmd(cmd)
+    anturlar.fos_cmd("mapspolicy --enable %s " % security_policy)
+    cmdrtn = anturlar.fos_cmd("mapspolicy --show -summary")    
+        
+    #### setup the actions
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,SW_CRITICAL,SW_MARGINAL")
+    
+    
+    
+    
+    
+    
+    anturlar.fos_cmd("mapsdb --show ")
+        
+    return()
+###############################################################################
+
+
+def tc_01_01_05_07():
+    """
+        Test Case   25.01.01.05.07
+        Title:      MAPS SAM EVENTS
+        Feature:    MAPS 
+        Objective:  Verify the MAPS SAM output
+         
+    """
+    ###########################################################################
+    ####
+    ####  todo
+    ####
+    ###########################################################################
+    ####
+    ####  Steps
+    ####   1. MAPSSAM
+    ####   2. 
+    ####   3. 
+    ####
+    ####
+    ###########################################################################
+    #### start testing
+    ####
+    #### create the object and clear stats
+    en = anturlar.Maps()
+    ####
+    
+    #### cpu usage  and mem usage
+    ####   see test case 2.1.1.5.1 maps switch resource category
+    ####   for how this was calculated
+    cpu_calc    = en.cpu_usage()
+    
+    flash_df_command = anturlar.fos_cmd("df")
+    ras = re.compile('[\d]+(?=%)')
+    flash_raw = ras.search(flash_df_command)
+    flash_usage = flash_raw.group()   
+
+    mem_usage = en.mem_usage()
+    
+    liabhar.cls()
+    
+    capture_cmd = anturlar.fos_cmd("mapssam --show")
+    
+    capture_cmd = anturlar.fos_cmd("mapssam --show cpu")
+    
+    capture_cmd = anturlar.fos_cmd("mapssam --show memory")
+    
+    capture_cmd = anturlar.fos_cmd("mapssam --show flash")
+    
+    #capture_cmd = anturlar.fos_cmd("mapssam --clear")
+    
+    
+    
+    print("\n\n\n")
+    print("***   THIS TEST CASE AUTOMATION                       ***")
+    print("\n\n")
+    
+    print("***   Confirm CPU usage   MEM usage  and FLASH usage  ***")
+    print("***   match the output in mapssam command             ***\n\n")
+    print("CPU calculated   :   %s  " % cpu_calc)
+    print("FLASH calculated :   %s  " % flash_usage)
+    print("MEM calculated   :   %s  " % mem_usage)
+          
+    return()
+###############################################################################
    
 def tc_01_01_06_07():
     """
@@ -1388,10 +1601,11 @@ def tc_01_01_06_07():
     
     
         cmdrtn = anturlar.fos_cmd("mapsdb --show all")
-        liabhar.JustSleep(10)   
-        
+        liabhar.JustSleep(10)
+    return(0)
 ###############################################################################        
    
+
    
     
 def tc_01_01_template():
@@ -1891,6 +2105,12 @@ def check_gen_all_stats():
         
  
 def randomList(a):
+    """
+    randomize a list
+    
+    """
+    #### this belongs in liabhar
+    ####
     b = []
     for i in range(len(a)):
         element = random.choice(a)
@@ -2038,158 +2258,158 @@ def flow_to_each_SIM():
                             break
     
     
-def ha_failover( times=2):
-    """
-        do HA failover on directors
-        do hareboot on pizza box
-    """
-    #### steps
-    ####  1. Determine Pizza box or Director
-    ####  2. save username and password
-    ####  3. HA Failover 
-    ####  4. wait some time
-    ####  5. reconnect
-    ####  6. 
-    ####   
-    sw_info = anturlar.SwitchInfo()
-    fid_now = sw_info.ls_now()
-    ip_addr = sw_info.ipaddress()
-    go_or_not = sw_info.synchronized()
-    cons_out = anturlar.fos_cmd(" ")
-    username = 'root'
-    pwrd = 'password'
-    counter = 1
-    new_connect = True
-    ####  add error checking here
-    ####   the first step is to get original data before starting the test
-    #print("\n\noutside the while loop the go or not is equal to %s  " % go_or_not)
-    liabhar.count_down(10)
-    
-    
-    
-    while new_connect:
-        print("@"*40)
-        print("Starting Failover number %s "%counter)
-        print("@"*40)
-        
-        try:
-            
-            while times > 0:
-                anturlar.connect_tel_noparse(ip_addr,'root','password')
-                sw_info = anturlar.SwitchInfo()
-                while sw_info.synchronized() is False:
-                    liabhar.count_down(30)
-                    #print("\n\n")
-                    #print("@"*30)
-                    #print("\nwaiting for CPs to sync\n")
-                    #print("not in sync\n")
-                    #print("@"*30)
-                    #print("@"*30)
-                    liabhar.count_down(60)
-                                
-                sw_info = anturlar.fos_cmd("echo Y | hafailover")
-                ####  add error checking here
-                ####   get the same data as before the while loop and compare
-                #print("\n\ninside the while loop the go or not is equal to %s  " % go_or_not)
-                times -= 1
-                #print("\n\nwait here  %s\n\n" % times)
-                liabhar.count_down(30)
-        
-        except:
-        #except SocketError as e:
-            #if e.errno != errno.ECONNRESET:
-                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
-                #raise 
-            print("========================")
-            print("Telnet was disconnected ")
-            print("Attempting to reconnect shortly \n")
-            print("========================")
-            #pass
-            liabhar.count_down(60)
-        if times == 0:
-            new_connect = False   
+#def ha_failover( times=2):
+#    """
+#        do HA failover on directors
+#        do hareboot on pizza box
+#    """
+#    #### steps
+#    ####  1. Determine Pizza box or Director
+#    ####  2. save username and password
+#    ####  3. HA Failover 
+#    ####  4. wait some time
+#    ####  5. reconnect
+#    ####  6. 
+#    ####   
+#    sw_info = anturlar.SwitchInfo()
+#    fid_now = sw_info.ls_now()
+#    ip_addr = sw_info.ipaddress()
+#    go_or_not = sw_info.synchronized()
+#    cons_out = anturlar.fos_cmd(" ")
+#    username = 'root'
+#    pwrd = 'password'
+#    counter = 1
+#    new_connect = True
+#    ####  add error checking here
+#    ####   the first step is to get original data before starting the test
+#    #print("\n\noutside the while loop the go or not is equal to %s  " % go_or_not)
+#    liabhar.count_down(10)
+#    
+#    
+#    
+#    while new_connect:
+#        print("@"*40)
+#        print("Starting Failover number %s "%counter)
+#        print("@"*40)
+#        
+#        try:
+#            
+#            while times > 0:
+#                anturlar.connect_tel_noparse(ip_addr,'root','password')
+#                sw_info = anturlar.SwitchInfo()
+#                while sw_info.synchronized() is False:
+#                    liabhar.count_down(300)
+#                    #print("\n\n")
+#                    #print("@"*30)
+#                    #print("\nwaiting for CPs to sync\n")
+#                    #print("not in sync\n")
+#                    #print("@"*30)
+#                    #print("@"*30)
+#                    liabhar.count_down(60)
+#                                
+#                sw_info = anturlar.fos_cmd("echo Y | hafailover")
+#                ####  add error checking here
+#                ####   get the same data as before the while loop and compare
+#                #print("\n\ninside the while loop the go or not is equal to %s  " % go_or_not)
+#                times -= 1
+#                #print("\n\nwait here  %s\n\n" % times)
+#                liabhar.count_down(30)
+#        
+#        except:
+#        #except SocketError as e:
+#            #if e.errno != errno.ECONNRESET:
+#                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+#                #raise 
+#            print("========================")
+#            print("Telnet was disconnected ")
+#            print("Attempting to reconnect shortly \n")
+#            print("========================")
+#            #pass
+#            liabhar.count_down(60)
+#        if times == 0:
+#            new_connect = False   
      
      
     
-def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
-    """
-        do HA failover on directors
-        do hareboot on pizza box
-    """
-    #### steps
-    ####  1. Determine Pizza box or Director
-    ####  2. save username and password
-    ####  3. HA Failover 
-    ####  4. wait some time
-    ####  5. reconnect
-    ####  6. 
-    ####   
-    sw_info = anturlar.SwitchInfo()
-    fid_now = sw_info.ls_now()
-    ip_addr = sw_info.ipaddress()
-    go_or_not = sw_info.synchronized()
-    cons_out = anturlar.fos_cmd(" ")
-    username = 'root'
-    pwrd = 'fibranne'
-    counter = 1
-    new_connect = True
-    ####  add error checking here
-    ####   the first step is to get original data before starting the test
-    #print("\n\noutside the while loop the go or not is equal to %s  " % go_or_not)
-    liabhar.count_down(10)
-    
-    
-    
-    while new_connect:
-        print("@"*40)
-        print("Starting Failover number %s "%counter)
-        print("@"*40)
-        
-        try:
-            
-            while times > 0:
-                anturlar.connect_tel_noparse(ip_addr,'root','fibranne')
-                sw_info = anturlar.SwitchInfo()
-                #while sw_info.synchronized() is False:
-                #    liabhar.count_down(30)
-                #    #print("\n\n")
-                #    #print("@"*30)
-                #    #print("\nwaiting for CPs to sync\n")
-                #    #print("not in sync\n")
-                #    #print("@"*30)
-                #    #print("@"*30)
-                #    liabhar.count_down(60)
-                                
-                sw_info = anturlar.fos_cmd("echo Y | hareboot")
-                ####  add error checking here
-                ####   get the same data as before the while loop and compare
-                #print("\n\ninside the while loop the go or not is equal to %s  " % go_or_not)
-                times -= 1
-                #print("\n\nwait here  %s\n\n" % times)
-                liabhar.count_down(wait)
-        
-        except:
-        #except SocketError as e:
-            #if e.errno != errno.ECONNRESET:
-                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
-                #raise 
-            print("========================")
-            print("Telnet was disconnected ")
-            print("Attempting to reconnect shortly \n")
-            print("========================")
-            #pass
-            #liabhar.count_down(10)
-        if times == 0:
-            new_connect = False   
-     
-     
-        anturlar.connect_tel_noparse(adjacent_ipaddr,'root','fibranne')
-        sw_info = anturlar.SwitchInfo()
-        sw_info = anturlar.fos_cmd("switchshow")
-        sw_info = anturlar.fos_cmd("coreshow")
-        if "panic" in sw_info:
-            sys.exit()
-        anturlar.close_tel()
+#def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
+#    """
+#        do HA failover on directors
+#        do hareboot on pizza box
+#    """
+#    #### steps
+#    ####  1. Determine Pizza box or Director
+#    ####  2. save username and password
+#    ####  3. HA Failover 
+#    ####  4. wait some time
+#    ####  5. reconnect
+#    ####  6. 
+#    ####   
+#    sw_info = anturlar.SwitchInfo()
+#    fid_now = sw_info.ls_now()
+#    ip_addr = sw_info.ipaddress()
+#    go_or_not = sw_info.synchronized()
+#    cons_out = anturlar.fos_cmd(" ")
+#    username = 'root'
+#    pwrd = 'fibranne'
+#    counter = 1
+#    new_connect = True
+#    ####  add error checking here
+#    ####   the first step is to get original data before starting the test
+#    #print("\n\noutside the while loop the go or not is equal to %s  " % go_or_not)
+#    liabhar.count_down(10)
+#    
+#    
+#    
+#    while new_connect:
+#        print("@"*40)
+#        print("Starting Failover number %s "%counter)
+#        print("@"*40)
+#        
+#        try:
+#            
+#            while times > 0:
+#                anturlar.connect_tel_noparse(ip_addr,'root','fibranne')
+#                sw_info = anturlar.SwitchInfo()
+#                #while sw_info.synchronized() is False:
+#                #    liabhar.count_down(30)
+#                #    #print("\n\n")
+#                #    #print("@"*30)
+#                #    #print("\nwaiting for CPs to sync\n")
+#                #    #print("not in sync\n")
+#                #    #print("@"*30)
+#                #    #print("@"*30)
+#                #    liabhar.count_down(60)
+#                                
+#                sw_info = anturlar.fos_cmd("echo Y | hareboot")
+#                ####  add error checking here
+#                ####   get the same data as before the while loop and compare
+#                #print("\n\ninside the while loop the go or not is equal to %s  " % go_or_not)
+#                times -= 1
+#                #print("\n\nwait here  %s\n\n" % times)
+#                liabhar.count_down(wait)
+#        
+#        except:
+#        #except SocketError as e:
+#            #if e.errno != errno.ECONNRESET:
+#                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+#                #raise 
+#            print("========================")
+#            print("Telnet was disconnected ")
+#            print("Attempting to reconnect shortly \n")
+#            print("========================")
+#            #pass
+#            #liabhar.count_down(10)
+#        if times == 0:
+#            new_connect = False   
+#     
+#     
+#        anturlar.connect_tel_noparse(adjacent_ipaddr,'root','password')
+#        sw_info = anturlar.SwitchInfo()
+#        sw_info = anturlar.fos_cmd("switchshow")
+#        sw_info = anturlar.fos_cmd("coreshow")
+#        if "panic" in sw_info:
+#            sys.exit()
+#        anturlar.close_tel()
 
 
 def mapscommand_list(options="0"):

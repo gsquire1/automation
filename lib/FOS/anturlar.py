@@ -1655,7 +1655,7 @@ class Maps(SwitchInfo):
         sumt1 = ( float(cpu_calc[1]) + float(cpu_calc[2]) + float(cpu_calc[3]) \
                  + float(cpu_calc[4]) + float(cpu_calc[5]) + float(cpu_calc[6])\
                  + float(cpu_calc[7]))
-        liabhar.JustSleep(6)
+        liabhar.JustSleep(120)
         capture_cmd = fos_cmd("cat /proc/stat")
         ras = re.compile("^[ cpu]+([ \s\d]+)")
         ras = ras.match(capture_cmd)
@@ -1668,29 +1668,12 @@ class Maps(SwitchInfo):
         
         #cpu_use = (100 - (((float(cpu_calc[4]) - float(cpu_calcT2[4]))*100)/(sumt1 - sumt2)))
         cpu_use_n = ((float(cpu_calc[4]) - float(cpu_calcT2[4])) *100)
-        
-        print("@"*80)
-        print("@"*80)
         cpu_use_d = (sumt1 - sumt2)
         cpu_use  = (round(100-( cpu_use_n / cpu_use_d),2) ) 
-        
-        print("cpu top     %s  " % cpu_use_n)
-        print("cpu demon   %s  " % cpu_use_d)
-        print("values")
-        print(sumt1)
-        print(sumt2)
-        print(cpu_calc[4])
-        print(cpu_calcT2[4])
-        print(cpu_calc[1])
-        print(cpu_calc[3])
-        print(cpu_calc[5])
-        print(cpu_calc[6])
-        print(cpu_calc[7])
-        
-        print("@"*80)
-        print("@"*80)
-        
+    
         return(cpu_use)
+    
+    
     
     def temp_status(self):
         """

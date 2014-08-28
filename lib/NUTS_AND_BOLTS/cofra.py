@@ -5,6 +5,8 @@ import datetime
 import sys
 import anturlar
 import re
+import liabhar
+
 
 """
 cofra is cabinet
@@ -23,7 +25,6 @@ def bladeportmap_Info(blade = 0):
     
     return(ras)
 ###############################################################################
-
 
 def PortStats(counter="all", port_list = "all"):
     """
@@ -171,4 +172,155 @@ def PortStats(counter="all", port_list = "all"):
             
     return(counter_list_capture)
 ###############################################################################
+
+def ha_failover( times=2):
+    """
+        do HA failover on directors
+        do hareboot on pizza box
+    """
+    #### steps
+    ####  1. Determine Pizza box or Director
+    ####  2. save username and password
+    ####  3. HA Failover 
+    ####  4. wait some time
+    ####  5. reconnect
+    ####  6. 
+    ####   
+    sw_info = anturlar.SwitchInfo()
+    fid_now = sw_info.ls_now()
+    ip_addr = sw_info.ipaddress()
+    go_or_not = sw_info.synchronized()
+    cons_out = anturlar.fos_cmd(" ")
+    username = 'root'
+    pwrd = 'password'
+    #counter = 1
+    new_connect = True
+    ####  add error checking here
+    ####   the first step is to get original data before starting the test
+    #print("\n\noutside the while loop the go or not is equal to %s  " % go_or_not)
+    liabhar.count_down(10)
+    
+    while new_connect:
+        
+        try:
+            
+            while times > 0:
+                print("\n\n\n")
+                print("@"*60)
+                print("HA Failovers remaining -- %s " % times)
+                print("@"*60)
+                anturlar.connect_tel_noparse(ip_addr,'root','password')
+                liabhar.count_down(60)
+                sw_info = anturlar.SwitchInfo()
+                while sw_info.synchronized() is False:
+                    liabhar.count_down(360)
+                                
+                sw_info = anturlar.fos_cmd("echo Y | hafailover")
+                ####  add error checking here
+                ####   get the same data as before the while loop and compare
+                if "can't failover" in sw_info:
+                    print("\n\n\nSwitch Not Ready")
+                    print("Need to wait for LS/HA progress to complete\n\n")
+                    liabhar.count_down(300)
+                else:
+                    times -= 1
+                #liabhar.count_down(30)
+        
+        except:
+        #except SocketError as e:
+            #if e.errno != errno.ECONNRESET:
+                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+                #raise 
+            print("===============================")
+            print("Telnet was disconnected ")
+            print("Attempting to reconnect shortly \n")
+            print("===============================")
+            liabhar.count_down(60)
+        if times == 0:
+            new_connect = False   
+     
+    liabhar.count_down(300)
+
+    return()
+###############################################################################
+
+def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
+    """
+        do HA failover on directors 
+        do hareboot on pizza box - # still to be implimented
+    """
+    #### steps
+    ####  1. Determine Pizza box or Director
+    ####  2. save username and password
+    ####  3. HA Failover 
+    ####  4. wait some time
+    ####  5. reconnect
+    ####  6. 
+    ####   
+    sw_info = anturlar.SwitchInfo()
+    fid_now = sw_info.ls_now()
+    ip_addr = sw_info.ipaddress()
+    go_or_not = sw_info.synchronized()
+    cons_out = anturlar.fos_cmd(" ")
+    username = 'root'
+    pwrd = 'password'
+    counter = 1
+    new_connect = True
+    ####  add error checking here
+    ####   the first step is to get original data before starting the test
+    
+    liabhar.count_down(10)
+    
+    while new_connect:
+        
+        try:
+            
+            while times > 0:
+                print("@"*60)
+                print("HA Failovers Remaining  --  %s " % times)
+                print("@"*60)
+                
+                anturlar.connect_tel_noparse(ip_addr,'root','password')
+                sw_info = anturlar.SwitchInfo()
+                    
+                sw_info = anturlar.fos_cmd("echo Y | hafailover")
+                ####  add error checking here
+                ####   get the same data as before the while loop and compare
+                
+                if "can't failover" in sw_info:
+                    print("\n\n\nSwitch Not Ready")
+                    print("Need to wait for LS/HA progress to complete\n\n")
+                    liabhar.count_down(300)
+                else:
+                    times -= 1
+                    
+                liabhar.count_down(wait)
+        
+        except:
+        #except SocketError as e:
+            #if e.errno != errno.ECONNRESET:
+                #print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+                #raise 
+            print("===============================")
+            print("Telnet was disconnected ")
+            print("Attempting to reconnect shortly \n")
+            print("===============================")
+            #pass
+            #liabhar.count_down(10)
+        if times == 0:
+            new_connect = False   
+     
+     
+        anturlar.connect_tel_noparse(adjacent_ipaddr,'root','password')
+        sw_info = anturlar.SwitchInfo()
+        sw_info = anturlar.fos_cmd("switchshow")
+        sw_info = anturlar.fos_cmd("coreshow")
+        if "panic" in sw_info:
+            sys.exit()
+        anturlar.close_tel()
+
+    liabhar.count_down(300)
+    return()
+###############################################################################
+
 
