@@ -301,23 +301,23 @@ def parse_args(args):
     #parser.add_argument("user", help="username for SUT")
     #
     args = parser.parse_args()
-    print("Connecting to IP :  " + args.ip)
-    print("user             :  " + args.user)
+    #print("Connecting to IP :  " + args.ip)
+    #print("user             :  " + args.user)
     ipaddr = args.ip
     sw_user = args.user
     verbose = args.verbose
     fid = args.fid
     
-    if args.verbose >= 2:
-        print("verbosity is Enabled and set to 2")
-    elif args.verbose >= 1:
-        print("verbosity is Enabled and set to 1")
-    else:
-        print("verbosity        :  disabled")
-    if args.fid == 0:
-        print("fid              :  no fid given")
-    else:
-        print("Using fid number :  %s " % fid)
+    #if args.verbose >= 2:
+    #    print("verbosity is Enabled and set to 2")
+    #elif args.verbose >= 1:
+    #    print("verbosity is Enabled and set to 1")
+    #else:
+    #    print("verbosity        :  disabled")
+    #if args.fid == 0:
+    #    print("fid              :  no fid given")
+    #else:
+    #    print("Using fid number :  %s " % fid)
 
     return parser.parse_args()
 
