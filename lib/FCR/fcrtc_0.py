@@ -99,13 +99,22 @@ def ex_slots_find():
     Find slots that contain EX ports and return slot number(s).
     """
     fcri = anturlar.FcrConfig()
+    fcipi = anturlar.FcipInfo()
     port_list = fcri.vex_ports()
     port_list2 = fcri.ex_ports()
     port_list3 = fcri.disabled_ports()
+    #d = fcipi.vex_ports()
+    #e = fcipi.ex_ports()
+    f = fcipi.all_ge_ports()
+    #print(d)
+    #print(e)
+    print("PORTLISTPORTLIST")
     print(port_list)
+    print(f)
+    sys.exit(0)
+    
     print(port_list2)
     print(port_list3)
-    sys.exit(0)
     if self.am_i_director:
        for i in portlist:
             slot = i[0]
@@ -124,6 +133,8 @@ def ex_slots_find():
                 fos_cmd("portcfgexport "+i+" -a2")
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
+    
+
         
 def change_fid(fid):
     """
