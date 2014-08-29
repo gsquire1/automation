@@ -984,13 +984,15 @@ class FcipInfo(SwitchInfo, FabricInfo):
         #self.__getportlist__()
         print(capture_cmd)
         if self.am_i_director :
-            ras = re.compile('\s+(([0-9]{1,2}))(\s{1,2}[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+            ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
         else:
-            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
         ras = ras.findall(capture_cmd)
         print("RASRASRASRASRAS")
         print(ras)
         for i in ras:
+            print(i)
+            sys.exit(0)
             if self.am_i_director:
                 #slot_port_list.append(int(i[2]))
                 slot_port_list = [int(i[1]), int(i[2])]
