@@ -28,11 +28,49 @@ import fvtc_0
 import fcrtc_0
 import fos_gen_tc_0
 
-def testprocess( theargs, run_these, password ):
-    print("\n\n\nSTARTING A NEW CONNECTION")
-    print(theargs)
-    print(run_these)
+
+###############################################################################
+####   Print the summary of what will be tested                            ####
+###############################################################################
+
+def header(theargs, these):
     
+    print("\n")
+      
+    print("    IP ADDRESS of TARGET SWITCH     :   %s " % theargs.ip)
+    print("    FABRIC ID                       :   %s " % theargs.fid)
+    print("    FABRIC WIDE TEST                :   %s " % theargs.fabwide)
+    print("    USER NAME                       :   %s " % theargs.user)
+    print("\n")
+    print("    SUITE FILE USED                 :   %s " % theargs.suite)
+    print("\n")
+    print("    VERBOSE                         :   %s " % theargs.verbose)
+    print("    REPEAT THE TEST                 :   %s " % theargs.repeat)
+    print("    QUIET MODE                      :   %s " % theargs.quiet)
+    print("    IP FILE                         :   %s " % theargs.ipfile)
+
+    print("\n\n\n")
+    print("      SUITE FILE INCLUDES THE FOLLOWING")
+    print("             TEST CASES  TO RUN   ")
+    print("="*60)
+    
+    for t in these:
+        print("      %s" % t)
+    
+
+###############################################################################
+####  Start the test process
+###############################################################################
+
+def testprocess( theargs, run_these, password ):
+    print("\n\n\n")
+    print("="*60)
+    #header(theargs, run_these)
+    #print(theargs)
+    #print(run_these)l = sys.argparse.Namespace
+
+            
+                
     conn_value = anturlar.connect_tel(theargs, password )
     
     for i in run_these:
@@ -64,7 +102,29 @@ def testprocess( theargs, run_these, password ):
 #### close the telnet connection and end the test
 ###############################################################################
     anturlar.close_tel
+###############################################################################  
     
+    
+def user_start():
+    go = False
+    start = 'n'
+    while not go : 
+              
+        is_valid = 0
+        while not is_valid:
+            try:
+                start = str(input("\n\n\n\nSTART THE TEST ?  [y/n] : "))
+                is_valid = 1 
+            except:
+                print("\n\nthere was an error with the input")
+                sys.exit()
+                
+        if start == 'y':
+            go = True
+        else:
+            sys.exit()
+###############################################################################
+
 
 def main():   
     
@@ -116,12 +176,12 @@ def main():
     ####   is the testing switch only or fabric wide                           ####
     ####    the variable is in the parse args  fabwide 0 = switch only         ####
     ###############################################################################
-    print("#"*80)
-    print("#"*80)
+    #print("#"*80)
+    #print("#"*80)
     if pa.fabwide == False:
-        print("Testing in switch mode")
+        print("    Testing in switch mode")
     else:
-        print("Testing in fabric wide mode")
+        print("    Testing in fabric wide mode")
     ###############################################################################
     ####    Step 3                                                             ####
     ####   what test case do i run  -- read a config file                      ####
@@ -131,19 +191,19 @@ def main():
     cw_config_file_name = "%s%s%s"%("ini/",pa.suite,".txt")
     fileIN = open( cw_config_file_name, 'rb')
     testcaselist = []
-    print("Running the following Test Cases")
-    print("#"*32)
+    #print("Running the following Test Cases")
+    #print("#"*32)
     for line in fileIN:
         line = str(line.strip(), encoding='utf8')
         line = line.split(" ")
-        for j in line:
-            print("list item  %s  "%j )
+        #for j in line:
+            #print("list item  %s  "%j )
         if line[0] == 'Y':
             testcaselist.append(line)
-    print("test case list  \n")
-    print(testcaselist)
-    print("#"*80)
-    print("#"*80)
+    #print("test case list  \n")
+    #print(testcaselist)
+    #print("#"*80)
+    #print("#"*80)
     ###########################################################################
     ####    Step 4                                                         ####
     #### Start the appropriate test to each switch  or  Fabrica Wide  or   ####
@@ -159,6 +219,9 @@ def main():
         anturlar.close_tel()
         #liabhar.count_down(5)
         time.sleep(1)
+         
+        header(pa, testcaselist)
+        user_start()
         for ip in fablist:
             #print("\n\n\n\n%s"%ip)
             pa.ip = ip
@@ -171,6 +234,9 @@ def main():
         pass
     
     else:
+         
+        header(pa,testcaselist)
+        user_start()
         p = Process(target=testprocess, args=(pa, testcaselist, pw))
         #p.daemon = True  #### use True value all child process will stop when the main process stops
         p.daemon = False  #### this will run in the background even if this script finishes
