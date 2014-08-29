@@ -892,8 +892,9 @@ class SwitchInfo:
 class FcipInfo(SwitchInfo, FabricInfo):
     """
         A class to return information about a switch
+    
     """
-    global tn
+    #global tn
     
     def __init__(self):
         SwitchInfo.__init__(self)
@@ -903,16 +904,19 @@ class FcipInfo(SwitchInfo, FabricInfo):
         #self.ipaddr =  self.__myIPaddr__()    
         #a = self.__sw_show_info_all_ports__()
         
-    def __getportlist__(self, porttype):
+    def __getportlist__(self, port_type):
         """
            Return a list of the porttype passed in - in the current FID
             
         """
         port_list = []
-        self.__sw_show_info_all_ports__()
-        capture_cmd_split = self.online_ports
+        ge_port = self.__all_ge_ports__()
+        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print(ge_port)
+        #capture_cmd_split = self.all_ports()
+        #print(capture_cmd_split)
+        sys.exit(0)
         ras_result = capture_cmd_split.count(porttype)
-        
         if self.am_i_director:
             location = 8
         else:
@@ -977,17 +981,27 @@ class FcipInfo(SwitchInfo, FabricInfo):
         Capture all ge and xge ports
         """
         capture_cmd = fos_cmd("switchshow | grep -i ge")
+        #self.__getportlist__()
+        print(capture_cmd)
         if self.am_i_director :
             ras = re.compile('\s+(([0-9]{1,2}))(\s{1,2}[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
         else:
-            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
         ras = ras.findall(capture_cmd)
         print("RASRASRASRASRAS")
         print(ras)
-        #self.online_ports = ras
+        for i in ras:
+            if self.am_i_director:
+                #slot_port_list.append(int(i[2]))
+                slot_port_list = [int(i[1]), int(i[2])]
+                #port_list.append(s_p)
+            else:
+                slot_port_list = [0, int(i[1])]
+                #port_list.append(slot_port_list) 
+        print(slot_port_list)
 
         
-    def all_ge_ports_disabled(self):
+    def all_ge_port_disabled(self):
         """
         Capture all disabled ge and xge ports
         """

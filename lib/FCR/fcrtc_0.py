@@ -112,7 +112,7 @@ def ex_slots_find():
     print(port_list)
     print(f)
     sys.exit(0)
-    
+    #################################
     print(port_list2)
     print(port_list3)
     if self.am_i_director:
