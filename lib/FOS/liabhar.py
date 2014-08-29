@@ -355,6 +355,20 @@ def parse_args_fillword(args):
 
     return parser.parse_args()
 
+def randomList(a):
+    """
+    randomize a list
+    
+    """
+    #### this belongs in liabhar
+    ####
+    b = []
+    for i in range(len(a)):
+        element = random.choice(a)
+        a.remove(element)
+        b.append(element)
+    
+    return b
     
 def random_number():
     """

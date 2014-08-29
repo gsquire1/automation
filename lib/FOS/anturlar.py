@@ -22,8 +22,6 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
-
-
 class FabricInfo:
     """
         a class to return iformations about a Fabric including
@@ -131,7 +129,7 @@ class FabricInfo:
         ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         ras_result_all = ras.findall(capture_cmd)
         #print("\n\n\n\n\nFCR FAB SHOW LIST   ", ras_result_all, "\n\n\n\n")
-        print("\n\n\n\n\nFABLIST IS  :  ", fablist, "\n\n\n\n\n")
+        #print("\n\n\n\n\nFABLIST IS  :  ", fablist, "\n\n\n\n\n")
         
         if ras_result_all:
             for ip in ras_result_all:
@@ -145,11 +143,14 @@ class FabricInfo:
                     if n not in fablist:
                         fablist.append(n)
                 pa.ip = orig_ip
-                 
-        print("\n\n\n\n\nFABLIST with No DUPLICATES IS  :  ", fablist, "\n\n\n\n\n")
-        liabhar.count_down(10)
+        #liabhar.cls()
+        #print("\n\n\nFABLIST \nList of IP in the Fabric :  ")
+        #for ip in fablist:
+            #print("    %s" % ip)
         
-        return fablist
+        #liabhar.count_down(10)
+        
+        return(fablist)
     
     
     def name(self):
@@ -245,12 +246,13 @@ class FabricInfo:
         #ras = re.compile('Effective configuration:\s+cfg:([_0-9A-Za-z])')
         ras = re.compile('(Effective configuration):\s+\\n\s+cfg:\s([_A-Za-z0-9]+)(?=\\t)')
         ras_result = ras.search(capture_cmd)
-        
-        result = [ ras_result.group(1), ras_result.group(2)]
-        r_list = [result]
+        if not ras_result:
+            r_list = "NO Config Found"
+        else:
+            result = [ ras_result.group(1), ras_result.group(2)]
+            r_list = [result]
         return(r_list)
-    
-    
+        
 class SwitchInfo:
     """
         A class to return information about a switch
@@ -516,7 +518,10 @@ class SwitchInfo:
         print("\n\n\n")
         print("CURRENT FID")
         print(ras)
-        fid = int(ras[0])
+        if not ras:
+            fid = "AG MODE ?"
+        else:
+            fid = int(ras[0])
         return(fid)
         
     def d_ports(self):
@@ -888,7 +893,6 @@ class SwitchInfo:
             #print("\n\n\nVF is enabled on this switch\n\n\n")
             return (True)
 
-
 class FcipInfo(SwitchInfo, FabricInfo):
     """
         A class to return information about a switch
@@ -1039,250 +1043,7 @@ class FcipInfo(SwitchInfo, FabricInfo):
             Return a list of the ge-Ports in the current FID
         """
         return(self.__getportlist__("ge-Port"))
-    
-    
-
-
-
-
-    
-   
-class DoSupportsave():
-    """
-        start a supportsave on the current switch
-        the ip user 
-    """
-    def __init__(self, ip, user, passw, chas_name, tr = 'yes'):
-        self.tr = tr
-        self.ip = ip
-        self.user = user
-        self.passw = passw
-        self.chas_name = chas_name
-        self.dirname = ""
-        self.createdir()
-        self.start()
         
-    def start(self):
-        """
-         doc here
-        """
-        
-        self.tracedump()
-        
-        capture = ""
-        reg_ex_list = [b'root> ', b'.*\r\n']
-        reg_ex_list = [b'root>', b'please retry later', b'SupportSave complete', b'Supportsave failed.']
-        cmd = "supportsave -n -u %s -p %s -h %s -l ftp -d %s" % (self.user, self.passw, self.ip, self.dirname)
-        reg_ex_list_only_root = [b'(.*\d\\r\\n )']
-        reg_ex_list_only_cmd = [ cmd.encode()]
-        print(cmd)
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_only_cmd, 10)
-        capture = tn.expect(reg_ex_list, 3600)
-        capture = capture[2]
-        capture = capture.decode()
-        print(capture, end=' ')
-    
-    def tracedump(self):
-        if self.tr == "yes":
-            capture_cmd = fos_cmd("tracedump -n")
-            capture_cmd = fos_cmd("")
-         
-    def createdir(self):
-        global tn
-        i = str(datetime.datetime.today())  #### ISO format 2013-02-21 06:35:45.707450
-        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
-        print(i)
-        d = [" ", "-", ":", "."]
-        for k in d:
-            print(k)
-            i = i.replace(k, "_")
-         
-        print("\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
-        print(i)
-        self.dirname = self.chas_name
-        self.dirname += "__"
-        self.dirname += i
-        print("new directory name\n")
-        print(self.dirname)
-        print("\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
-            
-        reg_ex_list_ftp = [b'root\):', b'none\)\):']
-        cmd = "ftp "
-        cmd += self.ip
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_ftp, 10)
-        print(capture)
-        reg_ex_list_ftp = [b'assword:']
-        cmd = self.user
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_ftp, 10)
-        print(capture)
-        
-        reg_ex_list_ftp = [b'ftp> ']
-        cmd = self.passw
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_ftp, 10)
-        print(capture)
-     
-        reg_ex_list_ftp = [b'ftp', b'denied ', b'timeout']
-        cmd = "mkdir "
-        cmd += self.dirname
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_ftp, 10)
-        print(capture)
-        
-        reg_ex_list_ftp = [b'ftp', b'denied ', b'timeout']
-        cmd = "exit"
-        tn.write(cmd.encode('ascii') + b"\n")
-        capture = tn.expect(reg_ex_list_ftp, 10)
-        print(capture)
-        
-        return 0
-   
-class DoFirmwaredownloadChoice():
-    """
-        do a firmware download to 7.3.x or 7.2.x builds depending on what
-        is already on the switch
-        
-    """
-    def __init__(self, firmdown, firmup):
-        self.firmdown = firmdown
-        self.firmup = firmup
-        #self.check_version()
-        self.start()
-        
-    def check_status(self):
-        capture_cmd = fos_cmd("firmwaredownloadstatus")
-        if "firmware versions" in capture_cmd:
-            return("1")
-        else:
-            liabhar.count_down(30)
-            self.check_status()
-               
-         
-    def check_version(self):
-         
-        capture_cmd = fos_cmd("firmwareshow") 
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = ras.search(capture_cmd)
-        ras_dir = ras_dir.search(capture_cmd)
-        #print(ras.group(0))
-        #print(ras_dir.group(0))
-        #print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-        f=""
-        try:
-            if ras.group(0) != "none":
-                f= ras.group(1)
-        except:
-            pass
-        try:
-            if ras_dir(0) != "none":
-                f=ras_dir.group(1)
-        except:
-            pass
-         
-         
-        #liabhar.JustSleep(20)
-        #self.check_version()
-            
-        #print("found the firmware version\n")
-        #print(f)
-        #print(capture_cmd)
-        return(f)
-         
-         
-    def start(self):
-        ras = self.check_version()
-        print("FIRMUP IS %s\n"%(self.firmup))
-        print("RAS IS     %s\n"%(ras))
-        if ras != self.firmup:
-            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
-        else:
-            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
-        capture_own_regex = fos_cmd_regex(firmware_cmd, reg_ex_list)
-        if "the same firmware" in capture_own_regex:
-            return(capture_own_regex)
-        if "server is inaccessible" in capture_own_regex:
-            return(capture_own_regex)
-        
-        capture_cmd = fos_cmd("Y")
-        close_tel()
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
-        liabhar.count_down(1200) 
-        return(capture_cmd)
-        
-    
-class doFirmwareDownload():
-    """
-        do a firmware download to 7.3.0 build of  firmware
-        then close the telnet connection and
-        wait 1200 seconds before closing ending the function
-        Return could be
-                1. a message that firmware version are the same
-                2. server is inaccessible
-                3. the user prompt after firmware download is started
-    """
-    def __init__(self, firmvrsn ):
-        self.firmvrsn = firmvrsn
-        self.start()
-    
-    def check_status(self):
-        capture_cmd = fos_cmd("firmwaredownloadstatus")
-        if "firmware versions" in capture_cmd:
-            return("1")
-        else:
-            liabhar.count_down(30)
-            self.check_status()
-            
-    def check_version(self):
-         
-        capture_cmd = fos_cmd("firmwareshow") 
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = ras.search(capture_cmd)
-        ras_dir = ras_dir.search(capture_cmd)
-        f=""
-        try:
-            if ras.group(0) != "none":
-                f= ras.group(1)
-        except:
-            pass
-        try:
-            if ras_dir(0) != "none":
-                f=ras_dir.group(1)
-        except:
-            pass
-        
-        return(f)
-
-    def start(self):
-        ras = self.check_version()
-        #print("FIRMUP IS %s\n"%(self.firmup))
-        #print("RAS IS     %s\n"%(ras))
-        if ras != self.firmvrsn:
-            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmvrsn)
-        else:
-            return "fail to perform Firmwaredownload since versions were the same"
-            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
-        capture_own_regex = fos_cmd_regex(firmware_cmd, reg_ex_list)
-        if "the same firmware" in capture_own_regex:
-            return(capture_own_regex)
-        if "server is inaccessible" in capture_own_regex:
-            return(capture_own_regex)
-        
-        capture_cmd = fos_cmd("Y")
-        close_tel()
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
-        liabhar.count_down(1200) 
-        return(capture_cmd)
-    
-    
 class configSwitch(SwitchInfo):
     
     
@@ -1400,9 +1161,7 @@ class configSwitch(SwitchInfo):
             if "LOGICAL SWITCH PORTS" in line_str:
                 keepnext = 1
                 print("change keepnext to 1")
-                
 
-   
 class FcrConfig(SwitchInfo, FabricInfo):
     """
     Class for FCR functions etc. Doc strings need to be added for some of the functions.
@@ -1609,10 +1368,6 @@ class FcrConfig(SwitchInfo, FabricInfo):
                 fos_cmd("\r")
         cmd_cap = fos_cmd("switchenable")
         return(cmd_cap)
-     
-     
-     
-
 
 class Maps(SwitchInfo):
     
@@ -1872,9 +1627,7 @@ class Maps(SwitchInfo):
         mem_use = (100 * round( mem_use / float(mem_calc[1]), 2))
         
         return(mem_use)
-        
-        
-
+    
 class FlowV(SwitchInfo):
     
     def genAll(self, on_off = "on"):
@@ -1948,29 +1701,6 @@ class FlowV(SwitchInfo):
               
         return(portlist)
 
-
-def clear_stats():
-    """
-        clear the following stats on a switch
-        fcrlogclear     errclear    diagclearerror -all     tracedump -R
-        supportsave -R  statsclear  portlogclear        coreshow -R
-        slotstatsclear    fabstatsclear   history clear
-        
-    """
-    switch_info = fos_cmd("")
-    switch_info = fos_cmd("fcrlogclear")
-    switch_info = fos_cmd("supportsave -R")
-    switch_info = fos_cmd("errclear")
-    switch_info = fos_cmd("statsclear")
-    switch_info = fos_cmd("portlogclear")
-    switch_info = fos_cmd("diagclearerror -all")
-    switch_info = fos_cmd("tracedump -R")
-    switch_info = fos_cmd("coreshow -R")
-    switch_info = fos_cmd("slotstatsclear")
-    switch_info = fos_cmd("fabstatsclear")
-    switch_info = fos_cmd("history -c")
-   
-
 def login(pw=""):
     pa = liabhar.parse_args(sys.argv)
     if pw == "":
@@ -1978,13 +1708,11 @@ def login(pw=""):
     conn_value = connect_tel(pa,pw)
     return conn_value
 
-
 def close_tel():
     global tn
     tn.write(b"exit\n")
     tn.close()
     return 0
-   
    
 def connect_tel(pa, pw):
     global tn
@@ -2106,7 +1834,6 @@ def fos_cmd_regex(cmd, reg, dblevel=0):
         print("handle the EOF case here")
         print("========================")
 
-
 def fos_cmd(cmd, dl=0):
     global tn
     try: 
@@ -2145,67 +1872,10 @@ def fos_cmd(cmd, dl=0):
         print("========================")       
 
 
-def waitForOnline(si):
-    """
-        what for a switch to return to online state
-        si = switch object from SwitchInfo
-        
-    """
-    print("\n\n\n\n")
-    s_state = si.switch_state()
-    while "Offline" in s_state:
-        s_state = si.switch_state()
-        sleeping = liabhar.count_down(15)
-        print("\n\nswitch is Offline ")
-        print(s_state)
-    sleeping = liabhar.count_down(10)
-    return 1
 
 
 
-def mem_usage():
-    """
-        Returns the top memory users on the switch
-    """
-    
-    capture = fos_cmd("ps axu")
-    return capture
- 
-def mem_usage_top20():
-    """
-        Returns the top 20 memory users on the switch
-    """
-    capture = fos_cmd("ps -eo vsz,rss,comm,pid | sort | tail -20")
-    return capture
-    
-
     
     
-    
-def fids_check(self, fid, lscfgshow): 
-        """
-            Check if FID given is resident on switch.
-        """
-        self.fid = fid
-        self.lscfgshow = lscfgshow
-        #print("\n\n\nChecking if FID %s is a valid FID on switch.\n\n\n " % fid)
-        fids = re.findall('(\d{1,3})\(', lscfgshow)
-        #print("==================")
-        #print("Below is list of available FIDs: ")
-        #print(fids)
-        #print("==================")
-        b = (str(fid))
-        if b in fids:
-            #print("\n")
-            #print("="*20)
-            #print("%s is a valid FID on this switch " % fid)
-            #print("="*20)
-            return(1)
-        else:
-            print("\n")
-            print("="*20)
-            print("%s is a NOT valid FID on this switch " % fid)
-            print("="*20)
-            return(0)
 
     

@@ -217,9 +217,16 @@ def main():
         fabi = anturlar.FabricInfo(pa.fid)
         fablist = fabi.ipv4_plus_fcr_list(pa,pw)
         anturlar.close_tel()
-        #liabhar.count_down(5)
+                
         time.sleep(1)
-         
+        liabhar.cls()
+        print("@"*60)
+        print("@"*60)
+        print("\n    FABRIC LIST OF IP TO BE TESTED : ")
+        print("-"*60)
+        for ip in fablist:
+            print("    %s" % ip)
+        
         header(pa, testcaselist)
         user_start()
         for ip in fablist:

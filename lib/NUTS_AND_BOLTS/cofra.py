@@ -11,7 +11,247 @@ import liabhar
 """
 cofra is cabinet
 """
- 
+
+
+
+class doFirmwareDownload():
+    """
+        do a firmware download to 7.3.0 build of  firmware
+        then close the telnet connection and
+        wait 1200 seconds before closing ending the function
+        Return could be
+                1. a message that firmware version are the same
+                2. server is inaccessible
+                3. the user prompt after firmware download is started
+    """
+    def __init__(self, firmvrsn ):
+        self.firmvrsn = firmvrsn
+        self.start()
+    
+    def check_status(self):
+        capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
+        if "firmware versions" in capture_cmd:
+            return("1")
+        else:
+            liabhar.count_down(30)
+            self.check_status()
+            
+    def check_version(self):
+         
+        capture_cmd = anturlar.fos_cmd("firmwareshow") 
+        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras = ras.search(capture_cmd)
+        ras_dir = ras_dir.search(capture_cmd)
+        f=""
+        try:
+            if ras.group(0) != "none":
+                f= ras.group(1)
+        except:
+            pass
+        try:
+            if ras_dir(0) != "none":
+                f=ras_dir.group(1)
+        except:
+            pass
+        
+        return(f)
+
+    def start(self):
+        ras = self.check_version()
+        #print("FIRMUP IS %s\n"%(self.firmup))
+        #print("RAS IS     %s\n"%(ras))
+        if ras != self.firmvrsn:
+            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmvrsn)
+        else:
+            return "fail to perform Firmwaredownload since versions were the same"
+            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
+        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+        if "the same firmware" in capture_own_regex:
+            return(capture_own_regex)
+        if "server is inaccessible" in capture_own_regex:
+            return(capture_own_regex)
+        
+        capture_cmd = anturlar.fos_cmd("Y")
+        close_tel()
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
+        liabhar.count_down(1200) 
+        return(capture_cmd)
+###############################################################################
+
+class DoSupportsave():
+    """
+    start a supportsave on the current switch
+    the ip user password chassisname and if to do tracedump (default yes)
+        
+    """
+    def __init__(self, ip, user, passw, chas_name, tr = 'yes'):
+        self.tr = tr
+        self.ip = ip
+        self.user = user
+        self.passw = passw
+        self.chas_name = chas_name
+        self.dirname = ""
+        self.createdir()
+        self.start()
+        
+    def start(self):
+        """
+         doc here
+        """
+        
+        self.tracedump()
+        
+        capture = ""
+        reg_ex_list = [b'root> ', b'.*\r\n']
+        reg_ex_list = [b'root>', b'please retry later', b'SupportSave complete', b'Supportsave failed.']
+        cmd = "supportsave -n -u %s -p %s -h %s -l ftp -d %s" % (self.user, self.passw, self.ip, self.dirname)
+        reg_ex_list_only_root = [b'(.*\d\\r\\n )']
+        reg_ex_list_only_cmd = [ cmd.encode()]
+        print(cmd)
+        cmd_cap = anturlar.fos_cmd(cmd)
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_only_cmd, 10)
+        #capture = tn.expect(reg_ex_list, 3600)
+        #capture = capture[2]
+        #capture = capture.decode()
+        print( cmd_cap )
+    
+    def tracedump(self):
+        if self.tr == "yes":
+            capture_cmd = anturlar.fos_cmd("tracedump -n")
+            capture_cmd = anturlar.fos_cmd("")
+         
+    def createdir(self):
+        global tn
+        i = str(datetime.datetime.today())  #### ISO format 2013-02-21 06:35:45.707450
+        print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
+        print(i)
+        d = [" ", "-", ":", "."]
+        for k in d:
+            print(k)
+            i = i.replace(k, "_")
+         
+        print("\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
+        print(i)
+        self.dirname = self.chas_name
+        self.dirname += "__"
+        self.dirname += i
+        print("new directory name\n")
+        print(self.dirname)
+        print("\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
+            
+        reg_ex_list_ftp = [b'root\):', b'none\)\):']
+        cmd = "ftp "
+        cmd += self.ip
+        cmd_cap = anturlar.fos_cmd_regex(cmd, reg_ex_list_ftp)
+        
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_ftp, 10)
+        print(cmd_cap)
+        reg_ex_list_ftp = [b'assword:']
+        cmd = self.user
+        cmd_cap = anturlar.fos_cmd_regex(cmd, reg_ex_list_ftp)
+        
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_ftp, 10)
+        print(cmd_cap)
+        
+        reg_ex_list_ftp = [b'ftp> ']
+        cmd = self.passw
+        cmd_cap = anturlar.fos_cmd_regex(cmd, reg_ex_list_ftp)
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_ftp, 10)
+        print(cmd_cap)
+     
+        reg_ex_list_ftp = [b'ftp', b'denied ', b'timeout']
+        cmd = "mkdir "
+        cmd += self.dirname
+        cmd_cap = anturlar.fos_cmd_regex(cmd, reg_ex_list_ftp)
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_ftp, 10)
+        print(cmd_cap)
+        
+        reg_ex_list_ftp = [b'ftp', b'denied ', b'timeout']
+        cmd = "exit"
+        cmd_cap = anturlar.fos_cmd_regex(cmd, reg_ex_list_ftp)
+        #tn.write(cmd.encode('ascii') + b"\n")
+        #capture = tn.expect(reg_ex_list_ftp, 10)
+        print(cmd_cap)
+        
+        return 0
+###############################################################################
+
+class DoFirmwaredownloadChoice():
+    """
+        do a firmware download to 7.3.x or 7.2.1 builds depending on what
+        is already on the switch
+        
+    """
+    def __init__(self, firmdown, firmup):
+        self.firmdown = firmdown
+        self.firmup = firmup
+        #self.check_version()
+        self.start()
+        
+    def check_status(self):
+        capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
+        if "firmware versions" in capture_cmd:
+            return("1")
+        else:
+            liabhar.count_down(30)
+            self.check_status()
+               
+    def check_version(self):
+         
+        capture_cmd = anturlar.fos_cmd("firmwareshow") 
+        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras = ras.search(capture_cmd)
+        ras_dir = ras_dir.search(capture_cmd)
+        
+        f=""
+        try:
+            if ras.group(0) != "none":
+                f= ras.group(1)
+        except:
+            pass
+        try:
+            if ras_dir(0) != "none":
+                f=ras_dir.group(1)
+        except:
+            pass
+  
+        return(f)
+          
+    def start(self):
+        ras = self.check_version()
+        print("FIRMUP IS %s\n"%(self.firmup))
+        print("RAS IS     %s\n"%(ras))
+        if ras != self.firmup:
+            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
+        else:
+            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
+        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+        if "the same firmware" in capture_own_regex:
+            return(capture_own_regex)
+        if "server is inaccessible" in capture_own_regex:
+            return(capture_own_regex)
+        
+        capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
+        #anturlar.close_tel()
+        
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.count_down(1800) 
+        return(capture_cmd)
+###############################################################################
+    
 def bladeportmap_Info(blade = 0):
     """
     bladeportmap_Info
@@ -26,6 +266,28 @@ def bladeportmap_Info(blade = 0):
     return(ras)
 ###############################################################################
 
+def clear_stats():
+    """
+        clear the following stats on a switch
+        fcrlogclear     errclear    diagclearerror -all     tracedump -R
+        supportsave -R  statsclear  portlogclear        coreshow -R
+        slotstatsclear    fabstatsclear   history clear
+        
+    """
+    switch_info = anturlar.fos_cmd("")
+    switch_info = anturlar.fos_cmd("fcrlogclear")
+    switch_info = anturlar.fos_cmd("supportsave -R")
+    switch_info = anturlar.fos_cmd("errclear")
+    switch_info = anturlar.fos_cmd("statsclear")
+    switch_info = anturlar.fos_cmd("portlogclear")
+    switch_info = anturlar.fos_cmd("diagclearerror -all")
+    switch_info = anturlar.fos_cmd("tracedump -R")
+    switch_info = anturlar.fos_cmd("coreshow -R")
+    switch_info = anturlar.fos_cmd("slotstatsclear")
+    switch_info = anturlar.fos_cmd("fabstatsclear")
+    switch_info = anturlar.fos_cmd("history -c")
+###############################################################################
+   
 def PortStats(counter="all", port_list = "all"):
     """
     PortStats Values
@@ -323,4 +585,66 @@ def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
     return()
 ###############################################################################
 
+def fids_check(self, fid, lscfgshow): 
+        """
+            Check if FID given is resident on switch.
+        """
+        self.fid = fid
+        self.lscfgshow = lscfgshow
+        #print("\n\n\nChecking if FID %s is a valid FID on switch.\n\n\n " % fid)
+        fids = re.findall('(\d{1,3})\(', lscfgshow)
+        #print("==================")
+        #print("Below is list of available FIDs: ")
+        #print(fids)
+        #print("==================")
+        b = (str(fid))
+        if b in fids:
+            #print("\n")
+            #print("="*20)
+            #print("%s is a valid FID on this switch " % fid)
+            #print("="*20)
+            return(1)
+        else:
+            print("\n")
+            print("="*20)
+            print("%s is a NOT valid FID on this switch " % fid)
+            print("="*20)
+            return(0)
+###############################################################################
+
+def waitForOnline(si):
+    """
+        what for a switch to return to online state
+        si = switch object from SwitchInfo
+        
+    """
+    print("\n\n\n\n")
+    s_state = si.switch_state()
+    while "Offline" in s_state:
+        s_state = si.switch_state()
+        sleeping = liabhar.count_down(15)
+        print("\n\nswitch is Offline ")
+        print(s_state)
+    sleeping = liabhar.count_down(10)
+    return 1
+###############################################################################
+
+def mem_usage():
+    """
+        Returns the top memory users on the switch
+    """
+    
+    capture = anturlar.fos_cmd("ps axu")
+    return capture
+###############################################################################
+
+def mem_usage_top20():
+    """
+        Returns the top 20 memory users on the switch
+    """
+    capture = anturlar.fos_cmd("ps -eo vsz,rss,comm,pid | sort | tail -20")
+    return capture
+###############################################################################    
+
+    
 
