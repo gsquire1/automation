@@ -59,9 +59,11 @@ def remove_sim():
 
 def ports_disable(portlist = "", t=1, wait=10):
     """
-     port disable for the number of time passed in
-     should be no reason to do more than one time
+    port disable for the number of time passed in
+    
     """
+    ####is there a reason to do more than one time from this function
+    ####
     if portlist == "":
         myp = anturlar.SwitchInfo()
         portlist = myp.all_ports()
@@ -1182,12 +1184,36 @@ def end():
     pass
     
     
-    
+def flowcommand_list(options = "0"):
+    """
+        returns a list fo the flow Vision commands
+        send true to recieve the list of options for each command
+        pass the options of 0 , usage or all
+        0 - or blank will use the core commands only
+        usage - will use commands that will return the help list
+        all   - will use commands that will function correctly
+        
+    """
+    l = "flow"
 
+    if options == "usage":
+        
+        l = ["flow --create , \
+              flow --sh, \
+              flow --create, \
+              flow --delete,\
+              flow --control, \
+              flow --reset, \
+              flow --activate, \
+              flow --deactivate, \
+              flow --show aa, \
+              flow --help,\
+             ",\
+            ]
 
+    if options == "all":
 
-
-
+        l = [ ]
 
 
 
