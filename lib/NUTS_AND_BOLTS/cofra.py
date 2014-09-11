@@ -8,11 +8,6 @@ import re
 import liabhar
 
 
-"""
-cofra is cabinet
-"""
-
-
 
 class doFirmwareDownload():
     """
@@ -749,6 +744,7 @@ def mem_usage():
     """
     
     capture = anturlar.fos_cmd("ps axu")
+    
     return capture
 ###############################################################################
 
