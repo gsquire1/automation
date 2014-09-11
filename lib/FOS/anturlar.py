@@ -992,19 +992,20 @@ class FcipInfo(SwitchInfo, FabricInfo):
         else:
             ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
         ras = ras.findall(capture_cmd)
+        return(ras)
         print("RASRASRASRASRAS")
         print(ras)
-        for i in ras:
-            print(i)
-            sys.exit(0)
-            if self.am_i_director:
-                #slot_port_list.append(int(i[2]))
-                slot_port_list = [int(i[1]), int(i[2])]
-                #port_list.append(s_p)
-            else:
-                slot_port_list = [0, int(i[1])]
-                #port_list.append(slot_port_list) 
-        print(slot_port_list)
+        #for i in ras:
+        #    print(i)
+        #    sys.exit(0)
+        #    if self.am_i_director:
+        #        #slot_port_list.append(int(i[2]))
+        #        slot_port_list = [int(i[1]), int(i[2])]
+        #        #port_list.append(s_p)
+        #    else:
+        #        slot_port_list = [0, int(i[1])]
+        #        #port_list.append(slot_port_list) 
+        #print(slot_port_list)
 
         
     def all_ge_port_disabled(self):
@@ -1302,17 +1303,23 @@ class FcrConfig(SwitchInfo, FabricInfo):
     def sw_basic_info(self):
         """
             Retrieve FCR fabric and return info. Variable #'s:
-            0) FCR Enabled
+            0) Switch name
+            1) IP address
             1) Chassis or Pizza Box
             2) VF or not
-            3) Base Configured
+            3) FCR Enabled
+            4) Base Configured
 
         """
-        fcr = self.fcr_enabled()
+        switchname = self.switch_name()
+        ip_addr = self.ipaddress()
         director = self.director()
         vf = self.vf_enabled()
+        fcr = self.fcr_enabled()
         base = self.base_check()
-        return [fcr, director, vf, base]
+        
+        
+        return [switchname, ip_addr, director, vf, fcr, base]
 
     def ipv4_fcr(self):
         """

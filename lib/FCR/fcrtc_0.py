@@ -10,8 +10,11 @@ FCR 1st Test Case Module
 
 import anturlar
 import liabhar
-import re
+import re, sys, os
 import sys, os
+import fcr_tools
+import argparse
+
 """
 Naming conventions --
 
@@ -23,117 +26,53 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 function_name
                                 
 """
-def fab_wide_proxy_device_numbers():
+def bb_ip_all():
     """
-    Retrieve number of proxy device on all backbone switches in fabric.
+        Returns switch IP of all switches resident in Backbone fabric
     """
+    ips = fcr_tools.all_switches_in_bb_ip()
+    print(ips)
+    return(ips)
 
-    #fcrinfo = anturlar.FcrConfig()
-    #initial_checks = fcrinfo.sw_basic_info()
-    #print('\n\n'+ '='*20)
-    #print("FCR enabled :  %s" % initial_checks[0])
-    #print("Chassis :  %s" % initial_checks[1])
-    #print("VF enabled :  %s" % initial_checks[2])
-    #print("Base configured :  %s" % initial_checks[3])
-    #print('='*20 + '\n\n')
-    fcrinfo = anturlar.FcrConfig()
-    backbone_ip = fcrinfo.fcr_backbone_ip()
-    print('\n\n'+ '='*20)
-    bb_fab = (len(backbone_ip))
-    print('Backbone Fabric consists of %s switches.' % bb_fab)
-    print('IP addresses:')
-    print(backbone_ip)
-    print('='*20 + '\n\n')
+def bb_fabric_switch_status():
+    switch_info = fcr_tools.bb_fabric_switch_status()
+    b = (len(switch_info))
+    print("The number of switches in backbone is:", b)
+    print(switch_info)
+    #switch_dict = switch_info[3]
+    #print(switch_dict)
+    sys.exit(0)#################
+    z = switch_dict['switch_name']
+    #print(type(z))
+    print(z)
+    sortedkeys = switch_dict.keys()
+    print(sortedkeys)
+    #for key, value in sorted(switch_dict.items()):
+    for value in sorted(switch_dict.items()):
+        print(value)
+
+    sys.exit(0)###############
     
-    all_ips = []
-    for ip in backbone_ip:
-        anturlar.connect_tel_noparse(ip,'root','password')
-        base = fcrinfo.base_check() # get the base FID number
-        if base is not False:
-            #f = f.FcrConfig(base) ###########NEW OBJECT FOR BASE FID
-            #f = fcrinfo(base) ###########NEW OBJECT FOR BASE FID
-            anturlar.fos_cmd("setcontext " + base)
-            get_proxy = fcrinfo.fcr_proxy_dev() ###########NEW OBJECT FOR BASE FID
-            all_ips.extend(get_proxy)
-        else:
-            get_proxy = fcrinfo.fcr_proxy_dev()
-            all_ips.extend(get_proxy)
+    for i in switch_info:
+        items = i.items()
+        print('ITEMS')
+        print(items)
+    print("*"*20)
+    for i in switch_info:
+        keys = (i.keys())
+        print('KEYS')
+        print(keys)
+    print("*"*20)
+    for i in switch_info:
+        values = i.values()
+        print('VALUES')
+        print(values)
+    print("*"*20)
+    #for i in switch_info:
+    #    keys = i.keys()
+    #    print(keys)
 
-    proxy_dev = (str(all_ips))
-    f = ('logs/ProxyDev_Count.txt')
-    ff = liabhar.FileStuff(f,'w+b') ###open new file or clobber old
-    ff.write(proxy_dev)
-    #ff.write(cons_out+"\n")
-    ff.close()
-    print(proxy_dev)
-    return(proxy_dev)
-    
 
-def switch_status():
-    """
-        Retrieve basic switch info. sys.arg(0),sys.arg(1) etc. :
-        0) FCR Enabled
-        1) Chassis or Pizza Box
-        2) VF or not
-        3) Base Configured
-    """
-    fcrinfo = anturlar.FcrConfig()
-    initial_checks = fcrinfo.sw_basic_info()
-    print('\n\n'+ '='*20)
-    print("FCR enabled :  %s" % initial_checks[0])
-    print("Chassis :  %s" % initial_checks[1])
-    print("VF enabled :  %s" % initial_checks[2])
-    print("Base configured :  %s" % initial_checks[3])
-    print('='*20 + '\n\n')
-    return (initial_checks)
-    #a = fcrinfo.get_licenses()
-
-def get_fabwide_ip():
-    fcrcfg = anturlar.FcrConfig()
-    fab_ip_list = list(fcrcfg.fcr_fab_wide_ip())
-    print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
-    return(fab_ip_list)
-
-def ex_slots_find():
-    """
-    Find slots that contain EX ports and return slot number(s).
-    """
-    fcri = anturlar.FcrConfig()
-    fcipi = anturlar.FcipInfo()
-    port_list = fcri.vex_ports()
-    port_list2 = fcri.ex_ports()
-    port_list3 = fcri.disabled_ports()
-    #d = fcipi.vex_ports()
-    #e = fcipi.ex_ports()
-    f = fcipi.all_ge_ports()
-    #print(d)
-    #print(e)
-    print("PORTLISTPORTLIST")
-    print(port_list)
-    print(f)
-    sys.exit(0)
-    #################################
-    print(port_list2)
-    print(port_list3)
-    if self.am_i_director:
-       for i in portlist:
-            slot = i[0]
-            port = i[1]
-            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-            cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
-            ex = pattern.search(cmd)
-            if ex:
-                fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2") )
-    else: 
-        for i in portlist:
-            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-            cmd = fos_cmd("portcfgshow %a" % i)
-            ex = pattern.search(cmd)
-            if ex:
-                fos_cmd("portcfgexport "+i+" -a2")
-        cmd_cap = fos_cmd("switchenable")        
-        return(cmd_cap)
-    
 
         
 def change_fid(fid):
@@ -649,11 +588,6 @@ def send_cmds(filename , loops = 1):
     g.close()
     return 0
 
-
-          
-def end():
-    pass
-        
     
     
     
