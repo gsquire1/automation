@@ -91,9 +91,9 @@ def tc_01_01_01_02():
     test_result = ""
     
     p = anturlar.Maps()
-    cmds_list = mapscommand_list()
-    cmds_list_w_usage = mapscommand_list("usage")
-    cmds_list_w_correct = mapscommand_list("all")
+    cmds_list = maps_tools.mapscommand_list()
+    cmds_list_w_usage = maps_tools.mapscommand_list("usage")
+    cmds_list_w_correct = maps_tools.mapscommand_list("all")
     #### get the list of license and remove them from the switch
     l_list = p.getLicense()
     print("license list \n\n%s "% l_list)
@@ -1387,7 +1387,7 @@ def tc_01_01_05_06():
     return()
 ###############################################################################
 
-def tc_01_01_05_07():
+def tc_01_01_05_07(): 
     """
         Test Case   25.01.01.05.07
         Title:      MAPS SAM EVENTS
@@ -1605,16 +1605,13 @@ def tc_01_01_06_07():
     return(0)
 ###############################################################################        
    
-
-   
-    
-def tc_01_01_template():
+def tc_02_01_01_01():
     """
-        Test Case   25.01.01.template
-        Title:
-        Feature:    Predfined Group Management
-        Objective:  Verify the predefined groups including only the elements
-        defined for each group 
+        Test Case   25.02.01.01.01 
+        Title:      License of Flow Vision
+        Feature:    Flow Vision
+        Objective:  Verify Flow Vision requires a license
+        
     """
     ###########################################################################
     ####  todo -
@@ -1623,7 +1620,30 @@ def tc_01_01_template():
     ###########################################################################
     ####
     #### Steps:
-    ####    1. 
+    #### 1. confirm license is not installed
+    ####    a. this can be flow vision, APM or FW license
+    ####    b. if license is installed remove license
+    #### 2. send each Flow Vision command
+    #### 3. confirm the message for each command
+    #### 4. add all license back
+    ####    a. dont need to confirm Flow Vision license since the
+    ####        test will fail if it is not one of the license
+    #### 5. send each Flow Vision command
+    #### 6. confirm the message for each command
+    ####
+    #### 7. confirm help message for each command
+    #### 8. confirm man page is available for each command
+    ####    a. confirm first page of man page - the rest is visual
+    ####
+    ####  Flow 
+    ####  mapsConfig 	 mapsPolicy  	mapsconfig  	mapshelp
+    ####  mapsrule 	 mapsHelp   	 mapsRule    	mapsdb      
+    ####  mapspolicy  	mapssam 	relayconfig *	logicalgroup *
+    ####  * commands will not have a MAPS message since they are used
+    ####     in other features
+    #### LPMDE3mKQQrtTYYrKAWEPfFGgZfm7X3JBAXFM
+    ####     
+    #### start the test
     ####
     ###########################################################################
     #### start testing
@@ -1631,9 +1651,26 @@ def tc_01_01_template():
     #### create the object and clear stats
     en = anturlar.Maps()
     ####
-    #fabmems = anturlar.fabric_members()
+    cmds_list = maps_tools.mapscommand_list()
+    cmds_list_w_usage = maps_tools.mapscommand_list("usage")
+    cmds_list_w_correct = maps_tools.mapscommand_list("all")
     
-
+    #### get the list of license and remove them from the switch
+    l_list = p.getLicense()
+    print("license list \n\n%s "% l_list)
+    for license in l_list:
+        anturlar.fos_cmd("licenseremove %s " % license)
+    #### no need to confirm the Flow Vision license
+    ####  just remove all the license and test
+    ####   if no license for flow vision the test case will fail
+    
+    cmds_list = flow_tools.flow()
+    cmds_list_w_usage = maps_tools.mapscommand_list("usage")
+    cmds_list_w_correct = maps_tools.mapscommand_list("all")
+    
+    
+    
+    
     fab_stuff = anturlar.FabricInfo(en.currentFID())
     fabmems = fab_stuff.fabric_members()
     myzone = fab_stuff.zone_info()
@@ -1679,32 +1716,273 @@ def tc_01_01_template():
 ###############################################################################   
     
  
+   
+    
+def tc_01_01_template():
+    """
+        Test Case   25.01.01.template
+        Title:
+        Feature:    Predfined Group Management
+        Objective:  Verify the predefined groups including only the elements
+        defined for each group 
+    """
+    ###########################################################################
+    ####  todo -
+    ####    1.   ??
+    ####
+    ###########################################################################
+    ####
+    #### Steps:
+    ####    1. 
+    ####
+    ###########################################################################
+    #### start testing
+    ####
+    #### create the object and clear stats
+    en = anturlar.Maps()
+    ####
+    #fabmems = anturlar.fabric_members()
+    
+
+    fab_stuff = anturlar.FabricInfo(en.currentFID())
+    fabmems = fab_stuff.fabric_members()
+    myzone = fab_stuff.zone_info()
+    
+    eports = en.e_ports()
+    #print("\n\nMY E-PORTS  %s " % eports )
+    #print("use the first port found for now %s  " % eports[0][0])
+    #### for pizza box
+    
+    #fid_now = en.currentFID()
+    
+    f = cofra.DoSupportsave('10.38.38.138','ftp2','ftp','chassisname')
+    
+    x = 0
+    while x <= 3600:
+        
+        anturlar.fos_cmd("date") 
+        anturlar.fos_cmd("mapsdb --show")
+        cmdrtn = anturlar.fos_cmd("sleep 5")
+        
+        for p in eports:
+            x += 1
+            cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+            #cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            #cmdrtn = anturlar.fos_cmd("sleep 10")
+        
+        for p in eports:
+            cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+    
+    
+        for p in eports:
+            x += 1
+            cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+            cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+    
+    
+    
+    return()
+###############################################################################   
+    
+ 
 
 
-
+def mem_monitor(wait_time=1800, iters=336):
+    """
+        Test Case   Monitor of memory
+        Title:
+        Feature:    No specific feature
+        Objective:  confirm no memory leaks 
+        
+    """
+    ###########################################################################
+    ####  todo -
+    ####    1.    
+    ####
+    ###########################################################################
+    ####
+    #### Steps:
+    ####    1. get the memory usage every 1800 seconds ( 30 minute default)
+    ####      count is set to 
+    ###########################################################################
+    #### start testing
+    ####
+    en = anturlar.Maps()
+    sw_ip = en.ipaddress()
+    
+    baseline = anturlar.fos_cmd("ps -eo command,pid,pmem,rss,vsz ")
+    ras = re.compile('([- \.:,\[\]\w\/@\d]+)\s+([\d]+)\s+([.\d]+)\s+([\d]+)\s+([\d]+)(?=\\r\\n)')
+    ras = ras.findall(baseline)
+    
+    i = 0
+    k = ras[i][0] + ras[i][1]  #### craete a key with the command name
+                               #### and pid added together
+    v = [ras[i][3]]   #### create the value as a list otherwise the first one
+                      #### is a string and extend command later on will fail
+    #print("K AND V ARE : %s   %s " % (k,v))
+    d = {k:v}     #### create the first dictionary entry ras[0]
+    i = 1         #### start a loop to add all the rest of the entries to the dict
+    while i < len(ras):
+        if "ps -eo" not in ras[i][0]:    #### exclude the ps command
+            #print("\n\n\n\n VALUE OF I is : %s  " % i)
+            #print(ras[i][0])
+            k = ras[i][0]
+            k = k + ras[i][1]
+            v = [ras[i][3]]
+            d.update({k:v})
+        i += 1
+    #### print the first baseline dictionary ####     
+    for k,v in d.items():
+        print("%s      %s   " % (k,v))
+    #### wait to get the next set of usage stats
+    liabhar.count_down(wait_time)  
+ 
+    x = 0    
+    while x <= iters:    ####default is 336 so the test goes 7 days
+        x += 1         ####  when wait_time is 1800 seconds
+        
+        #### wrap with try expect or close any telnet session and reconnect
+        #### after the wait time
+        current_date = anturlar.fos_cmd("date") 
+        capture = anturlar.fos_cmd("ps -eo command,pid,pmem,rss,vsz ")
+         
+        ####  do the calculations
+        ####  capture the ps data and put it in a variableto add to the dictionary
+        ras = re.compile('([- \.:,\[\]\w\/@\d]+)\s+([\d]+)\s+([.\d]+)\s+([\d]+)\s+([\d]+)(?=\\r\\n)')
+        ras = ras.findall(capture)
+        #### add the data to the dictionary
+        value = []
+        y = 0
+        while y < len(ras):
+            if "ps -eo" not in ras[y][0]:  #### exlude the ps command
+                key = ras[y][0] + ras[y][1]
+                value = d[key]
+                ras_value = [ras[y][3]]
+                value.extend(ras_value)
+                d[key] = value            #### add the value to the key
+            y += 1                        #### if key does not exist add
+                                          ####new key and value
+        #### print the newest data and wait 
+        print("@"*60)
+        print("@"*60)
+        print("@"*60)
+        for kk, vv in d.items():
+            print(kk,vv)
+        print("@"*60)
+        
+        #######################################################################
+        ####  write the same data to a file
+        f = "%s%s%s"%("logs/memory_log_",sw_ip,".txt")
+        clear = 1
+        if clear == 1 :
+            ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        else:
+            ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
+                
+        st = "Runs  Percent  Ingrport  Egrport \n"        
+        header = "%s%s%s%s" % ("\nMEMORY WATCH\n", "  sw_info ipaddr  ",\
+                               sw_ip, "\n==============================\n\n")  
+        ff.write(header)
+        summary_string = ""
+        for kk, vv in d.items():
+            #print(kk,vv)
+            list_of_value = str(vv)
+            ' '.join(list_of_value)
+            list_of_value = list_of_value.strip('[]')
+            list_of_value = list_of_value.replace("'","")
+            list_of_value = kk + ",   " + list_of_value + "\n"
+            
+            ff.write(list_of_value)
+            
+            
+            list_of_value = list_of_value.strip('\n')
+            list_with_change_key = list_of_value.split(',')
+            name_pid = list_with_change_key[0]
+            values_for_name_pid = list_with_change_key[1:]
+            print("Name pid  :  %s " % name_pid )
+            print("VALUES for   %s " % values_for_name_pid)
+            low_value =999999
+            high_value = 0
+            for v in values_for_name_pid:
+                n_to_compare = int(v)
+                if low_value > n_to_compare:
+                    low_value = n_to_compare
+                elif high_value < n_to_compare:
+                    high_value = n_to_compare
+            print("NAME PID  %s  " % name_pid)
+            print("HIGH   LOW   LAST  AMOUNT_of_CHANGE   VALUES %s : %s  " % ( high_value, low_value))
+            any_change = high_value - low_value    
+            summary_string = summary_string+name_pid+",   "+str(low_value)+",  "+str(high_value)+",  "+n_to_compare+ ",  "+any_change+"\n"
+        
+        ff.write("\n"*6)
+        ff.write("@"*40)
+        ff.write("\n")
+        ff.write("@"*40)
+        ff.write("\n")
+        ff.write("SUMMARY OF MEMORY LOW AND HIGH VALUES")
+        ff.write("\n\n")
+        ff.write(summary_string)
+        
+        ff.close()
+        
+        liabhar.cls()
+        print("Memory Watch   Step  %s  " % x )
+        print("Your date is in %s  " % f )
+        print("time to next data capture : ")
+        liabhar.count_down(wait_time)
+    
+    return()
+###############################################################################   
+    
+ 
  
 def firmwaredownload(frmdwn ):
     """
-        use anturlar firmwaredownload to do testing for update to
+        uses cofra firmwaredownload to do testing for update to
         newest code
         
     """
+    
+    capture_cmd = anturlar.fos_cmd("ipaddrshow")
+    #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
+    match = re.search('(?P<pre>([\s+\w+]+):\s?(?P<ip>[0-9\.]{1,15}))', capture_cmd)
+    if match:
+        myip = (match.group('ip'))
+        #return(myip)
+    else:
+        print("\n\n NO IP FOUND \n\n")
+        #return (0)
+    
+    while True:
     #f = cofra.doFirmwareDownload(frmdwn)
-    en = anturlar.SwitchInfo()
-    f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
-#### reconnect to telnet session ??  if the firmwaredownload is disruptive
+        capture_cmd = anturlar.fos_cmd("version")
+        f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
+        
+        #
+        #print("value of f is :  ")
+        #print(f)
+        #
+        #if "failed" in f:
+        #    sys.exit()
+        
+         
+        liabhar.count_down(10)
+        
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        en = anturlar.SwitchInfo()
+        capture_cmd = anturlar.fos_cmd("version")
+        
+        f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
     
-    en = anturlar.SwitchInfo()
-    f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
-    
-    
-#def clearstats():
-#    """
-#        clear all stats using the clear stats procedure in anturlar.py
-#    """
-#    
-#    cs = anturlar.clear_stats()
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        en = anturlar.SwitchInfo()
 
+    return(0)
+###############################################################################
  
 
 def end():

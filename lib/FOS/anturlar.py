@@ -11,15 +11,14 @@ import liabhar
 from socket import error as SocketError
 import errno
 """
-Naming conventions --
+Note: Naming conventions follow the typical Python conventions
 
 module_name                     package_name            
 method_name                     ExceptionName           
 global_var_name                 instance_var_name
 function_parameter_name         local_var_name
 GLOBAL_CONSTANT_NAME            ClassName
-                                function_name
-                                
+                                function_name                                
 """
 
 class FabricInfo:
@@ -1829,12 +1828,12 @@ def fos_cmd_regex(cmd, reg, dblevel=0):
         print(cmd)
         tn.write(cmd.encode('ascii') + b"\n")
         
-        capture = tn.expect(reg_ex_list, 60)
+        capture = tn.expect(reg_ex_list, 3600)
         capture = capture[2]
         capture = capture.decode()
         print(capture, end="")
         tn.set_debuglevel(0)
-        return capture
+        return(capture)
  
     except EOFError:
         print("========================")
