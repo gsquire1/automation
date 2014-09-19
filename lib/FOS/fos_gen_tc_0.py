@@ -36,7 +36,7 @@ def show_vc(slot, port ):
     cons_out = anturlar.fos_cmd("")
     cmd_create = ("portregshow %s/%s | grep trc" %(slot, port))   
     
-    ons_out = anturlar.fos_cmd(cmd_create)
+    cons_out = anturlar.fos_cmd(cmd_create)
          
     ras = re.compile('(\d)(?= )') 
     ras = ras.findall(cons_out)
