@@ -225,6 +225,7 @@ class FabricInfo:
             return(ras_result_all)
             
         else:
+            print("NOOOOOOOOOOOOO!!!!!!!!!!")
             ras_result = "no fabric"
             return("no fabric")
             
@@ -292,7 +293,7 @@ class SwitchInfo:
         else:
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+[FCVE]\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')  
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FGVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
     
@@ -353,7 +354,6 @@ class SwitchInfo:
         self.__sw_show_info_all_ports__()
         capture_cmd_split = self.online_ports
         ras_result = capture_cmd_split.count(porttype)
-        
         if self.am_i_director:
             location = 8
         else:
@@ -403,8 +403,8 @@ class SwitchInfo:
             return the port list or none if no ports in the FID
             The list will include FC and VE ports
         """
-        ras_list = []
         
+        ras_list = []
         capture_cmd = fos_cmd("switchshow")
         if self.am_i_director:
             ras = re.compile('(?:\d{1,4}\s{3,4})(?P<slotnumber>\d{1,2})\s+?(?P<port>\d{1,2})') 
@@ -495,6 +495,8 @@ class SwitchInfo:
             capture_cmd = fos_cmd("slotshow -m")
             ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE)\s+(\d+)\s+([-FCOEX1032468]+)\s+(\w+)')
             ras = ras.findall(capture_cmd)
+            print("RASRASRASRASRAS")
+            print(ras)
             return(ras)
         else:
             return("not a director")
@@ -892,7 +894,216 @@ class SwitchInfo:
             #print("\n\n\nVF is enabled on this switch\n\n\n")
             return (True)
 
-class FcipInfo(SwitchInfo, FabricInfo):
+class FcrInfo(FabricInfo, SwitchInfo):
+    """
+    Class for FCR functions etc. Doc strings need to be added for some of the functions.
+    """
+    
+    def __init__(self):
+        SwitchInfo.__init__(self)
+        FabricInfo.__init__(self)
+
+    def all_ex_ports(self):
+        """
+            Capture all ex ports for both Chassis and Pizza Box
+        """
+        
+        capture_cmd = self.__getportlist__("EX-Port")
+        return(capture_cmd)
+    
+    def all_switches_in_bb_ip(self):
+        """
+            Returns ip addresses of all switches in backbone fabric
+        """
+        
+        backbone_ip = self.fcr_backbone_ip()
+        return(backbone_ip)
+    
+    def ex_deconfig(self):
+        """
+        Find all EX-Ports AND VEX-Ports on either director or pizzabox and deconfigure.   
+        """
+        fos_cmd("switchdisable")
+        portlist =  self.all_ports()
+        if self.am_i_director:
+            for i in portlist:
+                slot = i[0]
+                port = i[1]
+                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
+                ex = pattern.search(cmd)
+                if ex:
+                    fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2"))
+                    fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a2"))
+        else: 
+            for i in portlist:
+                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                cmd = fos_cmd("portcfgshow %a" % i)
+                ex = pattern.search(cmd)
+                if ex:
+                    fos_cmd("portcfgexport "+i+" -a2")
+                    fos_cmd("portcfgvexport "+i+" -a2")
+        cmd_cap = fos_cmd("switchenable")        
+        return(cmd_cap)
+    
+    def fcr_backbone_ip(self):
+        """
+        Runs fabricshow against backbone switches in a fabric to determine all IPs 
+        """
+        fcrcfg = FcrInfo()
+        fcrstatus = self.sw_basic_info()
+        print("FCRSTATUS")
+        print(fcrstatus)
+        if fcrstatus[5] is not False:  # Test if base config'd and if so
+            base = fcrcfg.base_check() # get the base FID number
+            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
+        else:
+            get_fabric_ip = fcrcfg.ipv4_list()
+        return(get_fabric_ip)
+
+    def fcr_fab_wide_ip(self):
+        """
+            Runs fcrfabricshow and fabricshow against switches in a fabric to determine all IPs then
+            removes any duplicate entries.
+            This includes both backbone and edge switches and any switches in edge fabrics.
+            Return is a set of IPs (set function doesn't allow duplicates).
+        """
+         
+        fcrcfg = FcrInfo()
+        fcrstatus = self.sw_basic_info()
+        if fcrstatus[3] is not False:  # Test if base config'd and if so
+            base = fcrcfg.base_check() # get the base FID number
+            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
+        else:
+            get_fabric_ip = fcrcfg.ipv4_list()
+        get_fcr_fabric = self.ipv4_fcr()
+        fcr_fab_ip_list = (set(get_fabric_ip + get_fcr_fabric))
+        
+        all_ips = []
+        get_fabric_ip = []
+        for ip in fcr_fab_ip_list:
+            connect_tel_noparse(ip,'root','password')
+            base = fcrcfg.base_check() # get the base FID number
+            if base is not False:
+                f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+                get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
+            else:
+                get_fabric_ip = fcrcfg.ipv4_list()
+                all_ips.extend(get_fabric_ip)
+        all_ips_no_dups = (set(all_ips))
+        return(all_ips_no_dups)
+
+    def fcr_proxy_dev(self):
+        """
+        Get number of proxy devices reported by switch
+        """
+        if self.am_i_director == True:
+            base = self.base_check()
+            if base is not False:
+                fos_cmd("setcontext " + base)
+            else:
+                pass
+        else:
+            pass
+        cmd_capture = fos_cmd("fcrproxydevshow | grep device")
+        print(cmd_capture)
+        device_number = re.findall(':\s([0-9]{1,4})', cmd_capture)
+        #print('DEVICEDEVICEDEVICE')
+        #print(device_number)
+        return(device_number)
+    
+    def get_licenses(self):
+        """
+        Write Licenses to a file in /home/RunFromHere/logs/Switch_Licenses
+        """
+        ip_list = self.fcr_fab_wide_ip()
+        for ip in ip_list:
+            connect_tel_noparse(ip,'root','password')
+            sw_info = SwitchInfo()
+            sw_name = sw_info.switch_name()
+            f = "%s%s%s"%("logs/Switch_Licenses/License_File_", sw_name ,".txt")
+            ff = liabhar.FileStuff(f,'a+b') ###open new file or clobber old
+            header = "%s%s%s%s" % ("\nLICENSE FILE \n", ip+"\n" , sw_name, "\n==============================\n\n")
+            cons_out = fos_cmd("licenseshow")
+            ff.write(header)
+            ff.write(cons_out+"\n")
+            ff.close()
+
+    def sw_basic_info(self):
+        """
+            Retrieve FCR fabric and return info. Variable #'s:
+            0) Switch name
+            1) IP address
+            2) Chassis or Pizza Box
+            3) VF or not
+            4) FCR Enabled
+            5) Base Configured
+
+        """
+        switchname = self.switch_name()
+        ip_addr = self.ipaddress()
+        director = self.director()
+        vf = self.vf_enabled()
+        fcr = self.fcr_enabled()
+        base = self.base_check()
+        
+        return [switchname, ip_addr, director, vf, fcr, base]
+
+    def ipv4_fcr(self):
+        """
+            Return a string (list) ipv4 address of switch\switches connected
+            to FCR Router thru EX-Port
+        """
+        #self.__change_fid__()
+        capture_cmd = fos_cmd("fcrfabricshow")
+        
+        ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        ras_result_all = ras.findall(capture_cmd)
+            
+        if not ras_result_all:
+            ras_result_all = None 
+        return ras_result_all
+
+    def ipv4_fid_export_fcr(self):
+        """
+            Return a string (list) containing EX-Port number, FID and ipv4 address of switch\switches connected
+            to FCR Router thru EX-Port
+        """
+        #self.__change_fid__()
+        capture_cmd = fos_cmd("fcrfabricshow")
+        ras = re.compile('(\d{1,3})\s+(\d{1,3})\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        ras_result_all = ras.findall(capture_cmd) 
+        if not ras_result_all:
+            ras_result_all = None
+        return ras_result_all 
+
+    def portcfgfillword(self, cfgvalue):
+        """
+            NOT WORKING. NEED TO FIGURE OUT HOW TO PASS IN CFGVALUE. applies user chosen setting (0-4) for portcfgfillword command.
+            Will try against all ports in given fid/switch with FOS rejecting
+            all but C2 (8GB) ports.
+        """
+        fos_cmd("switchdisable")
+        portlist =  self.all_ports()
+        if self.am_i_director:
+           for i in portlist:
+                slot = i[0]
+                port = i[1]
+                fos_cmd("\r")
+                fos_cmd("portcfgfillword "+slot+"/"+port+" "+ cfgvalue )
+                fos_cmd("\r")
+        else: 
+            for i in portlist:
+                fos_cmd("\r")
+                fos_cmd("portcfgfillword "+i+" "+ cfgvalue )
+                fos_cmd("\r")
+        cmd_cap = fos_cmd("switchenable")
+        return(cmd_cap)
+    
+    
+class FcipInfo(FabricInfo, SwitchInfo):
     """
         A class to return information about a switch
     
@@ -902,66 +1113,92 @@ class FcipInfo(SwitchInfo, FabricInfo):
     def __init__(self):
         SwitchInfo.__init__(self)
         FabricInfo.__init__(self)
-        #self.__director__()
-        #self.online_ports = ""
-        #self.ipaddr =  self.__myIPaddr__()    
-        #a = self.__sw_show_info_all_ports__()
-        
-    def __getportlist__(self, port_type):
-        """
-           Return a list of the porttype passed in - in the current FID
-            
-        """
-        port_list = []
-        ge_port = self.__all_ge_ports__()
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print(ge_port)
-        #capture_cmd_split = self.all_ports()
-        #print(capture_cmd_split)
-        sys.exit(0)
-        ras_result = capture_cmd_split.count(porttype)
-        if self.am_i_director:
-            location = 8
-        else:
-            location = 7
-            
-        persist_local = location
-        persist_local += 1
-            
-        for i in capture_cmd_split:
-            if i[location] == porttype:
-                #### port_list.append(i[0])
-                #slot_port_list = []
-                #slot_port_list.append(int(i[1]))
-                if self.am_i_director:
-                    #slot_port_list.append(int(i[2]))
-                    slot_port_list = [int(i[1]), int(i[2])]
-                #port_list.append(s_p)
-                else:
-                    slot_port_list = [0, int(i[1])]
-                port_list.append(slot_port_list)
-                 
-                 
-            if porttype == "Persistent":
-                try:
-                    if "rsistent" in i[persist_local]:
-                        ####port_list.append(i[0])
-                        #slot_port_list = []
-                        #slot_port_list.append(int(i[1]))
-                        if self.am_i_director:
-                            #slot_port_list.append(int(i[2]))
-                            slot_port_list = [int(i[1]), int(i[2])]
-                        else:
-                            slot_port_list = [0, int(i[1])]
-                        port_list.append(slot_port_list)
-                        
-                except UnboundLocalError:
-                    print("unboundlocalerror - moving on  ")
-                    pass
 
-        if not ras_result:
-            ras_result = "no port found"
-        return port_list
+        
+    def all_ge_ports(self):
+        """
+            Capture all ge and xge ports
+        """
+        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        #a = self.__getportlist__("ge-port")
+        print(capture_cmd)
+        if self.am_i_director :
+            ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
+        else:
+            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
+        ras = ras.findall(capture_cmd)
+        a = self.__getportlist__("EX-Port")
+        print(a)
+        return(ras)
+    
+
+        #for i in ras:
+        #    print(i)
+        #    sys.exit(0)
+        #    if self.am_i_director:
+        #        #slot_port_list.append(int(i[2]))
+        #        slot_port_list = [int(i[1]), int(i[2])]
+        #        #port_list.append(s_p)
+        #    else:
+        #        slot_port_list = [0, int(i[1])]
+        #        #port_list.append(slot_port_list) 
+        #print(slot_port_list)
+        
+    #def __getportlist__(self, port_type):
+    #    """
+    #       Return a list of the porttype passed in - in the current FID
+    #        
+    #    """
+    #    port_list = []
+    #    ge_port = self.all_ge_ports()
+    #    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    #    print(ge_port)
+    #    #capture_cmd_split = self.all_ports()
+    #    #print(capture_cmd_split)
+    #    sys.exit(0)
+    #    ras_result = capture_cmd_split.count(porttype)
+    #    if self.am_i_director:
+    #        location = 8
+    #    else:
+    #        location = 7
+    #        
+    #    persist_local = location
+    #    persist_local += 1
+    #        
+    #    for i in capture_cmd_split:
+    #        if i[location] == porttype:
+    #            #### port_list.append(i[0])
+    #            #slot_port_list = []
+    #            #slot_port_list.append(int(i[1]))
+    #            if self.am_i_director:
+    #                #slot_port_list.append(int(i[2]))
+    #                slot_port_list = [int(i[1]), int(i[2])]
+    #            #port_list.append(s_p)
+    #            else:
+    #                slot_port_list = [0, int(i[1])]
+    #            port_list.append(slot_port_list)
+    #             
+    #             
+    #        if porttype == "Persistent":
+    #            try:
+    #                if "rsistent" in i[persist_local]:
+    #                    ####port_list.append(i[0])
+    #                    #slot_port_list = []
+    #                    #slot_port_list.append(int(i[1]))
+    #                    if self.am_i_director:
+    #                        #slot_port_list.append(int(i[2]))
+    #                        slot_port_list = [int(i[1]), int(i[2])]
+    #                    else:
+    #                        slot_port_list = [0, int(i[1])]
+    #                    port_list.append(slot_port_list)
+    #                    
+    #            except UnboundLocalError:
+    #                print("unboundlocalerror - moving on  ")
+    #                pass
+    #
+    #    if not ras_result:
+    #        ras_result = "no port found"
+    #    return port_list
         
     def __sw_show_info_ge_port_type__(self):
         """
@@ -979,34 +1216,25 @@ class FcipInfo(SwitchInfo, FabricInfo):
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
     
-    def all_ge_ports(self):
-        """
-        Capture all ge and xge ports
-        """
-        capture_cmd = fos_cmd("switchshow | grep -i ge")
-        #self.__getportlist__()
-        print(capture_cmd)
-        if self.am_i_director :
-            ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
-        else:
-            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
-        ras = ras.findall(capture_cmd)
-        return(ras)
-        print("RASRASRASRASRAS")
-        print(ras)
-        #for i in ras:
-        #    print(i)
-        #    sys.exit(0)
-        #    if self.am_i_director:
-        #        #slot_port_list.append(int(i[2]))
-        #        slot_port_list = [int(i[1]), int(i[2])]
-        #        #port_list.append(s_p)
-        #    else:
-        #        slot_port_list = [0, int(i[1])]
-        #        #port_list.append(slot_port_list) 
-        #print(slot_port_list)
 
-        
+    #def all_ex_ports(self):
+    #    """
+    #    Capture all ex ports for both Chassis and Pizza Box
+    #    """
+    #    capture_cmd = fos_cmd("switchshow | grep -i EX")
+    #    #self.__getportlist__()
+    #    print(capture_cmd)
+    #    sys.exit(0)#############################################
+    #    
+    #    if self.am_i_director :
+    #        ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
+    #    else:
+    #        ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
+    #    ras = ras.findall(capture_cmd)
+    #    return(ras)
+    #    print("RASRASRASRASRAS")
+    #    print(ras)
+ 
     def all_ge_port_disabled(self):
         """
         Capture all disabled ge and xge ports
@@ -1161,219 +1389,6 @@ class configSwitch(SwitchInfo):
             if "LOGICAL SWITCH PORTS" in line_str:
                 keepnext = 1
                 print("change keepnext to 1")
-
-class FcrConfig(SwitchInfo, FabricInfo):
-    """
-    Class for FCR functions etc. Doc strings need to be added for some of the functions.
-    """
-    
-    def __init__(self):
-        SwitchInfo.__init__(self)
-        FabricInfo.__init__(self)
-    
-    def ex_cleanup(self):
-        """
-        Find all Ex-Ports on either director or pizzabox and deconfigure    
-        """
-        fos_cmd("switchdisable")
-        portlist =  self.all_ports()
-        if self.am_i_director:
-            for i in portlist:
-                slot = i[0]
-                port = i[1]
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2") )
-        else: 
-            for i in portlist:
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a" % i)
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport "+i+" -a2")
-        cmd_cap = fos_cmd("switchenable")        
-        return(cmd_cap)
-    
-    def slots_with_ex_ports(self):
-        """
-        Find slots that contain EX ports and return slot number(s).
-        """
-        #fos_cmd("switchshow | grep EX")
-        portlist =  self.ex_ports()
-        print(portlist)
-        sys.exit(0)
-        if self.am_i_director:
-           for i in portlist:
-                slot = i[0]
-                port = i[1]
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2") )
-        else: 
-            for i in portlist:
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a" % i)
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport "+i+" -a2")
-            cmd_cap = fos_cmd("switchenable")        
-            return(cmd_cap)
-    
-    def fcr_backbone_ip(self):
-        """
-        Runs fabricshow against backbone switches in a fabric to determine all IPs 
-        """
-         
-        fcrcfg = FcrConfig()
-        fcrstatus = self.sw_basic_info()
-        if fcrstatus[3] is not False:  # Test if base config'd and if so
-            base = fcrcfg.base_check() # get the base FID number
-            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-        else:
-            get_fabric_ip = fcrcfg.ipv4_list()
-        return(get_fabric_ip)
-
-    def fcr_fab_wide_ip(self):
-        """
-            Runs fcrfabricshow and fabricshow against switches in a fabric to determine all IPs then
-            removes any duplicate entries.
-            This includes both backbone and edge switches and any switches in edge fabrics.
-            Return is a set of IPs (set function doesn't allow duplicates).
-        """
-         
-        fcrcfg = FcrConfig()
-        fcrstatus = self.sw_basic_info()
-        if fcrstatus[3] is not False:  # Test if base config'd and if so
-            base = fcrcfg.base_check() # get the base FID number
-            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-        else:
-            get_fabric_ip = fcrcfg.ipv4_list()
-        get_fcr_fabric = self.ipv4_fcr()
-        fcr_fab_ip_list = (set(get_fabric_ip + get_fcr_fabric))
-        
-        all_ips = []
-        get_fabric_ip = []
-        for ip in fcr_fab_ip_list:
-            connect_tel_noparse(ip,'root','password')
-            base = fcrcfg.base_check() # get the base FID number
-            if base is not False:
-                f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-                get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-            else:
-                get_fabric_ip = fcrcfg.ipv4_list()
-                all_ips.extend(get_fabric_ip)
-        all_ips_no_dups = (set(all_ips))
-        return(all_ips_no_dups)
-
-
-    def fcr_proxy_dev(self):
-        """
-        Get number of proxy devices reported by switch
-        """
-        cmd_capture = fos_cmd("fcrproxydevshow | grep device")
-        print(cmd_capture)
-        device_number = re.findall(':\s([0-9]{1,4})', cmd_capture)
-        #print('DEVICEDEVICEDEVICE')
-        #print(device_number)
-        return(device_number)
-    
-
-    def get_licenses(self):
-        ip_list = self.fcr_fab_wide_ip()
-        for ip in ip_list:
-            connect_tel_noparse(ip,'root','password')
-            sw_info = SwitchInfo()
-            sw_name = sw_info.switch_name()
-            f = "%s%s%s"%("logs/Switch_Licenses/License_File_", sw_name ,".txt")
-            ff = liabhar.FileStuff(f,'a+b') ###open new file or clobber old
-            header = "%s%s%s%s" % ("\nLICENSE FILE \n", ip+"\n" , sw_name, "\n==============================\n\n")
-            cons_out = fos_cmd("licenseshow")
-            ff.write(header)
-            ff.write(cons_out+"\n")
-            ff.close()
-
-
-    def sw_basic_info(self):
-        """
-            Retrieve FCR fabric and return info. Variable #'s:
-            0) Switch name
-            1) IP address
-            1) Chassis or Pizza Box
-            2) VF or not
-            3) FCR Enabled
-            4) Base Configured
-
-        """
-        switchname = self.switch_name()
-        ip_addr = self.ipaddress()
-        director = self.director()
-        vf = self.vf_enabled()
-        fcr = self.fcr_enabled()
-        base = self.base_check()
-        
-        
-        return [switchname, ip_addr, director, vf, fcr, base]
-
-    def ipv4_fcr(self):
-        """
-            Return a string (list) ipv4 address of switch\switches connected
-            to FCR Router thru EX-Port
-        """
-        #self.__change_fid__()
-        capture_cmd = fos_cmd("fcrfabricshow")
-        
-        ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-        ras_result_all = ras.findall(capture_cmd)
-            
-        if not ras_result_all:
-            ras_result_all = None 
-        return ras_result_all
-
-
-    def ipv4_fid_export_fcr(self):
-        """
-            Return a string (list) containing EX-Port number, FID and ipv4 address of switch\switches connected
-            to FCR Router thru EX-Port
-        """
-        #self.__change_fid__()
-        capture_cmd = fos_cmd("fcrfabricshow")
-        
-        ras = re.compile('(\d{1,3})\s+(\d{1,3})\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-        ras_result_all = ras.findall(capture_cmd)
-            
-        if not ras_result_all:
-            ras_result_all = None
-        return ras_result_all 
-
-    
-    def portcfgfillword(self, cfgvalue):
-        """
-            Applies user chosen setting (0-4) for portcfgfillword command.
-            Will try against all ports in given fid/switch with FOS rejecting
-            all but C2 (8GB) ports.
-        """
-        fos_cmd("switchdisable")
-        portlist =  self.all_ports()
-        if self.am_i_director:
-           for i in portlist:
-                slot = i[0]
-                port = i[1]
-                fos_cmd("\r")
-                fos_cmd("portcfgfillword "+slot+"/"+port+" "+ cfgvalue )
-                fos_cmd("\r")
-        else: 
-            for i in portlist:
-                fos_cmd("\r")
-                fos_cmd("portcfgfillword "+i+" "+ cfgvalue )
-                fos_cmd("\r")
-        cmd_cap = fos_cmd("switchenable")
-        return(cmd_cap)
 
 class Maps(SwitchInfo):
     

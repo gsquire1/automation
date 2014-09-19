@@ -26,14 +26,6 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
-def all_switches_in_bb_ip():
-    """
-        Returns ip addresses of all switches in backbone fabric
-    """
-    fcrinfo = anturlar.FcrConfig()
-    backbone_ip = fcrinfo.fcr_backbone_ip()
-    return (backbone_ip)
-
 def bb_fabric_switch_status():
     """
         For all switches found in backbone fabric, returns a dictionary data structure for switch status for switch states:
@@ -45,22 +37,21 @@ def bb_fabric_switch_status():
         anturlar.connect_tel_noparse(i,'root','password')
         a = switch_status()
         switch_dict.append(a)
-    # = (len(switch_dict))
-    #print(s)
     return(switch_dict)
 
 def get_fabwide_ip():
-    fcrcfg = anturlar.FcrConfig()
+    fcrcfg = anturlar.FcrInfo()
     fab_ip_list = list(fcrcfg.fcr_fab_wide_ip())
     print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
     return(fab_ip_list)
+
 
 def fab_wide_proxy_device_numbers():
     """
     Retrieve number of proxy device on all backbone switches in fabric.
     """
     
-    fcrinfo = anturlar.FcrConfig()
+    fcrinfo = anturlar.FcrInfo()
     backbone_ip = fcrinfo.fcr_backbone_ip()
     print('\n\n'+ '='*20)
     bb_fab = (len(backbone_ip))
@@ -121,7 +112,7 @@ def switch_status():
         return dictionary with {switch_name, ipaddr, chassis, vf_enabled, base, fcr_enabled}}
     """
     
-    fcrinfo = anturlar.FcrConfig()
+    fcrinfo = anturlar.FcrInfo()
     initial_checks = fcrinfo.sw_basic_info()
     print('\n\n'+ '='*20)
     print("Switch Name :  %s" % initial_checks[0])
@@ -149,7 +140,7 @@ def ex_slots_find():
     """
     Find EX/VEX ports and return slot number/port number.
     """
-    fcri = anturlar.FcrConfig()
+    fcri = anturlar.FcrInfo()
     fcipi = anturlar.FcipInfo()
     vex_port_list = fcri.vex_ports()
     ex_port_list = fcri.ex_ports()

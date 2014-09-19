@@ -13,7 +13,6 @@ import liabhar
 import re, sys, os
 import sys, os
 import fcr_tools
-import argparse
 
 """
 Naming conventions --
@@ -26,15 +25,40 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 function_name
                                 
 """
-def bb_ip_all():
-    """
-        Returns switch IP of all switches resident in Backbone fabric
-    """
-    ips = fcr_tools.all_switches_in_bb_ip()
-    print(ips)
-    return(ips)
+def test_anturlar_functions():
+    fcri = anturlar.FcipInfo()
+    a = fcri.all_ge_ports()
+    print(a)
+    sys.exit(0)
 
-def bb_fabric_switch_status():
+def slotpower_off_on_check_devices():
+    si = anturlar.SwitchInfo()
+    fcrc = anturlar.FcrInfo()
+    fi = anturlar.FcipInfo()
+    
+    ip_address = fcr_tools.all_switches_in_bb_ip()
+    switch_info = fcr_tools.bb_fabric_switch_status()
+    #blades = si.blades()
+    #ex_ports = si.ex_ports()
+    b = (len(switch_info))
+    print("The number of switches in backbone is:", b)
+    print('\n\n\n')
+    print('IP addresses of all switches in Backbone:')
+    print(ip_address)
+    print('\n\n\n')
+    for i in ip_address:
+        print(i)
+        anturlar.connect_tel_noparse(i,'root','password')
+        a = si.ex_ports()
+        print(a)
+        sys.exit(0)
+        ex_port = a.append(a)
+        print('EXPORTSEXPORTS')
+        print(ex_port)
+    #print(switch_info) ##### Status on switches in BB fabric (ip, name, vf_enabled, fcr_enabled, base, chassis).
+    #print('\n\n\n')
+
+def Dictionary_Example():
     switch_info = fcr_tools.bb_fabric_switch_status()
     b = (len(switch_info))
     print("The number of switches in backbone is:", b)
@@ -67,21 +91,13 @@ def bb_fabric_switch_status():
         values = i.values()
         print('VALUES')
         print(values)
-    print("*"*20)
-    #for i in switch_info:
-    #    keys = i.keys()
-    #    print(keys)
-
-
-
-        
+              
 def change_fid(fid):
     """
         change a fid on a switch
     """
     cons_out = anturlar.fos_cmd("setcontext %s" % fid)
     
-
 def test_case_flow():
     """
         get the current flows on the SUT
@@ -523,7 +539,7 @@ def cfgsave():
     configsave = config.saveSwitchInfo
     
 #def get_fcr_ipv4():
-#    fcrinfo = anturlar.FcrConfig()
+#    fcrinfo = anturlar.FcrInfo()
 #    #switchinfo = anturlar.SwitchInfo
 #    #fabricinfo = anturlar.FabricInfo
 #    fcr_list = fcrinfo.ipv4_fcr()
