@@ -1673,7 +1673,11 @@ def connect_tel(pa, pw):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
+=======
+        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1719,12 +1723,16 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         traff_server = " ~]# "
         #traff_prompt = "----------"
         traff_prompt = " ~]# "
         traff_server = traff_server.encode()
         
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
+=======
+        reg_ex_list = [b"plogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1748,47 +1756,6 @@ def connect_tel_noparse(HOST,usrname,password, *args):
             
         print(capture)
         return(capture)      
-    
-    except EOFError:
-        print("========================")
-        print("handle the EOF case here")
-        print("========================")
-        pass
-    
-def connect_tel_noparse_power(HOST,usrname,password, *args):
-    global tn
-    try:
-        
-        usrn = usrname + '> '
-        usrn = usrn.encode()
-        telnet_closed = "telnet connection closed"
-        telnet_closed = telnet_closed.encode()
-        bad_login = "Login incorrect"
-        bad_login = bad_login.encode()
-        reg_ex_list = [b"cli->"]# b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
-        #print(HOST)
-        #print(usrname)
-        #print(password)
-        tn = telnetlib.Telnet(HOST)
-        #tn.set_debuglevel(9)
-        tn.read_until(b"login: ")
-        tn.write(usrname.encode('ascii') + b"\n")
-        if password:
-            tn.read_until(b"Password: ")
-            tn.write(password.encode('ascii') + b"\n")
-            capture = tn.expect(reg_ex_list, 10)
-            capture_t = capture
-            capture = capture[2]
-            badlog0 = capture_t[0]
-            capture = capture.decode()
-        if badlog0 == 6:
-            print("Could not connect at this time")
-            print("Try again with a correct username / password combination")
-            print("\n========================================================\n\n\n")
-            sys.exit()
-            
-        print(capture)
-        return capture      
     
     except EOFError:
         print("========================")
