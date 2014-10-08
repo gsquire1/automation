@@ -1750,6 +1750,47 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         print("========================")
         pass
     
+def connect_tel_noparse_power(HOST,usrname,password, *args):
+    global tn
+    try:
+        
+        usrn = usrname + '> '
+        usrn = usrn.encode()
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        bad_login = "Login incorrect"
+        bad_login = bad_login.encode()
+        reg_ex_list = [b"cli->"]# b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
+        #print(HOST)
+        #print(usrname)
+        #print(password)
+        tn = telnetlib.Telnet(HOST)
+        #tn.set_debuglevel(9)
+        tn.read_until(b"login: ")
+        tn.write(usrname.encode('ascii') + b"\n")
+        if password:
+            tn.read_until(b"Password: ")
+            tn.write(password.encode('ascii') + b"\n")
+            capture = tn.expect(reg_ex_list, 10)
+            capture_t = capture
+            capture = capture[2]
+            badlog0 = capture_t[0]
+            capture = capture.decode()
+        if badlog0 == 6:
+            print("Could not connect at this time")
+            print("Try again with a correct username / password combination")
+            print("\n========================================================\n\n\n")
+            sys.exit()
+            
+        print(capture)
+        return capture      
+    
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
+        pass
+    
 def fos_cmd_regex(cmd, reg, dblevel=0):
     global tn
     try: 

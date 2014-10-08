@@ -87,9 +87,9 @@ def fcr_state_persist_enabled():
             else:
                 pass
     
-    anturlar.connect_tel_noparse(power2,'user','pass')
-    a = os.getcwd()
-    print(a)
+    anturlar.connect_tel_noparse_power(power1,'user','pass')
+    anturlar.fos_cmd("cd access")
+    anturlar.fos_cmd("pwd")
     time.sleep(5)
     
     sys.exit(0)
