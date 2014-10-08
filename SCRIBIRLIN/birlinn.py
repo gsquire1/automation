@@ -27,6 +27,7 @@ import cofra
 import fvtc_0
 import fcrtc_0
 import fos_gen_tc_0
+import traffic_tools
 
 
 ###############################################################################

@@ -1750,7 +1750,7 @@ def connect_tel(pa, pw):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
-        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
+        reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1796,7 +1796,12 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
-        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
+        traff_server = " ~]# "
+        #traff_prompt = "----------"
+        traff_prompt = " ~]# "
+        traff_server = traff_server.encode()
+        
+        reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1819,7 +1824,7 @@ def connect_tel_noparse(HOST,usrname,password, *args):
             sys.exit()
             
         print(capture)
-        return capture      
+        return(capture)      
     
     except EOFError:
         print("========================")
@@ -1836,9 +1841,12 @@ def fos_cmd_regex(cmd, reg, dblevel=0):
         telnet_closed = telnet_closed.encode()
         
         tn.set_debuglevel(dblevel)
-        #reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed ]
-        reg_ex_list = reg
-        reg_ex_list.append(usrn)
+        
+        reg = reg.encode()
+        reg_ex_list = [reg, b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed ]
+        #reg_ex_list = reg
+        #reg_ex_list.append(usrn)
+        
         capture = ""
         print(cmd)
         tn.write(cmd.encode('ascii') + b"\n")
@@ -1862,9 +1870,13 @@ def fos_cmd(cmd, dl=0):
         usrn = usrn.encode()
         telnet_closed = "telnet connection closed"
         telnet_closed = telnet_closed.encode()
+        #traff_prompt = " ~]# "
+        #traff_prompt = "----------"
+        #traff_prompt = "]# "
+        #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(dl)
-        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
         tn.write(cmd.encode('ascii') + b"\n")
@@ -1895,8 +1907,82 @@ def fos_cmd(cmd, dl=0):
 
 
 
+def traff_cmd(cmd, dl=0):
+    global tn
+    try: 
+         
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+   
+        traff_prompt = "]# "
+        traff_prompt = traff_prompt.encode()
+      
+        #
+        tn.set_debuglevel(dl)
+        #reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed, traff_prompt ]
+        reg_ex_list = [ telnet_closed, traff_prompt]
+        
+        capture = ""
+        print(cmd)
+        tn.write(cmd.encode('ascii') + b"\n")
+        
+        #capture = tn.expect(reg_ex_list, 60)
+        capture = tn.expect(reg_ex_list)
+        capture = capture[2]
+        capture = capture.decode()
+        print(capture, end="")
+        
+        
+        return capture
+ 
+    #except EOFError:
+        #print("========================")
+        #print("handle the EOF case here")
+        #print("========================")
+    #except SocketError as e:
+    #        if e.errno != errno.ECONNRESET:
+    #            print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+    #            raise 
+    #        print("========================")
+    #        print("handle the EOF case here")
+    #        print("========================")           
+    except:
+        print("========================")
+        print("\n\nTELNET ERROR\n\n")
+        print("========================")       
 
     
     
+def traff_output(dl= 0):
+    global tn
+    try:
+        while True:
+            telnet_closed = "telnet connection closed"
+            telnet_closed = telnet_closed.encode()
+            traff_prompt = "]# "
+            traff_prompt = traff_prompt.encode()
+            traff_cpu = ".*CPU \d+"
+            traff_err = ".*Read:\d+"
+            traff_wrt = ".*Write:\d+"
+            
+            traff_cpu = traff_cpu.encode()
+            traff_err = traff_err.encode()
+            traff_wrt = traff_wrt.encode()
+            
+            tn.set_debuglevel(dl)
+            reg_ex_list = [ telnet_closed, traff_prompt, traff_cpu, traff_err, traff_wrt]
+            capture = ""
+            capture = tn.expect(reg_ex_list)
+            capture = capture[2]
+            capture = capture.decode()
+            print(capture, end="")
+            
+            if "]# " in capture:
+                return capture
+            else:
+                pass
+        
+    except:
+        pass
 
     
