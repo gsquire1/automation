@@ -26,6 +26,11 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
+def switch_status():
+    fcri = anturlar.FcrInfo()
+    a = fcri.sw_basic_info()
+    return(a)
+
 def bb_fabric_switch_status():
     """
         For all switches found in backbone fabric, returns a dictionary data structure for switch status for switch states:

@@ -495,8 +495,6 @@ class SwitchInfo:
             capture_cmd = fos_cmd("slotshow -m")
             ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE)\s+(\d+)\s+([-FCOEX1032468]+)\s+(\w+)')
             ras = ras.findall(capture_cmd)
-            print("RASRASRASRASRAS")
-            print(ras)
             return(ras)
         else:
             return("not a director")
@@ -524,7 +522,14 @@ class SwitchInfo:
         else:
             fid = int(ras[0])
         return(fid)
-        
+    
+    def chassisname(self):
+        capture_cmd = fos_cmd("chassisname")
+        cn = capture_cmd.replace(" ", '')
+        ras = re.compile('([\w\d_]+)(?:\\r\\n)')
+        ras = ras.findall(cn)
+        return(ras)
+    
     def d_ports(self):
         """
             this does not work because the getportlist requires the port
@@ -896,7 +901,7 @@ class SwitchInfo:
 
 class FcrInfo(FabricInfo, SwitchInfo):
     """
-    Class for FCR functions etc. Doc strings need to be added for some of the functions.
+    Class for FCR functions and information. Doc strings need to be added for some of the functions.
     """
     
     def __init__(self):
@@ -905,7 +910,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def all_ex_ports(self):
         """
-            Capture all ex ports for both Chassis and Pizza Box
+            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command 
         """
         
         capture_cmd = self.__getportlist__("EX-Port")
@@ -913,7 +918,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
     
     def all_switches_in_bb_ip(self):
         """
-            Returns ip addresses of all switches in backbone fabric
+            Returns ip addresses of all switches in backbone fabric. Does not get edge switches.
         """
         
         backbone_ip = self.fcr_backbone_ip()
@@ -946,28 +951,29 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
     
-    def fcr_backbone_ip(self):
-        """
-        Runs fabricshow against backbone switches in a fabric to determine all IPs 
-        """
-        fcrcfg = FcrInfo()
-        fcrstatus = self.sw_basic_info()
-        print("FCRSTATUS")
-        print(fcrstatus)
-        if fcrstatus[5] is not False:  # Test if base config'd and if so
-            base = fcrcfg.base_check() # get the base FID number
-            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-        else:
-            get_fabric_ip = fcrcfg.ipv4_list()
-        return(get_fabric_ip)
+    #def fcr_backbone_ip(self):
+    #    """
+    #    OBSOLETE:
+    #    Runs fabricshow against backbone switches in a fabric to determine all IPs 
+    #    """
+    #    fcrcfg = FcrInfo()
+    #    fcrstatus = self.sw_basic_info()
+    #    print("FCRSTATUS")
+    #    print(fcrstatus)
+    #    if fcrstatus[5] is not False:  # Test if base config'd and if so
+    #        base = fcrcfg.base_check() # get the base FID number
+    #        f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+    #        get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
+    #    else:
+    #        get_fabric_ip = fcrcfg.ipv4_list()
+    #    return(get_fabric_ip)
 
     def fcr_fab_wide_ip(self):
         """
-            Runs fcrfabricshow and fabricshow against switches in a fabric to determine all IPs then
+            Runs fcrfabricshow and fabricshow against switches in a backbone fabric to determine all IPs then
             removes any duplicate entries.
-            This includes both backbone and edge switches and any switches in edge fabrics.
-            Return is a set of IPs (set function doesn't allow duplicates).
+            This includes both backbone and edge switches and any additional switches resident in edge fabrics.
+            Return is a set of IPs.
         """
          
         fcrcfg = FcrInfo()
@@ -1016,7 +1022,8 @@ class FcrInfo(FabricInfo, SwitchInfo):
     
     def get_licenses(self):
         """
-        Write Licenses to a file in /home/RunFromHere/logs/Switch_Licenses
+        Query all switches in both bacakbone and edges, capture "licenseshow" command
+        and write licenses to a file in /home/RunFromHere/logs/Switch_Licenses/<switchname>
         """
         ip_list = self.fcr_fab_wide_ip()
         for ip in ip_list:
@@ -1101,20 +1108,34 @@ class FcrInfo(FabricInfo, SwitchInfo):
                 fos_cmd("\r")
         cmd_cap = fos_cmd("switchenable")
         return(cmd_cap)
-    
-    
+        
 class FcipInfo(FabricInfo, SwitchInfo):
     """
         A class to return information about a switch
-    
+    Class for FCIP functions and information.
     """
     #global tn
     
     def __init__(self):
         SwitchInfo.__init__(self)
         FabricInfo.__init__(self)
-
         
+    def __sw_show_info_ge_port_type__(self):
+        """
+            capture the switch info and each column with regexs
+            if the port type is not included in switchshow output
+            then add the port to the list
+        """
+        #tn.set_debuglevel(9)
+        capture_cmd = fos_cmd("switchshow")
+        if self.am_i_director:
+            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+        else:
+            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9a-f]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+        ras = ras.findall(capture_cmd)
+        self.online_ports = ras
+ 
     def all_ge_ports(self):
         """
             Capture all ge and xge ports
@@ -1143,98 +1164,7 @@ class FcipInfo(FabricInfo, SwitchInfo):
         #        slot_port_list = [0, int(i[1])]
         #        #port_list.append(slot_port_list) 
         #print(slot_port_list)
-        
-    #def __getportlist__(self, port_type):
-    #    """
-    #       Return a list of the porttype passed in - in the current FID
-    #        
-    #    """
-    #    port_list = []
-    #    ge_port = self.all_ge_ports()
-    #    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    #    print(ge_port)
-    #    #capture_cmd_split = self.all_ports()
-    #    #print(capture_cmd_split)
-    #    sys.exit(0)
-    #    ras_result = capture_cmd_split.count(porttype)
-    #    if self.am_i_director:
-    #        location = 8
-    #    else:
-    #        location = 7
-    #        
-    #    persist_local = location
-    #    persist_local += 1
-    #        
-    #    for i in capture_cmd_split:
-    #        if i[location] == porttype:
-    #            #### port_list.append(i[0])
-    #            #slot_port_list = []
-    #            #slot_port_list.append(int(i[1]))
-    #            if self.am_i_director:
-    #                #slot_port_list.append(int(i[2]))
-    #                slot_port_list = [int(i[1]), int(i[2])]
-    #            #port_list.append(s_p)
-    #            else:
-    #                slot_port_list = [0, int(i[1])]
-    #            port_list.append(slot_port_list)
-    #             
-    #             
-    #        if porttype == "Persistent":
-    #            try:
-    #                if "rsistent" in i[persist_local]:
-    #                    ####port_list.append(i[0])
-    #                    #slot_port_list = []
-    #                    #slot_port_list.append(int(i[1]))
-    #                    if self.am_i_director:
-    #                        #slot_port_list.append(int(i[2]))
-    #                        slot_port_list = [int(i[1]), int(i[2])]
-    #                    else:
-    #                        slot_port_list = [0, int(i[1])]
-    #                    port_list.append(slot_port_list)
-    #                    
-    #            except UnboundLocalError:
-    #                print("unboundlocalerror - moving on  ")
-    #                pass
-    #
-    #    if not ras_result:
-    #        ras_result = "no port found"
-    #    return port_list
-        
-    def __sw_show_info_ge_port_type__(self):
-        """
-            capture the switch info and each column with regexs
-            if the port type is not included in switchshow output
-            then add the port to the list
-        """
-        #tn.set_debuglevel(9)
-        capture_cmd = fos_cmd("switchshow")
-        if self.am_i_director:
-            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
-        else:
-            #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9a-f]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
-        ras = ras.findall(capture_cmd)
-        self.online_ports = ras
     
-
-    #def all_ex_ports(self):
-    #    """
-    #    Capture all ex ports for both Chassis and Pizza Box
-    #    """
-    #    capture_cmd = fos_cmd("switchshow | grep -i EX")
-    #    #self.__getportlist__()
-    #    print(capture_cmd)
-    #    sys.exit(0)#############################################
-    #    
-    #    if self.am_i_director :
-    #        ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
-    #    else:
-    #        ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
-    #    ras = ras.findall(capture_cmd)
-    #    return(ras)
-    #    print("RASRASRASRASRAS")
-    #    print(ras)
- 
     def all_ge_port_disabled(self):
         """
         Capture all disabled ge and xge ports
@@ -1246,13 +1176,6 @@ class FcipInfo(FabricInfo, SwitchInfo):
             ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
-        
-    def director(self):
-        if self.am_i_director:
-            print("I am a director")
-        else:
-            print("I am a pizza box")
-        sys.exit(0)
         
     def vex_ports(self):
         """
@@ -1750,7 +1673,11 @@ def connect_tel(pa, pw):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
+=======
+        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1796,12 +1723,16 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         traff_server = " ~]# "
         #traff_prompt = "----------"
         traff_prompt = " ~]# "
         traff_server = traff_server.encode()
         
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
+=======
+        reg_ex_list = [b"plogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)

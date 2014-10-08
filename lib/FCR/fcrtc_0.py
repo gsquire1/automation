@@ -11,7 +11,7 @@ FCR 1st Test Case Module
 import anturlar
 import liabhar
 import re, sys, os
-import sys, os
+import sys, os, time, csv
 import fcr_tools
 
 """
@@ -25,6 +25,91 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 function_name
                                 
 """
+def fcr_state_persist_enabled():
+    
+    #si = anturlar.SwitchInfo()
+    #cn = si.chassisname()
+    #test_file = '/home/RunFromHere/ini/GS_SwitchMatrix.csv'
+    #csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    #for line in csv_file:
+    #    switch_name = (line['Nickname'])
+    #    if switch_name == cn[0]:
+    #        sn = (switch_name)
+    #        power1 = (line['Power1 IP'])
+    #        pp1 = (line['Power1 Port'])
+    #        power2 = (line['Power2 IP'])
+    #        pp2 = (line['Power2 Port'])
+    #        print("\n\n%s" % sn)
+    #        print(power1)
+    #        print(pp1)
+    #        print(power2)
+    #        print(pp2)    
+    #    else:
+    #        pass
+    #sys.exit(0)#######################
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    test_file = '/home/RunFromHere/ini/GS_SwitchMatrix.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    fcr_state = fcr_tools.switch_status()
+    state = fcr_state['fcr_enabled']
+    #if fcr_state['fcr_enabled'] is True:
+    if state is True:
+        anturlar.fos_cmd("switchdisable")
+        time.sleep(10)
+        enabled = fcr_tools.switch_status()
+        if enabled['fcr_enabled'] is True:
+            anturlar.fos_cmd("switchenable")
+            time.sleep(10)
+            print("\n\nENABLE/DISABLE TEST PASSED")
+        else:
+            pass
+    else:
+        print("\n\nENABLE/DISABLE TEST FAILED")
+        print("Please enable fcr for this test and try again")
+        sys.exit(0)
+    time.sleep(10)
+    #try:
+    if state is True:
+        for line in csv_file:
+            switch_name = (line['Nickname'])
+            if switch_name == cn[0]:
+                sn = (switch_name)
+                power1 = (line['Power1 IP'])
+                pp1 = (line['Power1 Port'])
+                power2 = (line['Power2 IP'])
+                pp2 = (line['Power2 Port'])
+                print("\n\n%s" % sn)
+                print(power1)
+                print(pp1)
+                print(power2)
+                print(pp2)    
+            else:
+                pass
+    
+    anturlar.connect_tel_noparse(power2,'user','pass')
+    a = os.getcwd()
+    print(a)
+    time.sleep(5)
+    
+    sys.exit(0)
+        #anturlar.fos_cmd("echo Y | reboot")
+        #time.sleep(120)
+        #anturlar.fos_cmd("switchshow")
+    #else:
+    #    pass
+    #    enabled_check = fcr_tools.switch_status()
+    #    print('ENABLED       ENABLED')
+    #    print(enabled_check)
+    #    if enabled_check['fcr_enabled'] is True:
+    #        print("SWITCH REBOOT TEST PASSED")
+    #    else:
+    #        pass
+    #else:
+    #    print("REBOOT TEST FAILED")
+    #except TypeError:
+    #    print("SWITCHNOTBACKONLINEAFTERREBOOT")
+        
 def test_anturlar_functions():
     fcri = anturlar.FcipInfo()
     a = fcri.all_ge_ports()
