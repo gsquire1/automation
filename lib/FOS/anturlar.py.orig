@@ -1673,7 +1673,11 @@ def connect_tel(pa, pw):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login ]
+=======
+        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -1719,12 +1723,16 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
+<<<<<<< HEAD
         traff_server = " ~]# "
         #traff_prompt = "----------"
         traff_prompt = " ~]# "
         traff_server = traff_server.encode()
         
         reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
+=======
+        reg_ex_list = [b"plogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
+>>>>>>> b699d06ba06feeb233aef0faa630fd31103fed07
         #print(HOST)
         #print(usrname)
         #print(password)
