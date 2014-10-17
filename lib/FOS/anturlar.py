@@ -1806,10 +1806,10 @@ def fos_cmd_regex(cmd, reg, dblevel=0):
         
         tn.set_debuglevel(dblevel)
         
-        reg = reg.encode()
+        #reg = reg.encode()
         reg_ex_list = [reg, b"login: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed ]
-        #reg_ex_list = reg
-        #reg_ex_list.append(usrn)
+        reg_ex_list = reg
+        reg_ex_list.append(usrn)
         
         capture = ""
         print(cmd)

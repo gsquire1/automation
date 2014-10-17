@@ -58,7 +58,7 @@ class doFirmwareDownload():
         #print("FIRMUP IS %s\n"%(self.firmup))
         #print("RAS IS     %s\n"%(ras))
         if ras != self.firmvrsn:
-            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmvrsn)
+            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
         else:
             return "fail to perform Firmwaredownload since versions were the same"
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
@@ -138,6 +138,7 @@ class DoSupportsave():
         print(self.dirname)
         print("\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\n")
             
+        #reg_ex_list_ftp = [b'root\):', b'none\)\):']
         reg_ex_list_ftp = [b'root\):', b'none\)\):']
         cmd = "ftp "
         cmd += self.ip
