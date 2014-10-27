@@ -36,10 +36,21 @@ import traffic_tools
 ####  Get the traffic info to start 
 ###############################################################################
 
+def get_switch_info():
+    
+###############################################################################
+#### read the csv file to get the switch info
+####  return the ip, username and password 
+###############################################################################
+    
+    pass
+
+
+
 
 def main():
     
-    my_ip = "10.38.39.48"
+    my_ip = "10.38.39.43"
     user_name = "root"
     psswd = "pass"
 

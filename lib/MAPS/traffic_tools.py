@@ -69,8 +69,8 @@ def traff_get_port_list(ip, user, pwd):
     #### combine the command with the drive list
     start_pain_sd = start_pain + ' -f"/dev/sd;%s"' % new_list
     print("NEWEST COMMAND  %s   " % start_pain_sd)
-    
-    cmdout = anturlar.fos_cmd_regex(start_pain_sd , "([\w\d]+)")
+    reg_list = [b'([\w\d]+)']
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
     
     cmdout = anturlar.traff_output()
     

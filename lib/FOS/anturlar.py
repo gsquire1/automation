@@ -1797,6 +1797,13 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         pass
     
 def fos_cmd_regex(cmd, reg, dblevel=0):
+    ###########################################################################
+    ####   
+    ####   to pass the reg make it a list and b style
+    ####    reg_list = [b'[my reg expression]', b'second expression' ]
+    ####
+    ####
+    ###########################################################################
     global tn
     try: 
         usrn = var.sw_user + '> '
