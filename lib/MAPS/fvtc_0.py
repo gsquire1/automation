@@ -11,6 +11,7 @@ import cofra
 import re
 import random
 import os,sys
+import maps_tools
 
 
 """
@@ -57,9 +58,10 @@ def tc_01_01_01_02():
     ####            (encryption)
     ####
     ####   Complete
-    ####   1.  pass / fail for each step of test case
+    ####   A.  pass / fail for each step of test case
     ####       make the test_result a list of list [ step_0 pass ][step_2 fail]
-    ####       
+    ####   B. log file of the commands and response
+    ####
     ####
     ###########################################################################
     ####
@@ -88,15 +90,27 @@ def tc_01_01_01_02():
     #### LPMDE3mKQQrtTYYrKAWEPfFGgZfm7X3JBAXFM
     ####   beRybSSdefSzc8     beRybSSdgfSzcA
     #### start the test
+    #header = "**************************************************************************"
+    test_numb = "25.01.01.01.02"
+    test_summary = "%s       MAPS commands available with a license" % test_numb
+    header = maps_tools.format_header(test_summary)
     test_result = ""
     
     p = anturlar.Maps()
+    sut_ip = p.ipaddress()
     cmds_list = maps_tools.mapscommand_list()
     cmds_list_w_usage = maps_tools.mapscommand_list("usage")
     cmds_list_w_correct = maps_tools.mapscommand_list("all")
+    #### set up the log file info
+    f_path = '/home/run_from_here/logs/%s_%s' % ( test_numb, sut_ip )
+    
+    f = liabhar.FileStuff(f_path, 'w+b')
+    f.write(header)
+    
     #### get the list of license and remove them from the switch
     l_list = p.getLicense()
     print("license list \n\n%s "% l_list)
+    f.write("license list \n\n%s "% l_list)
     for license in l_list:
         anturlar.fos_cmd("licenseremove %s " % license)
     #### no need to confirm the Flow Vision license
@@ -105,18 +119,21 @@ def tc_01_01_01_02():
     
     for cmd in cmds_list:
         console_out = anturlar.fos_cmd("%s" % cmd)
+        f.write(console_out + "\r\n")
         if "license not present" not in console_out:
             test_result += cmd
             test_result += ' step1'
             test_result += ' Fail\n'
             print("\nFail Fail Fail Fail\n\n")
-
+            f.write("\nFail Fail Fail Fail\n\n")
+            
     for license in l_list:
         anturlar.fos_cmd("licenseadd %s " % license)
         
     
     for cmd in cmds_list_w_usage:
         console_out = anturlar.fos_cmd("%s" % cmd)
+        f.write(console_out + "\r\n")
         if "Usage:" in console_out:
             pass
         elif "MAPS not active." in console_out:
@@ -126,10 +143,11 @@ def tc_01_01_01_02():
             test_result += ' step2'
             test_result += ' Fail\n'
             print("\nFail Fail Fail Fail\n\n")
-            
+            f.write("\nFail Fail Fail Fail\n\n")
     
     for cmd in cmds_list_w_correct:
         console_out = anturlar.fos_cmd("%s" % cmd)
+        f.write(console_out + "\r\n")
         if "root>" not in console_out:
             test_result += cmd
             test_result += ' step3'
@@ -142,6 +160,9 @@ def tc_01_01_01_02():
     
     print("\n\nTEST RESULTS FOR Test Case   25.01.01.01.02 ")
     print(test_result)
+    tc_result = maps_tools.format_results(test_summary, test_result)
+    f.write(maps_tools.format_results(test_summary, test_result))
+    
     return(test_result)
 
 
@@ -171,16 +192,28 @@ def tc_01_01_03_01():
     ####  4. return any diffence as a failure
     ####
     ####
+    ####
     #### start the test
+    test_numb = "25.01.01.03.01"
+    test_summary = "%s    MAPS Catergory Management Default thresholds" % test_numb
+    header = maps_tools.format_header(test_summary)
     test_result = ""
     
     p = anturlar.Maps()
+    sut_ip = p.ipaddress()
     sw_rules = p.get_rules()
+    
+     #### set up the log file info
+    f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
+    
+    f = liabhar.FileStuff(f_path, 'w+b')
+    f.write(header)
+    
     #sw_rules = str(sw_rules)
     #sw_rules = sw_rules.replace("'", "") #### remove ' from string
     #sw_rules = sw_rules.replace("[", "") #### remove open bracket
     #sw_rules = sw_rules.replace("]", "") #### remove ending bracket
-    df_rules = maps_default_rule()
+    df_rules = maps_tools.maps_default_rule()
     
     sw_rules = sw_rules.split()
     df_rules = df_rules.split()
@@ -209,13 +242,20 @@ def tc_01_01_03_01():
     print("The number of additional rules on the switch %s " % ( count - count_df))
     print(len(sw_rules))
     print(len(df_rules))
+    f.write("The number of rules that differ are %s \r\n" % rule_differ)
+    f.write("The number of additional rules on the switch %s \r\n" % ( count - count_df))
+    f.write("Total number of switch rules    %s  \r\n" % len(sw_rules))
+    f.write("Total number of default rules   %s  \r\n" % len(df_rules))
+
 
     if test_result == "":
         test_result = "PASS"
     
     print("="*80)
-    print("\n\nTEST RESULTS FOR Test Case   25.01.01.01.02 ")
+    print("\n\nTEST RESULTS FOR Test Case   25.01.01.03.01 ")
     print(test_result)
+    f.write(maps_tools.format_results(test_summary, test_result))
+       
     return(test_result)
 
 
@@ -269,6 +309,7 @@ def tc_01_01_03_02():
     ####  Step 1
     ####
     pgm = anturlar.Maps()
+    sut_ip = pgm.ipaddress()
     port_list = pgm.all_ports()
     port_list_no_ve = pgm.all_ports_fc_only()
     e_ports = pgm.e_ports()
@@ -1844,6 +1885,8 @@ def firmwaredownload(frmdwn ):
     return(0)
 ###############################################################################
  
+def credit_recovery():
+    pass
 
 def end():
     pass

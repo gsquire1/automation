@@ -1167,7 +1167,33 @@ def get_policy_rules( p = "None"):
     ras = re.compile('([_A-Za-z]+)(?=\s+\w+,)')
     ras = ras.findall(capture_cmd)
     return(ras)
-           
+    
+    
+    
+def format_header(testcase):
+    
+    a = "***************************************************************************\r\n"
+    b = "****        %s   \r\n" % testcase
+    c = "****        STARTING THE TEST \r\n"
+    
+    h = a + a + b + c + a + a
+    
+    return(h)
+    
+    
+def format_results(testcase, testresult):
+    
+    a = "***************************************************************************\r\n"
+    b = "****        TEST RESULTS      \r\n"
+    c = "****        %s  \r\n" % testcase
+    d = "****        %s  \r\n" % testresult
+    
+    h = a + a + b + c + d + a + a
+    
+    return(h)
+    
+    
+    
 def end():
     pass
     
