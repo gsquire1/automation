@@ -101,6 +101,8 @@ class FabricInfo:
         #ras = re.compile('\s+([.\d]{7,15})\s+')
         ras = re.compile('(?:\s?[0-9]{1,3}:\s+[\d\w]{6}\s+[:\d\w]{23}\s+)([1-9][0-90-9].\d{1,3}.\d{1,3}.\d{1,3})')
         ras_result_all = ras.findall(capture_cmd)
+
+        print(ras_result_all)
             
         
         if not ras_result_all:
@@ -304,6 +306,8 @@ class SwitchInfo:
             False = pizza box
         """
         capture_cmd = fos_cmd("hashow")
+        #print('ZZZZZZZZZZZ')
+        #print(capture_cmd)
         self.am_i_director = True
         if "hashow: Not supported" in capture_cmd:
             self.am_i_director = False
@@ -1776,7 +1780,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         if password:
             tn.read_until(b"Password: ")
             tn.write(password.encode('ascii') + b"\n")
-            capture = tn.expect(reg_ex_list, 10)
+            capture = tn.expect(reg_ex_list)
             capture_t = capture
             capture = capture[2]
             badlog0 = capture_t[0]
@@ -1795,15 +1799,40 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         print("handle the EOF case here")
         print("========================")
         pass
-    
-def fos_cmd_regex(cmd, reg, dblevel=0):
-    ###########################################################################
+ 
+
+def power_cmd(cmd, dl=0):
+    global tn
+    try: 
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        #traff_prompt = "\(yes, no\)  : "
+        #traff_prompt = traff_prompt.encode()
+        
+        tn.set_debuglevel(dl)
+        reg_ex_list = [b" cli->", b"\(yes, no\)  : ", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        capture = ""
+        print(cmd)
+        tn.write(cmd.encode('ascii') + b"\n")
+        capture = tn.expect(reg_ex_list)
+        capture = capture[2]
+        capture = capture.decode()
+        print(capture, end="")
+        return capture
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
+
+def fos_cmd_regex(cmd, reg,dblevel=0):
+     ###########################################################################
     ####   
     ####   to pass the reg make it a list and b style
     ####    reg_list = [b'[my reg expression]', b'second expression' ]
     ####
     ####
     ###########################################################################
+ 
     global tn
     try: 
         usrn = var.sw_user + '> '

@@ -6,6 +6,7 @@ import sys
 import anturlar
 import re
 import liabhar
+import csv
 
 
 
@@ -724,7 +725,7 @@ def fids_check(self, fid, lscfgshow):
 
 def waitForOnline(si):
     """
-        what for a switch to return to online state
+        wait for a switch to return to online state
         si = switch object from SwitchInfo
         
     """
@@ -903,4 +904,38 @@ def mem_monitor(wait_time=1800, iters=336):
     
     return()
 ###############################################################################   
-    
+
+def switch_power_off_on(cn, mode = 'on'):  
+    """
+        From hand edited Switch_Matrix csv file (should be in /home/RunFromHere/ini directory),
+        find IP and port# of related Power Tower and power off all power supplies for that switch
+        then power on again for a full power cycle.
+           
+    """
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    for line in csv_file:
+        switch_name = (line['Nickname'])
+        if switch_name == cn[0]:
+            sn = (switch_name)
+            power1 = (line['Power1 IP'])
+            pp1 = (line['Power1 Port'])
+            power2 = (line['Power2 IP'])
+            pp2 = (line['Power2 Port'])
+            power3 = (line['Power3 IP'])
+            pp3 = (line['Power3 Port'])
+            power4 = (line['Power4 IP'])
+            pp4 = (line['Power4 Port'])            
+            a = [power1, pp1, power2, pp2, power3, pp3, power4, pp4]
+    for i in range(0,len(a),2):
+        if a[i]:
+            power = (a[i])
+            pp = (a[i+1])
+            anturlar.connect_tel_noparse_power(power,'user','pass', 9)
+            db = 9
+            anturlar.power_cmd("cd access/1\t/1\t" + pp, db)
+            for i in ["show", mode, "yes"]:
+                anturlar.power_cmd(i, db)
+            liabhar.JustSleep(10)
+            anturlar.close_tel()
+    return(True)
