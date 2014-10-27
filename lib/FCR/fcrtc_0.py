@@ -8,10 +8,8 @@
 FCR 1st Test Case Module
 """
 
-import anturlar
-import liabhar
-import re, sys, os
-import sys, os, time, csv
+import anturlar, liabhar, cofra
+import re, sys, os, csv
 import fcr_tools
 
 """
@@ -26,73 +24,135 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 def fcr_state_persist_enabled():
-    
-    #si = anturlar.SwitchInfo()
-    #cn = si.chassisname()
-    #test_file = '/home/RunFromHere/ini/GS_SwitchMatrix.csv'
-    #csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
-    #for line in csv_file:
-    #    switch_name = (line['Nickname'])
-    #    if switch_name == cn[0]:
-    #        sn = (switch_name)
-    #        power1 = (line['Power1 IP'])
-    #        pp1 = (line['Power1 Port'])
-    #        power2 = (line['Power2 IP'])
-    #        pp2 = (line['Power2 Port'])
-    #        print("\n\n%s" % sn)
-    #        print(power1)
-    #        print(pp1)
-    #        print(power2)
-    #        print(pp2)    
-    #    else:
-    #        pass
-    #sys.exit(0)#######################
-    si = anturlar.SwitchInfo()
-    cn = si.chassisname()
-    test_file = '/home/RunFromHere/ini/GS_SwitchMatrix.csv'
+    #print(sys.argv)
+    host = (sys.argv[1])
+    user = sys.argv[2]
+    password = sys.argv[7]
+    print('HOST')
+    print(host)
+    print('SYSARG0')
+    print(user)
+    print ('SYSARG7')
+    print(password)
+    #sys.exit(0)
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
     csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
     fcr_state = fcr_tools.switch_status()
     state = fcr_state['fcr_enabled']
-    #if fcr_state['fcr_enabled'] is True:
+    #if state is True:
+    #    anturlar.fos_cmd("switchdisable")
+    #    liabhar.JustSleep(10)
+    #    enabled = fcr_tools.switch_status()
+    #    if enabled['fcr_enabled'] is True:
+    #        anturlar.fos_cmd("switchenable")
+    #        liabhar.JustSleep(10)
+    #        print("\n\nENABLE/DISABLE TEST PASSED")
+    #    else:
+    #        pass
+    #else:
+    #    print("\n\nENABLE/DISABLE TEST FAILED")
+    #    print("Please enable fcr for this test and try again")
+    #    sys.exit(0)
+    #liabhar.JustSleep(10)
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    a = cofra.switch_power_off_on(cn, 'off')
+    print('Sleeping: 20')
+    liabhar.JustSleep(20)
+    a = cofra.switch_power_off_on(cn, 'on')
+    print('Sleeping: 120')
+    liabhar.JustSleep(120)
+    anturlar.connect_tel_noparse(host, user, password)
+    si = anturlar.SwitchInfo()
+    print("GETTINGFCRSTATE")
+    fcr_state = fcr_tools.switch_status()
+    state = fcr_state['fcr_enabled']
     if state is True:
+        print('Reboot Complete. FCR State remains consistent')
+        print('TEST PASSED')
+    else:
+        print('FCR State changed.')
+        print('TEST FAILED')
+        
+def fcr_state_persist_disabled():
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    fcr_state = fcr_tools.switch_status()
+    state = fcr_state['fcr_enabled']
+    if state is False:
         anturlar.fos_cmd("switchdisable")
-        time.sleep(10)
+        liabhar.JustSleep(10)
         enabled = fcr_tools.switch_status()
-        if enabled['fcr_enabled'] is True:
+        if enabled['fcr_enabled'] is False:
             anturlar.fos_cmd("switchenable")
-            time.sleep(10)
+            liabhar.JustSleep(10)
             print("\n\nENABLE/DISABLE TEST PASSED")
         else:
             pass
     else:
         print("\n\nENABLE/DISABLE TEST FAILED")
-        print("Please enable fcr for this test and try again")
+        print("Please disable fcr for this test and try again")
         sys.exit(0)
-    time.sleep(10)
-    #try:
+    liabhar.JustSleep(10)
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    a = cofra.switch_power_off_on(cn, 'off')
+    liabhar.JustSleep(20)
+    a = cofra.switch_power_off_on(cn, 'on')
+    liabhar.JustSleep(20)
+    fcr_state = fcr_tools.switch_status()
+    state = fcr_state['fcr_enabled']
     if state is True:
-        for line in csv_file:
-            switch_name = (line['Nickname'])
-            if switch_name == cn[0]:
-                sn = (switch_name)
-                power1 = (line['Power1 IP'])
-                pp1 = (line['Power1 Port'])
-                power2 = (line['Power2 IP'])
-                pp2 = (line['Power2 Port'])
-                print("\n\n%s" % sn)
-                print(power1)
-                print(pp1)
-                print(power2)
-                print(pp2)    
-            else:
-                pass
+        print('Reboot Complete. FCR State remains consistent')
+        print('TEST PASSED')
+    else:
+        print('FCR State changed.')
+        print('TEST FAILED')
+
+    sys.exit(0)#######################
+
     
-    anturlar.connect_tel_noparse_power(power1,'user','pass')
-    anturlar.fos_cmd("cd access")
-    anturlar.fos_cmd("pwd")
-    time.sleep(5)
+    #si = anturlar.SwitchInfo()
+    #cn = si.chassisname()
+    #test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    #csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    #fcr_state = fcr_tools.switch_status()
+    #state = fcr_state['fcr_enabled']
+    ##if fcr_state['fcr_enabled'] is True:
+    #if state is True:
+    #    anturlar.fos_cmd("switchdisable")
+    #    time.sleep(10)
+    #    enabled = fcr_tools.switch_status()
+    #    if enabled['fcr_enabled'] is True:
+    #        anturlar.fos_cmd("switchenable")
+    #        time.sleep(10)
+    #        print("\n\nENABLE/DISABLE TEST PASSED")
+    #    else:
+    #        pass
+    #else:
+    #    print("\n\nENABLE/DISABLE TEST FAILED")
+    #    print("Please enable fcr for this test and try again")
+    #    sys.exit(0)
+    #time.sleep(10)
+    ##try:
+    #if state is True:
+    #    for line in csv_file:
+    #        switch_name = (line['Nickname'])
+    #        if switch_name == cn[0]:
+    #            sn = (switch_name)
+    #            power1 = (line['Power1 IP'])
+    #            pp1 = (line['Power1 Port'])
+    #            power2 = (line['Power2 IP'])
+    #            pp2 = (line['Power2 Port'])
+    #            print("\n\n%s" % sn)
+    #            print(power1)
+    #            print(pp1)
+    #            print(power2)
+    #            print(pp2)    
+    #        else:
+    #            pass
     
-    sys.exit(0)
+    sys.exit(0)#####################
         #anturlar.fos_cmd("echo Y | reboot")
         #time.sleep(120)
         #anturlar.fos_cmd("switchshow")
