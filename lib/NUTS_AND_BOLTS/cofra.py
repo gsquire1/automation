@@ -931,8 +931,8 @@ def switch_power_off_on(cn, mode = 'on'):
         if a[i]:
             power = (a[i])
             pp = (a[i+1])
-            anturlar.connect_tel_noparse_power(power,'user','pass', 9)
-            db = 9
+            db = 0
+            anturlar.connect_tel_noparse_power(power,'user','pass', db)
             anturlar.power_cmd("cd access/1\t/1\t" + pp, db)
             for i in ["show", mode, "yes"]:
                 anturlar.power_cmd(i, db)
