@@ -264,11 +264,22 @@ def platform():
     """
     
     #from subprocess import call
-    from platform import system
-    os = system()
-    print(os)
-    return os    
-    
+    #from platform import system
+    #os = system()
+    #print(os)
+    from sys import platform as _platform
+    if _platform == "linux" or _platform == "linux2":
+        os = "linux"
+    elif _platform == "darwin":
+        os = "OS X"
+    elif _platform == "win32":
+        os = "Windows"
+        
+    return(os)    
+
+
+
+
 def parent_parser():
     
     pp = argparse.ArgumentParser(add_help=False)

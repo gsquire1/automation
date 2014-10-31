@@ -1800,6 +1800,55 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         print("========================")
         pass
  
+def connect_tel_noparse_traffic(HOST,usrname,password, *args):
+    global tn
+    try:
+         
+        usrn = usrname + '> '
+        usrn = usrn.encode()
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        bad_login = "Login incorrect"
+        bad_login = bad_login.encode()
+        traff_server = " ~]# "
+        #traff_prompt = "----------"
+        traff_prompt = " ~]# "
+        traff_server = traff_server.encode()
+        
+        reg_ex_list = [b"hlogin: ", b"inistrator", b"assword: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
+        #print(HOST)
+        #print(usrname)
+        #print(password)
+        tn = telnetlib.Telnet(HOST)
+        tn.set_debuglevel(9)
+        tn.read_until(b"login: ")
+        tn.write(usrname.encode('ascii') + b"\r\n")
+        
+        if password:
+            #print("looking for password here ::")
+            #tn.expect(reg_ex_list,10)
+            tn.read_until(b"assword:")
+            tn.write(password.encode('ascii') + b"\r\n")
+            capture = tn.expect(reg_ex_list, 10)
+            capture_t = capture
+            capture = capture[2]
+            badlog0 = capture_t[0]
+            capture = capture.decode()
+        if badlog0 == 6:
+            print("Could not connect at this time")
+            print("Try again with a correct username / password combination")
+            print("\n========================================================\n\n\n")
+            sys.exit()
+            
+        print(capture)
+        return(capture)      
+    
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
+        pass
+    
 
 def power_cmd(cmd, dl=0):
     global tn
@@ -1920,11 +1969,11 @@ def traff_cmd(cmd, dl=0):
         #
         tn.set_debuglevel(dl)
         #reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed, traff_prompt ]
-        reg_ex_list = [ telnet_closed, traff_prompt]
+        reg_ex_list = [ telnet_closed, traff_prompt, b"Administrator", b"admin"]
         
         capture = ""
         print(cmd)
-        tn.write(cmd.encode('ascii') + b"\n")
+        tn.write(cmd.encode('ascii') + b"\r\n")
         
         #capture = tn.expect(reg_ex_list, 60)
         capture = tn.expect(reg_ex_list)
@@ -1985,4 +2034,76 @@ def traff_output(dl= 0):
     except:
         pass
 
+  
+def fos_cmd_regex_gen(cmd, reg,dblevel=0):
+     ###########################################################################
+    ####   
+    ####   to pass the reg make it a list and b style
+    ####    reg_list = [b'[my reg expression]', b'second expression' ]
+    ####
+    ####    gen since teh user name is not needed
+    ###########################################################################
+ 
+    global tn
+    try: 
+        #usrn = var.sw_user + '> '
+        #usrn = usrn.encode()
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        
+        tn.set_debuglevel(dblevel)
+        reg = reg.encode()
+        #reg = reg.encode()
+        reg_ex_list = [reg, b"login: ", b"Password: ", b"option :", b"root>", telnet_closed ]
+        #reg_ex_list = reg
+        #reg_ex_list.append(usrn)
+        
+        capture = ""
+        print(cmd)
+        tn.write(cmd.encode('ascii') + b"\n")
+        
+        capture = tn.expect(reg_ex_list, 3600)
+        capture = capture[2]
+        capture = capture.decode()
+        print(capture, end="")
+        tn.set_debuglevel(0)
+        return(capture)
+ 
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
+        
     
+def remote_os_ver(ip="127.0.0.1", dl=0):
+    
+    ###########################################################################
+    ####  find the os type of remote switch
+    ####    if the ip is not passed it will find the version of local switch
+    ####
+    ###########################################################################
+    
+    db_level = dl
+    ras = re.compile('ttl=([\d]{1,3})')
+    this_command = "ping -c 1 " + ip + "\r\n"
+    reg = "]#"
+    connect_tel_noparse("127.0.0.1","root", "pass")
+    
+    cmdout = fos_cmd_regex_gen(this_command,reg, 9)
+    
+    os_ver = ras.findall(cmdout)
+    print("\n"*33)
+    print(os_ver)
+    os_is = ""
+    if os_ver[0] == '128':
+        os_is = "windows"
+    if os_ver[0] == '64':
+        os_is = "linux"
+    
+    
+    close_tel()
+    
+
+    return(os_is)
+
+
