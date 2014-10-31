@@ -45,50 +45,12 @@ def bcu_version():
     return(ras)
     
     
+def start_linux_pre_3_2(h, start_cmd):
     
     
-
-def traff_get_port_list(ip, user, pwd, start_command, os_ver):
-    
-    
-    #### add the variable pain_main in the command line
-    ####  add option to be random traffic
-    ####      random pattern    block size   etc
-    ####      random drives    
-    
-    start_pain = "pain -t4 -r -b8k -o -u -n -l69 -q5 "
-    start_pain = "pain -t8 -M60 -b8k -o -u -n -l69 -q5 "
-    start_pain = start_command
-    
-    print("aaaaaaaaaaaaaaaaaaaaaaaa")
-    print(type(ip))
-    print(user)
-    print(pwd)
-    print("aaaaaaaaaaaaaaaaaaaaaaaa")
     db_level = 9
     remote_list = []
-    
-    anturlar.connect_tel_noparse_traffic(ip, user, pwd)
-    cmdout = anturlar.traff_cmd("" , db_level )
-    cmdout = anturlar.traff_cmd("cd /home/traffic" , db_level )
-    
-    this_platform = os_ver
-    #this_platform = liabhar.platform()
-    this_bcu_version = bcu_version()
-    
-    print("\n\nPLATFORM IS        :   %s  " % this_platform)
-    print("ADAPTER HW-PATH    :   %s  " % this_bcu_version)
-    
-    
-    sys.exit()
-    ####  windows style
-    ####  windows with 3.2 driver
-    ####
-    #### linux style
-    #### linux style with 3.2 driver
-    ####
-    #### add the other type of os version to the remote os ver function
-    
+    start_pain = start_cmd
     
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
@@ -115,11 +77,197 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
     print("NEWEST COMMAND  %s   " % start_pain_sd)
     reg_list = [b'([\w\d]+)']
     cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
-    
     cmdout = anturlar.traff_output()
     
+    anturlar.close_tel()    
+
+
+def start_linux_post_3_2(h, start_cmd):
+    
+    db_level = 9
+    remote_list = []
+    start_pain = start_cmd
+    
+    
+    for i in [1,2,3,4]:
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
+        ras = re.compile('/dev/sd([a-z]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
+        ras = re.compile('/dev/sd([a-z]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+    
+    print("remote port list  :  %s  " % remote_list )
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    
+    ####  put the list is the correct syntax
+    new_list = ",".join(remote_list)
+        
+    print("NEW LIST IS   :   %s " % new_list)
+    
+    #### combine the command with the drive list
+    start_pain_sd = start_pain + ' -f"/dev/sd;%s"' % new_list
+    print("NEWEST COMMAND  %s   " % start_pain_sd)
+    reg_list = [b'([\w\d]+)']
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
+    cmdout = anturlar.traff_output()
     
     anturlar.close_tel()
+    
+  
+  
+def start_windows_pre_3_2(h, start_cmd):
+    
+    db_level = 9
+    remote_list = []
+    start_pain = start_cmd
+    
+    for i in [1,2,3,4]:
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu rport --osname %s/0" % i , db_level )
+        ras = re.compile('/dev/sd([a-z]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu rport --osname %s/1" % i , db_level )
+        ras = re.compile('Drive([a-z]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+    
+    print("remote port list  :  %s  " % remote_list )
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    
+    ####  put the list is the correct syntax
+    new_list = ",".join(remote_list)
+        
+    print("NEW LIST IS   :   %s " % new_list)
+    
+    #### combine the command with the drive list
+    start_pain_sd = start_pain + ' -f"\\\.\PhysicalDrive;%s"' % new_list
+    print("NEWEST COMMAND  %s   " % start_pain_sd)
+    reg_list = [b'([\w\d]+)']
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
+    cmdout = anturlar.traff_output()
+    
+    anturlar.close_tel()    
+    
+  
+    
+def start_windows_post_3_2(h, start_cmd):
+    
+    db_level = 9
+    remote_list = []
+    start_pain = start_cmd
+    
+    
+    for i in [1,2,3,4]:
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
+        ras = re.compile('/dev/sd([a-z]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+        cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
+        cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
+        ras = re.compile('Drive([0-9]+)')
+        ras = ras.findall(cmdout)
+        remote_list = remote_list + ras
+    
+    print("remote port list  :  %s  " % remote_list )
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    
+    ####  put the list is the correct syntax
+    new_list = ",".join(remote_list)
+        
+    print("NEW LIST IS   :   %s " % new_list)
+    
+    #### combine the command with the drive list
+    start_pain_sd = start_pain + ' -f"\\\.\PhysicalDrive;%s"' % new_list
+    print("NEWEST COMMAND  %s   " % start_pain_sd)
+    reg_list = [b'([\w\d]+)']
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
+    cmdout = anturlar.traff_output()
+    
+    anturlar.close_tel()
+    
+    
+    
+
+def traff_get_port_list(ip, user, pwd, start_command, os_ver):
+    
+    
+    #### add the variable pain_main in the command line
+    ####  add option to be random traffic
+    ####      random pattern    block size   etc
+    ####      random drives    
+    
+    #start_pain = "pain -t4 -r -b8k -o -u -n -l69 -q5 "
+    #start_pain = "pain -t8 -M60 -b8k -o -u -n -l69 -q5 "
+    #start_pain = start_command
+    
+    #print("aaaaaaaaaaaaaaaaaaaaaaaa")
+    #print(type(ip))
+    #print(user)
+    #print(pwd)
+    #print("aaaaaaaaaaaaaaaaaaaaaaaa")
+    db_level = 9
+    #remote_list = []
+    
+    h = anturlar.connect_tel_noparse_traffic(ip, user, pwd)
+    cmdout = anturlar.traff_cmd("" , db_level )
+    cmdout = anturlar.traff_cmd("cd c:\traffic" , db_level )
+    
+    this_platform = os_ver
+    #this_platform = liabhar.platform()
+    this_bcu_version = bcu_version()
+    
+    print("\n\nPLATFORM IS        :   %s  " % this_platform)
+    print("ADAPTER HW-PATH    :   %s  " % this_bcu_version)
+    
+    
+    if "windows" in this_platform:
+        if "3.2" in this_bcu_version[0] :
+            print("START POST windows  ")
+            #cmdout = anturlar.traff_cmd("catapult -p -t" , db_level )
+            #cmdout = anturlar.traff_cmd("cd sqa\t" , db_level )
+            
+            start_windows_post_3_2(h, start_command)
+        else:
+            print("START PRe windows")
+            sys.exit()
+            start_windows_pre_3_2(h, start_command)
+        
+    elif "linux" in this_platform:
+        if "3.2" in this_bcu_version[0]:
+            print("START POST linux ")
+            sys.exit()
+            start_linux_post_3_2(h, start_command)
+        else:
+            print("START PRE linux")
+            sys.exit()
+            start_linux_pre_3_2(h, start_command)
+        
+    else:
+        print("not sure of the platform") 
+    
+    
+    
+    ####  windows style
+    ####  windows with 3.2 driver
+    ####
+    #### linux style
+    #### linux style with 3.2 driver
+    ####
+    #### add the other type of os version to the remote os ver function
+     
+    
+    
+    
+    
+    
     
     
     
