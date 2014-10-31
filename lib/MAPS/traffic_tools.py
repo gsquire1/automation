@@ -81,6 +81,14 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
     
     
     sys.exit()
+    ####  windows style
+    ####  windows with 3.2 driver
+    ####
+    #### linux style
+    #### linux style with 3.2 driver
+    ####
+    #### add the other type of os version to the remote os ver function
+    
     
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
