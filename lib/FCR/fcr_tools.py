@@ -11,8 +11,7 @@ FCR TOOLS - different functions to get information from switches and/or fabrics 
 
 import anturlar
 import liabhar
-import re
-import sys, os
+import sys, os, csv, re
 
 """
 Naming conventions --
@@ -178,3 +177,92 @@ def ex_slots_find():
                 fos_cmd("portcfgexport "+i+" -a2")
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
+    
+def fcr_state_persist_enabled():
+    #print(sys.argv)
+    host = (sys.argv[1])
+    user = sys.argv[2]
+    password = sys.argv[7]
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    fcr_state = switch_status()
+    state = fcr_state['fcr_enabled']
+    if state is True:
+        anturlar.fos_cmd("switchdisable")
+        liabhar.JustSleep(10)
+        enabled = switch_status()
+        if enabled['fcr_enabled'] is True:
+            anturlar.fos_cmd("switchenable")
+            liabhar.JustSleep(10)
+            print("\n\nENABLE/DISABLE TEST PASSED")
+        else:
+            pass
+    else:
+        print("\n\nENABLE/DISABLE TEST FAILED")
+        print("Please enable fcr for this test and try again")
+        sys.exit(0)
+    print('Sleeping: 10')
+    liabhar.JustSleep(10)
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    a = cofra.switch_power_off_on(cn, 'off')
+    print('Sleeping: 20')
+    liabhar.JustSleep(20)
+    a = cofra.switch_power_off_on(cn, 'on')
+    print('Sleeping: 120')
+    liabhar.JustSleep(120)
+    anturlar.connect_tel_noparse(host, user, password)
+    si = anturlar.SwitchInfo()
+    print("GETTINGFCRSTATE")
+    fcr_state = switch_status()
+    state = fcr_state['fcr_enabled']
+    if state is True:
+        print('Reboot Complete. FCR State remains consistent')
+        print('TEST PASSED')
+    else:
+        print('FCR State changed.')
+        print('TEST FAILED')
+        
+def fcr_state_persist_disabled():
+    host = (sys.argv[1])
+    user = sys.argv[2]
+    password = sys.argv[7]
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    fcr_state = switch_status()
+    state = fcr_state['fcr_enabled']
+    if state is False: #the same to here disabled is false, enabled is true
+        anturlar.fos_cmd("switchdisable")
+        liabhar.JustSleep(10)
+        enabled = switch_status()
+        if enabled['fcr_enabled'] is False:
+            anturlar.fos_cmd("switchenable")
+            liabhar.JustSleep(10)
+            print("\n\nENABLE/DISABLE TEST PASSED")
+        else:
+            pass
+    else:
+        print("\n\nENABLE/DISABLE TEST FAILED")
+        print("Please disable fcr for this test and try again")
+        sys.exit(0)
+    print('Sleeping: 10')
+    liabhar.JustSleep(10)
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    a = cofra.switch_power_off_on(cn, 'off')
+    print('Sleeping: 20')
+    liabhar.JustSleep(20)
+    a = cofra.switch_power_off_on(cn, 'on')
+    print('Sleeping: 120')
+    liabhar.JustSleep(120)
+    anturlar.connect_tel_noparse(host, user, password)
+    fcr_state = switch_status()
+    state = fcr_state['fcr_enabled']
+    if state is False:
+        print('Reboot Complete. FCR State remains consistent')
+        print('TEST PASSED')
+    else:
+        print('FCR State changed.')
+        print('TEST FAILED')
+
+    sys.exit(0)#######################

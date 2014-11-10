@@ -112,6 +112,10 @@ def fcr_state_persist_disabled():
 
     sys.exit(0)#######################
 
+def ex_deconfig():
+    fcri = anturlar.FcrInfo()
+    test = fcri.ex_deconfig()
+    print('\n\nAll EX_ports found are now deconfigured.')
   
 def test_anturlar_functions():
     fcri = anturlar.FcipInfo()
