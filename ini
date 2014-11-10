@@ -1,0 +1,14 @@
+N fcrtc_0.fab_wide_proxy_device_numbers
+Y fcrtc_0.fcr_status
+N fcrtc_0.get_fabwide_ip
+N fcrtc_0.clearstats
+N fcrtc_0.ports_enable
+N fcrtc_0.enable_disabled_ports
+N fcrtc_0.ve_ports
+N fcrtc_0.send_cmds 'SwitchIp.txt'
+N fcrtc_0.get_licenses
+N fcrtc_0.configdl
+N cfgsave
+N configdl
+Y fcr_config_deconfig.ex_deconfig
+
