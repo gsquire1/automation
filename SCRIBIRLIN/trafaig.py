@@ -109,7 +109,7 @@ def main():
         if t[23]: cmd_options = cmd_options + " -L" + t[23]
         if t[24]: cmd_options = cmd_options + " -m" + t[24]
         if t[25]: cmd_options = cmd_options + " -M" + t[25]
-        if t[26]: cmd_options = cmd_options + " -n" + t[26]
+        if t[26]: cmd_options = cmd_options + " -n" 
         if t[27]: cmd_options = cmd_options + " -N" + t[27]
         if t[28]: cmd_options = cmd_options + " -o"
         if t[29]: cmd_options = cmd_options + " -O" + t[29]
@@ -123,7 +123,7 @@ def main():
         if t[37]: cmd_options = cmd_options + " -S" + t[37]
         if t[38]: cmd_options = cmd_options + " -t" + t[38]
         if t[39]: cmd_options = cmd_options + " -T" + t[39]
-        if t[40]: cmd_options = cmd_options + " -u" + t[40]
+        if t[40]: cmd_options = cmd_options + " -u"
         if t[41]: cmd_options = cmd_options + " -U" + t[41]
         if t[42]: cmd_options = cmd_options + " -v" + t[42]
         if t[43]: cmd_options = cmd_options + " -V" + t[43]
@@ -164,10 +164,15 @@ def main():
           
             
             p = Process(target=traffic_tools.traff_get_port_list, args=(serv_ip, serv_usr, serv_pwd, strt_cmd, os_ver))
-            p.daemon = False
+            p.daemon = True
             p.start()
             #p.join()
             
             time.sleep(5.2)
+
+
+    liabhar.count_down(300)
+
+
 
 main()

@@ -129,12 +129,12 @@ def start_windows_pre_3_2(h, start_cmd):
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/0" % i , db_level )
-        ras = re.compile('/dev/sd([a-z]+)')
+        ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
         remote_list = remote_list + ras
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/1" % i , db_level )
-        ras = re.compile('Drive([a-z]+)')
+        ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
         remote_list = remote_list + ras
     
@@ -167,12 +167,12 @@ def start_windows_post_3_2(h, start_cmd):
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
-        ras = re.compile('/dev/sd([a-z]+)')
+        ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
         remote_list = remote_list + ras
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
-        ras = re.compile('Drive([0-9]+)')
+        ras = re.compile('rive([0-9]{1,3})')
         ras = ras.findall(cmdout)
         remote_list = remote_list + ras
     
@@ -185,9 +185,9 @@ def start_windows_post_3_2(h, start_cmd):
     print("NEW LIST IS   :   %s " % new_list)
     
     #### combine the command with the drive list
-    start_pain_sd = start_pain + ' -f"\\\.\PhysicalDrive;%s"' % new_list
+    start_pain_sd = start_pain + ' -f"\\\.\PhysicalDrive;%s"\r\n' % new_list
     print("NEWEST COMMAND  %s   " % start_pain_sd)
-    reg_list = [b'([\w\d]+)']
+    reg_list = [b'([.\w\d]+)']
     cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
     cmdout = anturlar.traff_output()
     
@@ -237,17 +237,17 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
             start_windows_post_3_2(h, start_command)
         else:
             print("START PRe windows")
-            sys.exit()
+            #sys.exit()
             start_windows_pre_3_2(h, start_command)
         
     elif "linux" in this_platform:
         if "3.2" in this_bcu_version[0]:
             print("START POST linux ")
-            sys.exit()
+            #sys.exit()
             start_linux_post_3_2(h, start_command)
         else:
             print("START PRE linux")
-            sys.exit()
+            #sys.exit()
             start_linux_pre_3_2(h, start_command)
         
     else:
