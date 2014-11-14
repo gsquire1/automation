@@ -28,16 +28,18 @@ def fcr_state_persist_enabled():
     host = (sys.argv[1])
     user = sys.argv[2]
     password = sys.argv[7]
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    #test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    #csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
     fcr_state = fcr_tools.switch_status()
     state = fcr_state['fcr_enabled']
     if state is True:
         anturlar.fos_cmd("switchdisable")
+        print('\n\nSleeping: 10')
         liabhar.JustSleep(10)
         enabled = fcr_tools.switch_status()
         if enabled['fcr_enabled'] is True:
             anturlar.fos_cmd("switchenable")
+            print('\n\nSleeping: 10')
             liabhar.JustSleep(10)
             print("\n\nENABLE/DISABLE TEST PASSED")
         else:
@@ -46,7 +48,7 @@ def fcr_state_persist_enabled():
         print("\n\nENABLE/DISABLE TEST FAILED")
         print("Please enable fcr for this test and try again")
         sys.exit(0)
-    print('Sleeping: 10')
+    print('\n\nSleeping: 10')
     liabhar.JustSleep(10)
     si = anturlar.SwitchInfo()
     cn = si.chassisname()
@@ -72,16 +74,18 @@ def fcr_state_persist_disabled():
     host = (sys.argv[1])
     user = sys.argv[2]
     password = sys.argv[7]
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    #test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    #csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
     fcr_state = fcr_tools.switch_status()
     state = fcr_state['fcr_enabled']
     if state is False: #the same to here disabled is false, enabled is true
         anturlar.fos_cmd("switchdisable")
+        print('\n\nSleeping: 10')
         liabhar.JustSleep(10)
         enabled = fcr_tools.switch_status()
         if enabled['fcr_enabled'] is False:
             anturlar.fos_cmd("switchenable")
+            print('\n\nSleeping: 10')
             liabhar.JustSleep(10)
             print("\n\nENABLE/DISABLE TEST PASSED")
         else:

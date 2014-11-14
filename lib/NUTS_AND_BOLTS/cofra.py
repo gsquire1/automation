@@ -939,3 +939,4 @@ def switch_power_off_on(cn, mode = 'on'):
             liabhar.JustSleep(10)
             anturlar.close_tel()
     return(True)
+

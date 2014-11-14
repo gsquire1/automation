@@ -11,6 +11,7 @@ FCR TOOLS - different functions to get information from switches and/or fabrics 
 
 import anturlar
 import liabhar
+import cofra
 import sys, os, csv, re
 
 """
@@ -189,10 +190,12 @@ def fcr_state_persist_enabled():
     state = fcr_state['fcr_enabled']
     if state is True:
         anturlar.fos_cmd("switchdisable")
+        print('\n\nSleeping: 10')
         liabhar.JustSleep(10)
         enabled = switch_status()
         if enabled['fcr_enabled'] is True:
             anturlar.fos_cmd("switchenable")
+            print('\n\nSleeping: 10')
             liabhar.JustSleep(10)
             print("\n\nENABLE/DISABLE TEST PASSED")
         else:
@@ -201,15 +204,15 @@ def fcr_state_persist_enabled():
         print("\n\nENABLE/DISABLE TEST FAILED")
         print("Please enable fcr for this test and try again")
         sys.exit(0)
-    print('Sleeping: 10')
+    print('\n\nSleeping: 10')
     liabhar.JustSleep(10)
     si = anturlar.SwitchInfo()
     cn = si.chassisname()
     a = cofra.switch_power_off_on(cn, 'off')
-    print('Sleeping: 20')
+    print('\n\nSleeping: 20')
     liabhar.JustSleep(20)
     a = cofra.switch_power_off_on(cn, 'on')
-    print('Sleeping: 120')
+    print('\n\nSleeping: 120')
     liabhar.JustSleep(120)
     anturlar.connect_tel_noparse(host, user, password)
     si = anturlar.SwitchInfo()
@@ -233,10 +236,12 @@ def fcr_state_persist_disabled():
     state = fcr_state['fcr_enabled']
     if state is False: #the same to here disabled is false, enabled is true
         anturlar.fos_cmd("switchdisable")
+        print('\n\nSleeping: 10')
         liabhar.JustSleep(10)
         enabled = switch_status()
         if enabled['fcr_enabled'] is False:
             anturlar.fos_cmd("switchenable")
+            print('\n\nSleeping: 10')
             liabhar.JustSleep(10)
             print("\n\nENABLE/DISABLE TEST PASSED")
         else:
@@ -245,15 +250,15 @@ def fcr_state_persist_disabled():
         print("\n\nENABLE/DISABLE TEST FAILED")
         print("Please disable fcr for this test and try again")
         sys.exit(0)
-    print('Sleeping: 10')
+    print('\n\nSleeping: 10')
     liabhar.JustSleep(10)
     si = anturlar.SwitchInfo()
     cn = si.chassisname()
     a = cofra.switch_power_off_on(cn, 'off')
-    print('Sleeping: 20')
+    print('\n\nSleeping: 20')
     liabhar.JustSleep(20)
     a = cofra.switch_power_off_on(cn, 'on')
-    print('Sleeping: 120')
+    print('\n\nSleeping: 120')
     liabhar.JustSleep(120)
     anturlar.connect_tel_noparse(host, user, password)
     fcr_state = switch_status()
@@ -266,3 +271,44 @@ def fcr_state_persist_disabled():
         print('TEST FAILED')
 
     sys.exit(0)#######################
+    
+def license_restore(): #### NEED TO ADD supportftp settings
+    host = sys.argv[1]
+    user = sys.argv[2]
+    password = sys.argv[7]
+    si = anturlar.SwitchInfo()
+    cn = si.chassisname()
+    test_file = '/home/RunFromHere/ini/SwitchLicenses.csv'
+    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    for line in csv_file:
+        switch_name = (line['Nickname'])
+        if switch_name == cn[0]:
+            sn = (switch_name)
+            License1 = (line['License1'])
+            License2 = (line['License2'])
+            License3 = (line['License3'])
+            License4 = (line['License4'])
+            License5 = (line['License5'])
+            License6 = (line['License6'])
+            License7 = (line['License7'])
+            License8 = (line['License8'])
+            License9 = (line['License9'])
+            License10 = (line['License10'])
+            License11 = (line['License11'])
+            License12 = (line['License12'])
+            License13 = (line['License13'])
+            License14 = (line['License14'])
+            License15 = (line['License15'])            
+    a = [License1, License2, License3, License4, License5, License6, License7, License8, License9, License10, License11, License12, License13, License14, License15]          
+    for i in a:
+        if i != (''):
+            anturlar.fos_cmd("licenseadd %s" % i)
+            print(i)
+            liabhar.JustSleep(2)
+    anturlar.fos_cmd("echo y | reboot")
+    print('\n\nSleeping: 90')
+    liabhar.JustSleep(90)   
+    anturlar.connect_tel_noparse(host, user, password)
+    anturlar.fos_cmd('licenseshow')
+    return(True)
+    
