@@ -272,7 +272,7 @@ def fcr_state_persist_disabled():
 
     sys.exit(0)#######################
     
-def license_restore(): #### NEED TO ADD supportftp settings
+def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     host = sys.argv[1]
     user = sys.argv[2]
     password = sys.argv[7]
