@@ -844,19 +844,13 @@ def mem_monitor(wait_time=1800, iters=336):
         print("@"*60)
         header_raw = "%s%s%s%s" % ("\nMEMORY WATCH       RAW DATA\n", "  sw_info ipaddr  ",\
                                sw_ip, "\n=================================================\n\n")
-        footer_raw = "\n======================================================================="
+        footer_raw = "\n=======================================================================\n"
         fraw = "%s%s%s"%("logs/memory_log_raw_data",sw_ip,".txt")
         ffraw = liabhar.FileStuff(fraw, 'w+b')
         ffraw.write(header_raw)
         for kk, vv in d.items():
             print(kk,vv)    #### print to the crt
-            #ffraw.write(str(kk)+"  "+str(vv)+"\n")
-            #ffraw.write(str(vv))
-             
         print("@"*60)
-        
-        #ffraw.write(footer_raw)
-        #ffraw.close()
         
         #######################################################################
         ####  write the same data to a file
