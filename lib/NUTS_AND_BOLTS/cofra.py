@@ -827,8 +827,9 @@ def mem_monitor(wait_time=1800, iters=336):
         while y < len(ras):
             if "ps -eo" not in ras[y][0]:  #### exlude the ps command
                 key = ras[y][0] + ras[y][1]
-                if 'key' in d:
+                if key in d:
                     value = d[key]
+                    #print("\n\n\nvalue of d key is :  %s " % value )
                 else:
                     value = []
                 ras_value = [ras[y][3]]
@@ -836,13 +837,26 @@ def mem_monitor(wait_time=1800, iters=336):
                 d[key] = value            #### add the value to the key
             y += 1                        #### if key does not exist add
                                           ####new key and value
-        #### print the newest data and wait 
+        #### print the newest data and wait
+        #### write the raw data to a file 
         print("@"*60)
         print("@"*60)
         print("@"*60)
+        header_raw = "%s%s%s%s" % ("\nMEMORY WATCH       RAW DATA\n", "  sw_info ipaddr  ",\
+                               sw_ip, "\n=================================================\n\n")
+        footer_raw = "\n======================================================================="
+        fraw = "%s%s%s"%("logs/memory_log_raw_data",sw_ip,".txt")
+        ffraw = liabhar.FileStuff(fraw, 'w+b')
+        ffraw.write(header_raw)
         for kk, vv in d.items():
-            print(kk,vv)
+            print(kk,vv)    #### print to the crt
+            #ffraw.write(str(kk)+"  "+str(vv)+"\n")
+            #ffraw.write(str(vv))
+             
         print("@"*60)
+        
+        #ffraw.write(footer_raw)
+        #ffraw.close()
         
         #######################################################################
         ####  write the same data to a file
@@ -867,7 +881,7 @@ def mem_monitor(wait_time=1800, iters=336):
             list_of_value = kk + ",   " + list_of_value + "\n"
             
             ff.write(list_of_value)
-            
+            ffraw.write(list_of_value)
             
             list_of_value = list_of_value.strip('\n')
             list_with_change_key = list_of_value.split(',')
@@ -875,7 +889,7 @@ def mem_monitor(wait_time=1800, iters=336):
             values_for_name_pid = list_with_change_key[1:]
             print("Name pid  :  %s " % name_pid )
             print("VALUES for   %s " % values_for_name_pid)
-            low_value =999999
+            low_value = 999999
             high_value = 0
             for v in values_for_name_pid:
                 n_to_compare = int(v)
@@ -898,6 +912,9 @@ def mem_monitor(wait_time=1800, iters=336):
         ff.write(summary_string)
         
         ff.close()
+        
+        ffraw.write(footer_raw)
+        ffraw.close()
         
         liabhar.cls()
         print("Memory Watch   Step  %s  " % x )
