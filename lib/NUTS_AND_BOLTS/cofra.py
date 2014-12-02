@@ -808,7 +808,7 @@ def mem_monitor(wait_time=1800, iters=336):
     #### wait to get the next set of usage stats
     liabhar.count_down(wait_time)  
  
-    x = 0    
+    x = 0               #### x is the number of loops to run 
     while x <= iters:    ####default is 336 so the test goes 7 days
         x += 1         ####  when wait_time is 1800 seconds
         
@@ -816,9 +816,9 @@ def mem_monitor(wait_time=1800, iters=336):
         #### after the wait time
         current_date = anturlar.fos_cmd("date") 
         capture = anturlar.fos_cmd("ps -eo command,pid,pmem,rss,vsz ")
-         
+        ####
         ####  do the calculations
-        ####  capture the ps data and put it in a variableto add to the dictionary
+        ####  capture the ps data and put it in a variable to add to the dictionary
         ras = re.compile('([- \.:,\[\]\w\/@\d]+)\s+([\d]+)\s+([.\d]+)\s+([\d]+)\s+([\d]+)(?=\\r\\n)')
         ras = ras.findall(capture)
         #### add the data to the dictionary
@@ -827,7 +827,10 @@ def mem_monitor(wait_time=1800, iters=336):
         while y < len(ras):
             if "ps -eo" not in ras[y][0]:  #### exlude the ps command
                 key = ras[y][0] + ras[y][1]
-                value = d[key]
+                if 'key' in d:
+                    value = d[key]
+                else:
+                    value = []
                 ras_value = [ras[y][3]]
                 value.extend(ras_value)
                 d[key] = value            #### add the value to the key
