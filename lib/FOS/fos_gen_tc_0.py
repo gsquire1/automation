@@ -91,7 +91,21 @@ def send_cmds(filename , loops = 1):
      
 
      
-     
+def ha_failover_check_maps_flow_ras_porterrs(times=1):
+    """
+        ha failover
+        
+        
+    """
+    ####    use cofra.hafailover to do the failover
+    ####       pass the number of times to repeat before checking stats
+    ####        
+    ####
+    ####
+    cofra.ha_failover(times)
+    maps_tools.
+    
+    
      
      
      
