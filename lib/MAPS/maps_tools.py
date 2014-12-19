@@ -1193,6 +1193,17 @@ def format_results(testcase, testresult):
     return(h)
     
     
+def check_same_state():
+    """
+    """
+    #### get maps stats for compare to previous
+    ####
+    ####
+    
+    pass
+    
+    
+    
     
 def end():
     pass
