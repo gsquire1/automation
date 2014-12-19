@@ -103,7 +103,7 @@ def ha_failover_check_maps_flow_ras_porterrs(times=1):
     ####
     ####
     cofra.ha_failover(times)
-    maps_tools.
+    pass
     
     
      

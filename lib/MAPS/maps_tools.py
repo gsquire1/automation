@@ -1199,8 +1199,13 @@ def check_same_state():
     #### get maps stats for compare to previous
     ####
     ####
+    capture_cmd = anturlar.fos_cmd('mapsdb --show all')
     
-    pass
+    print(capture_cmd)
+    
+    
+    
+    
     
     
     
