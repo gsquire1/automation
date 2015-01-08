@@ -298,8 +298,10 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
             License12 = (line['License12'])
             License13 = (line['License13'])
             License14 = (line['License14'])
-            License15 = (line['License15'])            
-    a = [License1, License2, License3, License4, License5, License6, License7, License8, License9, License10, License11, License12, License13, License14, License15]          
+            License15 = (line['License15'])
+            License16 = (line['License16'])
+            License17 = (line['License17'])
+    a = [License1, License2, License3, License4, License5, License6, License7, License8, License9, License10, License11, License12, License13, License14, License15, License16, License17]          
     for i in a:
         if i != (''):
             anturlar.fos_cmd("licenseadd %s" % i)
