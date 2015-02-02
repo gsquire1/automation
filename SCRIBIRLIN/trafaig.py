@@ -168,11 +168,16 @@ def main():
             p.start()
             #p.join()
             
-            time.sleep(5.2)
+            time.sleep(35.2)
 
-
-    liabhar.count_down(300)
-
-
+    time_traffic_run = 0
+    while True :
+        liabhar.count_down(300)
+        time_traffic_run += 300 
+        print("Traffic has been running for %s  seconds " % time_traffic_run )
+        print("\n"*5)
 
 main()
+
+
+
