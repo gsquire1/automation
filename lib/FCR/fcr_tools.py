@@ -26,11 +26,6 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
-def switch_status():
-    fcri = anturlar.FcrInfo()
-    a = fcri.sw_basic_info()
-    return(a)
-
 def bb_fabric_switch_status():
     """
         For all switches found in backbone fabric, returns a dictionary data structure for switch status for switch states:
@@ -116,7 +111,6 @@ def switch_status():
         
         return dictionary with {switch_name, ipaddr, chassis, vf_enabled, base, fcr_enabled}}
     """
-    
     fcrinfo = anturlar.FcrInfo()
     initial_checks = fcrinfo.sw_basic_info()
     print('\n\n'+ '='*20)
@@ -281,36 +275,23 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     test_file = '/home/RunFromHere/ini/SwitchLicenses.csv'
     csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
     for line in csv_file:
+        a = (type(line))
         switch_name = (line['Nickname'])
         if switch_name == cn[0]:
-            sn = (switch_name)
-            License1 = (line['License1'])
-            License2 = (line['License2'])
-            License3 = (line['License3'])
-            License4 = (line['License4'])
-            License5 = (line['License5'])
-            License6 = (line['License6'])
-            License7 = (line['License7'])
-            License8 = (line['License8'])
-            License9 = (line['License9'])
-            License10 = (line['License10'])
-            License11 = (line['License11'])
-            License12 = (line['License12'])
-            License13 = (line['License13'])
-            License14 = (line['License14'])
-            License15 = (line['License15'])
-            License16 = (line['License16'])
-            License17 = (line['License17'])
-    a = [License1, License2, License3, License4, License5, License6, License7, License8, License9, License10, License11, License12, License13, License14, License15, License16, License17]          
-    for i in a:
-        if i != (''):
-            anturlar.fos_cmd("licenseadd %s" % i)
-            print(i)
-            liabhar.JustSleep(2)
+            del (line[''])
+            del (line ['Nickname'])
+            del (line['IP Address'])
+            a = (list(line.values()))
+            for i in a:
+                if i != (''):
+                    anturlar.fos_cmd("licenseadd %s" % i)
+                    liabhar.JustSleep(5)
     anturlar.fos_cmd("echo y | reboot")
     print('\n\nSleeping: 150')
     liabhar.JustSleep(150)   
     anturlar.connect_tel_noparse(host, user, password)
     anturlar.fos_cmd('licenseshow')
     return(True)
+
+
     
