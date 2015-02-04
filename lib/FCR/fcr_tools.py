@@ -65,7 +65,6 @@ def get_fabwide_ip():
 
 def fab_wide_proxy_device_numbers():
     """
-    Testing Git
     Retrieve number of proxy device on all backbone switches in fabric. Drop those numbers
     into a file for later retreival (e.g. say after reboot testing). Also return a
     dictionary (e.g {switch_ip: # of proxy devices})
