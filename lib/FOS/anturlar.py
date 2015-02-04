@@ -924,7 +924,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
         """
             Returns ip addresses of all switches in backbone fabric. Does not get edge switches.
         """
-        
+    
         backbone_ip = self.fcr_backbone_ip()
         return(backbone_ip)
     
@@ -955,22 +955,21 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
     
-    #def fcr_backbone_ip(self):
-    #    """
-    #    OBSOLETE:
-    #    Runs fabricshow against backbone switches in a fabric to determine all IPs 
-    #    """
-    #    fcrcfg = FcrInfo()
-    #    fcrstatus = self.sw_basic_info()
-    #    print("FCRSTATUS")
-    #    print(fcrstatus)
-    #    if fcrstatus[5] is not False:  # Test if base config'd and if so
-    #        base = fcrcfg.base_check() # get the base FID number
-    #        f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-    #        get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-    #    else:
-    #        get_fabric_ip = fcrcfg.ipv4_list()
-    #    return(get_fabric_ip)
+    def fcr_backbone_ip(self):
+        """
+        Runs fabricshow against backbone switches in a fabric to determine all IPs 
+        """
+        fcrcfg = FcrInfo()
+        fcrstatus = self.sw_basic_info()
+        print("FCRSTATUS")
+        print(fcrstatus)
+        if fcrstatus[5] is not False:  # Test if base config'd and if so
+            base = fcrcfg.base_check() # get the base FID number
+            f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+            get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
+        else:
+            get_fabric_ip = fcrcfg.ipv4_list()
+        return(get_fabric_ip)
 
     def fcr_fab_wide_ip(self):
         """
