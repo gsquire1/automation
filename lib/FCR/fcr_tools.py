@@ -98,6 +98,9 @@ def fab_wide_proxy_device_numbers():
     print('='*20 + '\n\n')
     return(switch_list_with_proxy_dev)
 
+def check_proxy_dev_devices():
+    a = fab_wide_proxy_device_numbers()
+
     #switches = dict.fromkeys(['switch_name','switch_ip','form_factor'])
     #print(switches)
     #switches_found = (len(backbone_ip))
