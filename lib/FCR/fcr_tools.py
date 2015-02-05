@@ -65,7 +65,6 @@ def get_fabwide_ip():
 
 def fab_wide_proxy_device_numbers():
     """
-    Not Working as expected. Output is ambigious.
     Retrieve number of proxy device on all backbone switches in fabric. Drop those numbers
     into a file for later retreival (e.g. say after reboot testing). Also return a
     dictionary (e.g {switch_ip: # of proxy devices})
@@ -98,6 +97,9 @@ def fab_wide_proxy_device_numbers():
     print(switch_list_with_proxy_dev)
     print('='*20 + '\n\n')
     return(switch_list_with_proxy_dev)
+
+def check_proxy_dev_devices():
+    a = fab_wide_proxy_device_numbers()
 
     #switches = dict.fromkeys(['switch_name','switch_ip','form_factor'])
     #print(switches)
