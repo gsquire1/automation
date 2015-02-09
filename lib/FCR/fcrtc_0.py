@@ -5,7 +5,7 @@
 ####
 ###############################################################################
 """
-FCR 1st Test Case Module
+Contains test case functions.
 """
 
 import anturlar, liabhar, cofra
@@ -24,8 +24,11 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 def fcr_state_persist_enabled():
-    #print(sys.argv)
-    host = (sys.argv[1])
+    """
+    Check if FCR is enabled, if not bail out and ask user to enable it.
+    When FCR is enabled, do a reboot then check FCR is still enabled.
+    """
+    host = sys.argv[1]
     user = sys.argv[2]
     password = sys.argv[7]
     #test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
@@ -60,7 +63,7 @@ def fcr_state_persist_enabled():
     liabhar.JustSleep(120)
     anturlar.connect_tel_noparse(host, user, password)
     si = anturlar.SwitchInfo()
-    print("GETTINGFCRSTATE")
+    #print("GETTINGFCRSTATE")
     fcr_state = fcr_tools.switch_status()
     state = fcr_state['fcr_enabled']
     if state is True:
@@ -71,6 +74,10 @@ def fcr_state_persist_enabled():
         print('TEST FAILED')
         
 def fcr_state_persist_disabled():
+    """
+    Check if FCR is disabled, if not bail out and ask user to enable it.
+    When FCR is disabled, do a reboot then check FCR is still disabled. 
+    """
     host = (sys.argv[1])
     user = sys.argv[2]
     password = sys.argv[7]
@@ -115,17 +122,6 @@ def fcr_state_persist_disabled():
         print('TEST FAILED')
 
     sys.exit(0)#######################
-
-def ex_deconfig():
-    fcri = anturlar.FcrInfo()
-    test = fcri.ex_deconfig()
-    print('\n\nAll EX_ports found are now deconfigured.')
-  
-def test_anturlar_functions():
-    fcri = anturlar.FcipInfo()
-    a = fcri.all_ge_ports()
-    print(a)
-    sys.exit(0)
 
 def slotpower_off_on_check_devices():
     si = anturlar.SwitchInfo()
@@ -188,28 +184,7 @@ def Dictionary_Example():
         print('VALUES')
         print(values)
               
-def change_fid(fid):
-    """
-        change a fid on a switch
-    """
-    cons_out = anturlar.fos_cmd("setcontext %s" % fid)
-    
-def test_case_flow():
-    """
-        get the current flows on the SUT
-        remove the flows
-        create the same flows
-        
-    """
-    pass
 
-def test_case_config():
-    """
-        Get some information from the switch so config can be
-        put back to the switch
-    """
-    
-    pass
 
 def genAll():
     """
@@ -234,15 +209,6 @@ def genAll():
 
     si_maps_gen = si_maps.genAll("on")
     cons_out = anturlar.fos_cmd("flow --show")
-
-def remove_sim():
-    """
-    remove any SIM ports enabled on the switch
-    
-    """
-    
-    
-    pass
 
 def ports_disable(portlist = "", t=1, wait=10):
     """
