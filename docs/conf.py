@@ -26,7 +26,12 @@ sys.path.insert(0, '/home/automation/lib/MAPS')
 sys.path.insert(0, '/home/automation/lib/NUTS_AND_BOLTS')
 sys.path.insert(0, '/home/automation/lib/FCR')
 sys.path.insert(0, '/home/automation/APM')
-
+sys.path.insert(0, '/home/automation/automation/APM')
+sys.path.insert(0, '/home/automation/automation/lib/FOS')
+sys.path.insert(0, '/home/automation/automation/SCRIBIRLIN')
+sys.path.insert(0, '/home/automation/automation/lib/MAPS')
+sys.path.insert(0, '/home/automation/automation/lib/NUTS_AND_BOLTS')
+sys.path.insert(0, '/home/automation/automation/lib/FCR')
 
 # -- General configuration ------------------------------------------------
 

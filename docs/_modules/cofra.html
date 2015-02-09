@@ -1,0 +1,1047 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cofra &mdash; SQA_automation 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="SQA_automation 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for cofra</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python3</span>
+
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">anturlar</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">liabhar</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+
+
+<div class="viewcode-block" id="doFirmwareDownload"><a class="viewcode-back" href="../index.html#cofra.doFirmwareDownload">[docs]</a><span class="k">class</span> <span class="nc">doFirmwareDownload</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        do a firmware download to 7.3.0 build of  firmware</span>
+<span class="sd">        then close the telnet connection and</span>
+<span class="sd">        wait 1200 seconds before closing ending the function</span>
+<span class="sd">        Return could be</span>
+<span class="sd">                1. a message that firmware version are the same</span>
+<span class="sd">                2. server is inaccessible</span>
+<span class="sd">                3. the user prompt after firmware download is started</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">firmvrsn</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firmvrsn</span> <span class="o">=</span> <span class="n">firmvrsn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">check_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;firmwaredownloadstatus&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;firmware versions&quot;</span> <span class="ow">in</span> <span class="n">capture_cmd</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_status</span><span class="p">()</span>
+            
+    <span class="k">def</span> <span class="nf">check_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;firmwareshow&quot;</span><span class="p">)</span> 
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;FOS\s+([\._a-z0-9]{6,18})</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;FOS\s+([\._a-z0-9]{6,18})</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras_dir</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="n">ras_dir</span> <span class="o">=</span> <span class="n">ras_dir</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ras</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;none&quot;</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ras_dir</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;none&quot;</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">=</span><span class="n">ras_dir</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="k">return</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_version</span><span class="p">()</span>
+        <span class="c">#print(&quot;FIRMUP IS %s\n&quot;%(self.firmup))</span>
+        <span class="c">#print(&quot;RAS IS     %s\n&quot;%(ras))</span>
+        <span class="k">if</span> <span class="n">ras</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firmvrsn</span><span class="p">:</span>
+            <span class="n">firmware_cmd</span> <span class="o">=</span> <span class="s">&quot;firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/</span><span class="si">%s</span><span class="s">,fwdlacct&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmvrsn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;fail to perform Firmwaredownload since versions were the same&quot;</span>
+            <span class="c">#firmware_cmd = &quot;firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct&quot;%(self.firmdown)</span>
+        <span class="n">reg_ex_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;root&gt; &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Y/N\) \[Y]:&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;HA Rebooting&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Connection to host lost.&#39;</span><span class="p">]</span>
+        <span class="n">capture_own_regex</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">firmware_cmd</span><span class="p">,</span> <span class="n">reg_ex_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;the same firmware&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="n">capture_own_regex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;server is inaccessible&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="n">capture_own_regex</span><span class="p">)</span>
+        
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;Y&quot;</span><span class="p">)</span>
+        <span class="n">close_tel</span><span class="p">()</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">email_sender_html</span><span class="p">(</span><span class="s">&quot;smckie@brocade.com&quot;</span><span class="p">,</span> <span class="s">&quot;smckie@brocade.com&quot;</span><span class="p">,</span> <span class="s">&quot;Started Firmware Download &quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmvrsn</span><span class="p">))</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">1200</span><span class="p">)</span> 
+        <span class="k">return</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="DoSupportsave"><a class="viewcode-back" href="../index.html#cofra.DoSupportsave">[docs]</a><span class="k">class</span> <span class="nc">DoSupportsave</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    start a supportsave on the current switch</span>
+<span class="sd">    the ip user password chassisname and if to do tracedump (default yes)</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">passw</span><span class="p">,</span> <span class="n">chas_name</span><span class="p">,</span> <span class="n">tr</span> <span class="o">=</span> <span class="s">&#39;yes&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr</span> <span class="o">=</span> <span class="n">tr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passw</span> <span class="o">=</span> <span class="n">passw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chas_name</span> <span class="o">=</span> <span class="n">chas_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">createdir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        
+<div class="viewcode-block" id="DoSupportsave.start"><a class="viewcode-back" href="../index.html#cofra.DoSupportsave.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         doc here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracedump</span><span class="p">()</span>
+        
+        <span class="n">capture</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">reg_ex_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;root&gt; &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;.*</span><span class="se">\r\n</span><span class="s">&#39;</span><span class="p">]</span>
+        <span class="n">reg_ex_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;root&gt;&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;please retry later&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;SupportSave complete&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Supportsave failed.&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;supportsave -n -u </span><span class="si">%s</span><span class="s"> -p </span><span class="si">%s</span><span class="s"> -h </span><span class="si">%s</span><span class="s"> -l ftp -d </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">passw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="n">reg_ex_list_only_root</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;(.*\d</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n )&#39;</span><span class="p">]</span>
+        <span class="n">reg_ex_list_only_cmd</span> <span class="o">=</span> <span class="p">[</span> <span class="n">cmd</span><span class="o">.</span><span class="n">encode</span><span class="p">()]</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_only_cmd, 10)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list, 3600)</span>
+        <span class="c">#capture = capture[2]</span>
+        <span class="c">#capture = capture.decode()</span>
+        <span class="k">print</span><span class="p">(</span> <span class="n">cmd_cap</span> <span class="p">)</span>
+    </div>
+    <span class="k">def</span> <span class="nf">tracedump</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr</span> <span class="o">==</span> <span class="s">&quot;yes&quot;</span><span class="p">:</span>
+            <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;tracedump -n&quot;</span><span class="p">)</span>
+            <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+         
+    <span class="k">def</span> <span class="nf">createdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">tn</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">())</span>  <span class="c">#### ISO format 2013-02-21 06:35:45.707450</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">&quot;_&quot;</span><span class="p">)</span>
+         
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chas_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span> <span class="o">+=</span> <span class="s">&quot;__&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span> <span class="o">+=</span> <span class="n">i</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;new directory name</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            
+        <span class="c">#reg_ex_list_ftp = [b&#39;root\):&#39;, b&#39;none\)\):&#39;]</span>
+        <span class="n">reg_ex_list_ftp</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;root\):&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;none\)\):&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;ftp &quot;</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">reg_ex_list_ftp</span><span class="p">)</span>
+        
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_ftp, 10)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd_cap</span><span class="p">)</span>
+        <span class="n">reg_ex_list_ftp</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;assword:&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">reg_ex_list_ftp</span><span class="p">)</span>
+        
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_ftp, 10)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd_cap</span><span class="p">)</span>
+        
+        <span class="n">reg_ex_list_ftp</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;ftp&gt; &#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">passw</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">reg_ex_list_ftp</span><span class="p">)</span>
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_ftp, 10)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd_cap</span><span class="p">)</span>
+     
+        <span class="n">reg_ex_list_ftp</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;denied &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;timeout&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;mkdir &quot;</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirname</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">reg_ex_list_ftp</span><span class="p">)</span>
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_ftp, 10)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd_cap</span><span class="p">)</span>
+        
+        <span class="n">reg_ex_list_ftp</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;denied &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;timeout&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;exit&quot;</span>
+        <span class="n">cmd_cap</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">reg_ex_list_ftp</span><span class="p">)</span>
+        <span class="c">#tn.write(cmd.encode(&#39;ascii&#39;) + b&quot;\n&quot;)</span>
+        <span class="c">#capture = tn.expect(reg_ex_list_ftp, 10)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">cmd_cap</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="mi">0</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="DoFirmwaredownloadChoice"><a class="viewcode-back" href="../index.html#cofra.DoFirmwaredownloadChoice">[docs]</a><span class="k">class</span> <span class="nc">DoFirmwaredownloadChoice</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        do a firmware download to 7.3.x or 7.2.1 builds depending on what</span>
+<span class="sd">        is already on the switch</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">firmdown</span><span class="p">,</span> <span class="n">firmup</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firmdown</span> <span class="o">=</span> <span class="n">firmdown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firmup</span> <span class="o">=</span> <span class="n">firmup</span>
+        <span class="c">#self.check_version()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        
+    
+    <span class="k">def</span> <span class="nf">check_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;firmwaredownloadstatus&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;firmware versions&quot;</span> <span class="ow">in</span> <span class="n">capture_cmd</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_status</span><span class="p">()</span>
+               
+    <span class="k">def</span> <span class="nf">check_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;firmwareshow&quot;</span><span class="p">)</span> 
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;FOS\s+([\._a-z0-9]{6,18})</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;FOS\s+([\._a-z0-9]{6,18})</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras_dir</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+[</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n]*\s+([\._a-z0-9]{6,18})&#39;</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="n">ras_dir</span> <span class="o">=</span> <span class="n">ras_dir</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        
+        <span class="n">f</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;hashow&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;hashow: Not supported&quot;</span> <span class="ow">in</span> <span class="n">capture_cmd</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">ras_dir</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+        
+        <span class="c">#print(&quot;switch RAS is :  %s  &quot; % ras.group(1))</span>
+        <span class="c">#print(&quot;director RAS is  : %s &quot; % ras_dir.group(1))</span>
+        
+        <span class="c">#try:</span>
+        <span class="c">#    if ras_dir(0) != &quot;none&quot;:</span>
+        <span class="c">#        f=ras_dir.group(1)</span>
+        <span class="c">#except:</span>
+        <span class="c">#    pass</span>
+  
+        <span class="k">return</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+          
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_version</span><span class="p">()</span>
+        <span class="n">download_success</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">FIRMUP IS </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmup</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;RAS IS     </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ras</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ras</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">firmup</span><span class="p">:</span>
+            <span class="c">#firmware_cmd = &quot;firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct&quot;%(self.firmup)</span>
+            <span class="n">firmware_cmd</span> <span class="o">=</span> <span class="s">&quot;firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/</span><span class="si">%s</span><span class="s">,fwdlacct&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmup</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#firmware_cmd = &quot;firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct&quot;%(self.firmdown)</span>
+            <span class="n">firmware_cmd</span> <span class="o">=</span> <span class="s">&quot;firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/</span><span class="si">%s</span><span class="s">,fwdlacct&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmdown</span><span class="p">)</span>
+        <span class="n">reg_ex_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s">&#39;root&gt; &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Y/N\) \[Y]:&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;HA Rebooting&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Connection to host lost.&#39;</span><span class="p">,</span> \
+                       <span class="n">b</span><span class="s">&#39;with new firmware&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s">&#39;Firmware has been downloaded&#39;</span><span class="p">]</span>
+        
+        <span class="c">#capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">start firmwaredownload&quot;</span><span class="p">)</span>
+        <span class="n">capture_own_regex</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="n">firmware_cmd</span><span class="p">,</span> <span class="n">reg_ex_list</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="s">&quot;Y]:&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n</span><span class="s">sending yes </span><span class="se">\n\n\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="s">&quot;Y&quot;</span><span class="p">,</span> <span class="n">reg_ex_list</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">download_success</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="c">#print(capture_cmd)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;END OF SEND Y </span><span class="se">\n\n\n\n\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">close_tel</span><span class="p">()</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">1800</span><span class="p">)</span> 
+            <span class="k">return</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        
+        <span class="c">#### does  capture_cmd include ha rebooting ???</span>
+        <span class="c">#if &quot;HA Rebooting&quot; in capture_cmd:</span>
+        <span class="c">#    print(&quot;\n\n\n&quot;)</span>
+        <span class="c">#    return(capture_cmd)</span>
+        <span class="c">#</span>
+        <span class="c">#if &quot;with new firmware&quot; in capture_cmd:</span>
+        <span class="c">#    return(capture_cmd)</span>
+        <span class="c">#</span>
+        <span class="c">#if &quot;Firmware has been downloaded&quot; in capture_cmd:</span>
+        <span class="c">#    return(capture_cmd)</span>
+
+        <span class="c">#######################################################################   </span>
+        <span class="c">#######################################################################</span>
+        <span class="c">####</span>
+        <span class="c">#### port decommission  -- need to delete decom action in all FIDS</span>
+        <span class="c">####         -- mapsconfig --actions raslog,email</span>
+        <span class="c">#### FPI monitor        -- need to disable FPI monitor in all FIDS</span>
+        <span class="c">####         -- mapsconfig --disableFPImon</span>
+        <span class="c">#### discard frame logging --</span>
+        <span class="c">####         -- framelog --disable -type du  and -type unroute</span>
+        <span class="c">#### SIM ports configured --</span>
+        <span class="c">####         -- flow --control -simport [port] -disable </span>
+        <span class="c">####</span>
+        
+        <span class="c">####</span>
+        <span class="c">####  if &quot;root&gt;&quot; in capture_cmd_regex:</span>
+        <span class="c">####</span>
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;lscfg --show&quot;</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(\d{1,3})(?=\()&#39;</span><span class="p">)</span>  
+        <span class="n">ls_all</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        
+        <span class="n">message_check</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="s">&quot;the same firmware&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="n">message_check</span> <span class="o">=</span> <span class="s">&quot;Firmwaredownload failed&quot;</span>
+        <span class="k">if</span> <span class="s">&quot;server is inaccessible&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="n">message_check</span> <span class="o">=</span> <span class="s">&quot;Firmwaredownload failed&quot;</span>
+        
+        <span class="k">if</span> <span class="s">&quot;Downgrade is not allowed&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c">#message_check = &quot;failed&quot;</span>
+        <span class="k">if</span> <span class="s">&quot;Firmwaredownload is already running&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="s">&quot;Sanity check failed because system is non-redundant&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        
+        <span class="k">if</span> <span class="s">&quot;port decommission&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls_all</span><span class="p">:</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">l</span><span class="p">)</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;mapsconfig --actions raslog,email&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="s">&quot;FPI Monitor&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls_all</span><span class="p">:</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">l</span><span class="p">)</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;mapsconfig --disableFPImon&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="s">&quot;discard frame logging&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls_all</span><span class="p">:</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">l</span><span class="p">)</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;framelog --disable -type du&quot;</span><span class="p">)</span>
+                <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;framelog --disable -type unroute&quot;</span><span class="p">)</span>
+             
+        <span class="k">if</span> <span class="s">&quot;SIM ports configured&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="n">en</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+            <span class="c">#port_list = en.sim_ports()</span>
+            
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls_all</span><span class="p">:</span>
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">l</span><span class="p">)</span>
+                <span class="n">port_list</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">sim_ports</span><span class="p">()</span>
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --control -portIdMode slotport&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;port list is </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">port_list</span><span class="p">)</span>
+                
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">port_list</span><span class="p">:</span>
+                    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --control -simport </span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s"> -disable&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
+            
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --control -portIdMode index&quot;</span><span class="p">)</span>
+            <span class="c">#capture_cmd = anturlar.fos_cmd_regex(&quot;N&quot;, reg_ex_list)</span>
+            <span class="c">#message_check = &quot;Firmwaredownload failed&quot;</span>
+        
+        <span class="c">##if &quot;SIM ports configured&quot; in capture_own_regex:</span>
+        <span class="c">##    message_check = &quot;Firmwaredownload failed&quot;</span>
+        
+        <span class="k">if</span> <span class="s">&quot;Brocade FC16-64 blades&quot;</span> <span class="ow">in</span> <span class="n">capture_own_regex</span><span class="p">:</span>
+            <span class="n">message_check</span> <span class="o">=</span> <span class="s">&quot;failed&quot;</span>
+        
+        
+        
+        <span class="k">if</span> <span class="s">&quot;failed&quot;</span> <span class="ow">in</span> <span class="n">message_check</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">do you want to stop the test ?&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">message_check</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="c">#return(message_check)</span>
+        
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd_regex</span><span class="p">(</span><span class="s">&quot;Y&quot;</span><span class="p">,</span> <span class="n">reg_ex_list</span><span class="p">)</span>
+        <span class="c">#anturlar.close_tel()</span>
+        
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">email_sender_html</span><span class="p">(</span><span class="s">&quot;smckie@brocade.com&quot;</span><span class="p">,</span> <span class="s">&quot;smckie@brocade.com&quot;</span><span class="p">,</span> <span class="s">&quot;Started Firmware Download &quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firmdown</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">firmup</span><span class="p">))</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">1800</span><span class="p">)</span> 
+        <span class="k">return</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+    </div>
+<div class="viewcode-block" id="bladeportmap_Info"><a class="viewcode-back" href="../index.html#cofra.bladeportmap_Info">[docs]</a><span class="k">def</span> <span class="nf">bladeportmap_Info</span><span class="p">(</span><span class="n">blade</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    bladeportmap_Info</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;bladeportmap </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">blade</span><span class="p">)</span>
+ 
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;ENB\s(\d+)\s+([-\d]+)\s+([-\d]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([-\d]+)\s+(\d+)\s+([CONDOR324]+)\s+([:_/A-Za-z0-9]+)&#39;</span><span class="p">)</span>
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    
+    
+    <span class="k">return</span><span class="p">(</span><span class="n">ras</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="clear_stats"><a class="viewcode-back" href="../index.html#cofra.clear_stats">[docs]</a><span class="k">def</span> <span class="nf">clear_stats</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        clear the following stats on a switch</span>
+<span class="sd">        fcrlogclear     errclear    diagclearerror -all     tracedump -R</span>
+<span class="sd">        supportsave -R  statsclear  portlogclear        coreshow -R</span>
+<span class="sd">        slotstatsclear    fabstatsclear   history clear</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;fcrlogclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;supportsave -R&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;errclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;statsclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portlogclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;diagclearerror -all&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;tracedump -R&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;coreshow -R&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;slotstatsclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;fabstatsclear&quot;</span><span class="p">)</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;history -c&quot;</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+   </div>
+<div class="viewcode-block" id="PortStats"><a class="viewcode-back" href="../index.html#cofra.PortStats">[docs]</a><span class="k">def</span> <span class="nf">PortStats</span><span class="p">(</span><span class="n">counter</span><span class="o">=</span><span class="s">&quot;all&quot;</span><span class="p">,</span> <span class="n">port_list</span> <span class="o">=</span> <span class="s">&quot;all&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PortStats Values</span>
+<span class="sd">        los         --  Loss of Sync </span>
+<span class="sd">        lol         --  Link Failure</span>
+<span class="sd">        losig       --  Loss of Signal</span>
+<span class="sd">        swtxto      --  switch tx timeout</span>
+<span class="sd">        swrxto      --  switch rx timeout</span>
+<span class="sd">        proto       --  protocal error</span>
+<span class="sd">        crc         --  crc with g_eof</span>
+<span class="sd">        lrout       --  link reset out</span>
+<span class="sd">        lrin        --  link reset in</span>
+<span class="sd">        encout      --  encoding out error</span>
+<span class="sd">        encin       --  encoding in error</span>
+<span class="sd">        c3to        --  c3 timeout discard</span>
+<span class="sd">        pcserr      --  pcs error ( ITW errors )</span>
+<span class="sd">        statechange --  statechange</span>
+<span class="sd">        txcrd_zero  --  Port TX credit zero</span>
+<span class="sd">        </span>
+<span class="sd">        A list of all the Port Stats Values will be return by default</span>
+<span class="sd">        or the counter value can be passed from the list above</span>
+<span class="sd">        the port_list will return all ports unless pass </span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c">#### set the list of counters to get for each port</span>
+    <span class="k">if</span> <span class="s">&quot;all&quot;</span> <span class="ow">in</span> <span class="n">counter</span><span class="p">:</span>
+        <span class="n">counter_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;los&#39;</span><span class="p">,</span> <span class="s">&#39;lol&#39;</span><span class="p">,</span> <span class="s">&#39;losig&#39;</span><span class="p">,</span> <span class="s">&#39;swtxto&#39;</span><span class="p">,</span> <span class="s">&#39;swrxto&#39;</span><span class="p">,</span> <span class="s">&#39;proto&#39;</span><span class="p">,</span>\
+                        <span class="s">&#39;crc&#39;</span><span class="p">,</span> <span class="s">&#39;lrout&#39;</span><span class="p">,</span> <span class="s">&#39;lrin&#39;</span><span class="p">,</span> <span class="s">&#39;encout&#39;</span><span class="p">,</span> <span class="s">&#39;encin&#39;</span><span class="p">,</span>\
+                        <span class="s">&#39;c3to&#39;</span><span class="p">,</span> <span class="s">&#39;pcserr&#39;</span><span class="p">,</span> <span class="s">&#39;statechange&#39;</span> <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">counter_list</span> <span class="o">=</span> <span class="n">counter</span>
+        
+    <span class="n">port_list</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">counter_list_capture</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="n">los_count</span>        <span class="o">=</span> <span class="p">[</span><span class="s">&quot;los&quot;</span><span class="p">]</span>
+    <span class="n">lol_count</span>        <span class="o">=</span> <span class="p">[</span><span class="s">&quot;lol&quot;</span><span class="p">]</span>
+    <span class="n">losig_count</span>      <span class="o">=</span> <span class="p">[</span><span class="s">&quot;losig&quot;</span><span class="p">]</span>
+    <span class="n">c3to_tx_count</span>    <span class="o">=</span> <span class="p">[</span><span class="s">&#39;swtxto&#39;</span><span class="p">]</span>
+    <span class="n">c3to_rx_count</span>    <span class="o">=</span> <span class="p">[</span><span class="s">&#39;swrxto&#39;</span><span class="p">]</span>
+    <span class="n">c3_discard_count</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;c3to&#39;</span><span class="p">]</span>
+    <span class="n">proto_count</span>      <span class="o">=</span> <span class="p">[</span><span class="s">&#39;proto&#39;</span><span class="p">]</span>
+    <span class="n">crc_geof_count</span>   <span class="o">=</span> <span class="p">[</span><span class="s">&#39;crc&#39;</span><span class="p">]</span>
+    <span class="n">lr_out_count</span>     <span class="o">=</span> <span class="p">[</span><span class="s">&#39;lrout&#39;</span><span class="p">]</span>
+    <span class="n">lr_in_count</span>      <span class="o">=</span> <span class="p">[</span><span class="s">&#39;lrin&#39;</span><span class="p">]</span>
+    <span class="n">enc_out_count</span>    <span class="o">=</span> <span class="p">[</span><span class="s">&#39;encout&#39;</span><span class="p">]</span>
+    <span class="n">enc_in_count</span>     <span class="o">=</span> <span class="p">[</span><span class="s">&#39;encin&#39;</span><span class="p">]</span>
+    <span class="n">pcserr_count</span>     <span class="o">=</span> <span class="p">[</span><span class="s">&#39;pcserr&#39;</span><span class="p">]</span>
+    <span class="n">st_change_count</span>  <span class="o">=</span> <span class="p">[</span><span class="s">&#39;statechange&#39;</span><span class="p">]</span>
+
+    <span class="c">#### send the command portshow and capture the data for each counter</span>
+    <span class="c">####</span>
+    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portshow </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">port_list</span><span class="p">)</span>
+    
+    <span class="n">ras_intr_link_fail</span>    <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Interrupts:\s+(\d+)\s+Link_failure:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_intr_link_fail</span>    <span class="o">=</span> <span class="n">ras_intr_link_fail</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_unknown_loss_sync</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Unknown:\s+(\d+)\s+Loss_of_sync:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_unknown_loss_sync</span> <span class="o">=</span> <span class="n">ras_unknown_loss_sync</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_Lli_loss_signal</span>   <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Lli:\s+(\d+)\s+Loss_of_sig:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_Lli_loss_signal</span>   <span class="o">=</span> <span class="n">ras_Lli_loss_signal</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_proc_protoc_err</span>   <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Proc_rqrd:\s+(\d+)\s+Protocol_err:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_proc_protoc_err</span>   <span class="o">=</span> <span class="n">ras_proc_protoc_err</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_Suspend_lr_out</span>    <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Suspended:\s+(\d+)\s+Lr_out:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_Suspend_lr_out</span>    <span class="o">=</span> <span class="n">ras_Suspend_lr_out</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_Overrun_lr_in</span>     <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;Overrun:\s+(\d+)\s+Lr_in:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_Overrun_lr_in</span>     <span class="o">=</span> <span class="n">ras_Overrun_lr_in</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    <span class="n">ras_state_change</span>      <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;state transition count:\s+(\d+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_state_change</span>      <span class="o">=</span> <span class="n">ras_state_change</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+    
+    
+    <span class="c">#### send the command porterrshow and capture the data for each counter</span>
+    <span class="c">#### </span>
+    <span class="n">caputre_porterrshow</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;porterrshow </span><span class="si">%s</span><span class="s"> | grep :&quot;</span> <span class="o">%</span> <span class="n">port_list</span><span class="p">)</span>
+    <span class="n">ras_porterrshow</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;\s*\d+:\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)&#39;</span><span class="p">)</span>
+    <span class="n">ras_porterrshow</span> <span class="o">=</span> <span class="n">ras_porterrshow</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">caputre_porterrshow</span><span class="p">)</span>
+        
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">counter_list</span><span class="p">:</span>
+        
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">value of i is  </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>      
+        <span class="c">#### start of portshow command </span>
+        
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;lol&#39;</span> <span class="p">:</span>
+            <span class="n">los_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_intr_link_fail</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">los_count</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;los&#39;</span><span class="p">:</span>
+            <span class="n">lol_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_unknown_loss_sync</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lol_count</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;losig&#39;</span><span class="p">:</span>
+            <span class="n">losig_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_Lli_loss_signal</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">losig_count</span><span class="p">)</span>
+                
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&#39;proto&#39;</span><span class="p">:</span>
+            <span class="n">proto_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_proc_protoc_err</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proto_count</span><span class="p">)</span>           
+            
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&quot;lrout&quot;</span><span class="p">:</span>
+            <span class="n">lr_out_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_Suspend_lr_out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lr_out_count</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&quot;lrin&quot;</span><span class="p">:</span>
+            <span class="n">lr_in_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_Overrun_lr_in</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lr_in_count</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span><span class="s">&#39;statechange&#39;</span><span class="p">:</span>
+            <span class="n">st_change_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_state_change</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">st_change_count</span><span class="p">)</span>
+        
+        <span class="c">####  start of porterrshow command</span>
+        
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;crc&#39;</span><span class="p">:</span>
+            <span class="n">crc_geof_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">crc_geof_count</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;swtxto&#39;</span><span class="p">:</span>
+            <span class="n">c3to_tx_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">15</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c3to_tx_count</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;swrxto&#39;</span><span class="p">:</span>
+            <span class="n">c3to_rx_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">16</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c3to_rx_count</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;c3to&#39;</span><span class="p">:</span>
+            <span class="n">c3_discard_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c3_discard_count</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&#39;encin&#39;</span><span class="p">:</span>
+            <span class="n">enc_in_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enc_in_count</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&#39;encout&#39;</span><span class="p">:</span>
+            <span class="n">enc_out_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">8</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">enc_out_count</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">i</span> <span class="ow">in</span> <span class="s">&#39;pcserr&#39;</span><span class="p">:</span>
+            <span class="n">pcserr_count</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ras_porterrshow</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">17</span><span class="p">])</span>
+            <span class="n">counter_list_capture</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pcserr_count</span><span class="p">)</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            
+    <span class="k">return</span><span class="p">(</span><span class="n">counter_list_capture</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="ha_failover"><a class="viewcode-back" href="../index.html#cofra.ha_failover">[docs]</a><span class="k">def</span> <span class="nf">ha_failover</span><span class="p">(</span> <span class="n">times</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        do HA failover on directors</span>
+<span class="sd">        do hareboot on pizza box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#### steps</span>
+    <span class="c">####  1. Determine Pizza box or Director</span>
+    <span class="c">####  2. save username and password</span>
+    <span class="c">####  3. HA Failover </span>
+    <span class="c">####  4. wait some time</span>
+    <span class="c">####  5. reconnect</span>
+    <span class="c">####  6. </span>
+    <span class="c">####   </span>
+    <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">fid_now</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ls_now</span><span class="p">()</span>
+    <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ipaddress</span><span class="p">()</span>
+    <span class="n">go_or_not</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">synchronized</span><span class="p">()</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="s">&#39;root&#39;</span>
+    <span class="n">pwrd</span> <span class="o">=</span> <span class="s">&#39;password&#39;</span>
+    <span class="c">#counter = 1</span>
+    <span class="n">new_connect</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c">####  add error checking here</span>
+    <span class="c">####   the first step is to get original data before starting the test</span>
+    <span class="c">#print(&quot;\n\noutside the while loop the go or not is equal to %s  &quot; % go_or_not)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    
+    <span class="k">while</span> <span class="n">new_connect</span><span class="p">:</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            
+            <span class="k">while</span> <span class="n">times</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;HA Failovers remaining -- </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">times</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">ip_addr</span><span class="p">,</span><span class="s">&#39;root&#39;</span><span class="p">,</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+                <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+                <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+                <span class="k">while</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">synchronized</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>
+                                
+                <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;echo Y | hafailover&quot;</span><span class="p">)</span>
+                <span class="c">####  add error checking here</span>
+                <span class="c">####   get the same data as before the while loop and compare</span>
+                <span class="k">if</span> <span class="s">&quot;can&#39;t failover&quot;</span> <span class="ow">in</span> <span class="n">sw_info</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n</span><span class="s">Switch Not Ready&quot;</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Need to wait for LS/HA progress to complete</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+                    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">times</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="c">#liabhar.count_down(30)</span>
+        
+        <span class="k">except</span><span class="p">:</span>
+        <span class="c">#except SocketError as e:</span>
+            <span class="c">#if e.errno != errno.ECONNRESET:</span>
+                <span class="c">#print(&quot;\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n&quot;)</span>
+                <span class="c">#raise </span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;===============================&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Telnet was disconnected &quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Attempting to reconnect shortly </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;===============================&quot;</span><span class="p">)</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">times</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_connect</span> <span class="o">=</span> <span class="bp">False</span>   
+     
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">()</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="ha_failover_check_adjacent"><a class="viewcode-back" href="../index.html#cofra.ha_failover_check_adjacent">[docs]</a><span class="k">def</span> <span class="nf">ha_failover_check_adjacent</span><span class="p">(</span> <span class="n">adjacent_ipaddr</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        do HA failover on directors </span>
+<span class="sd">        do hareboot on pizza box - # still to be implimented</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#### steps</span>
+    <span class="c">####  1. Determine Pizza box or Director</span>
+    <span class="c">####  2. save username and password</span>
+    <span class="c">####  3. HA Failover </span>
+    <span class="c">####  4. wait some time</span>
+    <span class="c">####  5. reconnect</span>
+    <span class="c">####  6. </span>
+    <span class="c">####   </span>
+    <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">fid_now</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ls_now</span><span class="p">()</span>
+    <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ipaddress</span><span class="p">()</span>
+    <span class="n">go_or_not</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">synchronized</span><span class="p">()</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="s">&#39;root&#39;</span>
+    <span class="n">pwrd</span> <span class="o">=</span> <span class="s">&#39;password&#39;</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">new_connect</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c">####  add error checking here</span>
+    <span class="c">####   the first step is to get original data before starting the test</span>
+    
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    
+    <span class="k">while</span> <span class="n">new_connect</span><span class="p">:</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            
+            <span class="k">while</span> <span class="n">times</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;HA Failovers Remaining  --  </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">times</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+                
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">ip_addr</span><span class="p">,</span><span class="s">&#39;root&#39;</span><span class="p">,</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+                <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+                    
+                <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;echo Y | hafailover&quot;</span><span class="p">)</span>
+                <span class="c">####  add error checking here</span>
+                <span class="c">####   get the same data as before the while loop and compare</span>
+                
+                <span class="k">if</span> <span class="s">&quot;can&#39;t failover&quot;</span> <span class="ow">in</span> <span class="n">sw_info</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n</span><span class="s">Switch Not Ready&quot;</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Need to wait for LS/HA progress to complete</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+                    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">times</span> <span class="o">-=</span> <span class="mi">1</span>
+                    
+                <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+        
+        <span class="k">except</span><span class="p">:</span>
+        <span class="c">#except SocketError as e:</span>
+            <span class="c">#if e.errno != errno.ECONNRESET:</span>
+                <span class="c">#print(&quot;\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n&quot;)</span>
+                <span class="c">#raise </span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;===============================&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Telnet was disconnected &quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Attempting to reconnect shortly </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;===============================&quot;</span><span class="p">)</span>
+            <span class="c">#pass</span>
+            <span class="c">#liabhar.count_down(10)</span>
+        <span class="k">if</span> <span class="n">times</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_connect</span> <span class="o">=</span> <span class="bp">False</span>   
+     
+     
+        <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">adjacent_ipaddr</span><span class="p">,</span><span class="s">&#39;root&#39;</span><span class="p">,</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+        <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchshow&quot;</span><span class="p">)</span>
+        <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;coreshow&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&quot;panic&quot;</span> <span class="ow">in</span> <span class="n">sw_info</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="n">anturlar</span><span class="o">.</span><span class="n">close_tel</span><span class="p">()</span>
+
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">()</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="fids_check"><a class="viewcode-back" href="../index.html#cofra.fids_check">[docs]</a><span class="k">def</span> <span class="nf">fids_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">lscfgshow</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if FID given is resident on switch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fid</span> <span class="o">=</span> <span class="n">fid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lscfgshow</span> <span class="o">=</span> <span class="n">lscfgshow</span>
+        <span class="c">#print(&quot;\n\n\nChecking if FID %s is a valid FID on switch.\n\n\n &quot; % fid)</span>
+        <span class="n">fids</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;(\d{1,3})\(&#39;</span><span class="p">,</span> <span class="n">lscfgshow</span><span class="p">)</span>
+        <span class="c">#print(&quot;==================&quot;)</span>
+        <span class="c">#print(&quot;Below is list of available FIDs: &quot;)</span>
+        <span class="c">#print(fids)</span>
+        <span class="c">#print(&quot;==================&quot;)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fid</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">fids</span><span class="p">:</span>
+            <span class="c">#print(&quot;\n&quot;)</span>
+            <span class="c">#print(&quot;=&quot;*20)</span>
+            <span class="c">#print(&quot;%s is a valid FID on this switch &quot; % fid)</span>
+            <span class="c">#print(&quot;=&quot;*20)</span>
+            <span class="k">return</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> is a NOT valid FID on this switch &quot;</span> <span class="o">%</span> <span class="n">fid</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="waitForOnline"><a class="viewcode-back" href="../index.html#cofra.waitForOnline">[docs]</a><span class="k">def</span> <span class="nf">waitForOnline</span><span class="p">(</span><span class="n">si</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        wait for a switch to return to online state</span>
+<span class="sd">        si = switch object from SwitchInfo</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">s_state</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">switch_state</span><span class="p">()</span>
+    <span class="k">while</span> <span class="s">&quot;Offline&quot;</span> <span class="ow">in</span> <span class="n">s_state</span><span class="p">:</span>
+        <span class="n">s_state</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">switch_state</span><span class="p">()</span>
+        <span class="n">sleeping</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">switch is Offline &quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">s_state</span><span class="p">)</span>
+    <span class="n">sleeping</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="mem_usage"><a class="viewcode-back" href="../index.html#cofra.mem_usage">[docs]</a><span class="k">def</span> <span class="nf">mem_usage</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the top memory users on the switch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">capture</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;ps axu&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">capture</span>
+<span class="c">###############################################################################</span>
+</div>
+<div class="viewcode-block" id="mem_usage_top20"><a class="viewcode-back" href="../index.html#cofra.mem_usage_top20">[docs]</a><span class="k">def</span> <span class="nf">mem_usage_top20</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the top 20 memory users on the switch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">capture</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;ps -eo vsz,rss,comm,pid | sort | tail -20&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">capture</span>
+<span class="c">###############################################################################    </span>
+</div>
+<div class="viewcode-block" id="mem_monitor"><a class="viewcode-back" href="../index.html#cofra.mem_monitor">[docs]</a><span class="k">def</span> <span class="nf">mem_monitor</span><span class="p">(</span><span class="n">wait_time</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span class="mi">336</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test Case   Monitor of memory</span>
+<span class="sd">        Title:</span>
+<span class="sd">        Feature:    No specific feature</span>
+<span class="sd">        Objective:  confirm no memory leaks </span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">###########################################################################</span>
+    <span class="c">####  todo -</span>
+    <span class="c">####    1.    </span>
+    <span class="c">####</span>
+    <span class="c">###########################################################################</span>
+    <span class="c">####</span>
+    <span class="c">#### Steps:</span>
+    <span class="c">####    1. get the memory usage every 1800 seconds ( 30 minute default)</span>
+    <span class="c">####      count is set to </span>
+    <span class="c">###########################################################################</span>
+    <span class="c">#### start testing</span>
+    <span class="c">####</span>
+    <span class="n">en</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">Maps</span><span class="p">()</span>
+    <span class="n">sw_ip</span> <span class="o">=</span> <span class="n">en</span><span class="o">.</span><span class="n">ipaddress</span><span class="p">()</span>
+    
+    <span class="n">baseline</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;ps -eo command,pid,pmem,rss,vsz &quot;</span><span class="p">)</span>
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;([- \.:,\[\]\w\/@\d]+)\s+([\d]+)\s+([.\d]+)\s+([\d]+)\s+([\d]+)(?=</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n)&#39;</span><span class="p">)</span>
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">baseline</span><span class="p">)</span>
+    
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>  <span class="c">#### craete a key with the command name</span>
+                               <span class="c">#### and pid added together</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">]]</span>   <span class="c">#### create the value as a list otherwise the first one</span>
+                      <span class="c">#### is a string and extend command later on will fail</span>
+    <span class="c">#print(&quot;K AND V ARE : %s   %s &quot; % (k,v))</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span><span class="p">}</span>     <span class="c">#### create the first dictionary entry ras[0]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>         <span class="c">#### start a loop to add all the rest of the entries to the dict</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ras</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&quot;ps -eo&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>    <span class="c">#### exclude the ps command</span>
+            <span class="c">#print(&quot;\n\n\n\n VALUE OF I is : %s  &quot; % i)</span>
+            <span class="c">#print(ras[i][0])</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">ras</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">]]</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span><span class="n">v</span><span class="p">})</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c">#### print the first baseline dictionary ####     </span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">      </span><span class="si">%s</span><span class="s">   &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+    <span class="c">#### wait to get the next set of usage stats</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>  
+ 
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>               <span class="c">#### x is the number of loops to run </span>
+    <span class="k">while</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">iters</span><span class="p">:</span>    <span class="c">####default is 336 so the test goes 7 days</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>         <span class="c">####  when wait_time is 1800 seconds</span>
+        
+        <span class="c">#### wrap with try expect or close any telnet session and reconnect</span>
+        <span class="c">#### after the wait time</span>
+        <span class="n">current_date</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;date&quot;</span><span class="p">)</span> 
+        <span class="n">capture</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;ps -eo command,pid,pmem,rss,vsz &quot;</span><span class="p">)</span>
+        <span class="c">####</span>
+        <span class="c">####  do the calculations</span>
+        <span class="c">####  capture the ps data and put it in a variable to add to the dictionary</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;([- \.:,\[\]\w\/@\d]+)\s+([\d]+)\s+([.\d]+)\s+([\d]+)\s+([\d]+)(?=</span><span class="se">\\</span><span class="s">r</span><span class="se">\\</span><span class="s">n)&#39;</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture</span><span class="p">)</span>
+        <span class="c">#### add the data to the dictionary</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ras</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s">&quot;ps -eo&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ras</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>  <span class="c">#### exlude the ps command</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">ras</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ras</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="c">#print(&quot;\n\n\nvalue of d key is :  %s &quot; % value )</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">ras_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">ras</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">3</span><span class="p">]]</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ras_value</span><span class="p">)</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>            <span class="c">#### add the value to the key</span>
+            <span class="n">y</span> <span class="o">+=</span> <span class="mi">1</span>                        <span class="c">#### if key does not exist add</span>
+                                          <span class="c">####new key and value</span>
+        <span class="c">#### print the newest data and wait</span>
+        <span class="c">#### write the raw data to a file </span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">header_raw</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">MEMORY WATCH       RAW DATA</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;  sw_info ipaddr  &quot;</span><span class="p">,</span>\
+                               <span class="n">sw_ip</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">=================================================</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">footer_raw</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">=======================================================================</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">fraw</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="s">&quot;logs/memory_log_raw_data&quot;</span><span class="p">,</span><span class="n">sw_ip</span><span class="p">,</span><span class="s">&quot;.txt&quot;</span><span class="p">)</span>
+        <span class="n">ffraw</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">fraw</span><span class="p">,</span> <span class="s">&#39;w+b&#39;</span><span class="p">)</span>
+        <span class="n">ffraw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header_raw</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">kk</span><span class="p">,</span><span class="n">vv</span><span class="p">)</span>    <span class="c">#### print to the crt</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        
+        <span class="c">#######################################################################</span>
+        <span class="c">####  write the same data to a file</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="s">&quot;logs/memory_log_&quot;</span><span class="p">,</span><span class="n">sw_ip</span><span class="p">,</span><span class="s">&quot;.txt&quot;</span><span class="p">)</span>
+        <span class="n">clear</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">clear</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+            <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;w+b&#39;</span><span class="p">)</span>  <span class="c">#### reset the log file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;a+b&#39;</span><span class="p">)</span>  <span class="c">#### open for appending</span>
+                
+        <span class="n">st</span> <span class="o">=</span> <span class="s">&quot;Runs  Percent  Ingrport  Egrport </span><span class="se">\n</span><span class="s">&quot;</span>        
+        <span class="n">header</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">MEMORY WATCH</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;  sw_info ipaddr  &quot;</span><span class="p">,</span>\
+                               <span class="n">sw_ip</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">==============================</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>  
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="n">summary_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">kk</span><span class="p">,</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c">#print(kk,vv)</span>
+            <span class="n">list_of_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span>
+            <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_of_value</span><span class="p">)</span>
+            <span class="n">list_of_value</span> <span class="o">=</span> <span class="n">list_of_value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;[]&#39;</span><span class="p">)</span>
+            <span class="n">list_of_value</span> <span class="o">=</span> <span class="n">list_of_value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">list_of_value</span> <span class="o">=</span> <span class="n">kk</span> <span class="o">+</span> <span class="s">&quot;,   &quot;</span> <span class="o">+</span> <span class="n">list_of_value</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+            
+            <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">list_of_value</span><span class="p">)</span>
+            <span class="n">ffraw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">list_of_value</span><span class="p">)</span>
+            
+            <span class="n">list_of_value</span> <span class="o">=</span> <span class="n">list_of_value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">list_with_change_key</span> <span class="o">=</span> <span class="n">list_of_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">name_pid</span> <span class="o">=</span> <span class="n">list_with_change_key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">values_for_name_pid</span> <span class="o">=</span> <span class="n">list_with_change_key</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Name pid  :  </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">name_pid</span> <span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;VALUES for   </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">values_for_name_pid</span><span class="p">)</span>
+            <span class="n">low_value</span> <span class="o">=</span> <span class="mi">999999</span>
+            <span class="n">high_value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values_for_name_pid</span><span class="p">:</span>
+                <span class="n">n_to_compare</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">low_value</span> <span class="o">&gt;</span> <span class="n">n_to_compare</span><span class="p">:</span>
+                    <span class="n">low_value</span> <span class="o">=</span> <span class="n">n_to_compare</span>
+                <span class="k">elif</span> <span class="n">high_value</span> <span class="o">&lt;</span> <span class="n">n_to_compare</span><span class="p">:</span>
+                    <span class="n">high_value</span> <span class="o">=</span> <span class="n">n_to_compare</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;NAME PID  </span><span class="si">%s</span><span class="s">  &quot;</span> <span class="o">%</span> <span class="n">name_pid</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;HIGH   LOW   LAST  AMOUNT_of_CHANGE   VALUES </span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">  &quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">high_value</span><span class="p">,</span> <span class="n">low_value</span><span class="p">))</span>
+            <span class="n">any_change</span> <span class="o">=</span> <span class="n">high_value</span> <span class="o">-</span> <span class="n">low_value</span>    
+            <span class="n">summary_string</span> <span class="o">=</span> <span class="n">summary_string</span><span class="o">+</span><span class="n">name_pid</span><span class="o">+</span><span class="s">&quot;,   &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">low_value</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;,  &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">high_value</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;,  &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">n_to_compare</span><span class="p">)</span><span class="o">+</span> <span class="s">&quot;,  &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">any_change</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+        
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="o">*</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;SUMMARY OF MEMORY LOW AND HIGH VALUES&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">summary_string</span><span class="p">)</span>
+        
+        <span class="n">ff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="n">ffraw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">footer_raw</span><span class="p">)</span>
+        <span class="n">ffraw</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">cls</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Memory Watch   Step  </span><span class="si">%s</span><span class="s">  &quot;</span> <span class="o">%</span> <span class="n">x</span> <span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Your data is in </span><span class="si">%s</span><span class="s">  &quot;</span> <span class="o">%</span> <span class="n">f</span> <span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;time to next data capture : &quot;</span><span class="p">)</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+    
+    <span class="k">return</span><span class="p">()</span>
+<span class="c">###############################################################################   </span>
+</div>
+<div class="viewcode-block" id="switch_power_off_on"><a class="viewcode-back" href="../index.html#cofra.switch_power_off_on">[docs]</a><span class="k">def</span> <span class="nf">switch_power_off_on</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s">&#39;on&#39;</span><span class="p">):</span>  
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From hand edited Switch_Matrix csv file (should be in /home/RunFromHere/ini directory),</span>
+<span class="sd">        find IP and port# of related Power Tower and power off all power supplies for that switch</span>
+<span class="sd">        then power on again for a full power cycle.</span>
+<span class="sd">           </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">test_file</span> <span class="o">=</span> <span class="s">&#39;/home/RunFromHere/ini/SwitchMatrix.csv&#39;</span>
+    <span class="n">csv_file</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">test_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s">&#39;&quot;&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">csv_file</span><span class="p">:</span>
+        <span class="n">switch_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Nickname&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">switch_name</span> <span class="o">==</span> <span class="n">cn</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">sn</span> <span class="o">=</span> <span class="p">(</span><span class="n">switch_name</span><span class="p">)</span>
+            <span class="n">power1</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power1 IP&#39;</span><span class="p">])</span>
+            <span class="n">pp1</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power1 Port&#39;</span><span class="p">])</span>
+            <span class="n">power2</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power2 IP&#39;</span><span class="p">])</span>
+            <span class="n">pp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power2 Port&#39;</span><span class="p">])</span>
+            <span class="n">power3</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power3 IP&#39;</span><span class="p">])</span>
+            <span class="n">pp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power3 Port&#39;</span><span class="p">])</span>
+            <span class="n">power4</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power4 IP&#39;</span><span class="p">])</span>
+            <span class="n">pp4</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s">&#39;Power4 Port&#39;</span><span class="p">])</span>            
+            <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">power1</span><span class="p">,</span> <span class="n">pp1</span><span class="p">,</span> <span class="n">power2</span><span class="p">,</span> <span class="n">pp2</span><span class="p">,</span> <span class="n">power3</span><span class="p">,</span> <span class="n">pp3</span><span class="p">,</span> <span class="n">power4</span><span class="p">,</span> <span class="n">pp4</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse_power</span><span class="p">(</span><span class="n">power</span><span class="p">,</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;pass&#39;</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">power_cmd</span><span class="p">(</span><span class="s">&quot;cd access/1</span><span class="se">\t</span><span class="s">/1</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">pp</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;show&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="s">&quot;yes&quot;</span><span class="p">]:</span>
+                <span class="n">anturlar</span><span class="o">.</span><span class="n">power_cmd</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">close_tel</span><span class="p">()</span>
+    <span class="k">return</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, S_M.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

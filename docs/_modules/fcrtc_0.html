@@ -1,0 +1,801 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fcrtc_0 &mdash; SQA_automation 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="SQA_automation 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fcrtc_0</h1><div class="highlight"><pre>
+<span class="c">#!/opt/python3/bin/python3</span>
+
+<span class="c">###############################################################################</span>
+<span class="c">#### Home location is</span>
+<span class="c">####</span>
+<span class="c">###############################################################################</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">FCR 1st Test Case Module</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">anturlar</span><span class="o">,</span> <span class="nn">liabhar</span><span class="o">,</span> <span class="nn">cofra</span>
+<span class="kn">import</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">fcr_tools</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Naming conventions --</span>
+
+<span class="sd">module_name                     package_name            </span>
+<span class="sd">method_name                     ExceptionName           </span>
+<span class="sd">global_var_name                 instance_var_name</span>
+<span class="sd">function_parameter_name         local_var_name</span>
+<span class="sd">GLOBAL_CONSTANT_NAME            ClassName</span>
+<span class="sd">                                function_name</span>
+<span class="sd">                                </span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">fcr_state_persist_enabled</span><span class="p">():</span>
+    <span class="c">#print(sys.argv)</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+    <span class="c">#test_file = &#39;/home/RunFromHere/ini/SwitchMatrix.csv&#39;</span>
+    <span class="c">#csv_file = csv.DictReader(open(test_file, &#39;r&#39;), delimiter=&#39;,&#39;, quotechar=&#39;&quot;&#39;)</span>
+    <span class="n">fcr_state</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">fcr_state</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchdisable&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Sleeping: 10&#39;</span><span class="p">)</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">enabled</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchenable&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Sleeping: 10&#39;</span><span class="p">)</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">ENABLE/DISABLE TEST PASSED&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">ENABLE/DISABLE TEST FAILED&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Please enable fcr for this test and try again&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Sleeping: 10&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">chassisname</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">cofra</span><span class="o">.</span><span class="n">switch_power_off_on</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="s">&#39;off&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sleeping: 20&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">cofra</span><span class="o">.</span><span class="n">switch_power_off_on</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="s">&#39;on&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sleeping: 120&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;GETTINGFCRSTATE&quot;</span><span class="p">)</span>
+    <span class="n">fcr_state</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">fcr_state</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Reboot Complete. FCR State remains consistent&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;TEST PASSED&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;FCR State changed.&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;TEST FAILED&#39;</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">fcr_state_persist_disabled</span><span class="p">():</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+    <span class="c">#test_file = &#39;/home/RunFromHere/ini/SwitchMatrix.csv&#39;</span>
+    <span class="c">#csv_file = csv.DictReader(open(test_file, &#39;r&#39;), delimiter=&#39;,&#39;, quotechar=&#39;&quot;&#39;)</span>
+    <span class="n">fcr_state</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">fcr_state</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span> <span class="c">#the same to here disabled is false, enabled is true</span>
+        <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchdisable&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Sleeping: 10&#39;</span><span class="p">)</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">enabled</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchenable&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Sleeping: 10&#39;</span><span class="p">)</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">ENABLE/DISABLE TEST PASSED&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">ENABLE/DISABLE TEST FAILED&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Please disable fcr for this test and try again&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sleeping: 10&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">cn</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">chassisname</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">cofra</span><span class="o">.</span><span class="n">switch_power_off_on</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="s">&#39;off&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sleeping: 20&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">cofra</span><span class="o">.</span><span class="n">switch_power_off_on</span><span class="p">(</span><span class="n">cn</span><span class="p">,</span> <span class="s">&#39;on&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sleeping: 120&#39;</span><span class="p">)</span>
+    <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="n">fcr_state</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">switch_status</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">fcr_state</span><span class="p">[</span><span class="s">&#39;fcr_enabled&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Reboot Complete. FCR State remains consistent&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;TEST PASSED&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;FCR State changed.&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;TEST FAILED&#39;</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c">#######################</span>
+
+<span class="k">def</span> <span class="nf">ex_deconfig</span><span class="p">():</span>
+    <span class="n">fcri</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">FcrInfo</span><span class="p">()</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">fcri</span><span class="o">.</span><span class="n">ex_deconfig</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">All EX_ports found are now deconfigured.&#39;</span><span class="p">)</span>
+  
+<span class="k">def</span> <span class="nf">test_anturlar_functions</span><span class="p">():</span>
+    <span class="n">fcri</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">FcipInfo</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">fcri</span><span class="o">.</span><span class="n">all_ge_ports</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">slotpower_off_on_check_devices</span><span class="p">():</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">fcrc</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">FcrInfo</span><span class="p">()</span>
+    <span class="n">fi</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">FcipInfo</span><span class="p">()</span>
+    
+    <span class="n">ip_address</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">all_switches_in_bb_ip</span><span class="p">()</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">bb_fabric_switch_status</span><span class="p">()</span>
+    <span class="c">#blades = si.blades()</span>
+    <span class="c">#ex_ports = si.ex_ports()</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">switch_info</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;The number of switches in backbone is:&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;IP addresses of all switches in Backbone:&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ip_address</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ip_address</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s">&#39;root&#39;</span><span class="p">,</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">ex_ports</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ex_port</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;EXPORTSEXPORTS&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">ex_port</span><span class="p">)</span>
+    <span class="c">#print(switch_info) ##### Status on switches in BB fabric (ip, name, vf_enabled, fcr_enabled, base, chassis).</span>
+    <span class="c">#print(&#39;\n\n\n&#39;)</span>
+
+<span class="k">def</span> <span class="nf">Dictionary_Example</span><span class="p">():</span>
+    <span class="n">switch_info</span> <span class="o">=</span> <span class="n">fcr_tools</span><span class="o">.</span><span class="n">bb_fabric_switch_status</span><span class="p">()</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">switch_info</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;The number of switches in backbone is:&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">switch_info</span><span class="p">)</span>
+    <span class="c">#switch_dict = switch_info[3]</span>
+    <span class="c">#print(switch_dict)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c">#################</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">switch_dict</span><span class="p">[</span><span class="s">&#39;switch_name&#39;</span><span class="p">]</span>
+    <span class="c">#print(type(z))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">sortedkeys</span> <span class="o">=</span> <span class="n">switch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">sortedkeys</span><span class="p">)</span>
+    <span class="c">#for key, value in sorted(switch_dict.items()):</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">switch_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="c">###############</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">switch_info</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;ITEMS&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;*&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">switch_info</span><span class="p">:</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;KEYS&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;*&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">switch_info</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;VALUES&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+              
+<div class="viewcode-block" id="change_fid"><a class="viewcode-back" href="../index.html#fcrtc_0.change_fid">[docs]</a><span class="k">def</span> <span class="nf">change_fid</span><span class="p">(</span><span class="n">fid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        change a fid on a switch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">fid</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="test_case_flow"><a class="viewcode-back" href="../index.html#fcrtc_0.test_case_flow">[docs]</a><span class="k">def</span> <span class="nf">test_case_flow</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get the current flows on the SUT</span>
+<span class="sd">        remove the flows</span>
+<span class="sd">        create the same flows</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="test_case_config"><a class="viewcode-back" href="../index.html#fcrtc_0.test_case_config">[docs]</a><span class="k">def</span> <span class="nf">test_case_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get some information from the switch so config can be</span>
+<span class="sd">        put back to the switch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="genAll"><a class="viewcode-back" href="../index.html#fcrtc_0.genAll">[docs]</a><span class="k">def</span> <span class="nf">genAll</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    turn all ports to SIM ports and enable Flow genALL sys test</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#### send a fos command to configure</span>
+    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --control -portidmode slotport &quot;</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show&quot;</span><span class="p">)</span>
+
+    <span class="n">si_maps</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">maps</span><span class="p">()</span>
+    <span class="n">si_maps_sim</span> <span class="o">=</span> <span class="n">si_maps</span><span class="o">.</span><span class="n">toggle_all</span><span class="p">(</span><span class="s">&quot;off&quot;</span><span class="p">)</span>
+    
+    <span class="n">si_maps_gen</span> <span class="o">=</span> <span class="n">si_maps</span><span class="o">.</span><span class="n">genAll</span><span class="p">(</span><span class="s">&quot;on&quot;</span><span class="p">)</span>
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portcfgshow&quot;</span><span class="p">)</span>
+    
+    <span class="n">si_maps_sim</span> <span class="o">=</span> <span class="n">si_maps</span><span class="o">.</span><span class="n">toggle_all</span><span class="p">(</span><span class="s">&quot;on&quot;</span><span class="p">)</span>
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portcfgshow&quot;</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">_anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show&quot;</span><span class="p">)</span>
+
+    <span class="n">si_maps_gen</span> <span class="o">=</span> <span class="n">si_maps</span><span class="o">.</span><span class="n">genAll</span><span class="p">(</span><span class="s">&quot;on&quot;</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="remove_sim"><a class="viewcode-back" href="../index.html#fcrtc_0.remove_sim">[docs]</a><span class="k">def</span> <span class="nf">remove_sim</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    remove any SIM ports enabled on the switch</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="ports_disable"><a class="viewcode-back" href="../index.html#fcrtc_0.ports_disable">[docs]</a><span class="k">def</span> <span class="nf">ports_disable</span><span class="p">(</span><span class="n">portlist</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     port disable for the number of time passed in</span>
+<span class="sd">     should be no reason to do more than one time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">portlist</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+        <span class="n">portlist</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">all_ports</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portdisable </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="ge_ports"><a class="viewcode-back" href="../index.html#fcrtc_0.ge_ports">[docs]</a><span class="k">def</span> <span class="nf">ge_ports</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of the ge-ports in the current FID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchshow&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">si</span><span class="o">.</span><span class="n">am_i_director</span><span class="p">:</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;\s([0-9]{1,2})\s+([a-z]{1,3}[0-9])&#39;</span><span class="p">)</span>
+        <span class="n">ge_ports</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">ge_ports</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;\s?(ge[0-9]{1,2})&#39;</span><span class="p">)</span>
+        <span class="n">ge_ports</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">ge_ports</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="ve_ports"><a class="viewcode-back" href="../index.html#fcrtc_0.ve_ports">[docs]</a><span class="k">def</span> <span class="nf">ve_ports</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of the VE-ports in the current FID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">capture_cmd</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;switchshow&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">si</span><span class="o">.</span><span class="n">am_i_director</span><span class="p">:</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;\s?([0-9]{1,3})\s+(\d+)\s+(?:[-0-9a-f]{6})\s+(?:[-id]{2})\s+(?:[-UNG12486]{2,3})\s+(?:[_\w]{5,9})(?:\s+VE)&#39;</span><span class="p">)</span>
+        <span class="n">ve_ports</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;$$$$$$$$$$$$$$$$$$$$&#39;</span><span class="p">)</span>
+        <span class="c">#print(ve_ports)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">ve_ports</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;\s?([0-9]{1,3})\s+(?:\d+)\s+(?:[-0-9a-f]{6})\s+(?:[-id]{2})\s+(?:[-UNG12486]{2,3})\s+(?:[_\w]{5,9})(?:\s+VE)&#39;</span><span class="p">)</span>
+        <span class="n">ve_ports</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capture_cmd</span><span class="p">)</span>
+        <span class="c">#print(ve_ports)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">ve_ports</span><span class="p">)</span>
+            </div>
+<span class="k">def</span> <span class="nf">enable_disabled_ports</span><span class="p">():</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">portlist</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">disabled_ports</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">portlist</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">portlist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">si</span><span class="o">.</span><span class="n">am_i_director</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+            <span class="n">slot</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable %a/%a&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>  
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c">#port = (int(pt))</span>
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">pt</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ports_enable"><a class="viewcode-back" href="../index.html#fcrtc_0.ports_enable">[docs]</a><span class="k">def</span> <span class="nf">ports_enable</span><span class="p">(</span><span class="n">portlist</span><span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     port enable for the number of time passed in</span>
+<span class="sd">     there should be no reason for time to be more than 1</span>
+<span class="sd">     </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">portlist</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+        <span class="n">portlist</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">all_ports</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;$$$$$$$$$$$$$$$$$$$$&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">portlist</span><span class="p">))</span>
+        <span class="k">print</span> <span class="p">(</span><span class="n">portlist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">si</span><span class="o">.</span><span class="n">am_i_director</span> <span class="o">==</span> <span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+                    <span class="n">slot</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;$$$$$$$$$$$$$$$$$$$$&#39;</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">slot</span><span class="p">)</span>
+                    <span class="n">port</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+                    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable %a/%a&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>  
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+                    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable </span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                    
+    <span class="k">else</span><span class="p">:</span>  
+        <span class="k">if</span> <span class="n">si</span><span class="o">.</span><span class="n">am_i_director</span> <span class="o">==</span> <span class="s">&quot;1&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+                    <span class="n">slot</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">port</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable %a/%a&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+                    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable &quot;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span>
+        
+        </div>
+<div class="viewcode-block" id="ports_toggle"><a class="viewcode-back" href="../index.html#fcrtc_0.ports_toggle">[docs]</a><span class="k">def</span> <span class="nf">ports_toggle</span><span class="p">(</span><span class="n">portlist</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      port disable / port enable for the number of times passed in</span>
+<span class="sd">      </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">####  this is for pizza box</span>
+    <span class="c">####   need to add chassis</span>
+    <span class="c">####</span>
+    
+    <span class="k">if</span> <span class="n">portlist</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+        <span class="n">portlist</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">all_ports</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portdisable </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">a</span><span class="p">)</span>
+            
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+         
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">portlist</span><span class="p">:</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;portenable </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">count_down</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+    
+    </div>
+<div class="viewcode-block" id="configdl"><a class="viewcode-back" href="../index.html#fcrtc_0.configdl">[docs]</a><span class="k">def</span> <span class="nf">configdl</span><span class="p">(</span><span class="n">clear</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        capture any information for testing of the configdownload </span>
+<span class="sd">        - including mapspolicy --show</span>
+<span class="sd">                    mapsconfig --show</span>
+<span class="sd">                    flow --show</span>
+<span class="sd">                    flow --show -ctrlcfg</span>
+<span class="sd">                    relayconfig --show</span>
+<span class="sd">                    bottleneckmon --status</span>
+<span class="sd">                    </span>
+<span class="sd">        then perform configupload</span>
+<span class="sd">        </span>
+<span class="sd">        config upload </span>
+<span class="sd">        </span>
+<span class="sd">        Nimbus_______________Odin_86__:FID25:root&gt; configupload</span>
+<span class="sd">        Protocol (scp, ftp, sftp, local) [ftp]: ftp </span>
+<span class="sd">        Server Name or IP Address [host]: 10.38.38.138</span>
+<span class="sd">        User Name [user]: ftp2</span>
+<span class="sd">        Path/Filename [&lt;home dir&gt;/config.txt]: Odin_configupload.txt</span>
+<span class="sd">        Section (all|chassis|FID# [all]): all</span>
+<span class="sd">        Password:</span>
+<span class="sd">        </span>
+<span class="sd">        or</span>
+<span class="sd">        </span>
+<span class="sd">        configdownload [- all ] [-p ftp | -ftp] [&quot;host&quot;,&quot;user&quot;,&quot;path&quot;[,&quot;passwd&quot;]]</span>
+<span class="sd">        configdownload [- all ] [-p scp | -scp ] [&quot;host&quot;,&quot;user&quot;,&quot;path&quot;]</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#### capture maps config all FIDS</span>
+    <span class="c">#### capture flow config all FIDS</span>
+    <span class="c">####</span>
+    
+    <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="n">sw_info_ls</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ls</span><span class="p">()</span>
+    <span class="c">#print(&#39;$$$$$$$$$$$$$$$$$$$&#39;)</span>
+    <span class="c">#print(sw_info_ls)</span>
+    <span class="n">fid_now</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ls_now</span><span class="p">()</span>
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">sw_ip</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">ipaddr</span>
+     
+    
+    <span class="n">f</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="s">&quot;logs/Configupload_test_case_file&quot;</span><span class="p">,</span><span class="n">sw_ip</span><span class="p">,</span><span class="s">&quot;.txt&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">clear</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;w+b&#39;</span><span class="p">)</span>  <span class="c">#### reset the log file</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;a+b&#39;</span><span class="p">)</span>  <span class="c">#### open for appending</span>
+        
+    <span class="n">header</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">CONFIGUPLOAD CAPTURE FILE </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;  sw_info ipaddr  &quot;</span><span class="p">,</span><span class="n">sw_ip</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">==============================</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>  
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;a+b&#39;</span><span class="p">)</span>  <span class="c">#### open the log file for writing</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sw_info_ls</span><span class="p">))</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sw_info_ls</span><span class="p">:</span>
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext &quot;</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>   
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;mapsconfig --show&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;LOGICAL SWITCH :: &quot;</span> <span class="o">+</span><span class="n">i</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">MAPS CONFIG::&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;mapspolicy --show -summary&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show -ctrlcfg&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;relayconfig --show&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;bottleneckmon --status&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;setcontext </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">fid_now</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">configdown_cmd</span> <span class="o">=</span> <span class="s">&quot;configupload -all -p ftp 10.38.38.138,ftp2,configupload_test.txt,ftp&quot;</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span> <span class="p">(</span><span class="n">configdown_cmd</span><span class="p">)</span>
+    
+ </div>
+<div class="viewcode-block" id="firmwaredownload"><a class="viewcode-back" href="../index.html#fcrtc_0.firmwaredownload">[docs]</a><span class="k">def</span> <span class="nf">firmwaredownload</span><span class="p">(</span><span class="n">frmdwn</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        use anturlar firmwaredownload to do testing for update to</span>
+<span class="sd">        newest code</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">doFirmwareDownload</span><span class="p">(</span><span class="n">frmdwn</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="clearstats"><a class="viewcode-back" href="../index.html#fcrtc_0.clearstats">[docs]</a><span class="k">def</span> <span class="nf">clearstats</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        clear all stats using the clear stats procedure in anturlar.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">clear_stats</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="flow_all_switch"><a class="viewcode-back" href="../index.html#fcrtc_0.flow_all_switch">[docs]</a><span class="k">def</span> <span class="nf">flow_all_switch</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        capture all the flow --show information </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    </div>
+<div class="viewcode-block" id="add_remove_flow"><a class="viewcode-back" href="../index.html#fcrtc_0.add_remove_flow">[docs]</a><span class="k">def</span> <span class="nf">add_remove_flow</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">scr</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">ingrp</span><span class="p">,</span> <span class="n">egrp</span><span class="p">,</span> <span class="n">feat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add and remove a flow from the current switch and FID</span>
+<span class="sd">        </span>
+<span class="sd">        --should add find one of the ports on the switch and add the flow to</span>
+<span class="sd">        that port -</span>
+<span class="sd">        --discover which port is the same as the scrdev or dstdev and add</span>
+<span class="sd">        -- since this is a add and remove the flow test case the lun, ftype and bidir</span>
+<span class="sd">        could be random</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">####cmd = &quot;supportsave -n -u %s -p %s -h %s -l ftp -d %s&quot; % (variables, variables)</span>
+    <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;flow --create </span><span class="si">%s</span><span class="s"> -fea </span><span class="si">%s</span><span class="s"> -srcdev </span><span class="si">%s</span><span class="s"> -dstdev </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">fname</span><span class="p">,</span><span class="n">feat</span><span class="p">,</span><span class="n">scr</span><span class="p">,</span><span class="n">dst</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">ingrp</span> <span class="o">!=</span> <span class="s">&quot;na&quot;</span><span class="p">:</span>
+        <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -ingrport </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">cmd_create</span><span class="p">,</span> <span class="n">ingrp</span> <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">egrp</span> <span class="o">!=</span> <span class="s">&quot;na&quot;</span><span class="p">:</span>
+        <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -egrport </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">cmd_create</span><span class="p">,</span> <span class="n">egrp</span> <span class="p">)</span>
+        
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+    
+    <span class="k">while</span> <span class="n">repeat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --show&quot;</span><span class="p">)</span>
+        
+        <span class="n">repeat</span> <span class="o">=</span> <span class="n">repeat</span> <span class="o">-</span> <span class="mi">1</span> 
+    
+    <span class="k">return</span> <span class="mi">0</span> 
+
+    </div>
+<div class="viewcode-block" id="add_flow"><a class="viewcode-back" href="../index.html#fcrtc_0.add_flow">[docs]</a><span class="k">def</span> <span class="nf">add_flow</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">scr</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">ingrp</span><span class="p">,</span> <span class="n">egrp</span><span class="p">,</span> <span class="n">feat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        add a flow from the current switch and FID</span>
+<span class="sd">        this will add with the --noactivate option so that it is always added</span>
+<span class="sd">        </span>
+<span class="sd">        --should add find one of the ports on the switch and add the flow to</span>
+<span class="sd">        that port -</span>
+<span class="sd">        --discover which port is the same as the scrdev or dstdev and add</span>
+<span class="sd">        -- since this is a add and remove the flow test case the lun, ftype and bidir</span>
+<span class="sd">        could be random</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">####cmd = &quot;supportsave -n -u %s -p %s -h %s -l ftp -d %s&quot; % (variables, variables)</span>
+    <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;flow --create </span><span class="si">%s</span><span class="s"> -fea </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">fname</span><span class="p">,</span><span class="n">feat</span><span class="p">)</span>
+    
+    
+    <span class="k">if</span> <span class="n">scr</span> <span class="o">!=</span> <span class="s">&quot;b&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scr</span> <span class="o">==</span> <span class="s">&quot;learn&quot;</span><span class="p">:</span>
+            <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -srcdev &#39;*&#39; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -srcdev </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_create</span><span class="p">,</span> <span class="n">scr</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">dst</span> <span class="o">!=</span> <span class="s">&quot;b&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dst</span> <span class="o">==</span> <span class="s">&quot;learn&quot;</span><span class="p">:</span>
+            <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -dstdev &#39;*&#39; &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -dstdev </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_create</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">ingrp</span> <span class="o">!=</span> <span class="s">&quot;na&quot;</span><span class="p">:</span>
+        <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -ingrport </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">cmd_create</span><span class="p">,</span> <span class="n">ingrp</span> <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">egrp</span> <span class="o">!=</span> <span class="s">&quot;na&quot;</span><span class="p">:</span>
+        <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -egrport </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">cmd_create</span><span class="p">,</span> <span class="n">egrp</span> <span class="p">)</span>
+        
+    <span class="n">cmd_create</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -noactivate &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    
+    <span class="c">#while repeat &gt; 0:</span>
+    <span class="c">#    print(&quot;repeat\n&quot;)</span>
+    <span class="c">#    repeat = repeat - 1 </span>
+    
+    <span class="k">return</span> <span class="mi">0</span> 
+    
+    
+    </div>
+<div class="viewcode-block" id="delete_flow"><a class="viewcode-back" href="../index.html#fcrtc_0.delete_flow">[docs]</a><span class="k">def</span> <span class="nf">delete_flow</span><span class="p">(</span> <span class="n">name</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        delete flow vision flows from a switch</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&quot;all&quot;</span><span class="p">:</span>
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;echo Y | flow --delete all &quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;flow --delete </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    
+    </div>
+<div class="viewcode-block" id="mapsenable"><a class="viewcode-back" href="../index.html#fcrtc_0.mapsenable">[docs]</a><span class="k">def</span> <span class="nf">mapsenable</span><span class="p">(</span> <span class="n">pol</span><span class="p">,</span> <span class="n">al</span><span class="p">,</span> <span class="n">ml</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        enable MAPS with policy         pol</span>
+<span class="sd">                         actions list   al</span>
+<span class="sd">                         email list     ml</span>
+<span class="sd">                         </span>
+<span class="sd">        -- this function will enable MAPS only if you want to</span>
+<span class="sd">        change the policy use mapspolicy()</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">m</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">Maps</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">enable</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">actions</span><span class="p">(</span><span class="n">al</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">email_cfg</span><span class="p">(</span><span class="n">ml</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="mi">0</span>
+    
+</div>
+<div class="viewcode-block" id="enable_flows"><a class="viewcode-back" href="../index.html#fcrtc_0.enable_flows">[docs]</a><span class="k">def</span> <span class="nf">enable_flows</span><span class="p">(</span> <span class="n">ones</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        enable all fea of flows of current switch</span>
+<span class="sd">        - get the flow names</span>
+<span class="sd">        - enable the flows with all features</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">f</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">FlowV</span><span class="p">()</span>
+    <span class="n">the_names</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">flow_names</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">the_names</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">the_names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&quot;sys_gen_all_simports&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;not enabling this one&quot;</span> <span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd_create</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;flow --activate </span><span class="si">%s</span><span class="s"> -fea all&quot;</span> <span class="o">%</span> <span class="n">k</span> <span class="p">)</span>   
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="cfgsave"><a class="viewcode-back" href="../index.html#fcrtc_0.cfgsave">[docs]</a><span class="k">def</span> <span class="nf">cfgsave</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        save switch config to \logs\config</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">config</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">configSwitch</span><span class="p">()</span>
+    <span class="n">configsave</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">saveSwitchInfo</span>
+    
+<span class="c">#def get_fcr_ipv4():</span>
+<span class="c">#    fcrinfo = anturlar.FcrInfo()</span>
+<span class="c">#    #switchinfo = anturlar.SwitchInfo</span>
+<span class="c">#    #fabricinfo = anturlar.FabricInfo</span>
+<span class="c">#    fcr_list = fcrinfo.ipv4_fcr()</span>
+<span class="c">#    print(&#39;$$$$$$$$$$$printing fcr_list from fcrtc_o.py$$$$$$$$$$$$$$$$$$$&#39;)</span>
+<span class="c">#    print(fcr_list)</span>
+<span class="c">#    return(fcr_list)</span>
+
+<span class="c">#def ipv4_fcr():</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#        Return a string (list) ipv4 address of switch\switches connected</span>
+<span class="c">#        to FCR Router thru EX-Port</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    capture_cmd = fos_cmd(&quot;fcrfabricshow&quot;)</span>
+<span class="c">#        if capture_cmd = (&quot;fcrfabricshow should be executed only in base switch&quot;):</span>
+<span class="c">#            print(&#39;this is from ipv4_fcr in fcrtc_0.py&#39;)    </span>
+<span class="c">#    </span>
+<span class="c">#    ras = re.compile(&#39;(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})&#39;)</span>
+<span class="c">#    ras_result_all = ras.findall(capture_cmd)</span>
+<span class="c">#        </span>
+<span class="c">#    if not ras_result_all:</span>
+<span class="c">#        ras_result_all = &quot;NO EX_PORTS FOUND&quot; </span>
+<span class="c">#    return ras_result_all</span>
+</div>
+<span class="k">def</span> <span class="nf">get_licenses</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="n">anturlar</span><span class="o">.</span><span class="n">connect_tel_noparse</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="s">&#39;root&#39;</span><span class="p">,</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+    <span class="n">sw_info</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">SwitchInfo</span><span class="p">()</span>
+    <span class="c">#sw_ip = sw_info.ipaddr</span>
+    <span class="n">sw_name</span> <span class="o">=</span> <span class="n">sw_info</span><span class="o">.</span><span class="n">switch_name</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s</span><span class="s">&quot;</span><span class="o">%</span><span class="p">(</span><span class="s">&quot;logs/Switch_Licenses/License_File_&quot;</span><span class="p">,</span> <span class="n">sw_name</span> <span class="p">,</span><span class="s">&quot;.txt&quot;</span><span class="p">)</span>
+    <span class="n">ff</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="s">&#39;a+b&#39;</span><span class="p">)</span> <span class="c">###open new file or clobber old</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">LICENSE FILE </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">,</span> <span class="n">sw_name</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">==============================</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;licenseshow&quot;</span><span class="p">)</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">ff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="send_cmds"><a class="viewcode-back" href="../index.html#fcrtc_0.send_cmds">[docs]</a><span class="k">def</span> <span class="nf">send_cmds</span><span class="p">(</span><span class="n">filename</span> <span class="p">,</span> <span class="n">loops</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function to read cmds from a file and send them to the switch</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;$$$$$$$$$$$$$$$$$$$$$&#39;</span><span class="p">)</span>
+    <span class="nb">file</span> <span class="o">=</span> <span class="s">&quot;LicenseShow1&quot;</span> <span class="c">####Change this as needed</span>
+    <span class="n">fullpath</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;logs/configs/&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="p">,</span><span class="s">&quot;.txt&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s">&#39;a+b&#39;</span><span class="p">)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileio</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">fileio</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+    
+    <span class="k">while</span> <span class="n">loops</span> <span class="o">&gt;=</span><span class="mi">1</span> <span class="p">:</span>    
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+            
+        <span class="n">loops</span> <span class="o">-=</span> <span class="mi">1</span>
+     
+    <span class="n">g</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+    
+    
+    
+    
+    
+    
+    
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, S_M.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
