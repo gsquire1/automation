@@ -911,6 +911,26 @@ class FcrInfo(FabricInfo, SwitchInfo):
     def __init__(self):
         SwitchInfo.__init__(self)
         FabricInfo.__init__(self)
+        
+    def __sw_basic_info__(self):
+        """
+            Retrieve FCR fabric and return info. Variable #'s:
+            0) Switch name
+            1) IP address
+            2) Chassis or Pizza Box
+            3) VF or not
+            4) FCR Enabled
+            5) Base Configured
+
+        """
+        switchname = self.switch_name()
+        ip_addr = self.ipaddress()
+        director = self.director()
+        vf = self.vf_enabled()
+        fcr = self.fcr_enabled()
+        base = self.base_check()
+        
+        return [switchname, ip_addr, director, vf, fcr, base]    
 
     def all_ex_ports(self):
         """
@@ -1041,25 +1061,25 @@ class FcrInfo(FabricInfo, SwitchInfo):
             ff.write(cons_out+"\n")
             ff.close()
 
-    def sw_basic_info(self):
-        """
-            Retrieve FCR fabric and return info. Variable #'s:
-            0) Switch name
-            1) IP address
-            2) Chassis or Pizza Box
-            3) VF or not
-            4) FCR Enabled
-            5) Base Configured
-
-        """
-        switchname = self.switch_name()
-        ip_addr = self.ipaddress()
-        director = self.director()
-        vf = self.vf_enabled()
-        fcr = self.fcr_enabled()
-        base = self.base_check()
-        
-        return [switchname, ip_addr, director, vf, fcr, base]
+    #def sw_basic_info(self):
+    #    """
+    #        Retrieve FCR fabric and return info. Variable #'s:
+    #        0) Switch name
+    #        1) IP address
+    #        2) Chassis or Pizza Box
+    #        3) VF or not
+    #        4) FCR Enabled
+    #        5) Base Configured
+    #
+    #    """
+    #    switchname = self.switch_name()
+    #    ip_addr = self.ipaddress()
+    #    director = self.director()
+    #    vf = self.vf_enabled()
+    #    fcr = self.fcr_enabled()
+    #    base = self.base_check()
+    #    
+    #    return [switchname, ip_addr, director, vf, fcr, base]
 
     def ipv4_fcr(self):
         """
@@ -1141,19 +1161,29 @@ class FcipInfo(FabricInfo, SwitchInfo):
  
     def all_ge_ports(self):
         """
-            Capture all ge and xge ports
+        02/08/2015 === WORKING THIS ONE!!!!!!!!!!!!!! Need to handle NONE
+            Capture all online ge and xge ports
         """
+        self.sw_basic_info()
+        self.base_check()
+        sys.exit()
         capture_cmd = fos_cmd("switchshow | grep -i ge")
         #a = self.__getportlist__("ge-port")
-        print(capture_cmd)
         if self.am_i_director :
-            ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
+            ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}')
+            ras = ras.findall(capture_cmd)
+            print(ras)
+            for i in ras:
+                if i[3] == "Online":
+                    print(i)
         else:
-            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+FCIP')
-        ras = ras.findall(capture_cmd)
-        a = self.__getportlist__("EX-Port")
-        print(a)
-        return(ras)
+            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}')
+            ras = ras.findall(capture_cmd)
+            print(ras)
+            for i in ras:
+                if i[2] == "Online":
+                    print(i)
+            return(i)
     
 
         #for i in ras:

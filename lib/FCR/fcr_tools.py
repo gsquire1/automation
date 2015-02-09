@@ -26,6 +26,12 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
+def test_anturlar_functions():
+    fcri = anturlar.FcipInfo()
+    a = fcri.all_ge_ports()
+    print(a)
+    sys.exit(0)
+
 def bb_fabric_switch_status():
     """
         OBSOLETE????? Not sure if returned data is useable
@@ -158,6 +164,11 @@ def switch_status():
 #    s = (len(switch_dict))
 #    #print(s)
 #    return(switch_dict)
+
+def ex_deconfig():
+    fcri = anturlar.FcrInfo()
+    test = fcri.ex_deconfig()
+    print('\n\nAll EX_ports found are now deconfigured.')
 
 def ex_slots_find():
     """
