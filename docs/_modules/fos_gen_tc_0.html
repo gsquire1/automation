@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fos_gen_tc_0 &mdash; SQA_automation 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="SQA_automation 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fos_gen_tc_0</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python3</span>
+
+
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">####</span>
+<span class="c">#### HOME location is home/automation/lib/FOS/fos_gen_tc.py</span>
+<span class="c">####</span>
+<span class="c">####  this file holds the test cases that are not necessarily specific to</span>
+<span class="c">####   one area of FOS - ie mostly generic test cases</span>
+<span class="c">####</span>
+<span class="c">###############################################################################</span>
+
+<span class="kn">import</span> <span class="nn">anturlar</span>
+<span class="kn">import</span> <span class="nn">liabhar</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Naming conventions --</span>
+
+<span class="sd">module_name                     package_name            </span>
+<span class="sd">method_name                     ExceptionName           </span>
+<span class="sd">global_var_name                 instance_var_name</span>
+<span class="sd">function_parameter_name         local_var_name</span>
+<span class="sd">GLOBAL_CONSTANT_NAME            ClassName</span>
+<span class="sd">                                function_name</span>
+<span class="sd">                                </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="show_vc"><a class="viewcode-back" href="../index.html#fos_gen_tc_0.show_vc">[docs]</a><span class="k">def</span> <span class="nf">show_vc</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">port</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function to show which VC is in use</span>
+<span class="sd">                </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">cmd_create</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;portregshow </span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s"> | grep trc&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>   
+    
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+         
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(\d)(?= )&#39;</span><span class="p">)</span> 
+    <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">cons_out</span><span class="p">)</span>
+    <span class="n">ras</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ras</span><span class="p">]</span>
+    <span class="n">ras_previous</span> <span class="o">=</span> <span class="n">ras</span>
+    <span class="n">vc_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        
+        <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">cmd_create</span><span class="p">)</span>
+         
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(\d)(?= )&#39;</span><span class="p">)</span> 
+        <span class="n">ras</span> <span class="o">=</span> <span class="n">ras</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">cons_out</span><span class="p">)</span>
+        <span class="n">ras</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ras</span><span class="p">]</span>
+        <span class="c">#### </span>
+        <span class="n">pairwise</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ras</span><span class="p">,</span> <span class="n">ras_previous</span><span class="p">)</span>
+        <span class="n">vc_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pairwise</span><span class="p">)</span> <span class="k">if</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+               
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span><span class="s">&quot;=======&quot;</span><span class="p">,</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">VC LIST&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">vc_list</span><span class="p">)</span>
+        <span class="n">ras_previous</span> <span class="o">=</span> <span class="n">ras</span>
+        <span class="n">vc_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">liabhar</span><span class="o">.</span><span class="n">JustSleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        
+    
+    </div>
+<div class="viewcode-block" id="send_cmds"><a class="viewcode-back" href="../index.html#fos_gen_tc_0.send_cmds">[docs]</a><span class="k">def</span> <span class="nf">send_cmds</span><span class="p">(</span><span class="n">filename</span> <span class="p">,</span> <span class="n">loops</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function to read cmds from a file and send them to the switch</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">fullpath</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;logs/configs/cmdset/&quot;</span><span class="p">,</span> <span class="s">&quot;send_cmd_output.txt&quot;</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">liabhar</span><span class="o">.</span><span class="n">FileStuff</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="s">&#39;w+b&#39;</span><span class="p">)</span>
+    <span class="c">#f = liabhar.FileStuff(filename, &#39;r+b&#39;)</span>
+    <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileio</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">fileio</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    
+    <span class="k">while</span> <span class="n">loops</span> <span class="o">&gt;=</span><span class="mi">1</span> <span class="p">:</span>    
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">cons_out</span> <span class="o">=</span> <span class="n">anturlar</span><span class="o">.</span><span class="n">fos_cmd</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cons_out</span><span class="p">)</span>
+            <span class="n">g</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+            
+        <span class="n">loops</span> <span class="o">-=</span> <span class="mi">1</span>
+    
+    
+    <span class="n">g</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="mi">0</span>
+     
+
+     </div>
+<div class="viewcode-block" id="ha_failover_check_maps_flow_ras_porterrs"><a class="viewcode-back" href="../index.html#fos_gen_tc_0.ha_failover_check_maps_flow_ras_porterrs">[docs]</a><span class="k">def</span> <span class="nf">ha_failover_check_maps_flow_ras_porterrs</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ha failover</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">####    use cofra.hafailover to do the failover</span>
+    <span class="c">####       pass the number of times to repeat before checking stats</span>
+    <span class="c">####        </span>
+    <span class="c">####</span>
+    <span class="c">####</span>
+    <span class="n">cofra</span><span class="o">.</span><span class="n">ha_failover</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+    <span class="k">pass</span>
+    
+    
+     
+     
+     </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SQA_automation 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, S_M.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
