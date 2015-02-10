@@ -28,7 +28,7 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 def test_anturlar_functions():
     fcri = anturlar.FcipInfo()
-    a = fcri.all_ge_ports()
+    a = fcri.all_ge_port_disabled()
     print(a)
     sys.exit(0)
 
