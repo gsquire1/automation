@@ -988,12 +988,24 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
     
+    def get_fabwide_ip():
+        """
+        ################################################
+        Testing Anturlar functions. Left off here.
+        TypeError: get_fabwide_ip() takes 0 positional arguments but 1 was given
+        Get all IP addresses of backbone switches and edge switches 
+        """
+        #fcrcfg = anturlar.FcrInfo()
+        fab_ip_list = list(self.fcr_fab_wide_ip())
+        print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
+        return(fab_ip_list)
+    
     def fcr_backbone_ip(self):
         """
         Runs fabricshow against backbone switches in a fabric to determine all IPs 
         """
         fcrcfg = FcrInfo()
-        fcrstatus = self.sw_basic_info()
+        fcrstatus = self.__sw_basic_info__()
         print("FCRSTATUS")
         print(fcrstatus)
         if fcrstatus[5] is not False:  # Test if base config'd and if so
@@ -1004,7 +1016,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
             get_fabric_ip = fcrcfg.ipv4_list()
         return(get_fabric_ip)
 
-    def fcr_fab_wide_ip(self):
+    def fcr_fab_wide_ip():
         """
             Runs fcrfabricshow and fabricshow against switches in a backbone fabric to determine all IPs then
             removes any duplicate entries.
