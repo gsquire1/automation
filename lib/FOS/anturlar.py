@@ -266,6 +266,8 @@ class SwitchInfo:
         self.__director__()
         self.online_ports = ""
         self.ipaddr =  self.__myIPaddr__()
+        
+    
     
     def __sw_show_info_no_port_type__(self):
         """
@@ -298,7 +300,38 @@ class SwitchInfo:
             ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
+        
+    def __sw_basic_info__(self):
+        """
+            Retrieve FCR fabric and return info. Variable #'s:
+            0) Switch name
+            1) IP address
+            2) Chassis or Pizza Box
+            3) VF or not
+            4) FCR Enabled
+            5) Base Configured
     
+        """
+        switchname = self.switch_name()
+        ip_addr = self.ipaddress()
+        director = self.director()
+        vf = self.vf_enabled()
+        fcr = self.fcr_enabled()
+        base = self.base_check()
+        
+        return [switchname, ip_addr, director, vf, fcr, base]
+        
+        #Example on how to print Human readable results:
+        #print('\n\n'+ '='*20)
+        #print("Switch Name :  %s" % initial_checks[0])
+        #print("IP address :  %s" % initial_checks[1])
+        #print("Chassis :  %s" % initial_checks[2])
+        #print("VF enabled :  %s" % initial_checks[3])
+        #print("FCR enabled :  %s" % initial_checks[4])
+        #print("Base configured :  %s" % initial_checks[5])
+        #print('='*20 + '\n\n')
+        
+
     def __director__(self):
         """
             determine if the switch is director or pizza box
@@ -910,27 +943,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
     
     def __init__(self):
         SwitchInfo.__init__(self)
-        FabricInfo.__init__(self)
-        
-    def __sw_basic_info__(self):
-        """
-            Retrieve FCR fabric and return info. Variable #'s:
-            0) Switch name
-            1) IP address
-            2) Chassis or Pizza Box
-            3) VF or not
-            4) FCR Enabled
-            5) Base Configured
-
-        """
-        switchname = self.switch_name()
-        ip_addr = self.ipaddress()
-        director = self.director()
-        vf = self.vf_enabled()
-        fcr = self.fcr_enabled()
-        base = self.base_check()
-        
-        return [switchname, ip_addr, director, vf, fcr, base]    
+        FabricInfo.__init__(self) 
 
     def all_ex_ports(self):
         """
@@ -1061,26 +1074,6 @@ class FcrInfo(FabricInfo, SwitchInfo):
             ff.write(cons_out+"\n")
             ff.close()
 
-    #def sw_basic_info(self):
-    #    """
-    #        Retrieve FCR fabric and return info. Variable #'s:
-    #        0) Switch name
-    #        1) IP address
-    #        2) Chassis or Pizza Box
-    #        3) VF or not
-    #        4) FCR Enabled
-    #        5) Base Configured
-    #
-    #    """
-    #    switchname = self.switch_name()
-    #    ip_addr = self.ipaddress()
-    #    director = self.director()
-    #    vf = self.vf_enabled()
-    #    fcr = self.fcr_enabled()
-    #    base = self.base_check()
-    #    
-    #    return [switchname, ip_addr, director, vf, fcr, base]
-
     def ipv4_fcr(self):
         """
             Return a string (list) ipv4 address of switch\switches connected
@@ -1132,7 +1125,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_cap = fos_cmd("switchenable")
         return(cmd_cap)
         
-class FcipInfo(FabricInfo, SwitchInfo):
+class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
     """
         A class to return information about a switch
     Class for FCIP functions and information.
@@ -1140,8 +1133,10 @@ class FcipInfo(FabricInfo, SwitchInfo):
     #global tn
     
     def __init__(self):
-        SwitchInfo.__init__(self)
+        FcrInfo.__init__(self)
         FabricInfo.__init__(self)
+        SwitchInfo.__init__(self)
+
         
     def __sw_show_info_ge_port_type__(self):
         """
@@ -1159,56 +1154,109 @@ class FcipInfo(FabricInfo, SwitchInfo):
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
  
-    def all_ge_ports(self):
+    def all_online_ge_ports(self):
         """
-        02/08/2015 === WORKING THIS ONE!!!!!!!!!!!!!! Need to handle NONE
-            Capture all online ge and xge ports
+        02/09/2015 checked
+            Capture all online ge and xge ports.
+            On chassis and pizzaboxes only catches ge ports in base(if base configured).
         """
-        self.sw_basic_info()
-        self.base_check()
-        sys.exit()
-        capture_cmd = fos_cmd("switchshow | grep -i ge")
-        #a = self.__getportlist__("ge-port")
-        if self.am_i_director :
+        base = self.base_check()
+        #initial_checks = self.__sw_basic_info__()
+        #print('\n\n'+ '='*20)
+        #print("Switch Name :  %s" % initial_checks[0])
+        #print("IP address :  %s" % initial_checks[1])
+        #print("Chassis :  %s" % initial_checks[2])
+        #print("VF enabled :  %s" % initial_checks[3])
+        #print("FCR enabled :  %s" % initial_checks[4])
+        #print("Base configured :  %s" % initial_checks[5])
+        #print('='*20 + '\n\n')
+        #switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
+        online_ports = []
+        if self.am_i_director:
+            if base:
+                fos_cmd("setcontext " + base)
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            else:
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
             ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}')
             ras = ras.findall(capture_cmd)
-            print(ras)
             for i in ras:
-                if i[3] == "Online":
+                if "Online" in i:
                     print(i)
+                    online_ports.append(i)
+            #print(online_ports)    
+            return(online_ports)
         else:
+            if base:
+                fos_cmd("setcontext " + base)
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            else:
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
             ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}')
             ras = ras.findall(capture_cmd)
-            print(ras)
+            #print(ras)
             for i in ras:
-                if i[2] == "Online":
+                if "Online" in i:
                     print(i)
-            return(i)
-    
-
-        #for i in ras:
-        #    print(i)
-        #    sys.exit(0)
-        #    if self.am_i_director:
-        #        #slot_port_list.append(int(i[2]))
-        #        slot_port_list = [int(i[1]), int(i[2])]
-        #        #port_list.append(s_p)
-        #    else:
-        #        slot_port_list = [0, int(i[1])]
-        #        #port_list.append(slot_port_list) 
-        #print(slot_port_list)
+                    online_ports.append(i)
+            #print(online_ports)    
+            return(online_ports)
     
     def all_ge_port_disabled(self):
         """
-        Capture all disabled ge and xge ports
+            Capture all disabled ge and xge ports.
+            On chassis and pizzaboxes only catches ge ports in base(if base configured).
         """
-        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        base = self.base_check()
+        disabled_ports = []
         if self.am_i_director:
-            ras = re.compile('\s+(([0-9]{1,2}))(\s{1,2}[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+            if base:
+                fos_cmd("setcontext " + base)
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            else:
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            print(capture_cmd)
+            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+(Disabled)')
+            ras = ras.findall(capture_cmd)
+            for i in ras:
+                if "Disabled" in i:
+                    print(i)
+                    disabled_ports.append(i)
+            #print(online_ports)    
+            return(disabled_ports)
         else:
-            ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
-        ras = ras.findall(capture_cmd)
-        self.online_ports = ras
+            if base:
+                fos_cmd("setcontext " + base)
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            else:
+                capture_cmd = fos_cmd("switchshow | grep -i ge")
+            ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+(Disabled)')
+            #ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}\s+Disabled')
+            ras = ras.findall(capture_cmd)
+            print(ras)
+            for i in ras:
+                print(i)
+            sys.exit()
+            #    if "Disabled" in i:
+            #        print(i)
+            #        disabled_ports.append(i)
+            ##print(online_ports)    
+            return(disabled_ports)
+
+        #if self.am_i_director:
+        #    if base:
+        #        fos_cmd("setcontext " + base)
+        #        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        #    else:
+        #        capture_cmd = fos_cmd("switchshow | grep -i ge")
+        ##capture_cmd = fos_cmd("switchshow | grep -i ge")
+        #if self.am_i_director:
+        #    ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+Disabled')#This needs changed for chassis
+        #else:
+        #    #ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
+        #    ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+Disabled')## Pizza boxes
+        #ras = ras.findall(capture_cmd)
+        #self.online_ports = ras
         
     def vex_ports(self):
         """
