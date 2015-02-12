@@ -926,6 +926,9 @@ def switch_power_off_on(cn, mode = 'on'):
         then power on again for a full power cycle.
            
     """
+    ####  cn is switch matrix file - 
+    ####
+    
     test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
     csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
     for line in csv_file:

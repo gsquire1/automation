@@ -1318,6 +1318,8 @@ def connect_console(HOST,usrname,password,port, *args):
         
         var += 1   
         
+    capture = tn.expect(reg_list,30)
+    
     return tn
 
 #################################################################################
