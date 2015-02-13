@@ -7,6 +7,10 @@
 ####
 ###############################################################################
 
+import anturlar
+import liabhar
+import random
+
 
 def flowcommand_list(options = "0"):
     """
@@ -78,7 +82,7 @@ def flow_to_each_SIM():
     fid_now = sw_info.ls_now()
     cons_out = anturlar.fos_cmd(" ")
     #sw_ip = sw_info.ipaddress()
-    f = anturlar.FabricInfo()
+    f = anturlar.FabricInfo(fid_now)
     ip_list = f.ipv4_list()
     ip_count = len(ip_list)
     ip_c = ip_count
@@ -125,7 +129,8 @@ def flow_to_each_SIM():
             
             
         #### randomize the list
-        combine_port_list = liabhar.randomList(combine_port_list)
+        #combine_port_list = liabhar.randomList(combine_port_list)
+        random.shuffle(combine_port_list)
         j_port_list = combine_port_list
         #print("\n\n\nPORT LIST RANDOMIZED  \n", combine_port_list)
         #print("\n\n\nNEW LIST RANDOMIZED  \n", new_combine_port_list)
