@@ -882,6 +882,18 @@ class SwitchInfo:
         sn = str(ras[0])
         return(sn)
     
+    def switch_type(self ):
+        """
+           get the current switch type number from switchshow
+           return the type number
+        """
+        capture_cmd = fos_cmd("switchshow")
+        ras = re.compile('switchType:\s+(\d{1,3})')
+        ras = ras.findall(capture_cmd)
+        sn = str(ras[0])
+        return(sn)
+    
+    
     def synchronized(self):
         """
             determine if a switch CP blades are in sync
@@ -1954,7 +1966,7 @@ def power_cmd(cmd, dl=0):
         #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(dl)
-        reg_ex_list = [b" cli->", b"\(yes, no\)  : ", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        reg_ex_list = [b" cli->", b"\(yes, no\)  : ", b"seconds.", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
         tn.write(cmd.encode('ascii') + b"\n")
