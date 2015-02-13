@@ -1000,12 +1000,28 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_cap = fos_cmd("switchenable")        
         return(cmd_cap)
     
+    def get_fabwide_ip(self):
+        """
+        OBSOLETE ###################
+        Get all IP addresses of backbone switches and edge switches 
+        """
+        #fcrcfg = anturlar.FcrInfo()
+        #fab_ip_list = list(fcr_fab_wide_ip())
+        fab_ip_list = self.fcr_fab_wide_ip()
+        print(fab_ip_list)
+        sys.exit()
+        print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
+        return(fab_ip_list)
+    
+        
     def fcr_backbone_ip(self):
         """
-        Runs fabricshow against backbone switches in a fabric to determine all IPs 
+        Runs fabricshow against backbone switches in a fabric to determine all IPs
+        02/10/15 checked
         """
         fcrcfg = FcrInfo()
-        fcrstatus = self.sw_basic_info()
+        fcrstatus = self.__sw_basic_info__()
+        #fcrstatus = self.__sw_basic_info__()
         print("FCRSTATUS")
         print(fcrstatus)
         if fcrstatus[5] is not False:  # Test if base config'd and if so
@@ -1018,6 +1034,9 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def fcr_fab_wide_ip(self):
         """
+        ################################################
+        Testing Anturlar functions. Left off here.
+        Only Getting edge switch IPs!!!!!!!!!!!!!!
             Runs fcrfabricshow and fabricshow against switches in a backbone fabric to determine all IPs then
             removes any duplicate entries.
             This includes both backbone and edge switches and any additional switches resident in edge fabrics.
@@ -1025,7 +1044,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
         """
          
         fcrcfg = FcrInfo()
-        fcrstatus = self.sw_basic_info()
+        fcrstatus = self.__sw_basic_info__()
         if fcrstatus[3] is not False:  # Test if base config'd and if so
             base = fcrcfg.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
@@ -1051,7 +1070,8 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def fcr_proxy_dev(self):
         """
-        Get number of proxy devices reported by switch
+        Get number of proxy devices reported by a switch
+        02/10/15 Checked
         """
         if self.am_i_director == True:
             base = self.base_check()
@@ -1064,8 +1084,6 @@ class FcrInfo(FabricInfo, SwitchInfo):
         cmd_capture = fos_cmd("fcrproxydevshow | grep device")
         print(cmd_capture)
         device_number = re.findall(':\s([0-9]{1,4})', cmd_capture)
-        #print('DEVICEDEVICEDEVICE')
-        #print(device_number)
         return(device_number)
     
     def get_licenses(self):

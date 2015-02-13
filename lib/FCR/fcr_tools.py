@@ -27,14 +27,15 @@ GLOBAL_CONSTANT_NAME            ClassName
 """
 
 def test_anturlar_functions():
-    fcri = anturlar.FcipInfo()
-    a = fcri.all_ge_port_disabled()
+    fcri = anturlar.FcrInfo()
+    #si = anturlar.SwitchInfo()
+    a = fcri.ipv4_fid_export_fcr()
     print(a)
-    sys.exit(0)
+    sys.exit()
 
 def bb_fabric_switch_status():
     """
-        OBSOLETE????? Not sure if returned data is useable
+        OBSOLETE##############
         For all switches found in backbone fabric, returns a dictionary data structure for switch
         status for switch states:
         fcr_enabled (T or F); ip address; switch_name; vf_enabled (T or F); base (return base FID
@@ -49,24 +50,6 @@ def bb_fabric_switch_status():
         switch_dict = switch_dict + a
         print(switch_dict)
     return(switch_dict)
-
-def get_bb_ips():
-    """
-    Return ip addressses of all switches in backbone. ##Checked 02/03/2015
-    """
-    
-    fcrcfg = anturlar.FcrInfo()
-    fab_ip_list = list(fcrcfg.fcr_backbone_ip())
-    return(fab_ip_list)
-
-def get_fabwide_ip():
-    """
-    Get all IP addresses of backbone switches and edge switches ##Checked 02/03/2015
-    """
-    fcrcfg = anturlar.FcrInfo()
-    fab_ip_list = list(fcrcfg.fcr_fab_wide_ip())
-    print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
-    return(fab_ip_list)
 
 
 def fab_wide_proxy_device_numbers():
@@ -104,29 +87,7 @@ def fab_wide_proxy_device_numbers():
     print('='*20 + '\n\n')
     return(switch_list_with_proxy_dev)
 
-def check_proxy_dev_devices():
-    a = fab_wide_proxy_device_numbers()
 
-    #switches = dict.fromkeys(['switch_name','switch_ip','form_factor'])
-    #print(switches)
-    #switches_found = (len(backbone_ip))
-    #print (switches_found)
-    #while switches_found > 0:
-    #    for i in backbone_ip:
-    #        print(i)
-    #        switches_found = switches_found - 1
-    #        switches['switch_ip'] = i
-    #    #print(switches)
-    #print(proxy_dev)
-    #print(backbone_ip)
-    #print(switches)
-    #switchlist = [dict() for x in range(0,5)]
-    #print (switchlist)
-    #d={}
-    #for x in range(1,5):
-    #    d["string{1}".format(x)]="Hello"
-    #    print(d)
-    #return(proxy_dev, backbone_ip, switches)
     
 
 def switch_status():
@@ -153,17 +114,6 @@ def switch_status():
     print('='*20 + '\n\n')
     switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
     return (switch_info)
-
-#def bb_fabric_switch_status():
-#    ips = all_switches_in_bb_ip()
-#    switch_dict = []
-#    for i in ips:
-#        anturlar.connect_tel_noparse(i,'root','password')
-#        a = switch_status()
-#        switch_dict.append(a)
-#    s = (len(switch_dict))
-#    #print(s)
-#    return(switch_dict)
 
 def ex_deconfig():
     fcri = anturlar.FcrInfo()
