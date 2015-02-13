@@ -28,7 +28,8 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 def test_anturlar_functions():
     fcri = anturlar.FcrInfo()
-    a = fcri.get_fabwide_ip()
+    #si = anturlar.SwitchInfo()
+    a = fcri.ipv4_fid_export_fcr()
     print(a)
     sys.exit()
 
