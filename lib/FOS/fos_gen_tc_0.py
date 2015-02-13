@@ -14,6 +14,8 @@
 import anturlar
 import liabhar
 import re
+
+import flow_tools
 """
 Naming conventions --
 
@@ -109,3 +111,12 @@ def ha_failover_check_maps_flow_ras_porterrs(times=1):
      
      
      
+def start_all_SIM_flows():
+    
+    """
+        document how this works here
+    
+    """
+    
+    flow_tools.flow_to_each_SIM()
+    
