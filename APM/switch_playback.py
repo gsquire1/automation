@@ -271,8 +271,18 @@ def get_info_from_the_switch():
     switch_id = si.switch_id()
     theswitch_name = si.switch_name()
     vf_enabled = si.vf_enabled()
+    sw_type = si.switch_type()
+
+
+    print("\n\n\n")
+    print("SWITCH IP      :  %s  " % switch_ip)
+    print("LICENSE LIST   :  %s  " % license_list)
+    print("LOGICAL SWITCHES  :  %s " % switch_id)
+    print("SWITCH NAME       :  %s " % theswitch_name)
+    print("VF SETTING        :  %s " % vf_enabled)
+    print("SWITCH TYPE       :  %s " % sw_type)
+    print("*"*80)
     
-    print()
     
     
     
