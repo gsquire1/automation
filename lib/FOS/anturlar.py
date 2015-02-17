@@ -1310,6 +1310,10 @@ class configSwitch(SwitchInfo):
     
     
     
+    def cfgupload(self):
+        fos_cmd("configupload")
+    
+    
     def getLsPorts(self):
         rasfile = "configofswitch"
         rasfile = "%s%s%s" % ("logs/configofswitch", self.ipaddr,".txt")  #### %s string  %d number
@@ -1360,6 +1364,8 @@ class configSwitch(SwitchInfo):
             get switch id info
             
             save to config file logs/sqa_test_config.txt
+            
+            NOT WORKING. OBSOLETE?????
             
         """
         cw_config_file_name = "%s%s%s" %("logs/configofswitch", self.ipaddr,".txt")
