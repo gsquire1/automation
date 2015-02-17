@@ -272,21 +272,30 @@ def get_info_from_the_switch():
     theswitch_name = si.switch_name()
     vf_enabled = si.vf_enabled()
     sw_type = si.switch_type()
-
-
+    ports_and_ls = si.all_ports_fc_only()
+    
+    psw_reset_value = "YES"
+        
+    
     print("\n\n\n")
-    print("SWITCH IP      :  %s  " % switch_ip)
-    print("LICENSE LIST   :  %s  " % license_list)
-    print("LOGICAL SWITCHES  :  %s " % switch_id)
+    print("SWITCH IP         :  %s  " % switch_ip)
+    print("LICENSE LIST      :  %s  " % license_list)
+    print("SWITCH DOMAIN     :  %s " % switch_id)
+    print("Ports             :  %s " % ports_and_ls)
     print("SWITCH NAME       :  %s " % theswitch_name)
     print("VF SETTING        :  %s " % vf_enabled)
     print("SWITCH TYPE       :  %s " % sw_type)
     print("*"*80)
     
-    
+    print("TIMEOUT VALUE     :  0 ")
+    print("RESET PASSWORD    :  %s " % psw_reset_value)
     
     
     switch_dict = ""
+    
+    
+    sys.exit()
+    
     return(switch_dict)
 
     
