@@ -120,3 +120,74 @@ def start_all_SIM_flows():
     
     flow_tools.flow_to_each_SIM()
     
+    
+def fabric_switch_config_show():
+    
+    """
+       document how this works here
+    
+    """
+    
+    cons_out = anturlar.fos_cmd("")
+    fab = anturlar.FabricInfo()
+    fab_ip_list = fab.ipv4_list()
+    fname = "%s%s" % ("logs/fabric_info_switch" ,".txt")  #### %s string  %d number
+    ff = liabhar.FileStuff(fname, 'w+b')
+    ff.close()
+    
+    
+    fabric_data = []
+    for ip in fab_ip_list:
+        tnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+        
+        m_info = anturlar.Maps()
+        f_info = anturlar.FlowV()
+        maps_config = anturlar.fos_cmd("mapsconfig --show")
+        firmware_ver = check_version()
+        s_name = m_info.switch_name()
+        s_type = m_info.switch_type()
+        
+        
+        anturlar.close_tel()
+
+        ff = liabhar.FileStuff(fname, 'a+b')
+        ff.write("+"*80)
+        ff.write("+"*80)
+        ff.write("\r\n")
+        ff.write("Switch ipv4         :    %s \r\n" % ip)
+        ff.write("Firmware version    :    %s \r\n" % firmware_ver)
+        ff.write("Switch Name         :    %s \r\n" % s_name)
+        ff.write("Switch Type         :    %s \r\n" % s_type)
+    
+    
+    
+    
+def check_version():
+         
+    capture_cmd = anturlar.fos_cmd("firmwareshow") 
+    ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+    ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+    ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
+    ras = ras.search(capture_cmd)
+    ras_dir = ras_dir.search(capture_cmd)
+    f=""
+    try:
+        if ras.group(0) != "none":
+            f= ras.group(1)
+    except:
+        pass
+    try:
+        if ras_dir(0) != "none":
+            f=ras_dir.group(1)
+    except:
+        pass
+    
+    return(f)
+    
+    
+    
+    
+    
+    
+    
+    

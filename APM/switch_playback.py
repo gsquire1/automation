@@ -268,27 +268,92 @@ def get_info_from_the_switch():
     switch_ip = si.ipaddress()
     license_list = si.getLicense()
     ls_list = si.ls()
+    first_ls = si.ls_now()
     switch_id = si.switch_id()
     theswitch_name = si.switch_name()
     vf_enabled = si.vf_enabled()
     sw_type = si.switch_type()
-    ports_and_ls = si.all_ports_fc_only()
     
+    ports_and_ls = si.all_ports_fc_only()
     psw_reset_value = "YES"
+       
         
+    
+    
+    #############################################################
+    #### create a dict for ls and ports in the ls
+    ####
+    k = first_ls  #### craete a key with the command name
+                               #### and pid added together
+    v = ports_and_ls   #### create the value as a list otherwise the first one
+                      #### is a string and extend command later on will fail
+    #print("K AND V ARE : %s   %s " % (k,v))
+    d = {k:v}     #### create the first dictionary entry ras[0]
+    print(d)
+    print("@"*600)
+    print("@"*600)
+    print("@"*600)
+    for kk, vv in d.items():
+        print(kk,vv)    #### print to the crt
+        print("@"*60)
+    print("*"*80)
+    print("\n\n\n")
+    
+    for ls in ls_list:
+        cons_out = anturlar.fos_cmd("setcontext %s " % ls)
+        ports_and_ls = si.all_ports_fc_only()
+        key = ls
+        print(key)
+        print("@"*600)
+        if key not in d:
+            print("@"*600)
+            print("KEY IS NOT IN D   *************************")
+            print("looking for %s in d" % key)
+            print("ls value is  %s  " % ls)
+            print(key)
+            print("@"*600)
+            
+        if ls in d:
+            print("@"*600)
+            print("LS IS IN D   DD ******************************")
+            print("looking for %s in d" % key)
+            print("ls value is  %s  " % ls)
+            print(key)
+            print("@"*600)  
+            
+            
+            
+        
+        if key in d:
+            #value = d[key]
+            print("@"*600)
+            #print("\n\n\nvalue of d key is :  %s " % value )
+        else:
+            value = []
+            #ras_value = [ras[y][3]]
+            #value.extend(ras_value)
+            value = ports_and_ls 
+            d[key] = value            #### add the value to the key
+                       
     
     print("\n\n\n")
     print("SWITCH IP         :  %s  " % switch_ip)
     print("LICENSE LIST      :  %s  " % license_list)
-    print("SWITCH DOMAIN     :  %s " % switch_id)
-    print("Ports             :  %s " % ports_and_ls)
-    print("SWITCH NAME       :  %s " % theswitch_name)
-    print("VF SETTING        :  %s " % vf_enabled)
-    print("SWITCH TYPE       :  %s " % sw_type)
-    print("*"*80)
-    
-    print("TIMEOUT VALUE     :  0 ")
+    print("SWITCH DOMAIN     :  %s  " % switch_id)
+    print("LS LIST           :  %s  " % ls_list)
+    #print("Ports             :  %s  " % ports_and_ls)
+    print("SWITCH NAME       :  %s  " % theswitch_name)
+    print("VF SETTING        :  %s  " % vf_enabled)
+    print("SWITCH TYPE       :  %s  " % sw_type)
+    print("TIMEOUT VALUE     :  0   " )
     print("RESET PASSWORD    :  %s " % psw_reset_value)
+    
+    
+    for kk, vv in d.items():
+        print(kk,vv)    #### print to the crt
+        print("@"*60)
+    print("*"*80)
+    print("\n\n\n")
     
     
     switch_dict = ""
