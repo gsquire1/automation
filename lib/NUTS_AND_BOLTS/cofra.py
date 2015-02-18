@@ -957,3 +957,217 @@ def switch_power_off_on(cn, mode = 'on'):
             anturlar.close_tel()
     return(True)
 
+def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
+    """
+        capture any information for testing of the configdownload 
+        - including mapspolicy --show
+                    mapsconfig --show
+                    flow --show
+                    flow --show -ctrlcfg
+                    relayconfig --show
+                    bottleneckmon --status
+                    
+        then perform configupload
+        
+        config upload 
+        
+        Nimbus_______________Odin_86__:FID25:root> configupload
+        Protocol (scp, ftp, sftp, local) [ftp]: ftp 
+        Server Name or IP Address [host]: 10.38.38.138
+        User Name [user]: ftp2
+        Path/Filename [<home dir>/config.txt]: Odin_configupload.txt
+        Section (all|chassis|FID# [all]): all
+        Password:
+        
+        or
+        
+        configdownload [- all ] [-p ftp | -ftp] ["host","user","path"[,"passwd"]]
+        configdownload [- all ] [-p scp | -scp ] ["host","user","path"]
+        
+    """
+    #### capture maps config all FIDS
+    #### capture flow config all FIDS
+    ####
+    
+    sw_info = anturlar.SwitchInfo()
+    sw_info_ls = sw_info.ls()
+    fid_now = sw_info.ls_now()
+    
+    cons_out = anturlar.fos_cmd(" ")
+    sw_ip = sw_info.ipaddress()
+     
+    
+    f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
+    
+    if clear == 1 :
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+    else:
+        ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
+        
+    header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",sw_ip, "\n==============================\n\n")  
+    ff.write(header)
+    ff.close()
+    
+    ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
+    ff.write(str(sw_info_ls))
+    ff.write("\n"*2)
+    
+    #for i in sw_info_ls:
+    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
+    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write("="*80+"\n")
+    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
+    #    ff.write("="*80+"\n")
+    #    ff.write("\nMAPS CONFIG::"+i+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("flow --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("relayconfig --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #ff.write("="*80+"\n")
+    #ff.write("\n"*10)
+    
+    cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
+    #cons_out = anturlar.fos_cmd(" ")
+    configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
+    ftp_ip, ftp_user, ftp_pass
+    cons_out = anturlar.fos_cmd (configup_cmd)
+
+def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
+    """
+        capture any information for testing of the configdownload 
+        - including mapspolicy --show
+                    mapsconfig --show
+                    flow --show
+                    flow --show -ctrlcfg
+                    relayconfig --show
+                    bottleneckmon --status
+                    
+        then perform configupload
+        
+        config upload 
+        
+        Nimbus_______________Odin_86__:FID25:root> configupload
+        Protocol (scp, ftp, sftp, local) [ftp]: ftp 
+        Server Name or IP Address [host]: 10.38.38.138
+        User Name [user]: ftp2
+        Path/Filename [<home dir>/config.txt]: Odin_configupload.txt
+        Section (all|chassis|FID# [all]): all
+        Password:
+        
+        or
+        
+        configdownload [- all ] [-p ftp | -ftp] ["host","user","path"[,"passwd"]]
+        configdownload [- all ] [-p scp | -scp ] ["host","user","path"]
+        
+    """
+    #### capture maps config all FIDS
+    #### capture flow config all FIDS
+    ####
+    
+    sw_info = anturlar.SwitchInfo()
+    sw_info_ls = sw_info.ls()
+    fid_now = sw_info.ls_now()
+    switch_state = sw_info.switch_state()
+    
+    cons_out = anturlar.fos_cmd(" ")
+    sw_ip = sw_info.ipaddress()
+     
+    
+    #f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
+    #
+    #if clear == 1 :
+    #    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+    #else:
+    #    ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
+    #    
+    #header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",sw_ip, "\n==============================\n\n")  
+    #ff.write(header)
+    #ff.close()
+    #
+    #ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
+    #ff.write(str(sw_info_ls))
+    #ff.write("\n"*2)
+    
+    #for i in sw_info_ls:
+    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
+    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write("="*80+"\n")
+    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
+    #    ff.write("="*80+"\n")
+    #    ff.write("\nMAPS CONFIG::"+i+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("flow --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("relayconfig --show")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
+    #    ff.write("="*80+"\n")
+    #    ff.write(cons_out+"\n\n")
+    #    ff.write("#"*80+"\n")
+    #    ff.write("#"*80+"\n")
+    #    
+    #ff.write("="*80+"\n")
+    #ff.write("\n"*10)
+    if switch_state == "Online":
+        anturlar.fos_cmd("switchdisable")
+    else:
+        pass
+    
+    cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
+    configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
+    cons_out = anturlar.fos_cmd (configdown_cmd)
