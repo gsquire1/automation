@@ -434,6 +434,17 @@ class SwitchInfo:
             ras_result = "no port found"
         return port_list
     
+    def allow_xisl(self):
+        """
+            Return whether XISL Use is: 'ON or OFF'
+            
+        """
+        capture_cmd = fos_cmd("switchshow")
+        ras = re.compile('Allow XISL Use:\s+(\w{2,3})') 
+        ras = ras.findall(capture_cmd)
+        ss = str(ras[0])
+        return(ss)
+
     def all_ports(self):
         """
             Queuries switch for number of ports.
