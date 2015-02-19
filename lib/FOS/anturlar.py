@@ -440,10 +440,14 @@ class SwitchInfo:
             
         """
         capture_cmd = fos_cmd("switchshow")
-        ras = re.compile('Allow XISL Use:\s+(\w{2,3})') 
-        ras = ras.findall(capture_cmd)
-        ss = str(ras[0])
-        return(ss)
+        try:
+            ras = re.compile('Allow XISL Use:\s+(\w{2,3})') 
+            ras = ras.findall(capture_cmd)
+            ss = str(ras[0])
+        except IndexError: ##Base switch does not have "allow xisl" condition
+            return("OFF")
+        else:
+            return(ss)
 
     def all_ports(self):
         """
