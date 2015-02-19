@@ -11,6 +11,7 @@ import os,sys
 
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
+sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
 import telnetlib
 import getpass
@@ -18,6 +19,8 @@ import argparse
 import re
 import anturlar
 import liabhar
+import cofra
+
 
 ###############################################################################
 
@@ -260,7 +263,7 @@ def send_cmd(cmd, db=0):
     return(capture)
 
 
-def get_info_from_the_switch():
+def get_info_from_the_switch_is_now_in_cofra():
     cons_out = anturlar.login()
     
     si = anturlar.SwitchInfo()
@@ -273,6 +276,7 @@ def get_info_from_the_switch():
     theswitch_name = si.switch_name()
     vf_enabled = si.vf_enabled()
     sw_type = si.switch_type()
+    base_sw = si.base_check()
     
     ports_and_ls = si.all_ports_fc_only()
     psw_reset_value = "YES"
@@ -288,52 +292,24 @@ def get_info_from_the_switch():
     v = ports_and_ls   #### create the value as a list otherwise the first one
                       #### is a string and extend command later on will fail
     #print("K AND V ARE : %s   %s " % (k,v))
-    d = {k:v}     #### create the first dictionary entry ras[0]
-    print(d)
-    print("@"*600)
-    print("@"*600)
-    print("@"*600)
-    for kk, vv in d.items():
-        print(kk,vv)    #### print to the crt
-        print("@"*60)
-    print("*"*80)
-    print("\n\n\n")
+    d_port_list = {k:v}     #### create the first dictionary entry ras[0]
+    v_sn = theswitch_name
+    d_switch_name = {k:v_sn}
+
+    
     
     for ls in ls_list:
         cons_out = anturlar.fos_cmd("setcontext %s " % ls)
         ports_and_ls = si.all_ports_fc_only()
-        key = ls
-        print(key)
-        print("@"*600)
-        if key not in d:
-            print("@"*600)
-            print("KEY IS NOT IN D   *************************")
-            print("looking for %s in d" % key)
-            print("ls value is  %s  " % ls)
-            print(key)
-            print("@"*600)
-            
-        if ls in d:
-            print("@"*600)
-            print("LS IS IN D   DD ******************************")
-            print("looking for %s in d" % key)
-            print("ls value is  %s  " % ls)
-            print(key)
-            print("@"*600)  
-            
-            
-            
+        theswitch_name = si.switch_name()
         
-        if key in d:
-            #value = d[key]
-            print("@"*600)
-            #print("\n\n\nvalue of d key is :  %s " % value )
-        else:
+        if ls != str(first_ls):
             value = []
-            #ras_value = [ras[y][3]]
-            #value.extend(ras_value)
-            value = ports_and_ls 
-            d[key] = value            #### add the value to the key
+            value_sn = []
+            value = ports_and_ls
+            value_sn = theswitch_name
+            d_port_list[ls] = value            #### add the value to the key
+            d_switch_name[ls] = value_sn 
                        
     
     print("\n\n\n")
@@ -341,6 +317,7 @@ def get_info_from_the_switch():
     print("LICENSE LIST      :  %s  " % license_list)
     print("SWITCH DOMAIN     :  %s  " % switch_id)
     print("LS LIST           :  %s  " % ls_list)
+    print("BASE SWITCH       :  %s  " % base_sw)
     #print("Ports             :  %s  " % ports_and_ls)
     print("SWITCH NAME       :  %s  " % theswitch_name)
     print("VF SETTING        :  %s  " % vf_enabled)
@@ -349,11 +326,14 @@ def get_info_from_the_switch():
     print("RESET PASSWORD    :  %s " % psw_reset_value)
     
     
-    for kk, vv in d.items():
+    for kk, vv in d_port_list.items():
         print(kk,vv)    #### print to the crt
         print("@"*60)
     print("*"*80)
     print("\n\n\n")
+    for kk,vv in d_switch_name.items():
+        print(kk,vv)    #### print switchnames
+    print('*'*80)
     
     
     switch_dict = ""
@@ -387,9 +367,9 @@ def main():
     power_port = 12
     
     
-    sw_dict = get_info_from_the_switch()
+    sw_dict = cofra.get_info_from_the_switch()
     
-    
+    sys.exit()
     
 ###############################################################################
 #### 

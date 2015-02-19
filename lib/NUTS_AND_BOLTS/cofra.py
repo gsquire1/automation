@@ -1171,3 +1171,122 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
     configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
     cons_out = anturlar.fos_cmd (configdown_cmd)
+    
+    
+    
+    
+    
+def get_info_from_the_switch():
+    """
+    
+    """
+    
+    cons_out = anturlar.login()
+    
+    si = anturlar.SwitchInfo()
+    switch_ip = si.ipaddress()
+    license_list = si.getLicense()
+    ls_list = si.ls()
+    first_ls = si.ls_now()
+    switch_id = si.switch_id()
+    theswitch_name = si.switch_name()
+    vf_enabled = si.vf_enabled()
+    sw_type = si.switch_type()
+    base_sw = si.base_check()
+    fcr_state = si.fcr_enabled()
+    ports_and_ls = si.all_ports_fc_only()
+    psw_reset_value = "YES"
+       
+    
+    #############################################################
+    #### create a dict for ls and ports in the ls
+    ####
+    k = first_ls  #### craete a key with the command name
+                               #### and pid added together
+    v = ports_and_ls   #### create the value as a list otherwise the first one
+                      #### is a string and extend command later on will fail
+    d_port_list = {k:v}     #### create the first dictionary entry ras[0]
+    v_sn = theswitch_name
+    d_switch_name = {k:v_sn}
+   
+    ###########################################################################
+    #### add logical switch specific values to a dictionary
+    for ls in ls_list:
+        cons_out = anturlar.fos_cmd("setcontext %s " % ls)
+        ports_and_ls = si.all_ports_fc_only()
+        theswitch_name = si.switch_name()
+        
+        if ls != str(first_ls):
+            value = []
+            value_sn = []
+            value = ports_and_ls
+            value_sn = theswitch_name
+            d_port_list[ls] = value            #### add the value to the key
+            d_switch_name[ls] = value_sn 
+                       
+    
+    print("\n\n\n")
+    print("SWITCH IP         :  %s  " % switch_ip)
+    print("LICENSE LIST      :  %s  " % license_list)
+    print("SWITCH DOMAIN     :  %s  " % switch_id)
+    print("LS LIST           :  %s  " % ls_list)
+    print("BASE SWITCH       :  %s  " % base_sw)
+    #print("Ports             :  %s  " % ports_and_ls)
+    print("SWITCH NAME       :  %s  " % theswitch_name)
+    print("VF SETTING        :  %s  " % vf_enabled)
+    print("SWITCH TYPE       :  %s  " % sw_type)
+    print("TIMEOUT VALUE     :  0   " )
+    print("RESET PASSWORD    :  %s " % psw_reset_value)
+    print("FCR ENABLED       :  %s " % fcr_state)
+    
+    for kk, vv in d_port_list.items():
+        print(kk,vv)    #### print to the crt
+        print("@"*60)
+    print("*"*80)
+    print("\n\n\n")
+    for kk,vv in d_switch_name.items():
+        print(kk,vv)    #### print switchnames
+    print('*'*80)
+    
+    f = "%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")
+    header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
+                           "","", "==============================\n")  
+    ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
+    ff.write(header)
+    #ff.write(str(switch_ip))
+    ff.write("SWITCH IP         :  %s  \n" % switch_ip)
+    ff.write("SWITCH DOMAIN     :  %s  \n" % switch_id)
+    ff.write("LS LIST           :  %s  \n" % ls_list)
+    ff.write("BASE SWITCH       :  %s  \n" % base_sw)
+    ff.write("SWITCH NAME       :  %s  \n" % d_switch_name)
+    ff.write("VF SETTING        :  %s  \n" % vf_enabled)
+    ff.write("SWITCH TYPE       :  %s  \n" % sw_type)
+    ff.write("TIMEOUT VALUE     :  0   \n" )
+    ff.write("RESET PASSWORD    :  %s  \n" % psw_reset_value)
+    ff.write("FCR ENABLED       :  %s  \n" % fcr_state)
+    ff.write("Ports             :  %s  \n" % d_port_list)
+    ff.write("LICENSE LIST      :  %s  \n" % license_list)
+    
+    ff.write("\n"*2)
+    ff.close()
+    switch_dict = ""
+    
+    
+    return(switch_dict)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
