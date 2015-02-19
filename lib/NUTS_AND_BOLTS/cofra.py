@@ -1184,6 +1184,9 @@ def get_info_from_the_switch():
     cons_out = anturlar.login()
     
     si = anturlar.SwitchInfo()
+    mi = anturlar.Maps()
+    fi = anturlar.FlowV()
+    
     switch_ip = si.ipaddress()
     license_list = si.getLicense()
     ls_list = si.ls()
@@ -1196,33 +1199,48 @@ def get_info_from_the_switch():
     fcr_state = si.fcr_enabled()
     ports_and_ls = si.all_ports_fc_only()
     psw_reset_value = "YES"
-       
+    #xisl_st_per_ls = si.xisl()
+    maps_policy_sum = mi.get_policies()
+    maps_non_dflt_policy = mi.get_nondflt_policies()
+    
+    flow_per_ls = fi.flow_names()
     
     #############################################################
     #### create a dict for ls and ports in the ls
     ####
-    k = first_ls  #### craete a key with the command name
+    k = str(first_ls)  #### craete a key with the command name
                                #### and pid added together
     v = ports_and_ls   #### create the value as a list otherwise the first one
                       #### is a string and extend command later on will fail
     d_port_list = {k:v}     #### create the first dictionary entry ras[0]
-    v_sn = theswitch_name
-    d_switch_name = {k:v_sn}
-   
+    #v_sn = theswitch_name
+    d_switch_name = {k:theswitch_name}
+    d_domain_list = {k:switch_id}
+    #d_xisl_state = {k:xisl_st_per_ls}
+    d_flow_names = {k:flow_per_ls}
+    
+    
     ###########################################################################
     #### add logical switch specific values to a dictionary
     for ls in ls_list:
         cons_out = anturlar.fos_cmd("setcontext %s " % ls)
         ports_and_ls = si.all_ports_fc_only()
         theswitch_name = si.switch_name()
+        domain_for_ls = si.switch_id()
+        #xisl_st_per_ls = si.xisl()
+        flow_per_ls = fi.flow_names()
         
         if ls != str(first_ls):
-            value = []
-            value_sn = []
-            value = ports_and_ls
-            value_sn = theswitch_name
-            d_port_list[ls] = value            #### add the value to the key
-            d_switch_name[ls] = value_sn 
+            #value = []
+            #value_sn = []
+            #value = ports_and_ls
+            #value_sn = theswitch_name
+            d_port_list[ls] = ports_and_ls       #### add the value to the key
+            d_switch_name[ls] = theswitch_name 
+            d_domain_list[ls] = domain_for_ls
+            #d_xisl_state[ls] = xisl_st_per_ls
+            d_flow_names = flow_per_ls
+                       
                        
     
     print("\n\n\n")
@@ -1254,18 +1272,29 @@ def get_info_from_the_switch():
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
     ff.write(header)
     #ff.write(str(switch_ip))
-    ff.write("SWITCH IP         :  %s  \n" % switch_ip)
-    ff.write("SWITCH DOMAIN     :  %s  \n" % switch_id)
-    ff.write("LS LIST           :  %s  \n" % ls_list)
-    ff.write("BASE SWITCH       :  %s  \n" % base_sw)
-    ff.write("SWITCH NAME       :  %s  \n" % d_switch_name)
-    ff.write("VF SETTING        :  %s  \n" % vf_enabled)
-    ff.write("SWITCH TYPE       :  %s  \n" % sw_type)
-    ff.write("TIMEOUT VALUE     :  0   \n" )
-    ff.write("RESET PASSWORD    :  %s  \n" % psw_reset_value)
-    ff.write("FCR ENABLED       :  %s  \n" % fcr_state)
+    ff.write("SWITCH IP                :  %s  \n" % switch_ip)
+    ff.write("SWITCH DOMAIN            :  %s  \n" % d_domain_list)
+    ff.write("LS LIST                  :  %s  \n" % ls_list)
+    ff.write("BASE SWITCH              :  %s  \n" % base_sw)
+    ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
+    ff.write("VF SETTING               :  %s  \n" % vf_enabled)
+    ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
+    ff.write("TIMEOUT VALUE            :  0   \n" )
+    ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
+    ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
     ff.write("Ports             :  %s  \n" % d_port_list)
     ff.write("LICENSE LIST      :  %s  \n" % license_list)
+
+    ff.write("="*80)
+    ff.write("\n")
+    ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
+    ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
+    
+    ff.write("="*80)
+    ff.write("\n")
+    ff.write("FLOW CONFIGURATION       :  %s  \n" % f_flow_names)
+    
+    
     
     ff.write("\n"*2)
     ff.close()
