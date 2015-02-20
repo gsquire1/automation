@@ -1199,7 +1199,7 @@ def get_info_from_the_switch():
     fcr_state = si.fcr_enabled()
     ports_and_ls = si.all_ports_fc_only()
     psw_reset_value = "YES"
-    #xisl_st_per_ls = si.xisl()
+    xisl_st_per_ls = si.allow_xisl()
     maps_policy_sum = mi.get_policies()
     maps_non_dflt_policy = mi.get_nondflt_policies()
     
@@ -1216,7 +1216,7 @@ def get_info_from_the_switch():
     #v_sn = theswitch_name
     d_switch_name = {k:theswitch_name}
     d_domain_list = {k:switch_id}
-    #d_xisl_state = {k:xisl_st_per_ls}
+    d_xisl_state = {k:xisl_st_per_ls}
     d_flow_names = {k:flow_per_ls}
     
     
@@ -1227,7 +1227,7 @@ def get_info_from_the_switch():
         ports_and_ls = si.all_ports_fc_only()
         theswitch_name = si.switch_name()
         domain_for_ls = si.switch_id()
-        #xisl_st_per_ls = si.xisl()
+        xisl_st_per_ls = si.allow_xisl()
         flow_per_ls = fi.flow_names()
         
         if ls != str(first_ls):
@@ -1238,24 +1238,24 @@ def get_info_from_the_switch():
             d_port_list[ls] = ports_and_ls       #### add the value to the key
             d_switch_name[ls] = theswitch_name 
             d_domain_list[ls] = domain_for_ls
-            #d_xisl_state[ls] = xisl_st_per_ls
-            d_flow_names = flow_per_ls
+            d_xisl_state[ls] = xisl_st_per_ls
+            d_flow_names[ls] = flow_per_ls
                        
                        
     
     print("\n\n\n")
     print("SWITCH IP         :  %s  " % switch_ip)
-    print("LICENSE LIST      :  %s  " % license_list)
-    print("SWITCH DOMAIN     :  %s  " % switch_id)
+    print("SWITCH DOMAIN     :  %s  " % d_domain_list)
     print("LS LIST           :  %s  " % ls_list)
     print("BASE SWITCH       :  %s  " % base_sw)
     #print("Ports             :  %s  " % ports_and_ls)
-    print("SWITCH NAME       :  %s  " % theswitch_name)
+    print("SWITCH NAME       :  %s  " % d_switch_name)
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   " )
     print("RESET PASSWORD    :  %s " % psw_reset_value)
     print("FCR ENABLED       :  %s " % fcr_state)
+    print("LICENSE LIST      :  %s  " % license_list)
     
     for kk, vv in d_port_list.items():
         print(kk,vv)    #### print to the crt
@@ -1282,6 +1282,7 @@ def get_info_from_the_switch():
     ff.write("TIMEOUT VALUE            :  0   \n" )
     ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
     ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
+    ff.write("ALLOW XISL               :  %s  \n" % d_xisl_state)
     ff.write("Ports             :  %s  \n" % d_port_list)
     ff.write("LICENSE LIST      :  %s  \n" % license_list)
 
@@ -1292,7 +1293,7 @@ def get_info_from_the_switch():
     
     ff.write("="*80)
     ff.write("\n")
-    ff.write("FLOW CONFIGURATION       :  %s  \n" % f_flow_names)
+    ff.write("FLOW CONFIGURATION       :  %s  \n" % d_flow_names)
     
     
     
