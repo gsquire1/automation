@@ -275,7 +275,7 @@ def main():
 ###############################################################################
     cons_ip = "10.38.32.152"
     cons_port = 3019
-    my_ip = "10.38.37.83"
+    #my_ip = "10.38.37.83"
     user_name = "root"
     psswd = "password"
     gateway = "10.38.32.1"
@@ -289,12 +289,57 @@ def main():
     
     sw_dict = cofra.get_info_from_the_switch()
     
+    print("\n"*20)
+    print("SWITCH  DICTIONARY ")
+    print(sw_dict)
+    print("\n\n\n")
+    print(type(sw_dict))
+    
+    #### from cofra the key values for switch_dict
+    ####
+    #switch_dict["switch_name"]  = d_switch_name
+    #switch_dict["domain_list"]  = d_domain_list
+    #switch_dict["ls_list"]      = ls_list
+    #switch_dict["base_sw"]      = base_sw
+    #switch_dict["xisl_state"]   = d_xisl_state
+    #switch_dict["switch_type"]  = sw_type
+    #switch_dict["license_list"] = license_list
+    #switch_dict["vf_setting"]   = vf_enabled
+    #switch_dict["fcr_enabled"]  = fcr_state
+    #switch_dict["port_list"]    = d_port_list
+    my_ip         = sw_dict["switch_ip"]
+    sw_name       = sw_dict["switch_name"]
+    sw_domains    = sw_dict["domain_list"]
+    sw_ls_list    = sw_dict["ls_list"]
+    sw_base_fid   = sw_dict["base_sw"]
+    sw_xisl       = sw_dict["xisl_state"]
+    sw_type       = sw_dict["switch_type"]
+    sw_license    = sw_dict["license_list"]
+    sw_vf_setting = sw_dict["vf_setting"]
+    sw_fcr_enabled  = sw_dict["fcr_enabled"]
+    sw_port_list    = sw_dict["port_list"]
+    
+    print("\n"*20)
+    print("SWITHC IP            : %s   " % my_ip)
+    print("SWITCH NAME IS       : %s   " % sw_name)
+    print("SWITCH DOMAINS       : %s   " % sw_domains)
+    print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+    print("BASE FID             : %s   " % sw_base_fid)
+    print("XISL STATE           : %s   " % sw_xisl)
+    print("SWITCH TYPE          : %s   " % sw_type)
+    print("LICENSE LIST         : %s   " % sw_license)
+    print("VF SETTING           : %s   " % sw_vf_setting)
+    print("FCR SETTING          : %s   " % sw_fcr_enabled)
+    print("PORT LIST            : %s   " % sw_port_list)
+    
     
     sys.exit()
     
 ###############################################################################
-#### 
+#### connect to the console
+####
 ###############################################################################
+    
     tn  = connect_console(cons_ip,user_name,psswd,cons_port)
     
     print("**************************************************************")
