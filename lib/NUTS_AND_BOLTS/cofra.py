@@ -926,7 +926,7 @@ def switch_power_off_on(cn, mode = 'on'):
         then power on again for a full power cycle.
            
     """
-    ####  cn is switch matrix file - 
+    ####  cn is switch name  
     ####
     
     test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
@@ -1208,18 +1208,17 @@ def get_info_from_the_switch():
     #############################################################
     #### create a dict for ls and ports in the ls
     ####
-    k = str(first_ls)  #### craete a key with the command name
+    k = str(first_ls)    #### craete a key with the command name
                                #### and pid added together
-    v = ports_and_ls   #### create the value as a list otherwise the first one
-                      #### is a string and extend command later on will fail
+    v = ports_and_ls     #### create the value as a list otherwise the first one
+                         #### is a string and extend command later on will fail
     d_port_list = {k:v}     #### create the first dictionary entry ras[0]
     #v_sn = theswitch_name
     d_switch_name = {k:theswitch_name}
     d_domain_list = {k:switch_id}
-    d_xisl_state = {k:xisl_st_per_ls}
-    d_flow_names = {k:flow_per_ls}
-    
-    
+    d_xisl_state  = {k:xisl_st_per_ls}
+    d_flow_names  = {k:flow_per_ls}
+    ####
     ###########################################################################
     #### add logical switch specific values to a dictionary
     for ls in ls_list:
@@ -1240,16 +1239,34 @@ def get_info_from_the_switch():
             d_domain_list[ls] = domain_for_ls
             d_xisl_state[ls] = xisl_st_per_ls
             d_flow_names[ls] = flow_per_ls
-                       
-                       
+        
     
+    ###########################################################################
+    ####
+    ####  Create a dictionary
+    ####
+    switch_dict = {"switch_ip":switch_ip}
+    
+    switch_dict["switch_name"]  = d_switch_name
+    switch_dict["domain_list"]  = d_domain_list
+    switch_dict["ls_list"]      = ls_list
+    switch_dict["base_sw"]      = base_sw
+    switch_dict["xisl_state"]   = d_xisl_state
+    switch_dict["switch_type"]  = sw_type
+    switch_dict["license_list"] = license_list
+    switch_dict["vf_setting"]   = vf_enabled
+    switch_dict["fcr_enabled"]  = fcr_state
+    switch_dict["port_list"]    = d_port_list
+        
+    ###########################################################################
+    #### print the variables for review
+    ####
     print("\n\n\n")
     print("SWITCH IP         :  %s  " % switch_ip)
+    print("SWITCH NAME       :  %s  " % d_switch_name)
     print("SWITCH DOMAIN     :  %s  " % d_domain_list)
     print("LS LIST           :  %s  " % ls_list)
     print("BASE SWITCH       :  %s  " % base_sw)
-    #print("Ports             :  %s  " % ports_and_ls)
-    print("SWITCH NAME       :  %s  " % d_switch_name)
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   " )
@@ -1299,7 +1316,7 @@ def get_info_from_the_switch():
     
     ff.write("\n"*2)
     ff.close()
-    switch_dict = ""
+    #switch_dict = ""
     
     
     return(switch_dict)
