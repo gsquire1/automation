@@ -7,6 +7,7 @@ import anturlar
 import re
 import liabhar
 import csv
+import os
 
 
 
@@ -1304,9 +1305,48 @@ def get_info_from_the_switch():
     
     return(switch_dict)
     
+def playback_info_from_the_switch():
+    """
     
+    """
     
+    #cons_out = anturlar.login()
+    si = anturlar.SwitchInfo()
+    switch_ip = si.ipaddress()
+
     
+    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+    #print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+    #print(f)
+    ff = open(f, "r")
+    lines = ff.read()
+    #print(lines)
+    #sys.exit()
+    #for i in lines:
+    #    print('*****************************************')
+    #    print(lines)
+    #print(type(ff))
+    #ras = re.compile('LICENSE LIST\s+:\s+\[(.+)\]')
+    ras = re.findall('LICENSE LIST\s+:\s+(\[.+\])', lines)
+    print(type(ras))
+    print('*****************************************')
+    print(ras[0][2])
+        #print(i + '\n')
+    
+    #ras_string = (str(ras))
+    #print(ras_string)
+    #ff = liabhar.FileStuff(f, 'r+b')
+    #print(ff)
+
+    #try:
+    #    a = (os.path.isfile(f))
+    #    #print(f)
+    #    if a == (False):
+    #        print("NOT THERE")
+    #    sys.exit()
+    #except:
+    #    sys.exit()
+
     
     
     

@@ -67,20 +67,43 @@ class FileStuff:
         return self
     
     def write(self, some_text):
+        """
+        Write some files with utf_8 encoding
+        """
         self._f.write(some_text.encode('utf-8'))
         #self._f.write(some_text)
     
     def clear(self, mode= 'w+'):
+        """
+        Clear files/overwrite
+        """
         self._f.write(" ")
     
-    def close(self):
+    def close(self):    
+        """
+        Close file
+        """
         self._f.close()
         
     def readlines(self):
+        """
+        Reads entire file into memory
+        """
         self._f.readlines()
         
     def readline(self):
-        self._f.readline() 
+        """
+        Reads file one line at a time
+        """
+        self._f.readline()
+        
+    def read(self):
+        """
+        Reads file into 1 entire string.
+        Good for handling text all at once.
+        Use with RegEx
+        """
+        self._f.read()
 
 
 def cls():
