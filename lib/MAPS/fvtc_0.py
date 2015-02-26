@@ -485,7 +485,7 @@ def tc_01_01_05_01():
     ####
     
     en = anturlar.Maps()
-    anturlar.clear_stats()
+    cofra.clear_stats()
     
     #### create a policy and rules
     ####
@@ -596,7 +596,7 @@ def tc_01_01_05_01():
     policy_user_list = en.get_nondflt_policies()
     liabhar.count_down(5)
     
-    cleanup_policy(policy_user_list)
+    maps_tools.cleanup_policy(policy_user_list)
     policy_user_list_final = en.get_policies("s")
      
      

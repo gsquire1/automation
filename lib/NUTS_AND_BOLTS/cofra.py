@@ -1236,6 +1236,7 @@ def get_info_from_the_switch():
     first_ls = si.ls_now()
     switch_id = si.switch_id()
     theswitch_name = si.switch_name()
+    chassis_name = si.chassisname()
     vf_enabled = si.vf_enabled()
     sw_type = si.switch_type()
     base_sw = si.base_check()
@@ -1261,6 +1262,7 @@ def get_info_from_the_switch():
     d_domain_list = {k:switch_id}
     d_xisl_state  = {k:xisl_st_per_ls}
     d_flow_names  = {k:flow_per_ls}
+    
     ####
     ###########################################################################
     #### add logical switch specific values to a dictionary
@@ -1291,6 +1293,7 @@ def get_info_from_the_switch():
     switch_dict = {"switch_ip":switch_ip}
     
     switch_dict["switch_name"]  = d_switch_name
+    switch_dict["chassis_name"] = chassis_name
     switch_dict["domain_list"]  = d_domain_list
     switch_dict["ls_list"]      = ls_list
     switch_dict["base_sw"]      = base_sw
@@ -1337,6 +1340,7 @@ def get_info_from_the_switch():
     ff.write("LS LIST                  :  %s  \n" % ls_list)
     ff.write("BASE SWITCH              :  %s  \n" % base_sw)
     ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
+    ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
     ff.write("VF SETTING               :  %s  \n" % vf_enabled)
     ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
     ff.write("TIMEOUT VALUE            :  0   \n" )

@@ -307,21 +307,23 @@ def main():
     #switch_dict["vf_setting"]   = vf_enabled
     #switch_dict["fcr_enabled"]  = fcr_state
     #switch_dict["port_list"]    = d_port_list
-    my_ip         = sw_dict["switch_ip"]
-    sw_name       = sw_dict["switch_name"]
-    sw_domains    = sw_dict["domain_list"]
-    sw_ls_list    = sw_dict["ls_list"]
-    sw_base_fid   = sw_dict["base_sw"]
-    sw_xisl       = sw_dict["xisl_state"]
-    sw_type       = sw_dict["switch_type"]
-    sw_license    = sw_dict["license_list"]
-    sw_vf_setting = sw_dict["vf_setting"]
+    my_ip           = sw_dict["switch_ip"]
+    sw_name         = sw_dict["switch_name"]
+    sw_chass_name   = sw_dict["chassis_name"]
+    sw_domains      = sw_dict["domain_list"]
+    sw_ls_list      = sw_dict["ls_list"]
+    sw_base_fid     = sw_dict["base_sw"]
+    sw_xisl         = sw_dict["xisl_state"]
+    sw_type         = sw_dict["switch_type"]
+    sw_license      = sw_dict["license_list"]
+    sw_vf_setting   = sw_dict["vf_setting"]
     sw_fcr_enabled  = sw_dict["fcr_enabled"]
     sw_port_list    = sw_dict["port_list"]
     
     print("\n"*20)
     print("SWITHC IP            : %s   " % my_ip)
-    print("SWITCH NAME IS       : %s   " % sw_name)
+    print("SWITCH NAME          : %s   " % sw_name)
+    print("CHASSIS NAME         : %s   " % sw_chass_name)
     print("SWITCH DOMAINS       : %s   " % sw_domains)
     print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
     print("BASE FID             : %s   " % sw_base_fid)
