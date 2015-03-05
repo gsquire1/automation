@@ -4,7 +4,6 @@
 #### Home location is /home/automation/lib/MAPS/
 ####
 ###############################################################################
-
   
 def test_case_flow():
     """

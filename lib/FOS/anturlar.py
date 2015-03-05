@@ -879,12 +879,16 @@ class SwitchInfo:
            
         """
         #### need a check for AG switch 
-        capture_cmd = fos_cmd("switchshow")
-        ras = re.compile('switchDomain:\s+(\d{1,3})') 
-        ras = ras.findall(capture_cmd)
-        sid = [int(i) for i in ras]
-        sid = int(ras[0])
-        return(sid)     
+        try:
+            capture_cmd = fos_cmd("switchshow")
+            ras = re.compile('switchDomain:\s+(\d{1,3})') 
+            ras = ras.findall(capture_cmd)
+            sid = [int(i) for i in ras]
+            sid = int(ras[0])
+            return(sid)     
+        except IndexError:
+            return("AG")
+    
     
     def switch_name(self ):
         """
