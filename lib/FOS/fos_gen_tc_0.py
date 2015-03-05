@@ -164,23 +164,37 @@ def fabric_switch_config_show():
     
 def check_version():
          
-    capture_cmd = anturlar.fos_cmd("firmwareshow") 
-    ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras = ras.search(capture_cmd)
-    ras_dir = ras_dir.search(capture_cmd)
+    capture_cmd = anturlar.fos_cmd("version")
+    capture_cmd_dir = capture_cmd
+    
+    
+    ras = re.compile('Fabric OS:\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-z0-9]{6,18})(?:\\r\\n)')
+    
+    
+    #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+    #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+    #ras_dir = re.compile('[\s\t0-9CPFOS]{19,21}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
+    #ras_dir = re.compile('[ \\t0-9CPFOS]{19,21}')
+    #ras = ras.search(capture_cmd)
+    ras = ras.findall(capture_cmd)
+    #ras_dir = ras_dir.search(capture_cmd_dir)
+    #
     f=""
+    
     try:
         if ras.group(0) != "none":
             f= ras.group(1)
     except:
         pass
-    try:
-        if ras_dir(0) != "none":
-            f=ras_dir.group(1)
-    except:
-        pass
+    
+    f = ras[0]
+    #try:
+    #    if ras_dir.group(0) != "none":
+    #        f=ras_dir.group(1)
+    #except:
+    #    pass
+    #
     
     return(f)
     

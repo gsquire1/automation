@@ -962,18 +962,24 @@ def mem_monitor(wait_time=1800, iters=336):
     return()
 ###############################################################################   
 
-def switch_power_off_on(cn, mode = 'on'):  
+def switch_power_off_on(chassis_name, mode = 'on'):  
     """
         From hand edited Switch_Matrix csv file (should be in /home/RunFromHere/ini directory),
         find IP and port# of related Power Tower and power off all power supplies for that switch
         then power on again for a full power cycle.
-           
+          
+        File name is SwitchMatrix.csv 
     """
-    ####  cn is switch name  
+    ####  cn is chassis name   
     ####
-    
+    cn = chassis_name
     test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    try:
+        csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
+    except OSError:
+        print("Cannot find the file SwitchMatrix.csv")
+        return(False)
+    
     for line in csv_file:
         switch_name = (line['Nickname'])
         if switch_name == cn[0]:
@@ -1224,7 +1230,7 @@ def get_info_from_the_switch():
     
     """
     
-    cons_out = anturlar.login()
+    #cons_out = anturlar.login()
     
     si = anturlar.SwitchInfo()
     mi = anturlar.Maps()
@@ -1237,6 +1243,7 @@ def get_info_from_the_switch():
     switch_id = si.switch_id()
     theswitch_name = si.switch_name()
     chassis_name = si.chassisname()
+    director_pizza = si.director()
     vf_enabled = si.vf_enabled()
     sw_type = si.switch_type()
     base_sw = si.base_check()
@@ -1294,6 +1301,7 @@ def get_info_from_the_switch():
     
     switch_dict["switch_name"]  = d_switch_name
     switch_dict["chassis_name"] = chassis_name
+    switch_dict["director"]     = director_pizza
     switch_dict["domain_list"]  = d_domain_list
     switch_dict["ls_list"]      = ls_list
     switch_dict["base_sw"]      = base_sw
@@ -1341,6 +1349,7 @@ def get_info_from_the_switch():
     ff.write("BASE SWITCH              :  %s  \n" % base_sw)
     ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
     ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
+    ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)
     ff.write("VF SETTING               :  %s  \n" % vf_enabled)
     ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
     ff.write("TIMEOUT VALUE            :  0   \n" )

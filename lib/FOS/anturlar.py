@@ -342,9 +342,14 @@ class SwitchInfo:
         #print('ZZZZZZZZZZZ')
         #print(capture_cmd)
         self.am_i_director = True
-        if "hashow: Not supported" in capture_cmd:
-            self.am_i_director = False
-    
+        try:
+            if "hashow: Not supported" in capture_cmd:
+                self.am_i_director = False
+        except:
+            #self.am_i_director = False
+            return("COULD NOT DETERMINE IF SWITCH IS A DIRECTOR")
+        
+            
     def __myIPaddr__(self):
         """
             determine the current switch IP
@@ -352,14 +357,19 @@ class SwitchInfo:
             Return 0 if no match found
         """
         capture_cmd = fos_cmd("ipaddrshow", 0)
-        #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
-        match = re.search('(?P<pre>([\s+\w+]+):\s?(?P<ip>[0-9\.]{1,15}))', capture_cmd)
-        if match:
-            myip = (match.group('ip'))
-            return(myip)
-        else:
-            print("\n\n NO IP FOUND \n\n")
-            return (0)
+        try:
+            #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
+            match = re.search('(?P<sre>([\s+\w+]+):\s?(?P<ip>[0-9\.]{1,15}))', capture_cmd)
+        
+            if match:
+                myip = (match.group('ip'))
+                return(myip)
+            else:
+                print("\n\n NO IP FOUND \n\n")
+                return (0)
+        except:
+            return("COULD NOT MATCH IP ADDRESS")
+    
 
     def __getblanklist__(self):
         """
@@ -686,11 +696,15 @@ class SwitchInfo:
         """
             get a list of the license on the switch
         """
-        capture_cmd = fos_cmd("licenseshow")
-        ras = re.compile('([\w\d]{16,37})(?=:\\r\\n)')
-        ras = ras.findall(capture_cmd)
-        return(ras)
-    
+        try:
+            capture_cmd = fos_cmd("licenseshow")
+            ras = re.compile('([\w\d]{16,37})(?=:\\r\\n)')
+            ras = ras.findall(capture_cmd)
+            return(ras)
+        except:
+            return("COULD NOT DETERMINE LICENSE")
+        
+        
     def ipaddress(self):
         return(self.__myIPaddr__())
     
