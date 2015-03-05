@@ -1462,6 +1462,32 @@ class configSwitch(SwitchInfo):
             if "LOGICAL SWITCH PORTS" in line_str:
                 keepnext = 1
                 print("change keepnext to 1")
+                
+    def config_default(self):
+        """
+        Do switchconfigdefault on FID used in CLI only.
+        Switch needs to be offline, rebooted and brought back online.
+        """
+        
+        host = sys.argv[1]
+        user = sys.argv[2]
+        password = sys.argv[7]
+        state = SwitchInfo.switch_state(self)
+        if state == "Online":
+            fos_cmd("switchdisable")
+        else:
+            pass
+        fos_cmd("echo Y | configdefault")
+        fos_cmd("echo Y | reboot")
+        liabhar.count_down(120)
+        connect_tel_noparse(host, user, password)
+        fos_cmd("switchenable")
+        liabhar.count_down(10)
+        state = SwitchInfo.switch_state(self)
+        return(state)
+        
+                      
+    
 
 class Maps(SwitchInfo):
     
