@@ -1105,6 +1105,7 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
     ftp_ip, ftp_user, ftp_pass
     cons_out = anturlar.fos_cmd (configup_cmd)
+    return(cons_out)
 
 def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     """
@@ -1214,6 +1215,7 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
     configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
     cons_out = anturlar.fos_cmd (configdown_cmd)
+    return(cons_out)
     
     
     

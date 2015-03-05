@@ -11,6 +11,7 @@ import anturlar
 import liabhar
 import cofra
 import maps_tools
+import sys
 
 
 ##########################################################
@@ -48,17 +49,12 @@ def tc_22_2_1_2(ftp_ip, ftp_user, ftp_pass, clear = 0):
     
 #def cfgul(ftp_ip, ftp_user, ftp_pass, clear = 0):
 #def cfgul():
-    cofra.cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0)
-    liabhar.JustSleep(3)
-    cofra.cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0)
 
+    #liabhar.JustSleep(3)
 
-###############################################################################
-#STEVE'S EXAMPLE
-####################
-
-    test_numb = "25.01.01.03.01"
-    test_summary = "%s    MAPS Catergory Management Default thresholds" % test_numb
+    
+    test_numb = "22.2.1.2"
+    test_summary = "%s    FCR" % test_numb
     header = maps_tools.format_header(test_summary)
     test_result = ""
     
@@ -66,11 +62,41 @@ def tc_22_2_1_2(ftp_ip, ftp_user, ftp_pass, clear = 0):
     sut_ip = p.ipaddress()
     sw_rules = p.get_rules()
     
-     #### set up the log file info
-    f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
+    #### set up the log file info
+    f_path = '/home/RunFromHere/logs/%s_%s' % (test_numb, sut_ip)
+    f = open(f_path, 'w+b')
+    f.write(bytes(header, 'UTF-8'))
+    ### configupload
+    cfgupload_status = cofra.cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0)
+    if "Terminated" in cfgupload_status:
+        print("\n"+"#"*80+"\n")
+        print('Could not connect to remote host')
+        print("#"*80+"\n")
+        f.write(bytes(cfgupload_status, 'UTF-8'))
+        sys.exit()
+    else:
+        f.write(bytes(cfgupload_status, 'UTF-8'))
+    #a = cofra.cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0)
+    #f.write(bytes(a, 'UTF-8'))
     
-    f = liabhar.FileStuff(f_path, 'w+b')
-    f.write(header)
+    f.close()
+    sys.exit()
+
+###############################################################################
+#STEVE'S EXAMPLE
+####################
+
+
+    
+    #p = anturlar.Maps()
+    #sut_ip = p.ipaddress()
+    #sw_rules = p.get_rules()
+    
+     #### set up the log file info
+    #f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
+    #
+    #f = liabhar.FileStuff(f_path, 'w+b')
+    #f.write(header)
     
     #sw_rules = str(sw_rules)
     #sw_rules = sw_rules.replace("'", "") #### remove ' from string
@@ -105,7 +131,8 @@ def tc_22_2_1_2(ftp_ip, ftp_user, ftp_pass, clear = 0):
     print("The number of additional rules on the switch %s " % ( count - count_df))
     print(len(sw_rules))
     print(len(df_rules))
-    f.write("The number of rules that differ are %s \r\n" % rule_differ)
+    #f.write(bytes(header, 'UTF-8'))
+    #f.write(bytes("The number of rules that differ are %s \r\n" % rule_differ, 'UTF-8')
     f.write("The number of additional rules on the switch %s \r\n" % ( count - count_df))
     f.write("Total number of switch rules    %s  \r\n" % len(sw_rules))
     f.write("Total number of default rules   %s  \r\n" % len(df_rules))
