@@ -1045,7 +1045,6 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
      
-    
     f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
     
     if clear == 1 :
@@ -1060,51 +1059,6 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
     ff.write(str(sw_info_ls))
     ff.write("\n"*2)
-    
-    #for i in sw_info_ls:
-    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
-    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("\nMAPS CONFIG::"+i+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("relayconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #ff.write("="*80+"\n")
-    #ff.write("\n"*10)
     
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
     #cons_out = anturlar.fos_cmd(" ")
@@ -1153,66 +1107,6 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
      
-    
-    #f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
-    #
-    #if clear == 1 :
-    #    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-    #else:
-    #    ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
-    #    
-    #header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",sw_ip, "\n==============================\n\n")  
-    #ff.write(header)
-    #ff.close()
-    #
-    #ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-    #ff.write(str(sw_info_ls))
-    #ff.write("\n"*2)
-    
-    #for i in sw_info_ls:
-    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
-    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("\nMAPS CONFIG::"+i+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("relayconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #ff.write("="*80+"\n")
-    #ff.write("\n"*10)
     if switch_state == "Online":
         anturlar.fos_cmd("switchdisable")
     else:
@@ -1222,9 +1116,6 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
     cons_out = anturlar.fos_cmd (configdown_cmd)
     return(cons_out)
-    
-    
-    
     
     
 def get_info_from_the_switch():

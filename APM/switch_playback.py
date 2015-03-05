@@ -64,7 +64,8 @@ import csv
 def parent_parser():
     
     pp = argparse.ArgumentParser(add_help=False)
-    pp.add_argument("--repeat", help="repeat repeat")
+    #pp.add_argument("--repeat", help="repeat repeat")
+    pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
@@ -75,14 +76,14 @@ def parent_parser():
 
 def parse_args(args):
     
-    #global tn,sw_user
     verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
     #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
     #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
-    parser.add_argument('-ip', '--ipaddr', help="IP address of SUT")
+    parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
+    
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -233,8 +234,6 @@ def env_variables(swtype, db=0):
         g = ("setenv ethact ENETO \r\n")
         tn.write(g.encode('ascii'))
         capture = tn.expect(reg_list, 300)
-    
-    
     
     g = ("setenv gateway %s \r\n" % gateway)
     tn.write(g.encode('ascii'))
@@ -532,33 +531,18 @@ def main():
     
 ###############################################################################
 ####
-#### variable required for netinstall
+#### 
 ####
 ###############################################################################
-   
-    #cons_ip = "10.38.32.152"
-    #cons_port = 3019
-    ##my_ip = "10.38.37.83"
-    #user_name = "root"
-    #psswd = "password"
-    #gateway = "10.38.32.1"
-    #netmask = "255.255.240.0"
-    #bootargs = "ip=off"
-    #ethrotate = "no"
-    #server_ip = "10.38.2.40"
-    #pwr_ip= "10.38.32.119"
-    #power_port = 12
-    #
-    
-    
-    
     pa = parse_args(sys.argv)
     print(pa)
     print(pa.chassis_name)
     print(pa.ipaddr)
     print(pa.quiet)
     print(pa.verbose)
+    print(pa.firmware)
     print("@"*40)
+    sys.exit()
     ###########################################################################
     ###########################################################################
     ####
