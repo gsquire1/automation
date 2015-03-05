@@ -223,17 +223,23 @@ def env_variables(swtype, db=0):
     reg_list = [b"=>"]
     capture = tn.expect(reg_list, 300)
     
-    gateway = "10.38.32.1"
-    netmask = "255.255.240.0"
-    bootargs = "ip=off"
+    gateway   = "10.38.32.1"
+    netmask   = "255.255.240.0"
+    bootargs  = "ip=off"
     ethrotate = "no"
     server_ip = "10.38.2.40"
+    ethact    = "ENETO"
     
     if swtype == 133:
         print("ODIN")
-        g = ("setenv ethact ENETO \r\n")
-        tn.write(g.encode('ascii'))
-        capture = tn.expect(reg_list, 300)
+        ethact = "FM1@DTSEC2"
+    if (swtype == 141 or swtype == 142):
+        print("YODA")
+        ethact = "FM2@DTSEC4"
+        
+    a = ("setenv ethact %s \r\n" % ethact)
+    tn.write(a.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
     
     g = ("setenv gateway %s \r\n" % gateway)
     tn.write(g.encode('ascii'))
@@ -276,35 +282,39 @@ def pwr_cycle(pwr_ip, pp, db=0):
     
 def load_kernel(switch_type, sw_ip, frm_version):
     
-    #### set tftp command
-    if switch_type == 133: ###  ODIN
-        nbt = "tftpboot 0x1000000 net_install26_odin.img"
-    if switch_type == "STINGER":
-        nbt = "tftpboot 0x1000000 net_install_v7.2.img"
-    if switch_type == "TOMTOO":
-        nbt = "tftpboot 0x1000000 net_install_v7.2.img"
-    if switch_type == "5100":
-        nbt = "tftpboot 0x1000000 net_install_v7.2.img"
-    if switch_type == "TOMAHAWK":
-        nbt = "tftpboot 0x1000000 net_install_v7.2.img"
-       
-    ####set type true for skybolt and yoda
-    ####
-    if switch_type == 133:
-        type = True
-    
-    ####   do these step sfor ODIN, STINGER, TOMTOO, 5100, 300 
     reg_list = [ b"=>"]
     reg_bash = [ b"bash-2.04#"]
+    #### set tftp command
+    ras = re.compile('([\.a-z0-9]+)(?:_)')
+    ras = ras.search(frm_version)
+    frm_no_bld = ras.group(1)
     
-    tn.write(b"%s\r\n" % nbt)
-    capture = tn.expect(reg_list, 300)
-    tn.write(b"bootm 0x1000000\r\n")
-    capture = tn.expect(reg_bash, 300)
     
-    
-    if type:
-    ####  do these for SKYBOLT  and YODA  ONLY
+    if switch_type == 133:  ####  ODIN
+        nbt = "tftpboot 0x1000000 net_install26_odin.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+    if (switch_type == 66 or switch_type == 71 or switch_type == 118 or switch_type == 109):
+        #### 5100  Stinger   tomahawk  tom_too
+        nbt = "tftpboot 0x1000000 net_install_v7.2.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+    if (switch_type == 120 or switch_tyep == 121 or switch_type == 64 or switch_type == 83):
+        ####  DCX zentron  pluto zentron  thor  7800
+        nbt = "tftpboot 0x1000000 net_install26_8548.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+        
+    if switch_type == 148:  #### SKYBOLT
         tn.write(b"makesinrec 0x1000000 \r\n")
         capture = tn.expect(reg_bash,300)
         tn.write(b"tftpboot 0x2000000  skybolt/uImage \r\n")
@@ -315,12 +325,20 @@ def load_kernel(switch_type, sw_ip, frm_version):
         capture = tn.expect(reg_bash,300)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \r\n")
         caputure = tn.expect(reg_bash,300)
-    
-    
-    else:
-    #### do these steps for ALL switch types
-        pass
-    
+        
+    if (switch_type == 141 or switch_type == 142):  #### YODA 
+        tn.write(b"makesinrec 0x1000000 \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x2000000 yoda/uImage \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x3000000 yoda/ramdisk.yoda \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x4000000 yoda/silkworm_yoda.dtb \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \r\n")
+        caputure = tn.expect(reg_bash,300)
+        
+        
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
     capture = tn.expect(reg_bash, 300)
     tn.write(b"ifconfig eth0 %s netmask 255.255.240.0 \r\n" % sw_ip )
@@ -329,8 +347,12 @@ def load_kernel(switch_type, sw_ip, frm_version):
     capture = tn.expect(reg_bash, 300)
     tn.write(b"mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n")
     capture = tn.expect(reg_bash, 300)
-    tn.write(b"./install release\r\n")
+    ### firmwarepath
+    firmpath = "cd /loadSQA/fos/%s/%s" % (frm_no_bld, frm_version)
+    tn.write(firmpath.encode('ascii'))
+    capture = tn.expect(reg_bash,600)
     
+    tn.write(b"./install release\r\n")
     capture = tn.expect(reg_bash,600)
 
     return(0)
@@ -387,18 +409,18 @@ def console_info(chassis_name):
         print("Cannot find the file SwitchMatrix.csv")
         return(False)
     
-    print("@"*80)
-    print("@"*80)
-    print("looking for %s  " % chassis_name)
-    print(type(chassis_name))
-    print("@"*80)
+    #print("@"*80)
+    #print("@"*80)
+    #print("looking for %s  " % chassis_name)
+    #print(type(chassis_name))
+    #print("@"*80)
     
     for line in csv_file:
         chassis_name_from_file = (line['Nickname'])
-        print("@"*80)
-        print(chassis_name_from_file)
-        print(type(chassis_name_from_file))
-        print("@"*80)
+        #print("@"*80)
+        #print(chassis_name_from_file)
+        #print(type(chassis_name_from_file))
+        #print("@"*80)
         
         if chassis_name_from_file == chassis_name:
             #sn = (switch_name)
@@ -410,21 +432,21 @@ def console_info(chassis_name):
         
             a = []
             a = [cons_1_ip, cons_1_port]
-            print("@"*80)
-            print(chassis_name)
-            print("&"*80)
-            print(cons_2_ip)
+            #print("@"*80)
+            #print(chassis_name)
+            #print("&"*80)
+            #print(cons_2_ip)
             
             if cons_2_ip:
-                print("&"*80)
-                print("checked for true cons_2_ip")
-                print(cons_2_ip)
+                #print("&"*80)
+                #print("checked for true cons_2_ip")
+                #print(cons_2_ip)
                 
                 a += [cons_2_ip]
                 a += [cons_2_port]
          
         else:
-            print("NO MATCH")
+            print("\r\n")
             
     return(a)
 
@@ -440,9 +462,9 @@ def pwr_pole_info(chassis_name):
         print("Cannot find the file SwitchMatrix.csv")
         return(False)
     
-    print("@"*80)
-    print("@"*80)
-    print("@"*80)
+    #print("@"*80)
+    #print("@"*80)
+    #print("@"*80)
     
     for line in csv_file:
         chassis_name_from_file = (line['Nickname'])
@@ -542,47 +564,25 @@ def main():
     print(pa.verbose)
     print(pa.firmware)
     print("@"*40)
-    sys.exit()
+   
     ###########################################################################
     ###########################################################################
     ####
     #### hold the ip address from the command line
     ####  
     ipaddr = pa.ipaddr
-    #print("IP FROM COMMAND LINE  %s " % ipaddr)
-    
     cons_info         = console_info(pa.chassis_name)
-    #print("console"*7)
-    #print(cons_info)
     console_ip = cons_info[0]
     console_port = cons_info[1]
-    #print("Console IP and Port are  %s   %s  " %  (console_ip, console_port))
-    #print("console"*7)
-    
     power_pole_info   = pwr_pole_info(pa.chassis_name)    
-    #print("PowerPole"*6)
-    #print(power_pole_info)
-        
-    #print("PowerPole"*6)
-    
     usr_pass = get_user_and_pass(pa.chassis_name)
-    #print("USER PASSWORD  %s  " % usr_pass)
-    #print("USER NAME is %s    " % usr_pass[0])
-    #print("USER PASS is %s    " % usr_pass[1])
-    #print("USER__PASSWORD_"*5)
-    
     user_name = usr_pass[0]
     usr_psswd = usr_pass[1]
-    
-    
     ipaddr_switch = get_ip_from_file(pa.chassis_name)
-    #print("IP ADDRESS is %s  " % ipaddr_switch)
     
-    
-    
-    
-    
-    
+   
+   
+   
     #### need to get the ipaddress from the file
     #### pass to login procedure
     #### already have username password
@@ -640,16 +640,16 @@ def main():
     cons_out = send_cmd("switchshow")
     #print("**************************************************************")
     #print("\n\n\n\n\n\n\n\n\n\n")
-    cmd_list = ["switchshow", "fabricshow", "mapsdb --show"]
-    for c in cmd_list:
-        cons_out = send_cmd(c)
+    #cmd_list = ["switchshow", "fabricshow", "mapsdb --show"]
+    #for c in cmd_list:
+    #    cons_out = send_cmd(c)
 
 ###############################################################################
 ####
 ####  reboot and find the command prompt
 ####
     
-    #cons_out = stop_at_cmd_prompt(9)
+    cons_out = stop_at_cmd_prompt(9)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print(cons_out)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
@@ -658,7 +658,7 @@ def main():
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
     print(cons_out)
-    #pwr_cycle(pwr_ip, power_port)
+    load_kernel(sw_type, my_ip, pa.firmware)
     
     for pp in range(0, len(power_pole_info), 2):
         print('POWERPOLE')
@@ -666,7 +666,7 @@ def main():
         print(power_pole_info[pp+1])
         
         
-        #pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
+        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
     
     tn.write(b"exit\n")
     tn.close()
@@ -680,52 +680,6 @@ if __name__ == '__main__':
 
 
 ###############################################################################
-####
-####
-####
-####
-#
-#  Constant variables
-#       gateway_ip    10.38.32.1
-#       bootargs      =ip=off
-#       server_ip     10.38.2.40
-#       subnetmask    255.255.240.0
-#       
-
-
-#=> printenv
-#AutoLoad=yes
-#InitTest=MEM()
-#LoadIdentifiers=Fabric Operating System;Fabric Operating System
-#OSLoadOptions=quiet;quiet
-#OSLoader=ATA()0x1f1c48;ATA()0x1404f
-#OSRootPartition=hda2;hda1
-#SkipWatchdog=yes
-#baudrate=9600
-#bootargs=ip=off
-#bootcmd=setenv bootargs mem=${mem} ${OSLoadOptions};ataboot;bootm 0x400000
-#bootdelay=5
-#ethact=ENET0
-#ethaddr=00:05:33:7A:0F:88
-#gateway=10.38.32.1
-#gatewayip=10.38.32.1
-#hostname=sequoia
-#initrd_high=0x20000000
-#ipaddr=10.38.37.50
-#loads_echo=1
-#mem=1044480k
-#netmask=255.255.240.0
-#preboot=echo;echo Type "run flash_nfs" to mount root filesystem over NFS;echo
-#netdev=eth0
-#consoledev=ttyS1
-#ramdiskaddr=400000
-#ramdiskfile=your.ramdisk.u-boot
-#serverip=10.38.2.40
-#stderr=serial
-#stdin=serial
-#stdout=serial
-#submask=255.255.240.0
-#ver=U-Boot 1.1.3 (Feb  5 2015 - 14:19:55)
-#
-#Environment size: 784/4080 bytes
+#### END
+###############################################################################
 
