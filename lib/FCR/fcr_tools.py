@@ -468,5 +468,23 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     anturlar.fos_cmd('licenseshow')
     return(True)
 
+def reboot_sequence(iterations):
+    cs = anturlar.configSwitch()
+    while iterations >= 0:
+        a = cs.reboot()
+        iterations -= 1
+        print('NUMBERNUMBER')
+        print(iterations) 
+        if a == ("Online"):
+            c = anturlar.fos_cmd("lsanzoneshow - s | grep Configured")
+            if c:
+                print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+                print(c)
+                sys.exit(0)
+        
+        
+        
+    
+
 
     

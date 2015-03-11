@@ -1338,7 +1338,7 @@ class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
         """
         return(self.__getportlist__("ge-Port"))
         
-class configSwitch(SwitchInfo):
+class ConfigSwitch(SwitchInfo):
     
     
     
