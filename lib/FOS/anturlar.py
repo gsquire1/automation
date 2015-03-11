@@ -880,11 +880,16 @@ class SwitchInfo:
             Return the switch state 'Offline or Online'
             
         """
-        capture_cmd = fos_cmd("switchshow")
-        ras = re.compile('switchState:\s+(\w{6,7})') 
-        ras = ras.findall(capture_cmd)
-        ss = str(ras[0])
-        return(ss)     
+        while True:
+            capture_cmd = fos_cmd("switchshow")
+            ras = re.compile('switchState:\s+(\w{6,7})') 
+            ras = ras.findall(capture_cmd)
+            try:
+                ss = str(ras[0])
+                return(ss)
+            except IndexError:
+                liabhar.JustSleep(30)
+               
     
     def switch_id(self ):
         """
@@ -1493,6 +1498,7 @@ class ConfigSwitch(SwitchInfo):
         liabhar.count_down(120)
         connect_tel_noparse(host, user, password)
         liabhar.count_down(10)
+        
         state = SwitchInfo.switch_state(self)
         return(state)
 

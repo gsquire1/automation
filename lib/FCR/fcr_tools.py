@@ -469,10 +469,11 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     return(True)
 
 def reboot_sequence(iterations):
-    cs = anturlar.configSwitch()
-    while iterations >= 0:
+    cs = anturlar.ConfigSwitch()
+    while iterations >= 1:
         a = cs.reboot()
         iterations -= 1
+        print(a)
         print('NUMBERNUMBER')
         print(iterations) 
         if a == ("Online"):
