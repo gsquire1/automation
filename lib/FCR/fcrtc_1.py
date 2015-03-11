@@ -46,13 +46,8 @@ def tc_22_2_1_2(ftp_ip, ftp_user, ftp_pass, clear = 0):
     ####  7. Put switch back to original config
     ####
     #### start the test
-    
-#def cfgul(ftp_ip, ftp_user, ftp_pass, clear = 0):
-#def cfgul():
 
-    #liabhar.JustSleep(3)
-
-    
+ 
     test_numb = "22.2.1.2"
     test_summary = "%s    FCR" % test_numb
     header = maps_tools.format_header(test_summary)
@@ -61,57 +56,78 @@ def tc_22_2_1_2(ftp_ip, ftp_user, ftp_pass, clear = 0):
     p = anturlar.Maps()
     cs = anturlar.configSwitch()
     si = anturlar.SwitchInfo()
+    fcrinfo = anturlar.FcrInfo()
     sut_ip = p.ipaddress()
     sw_rules = p.get_rules()
+    sw_status = si.__sw_basic_info__()
     
-    #### set up the log file info
-    f_path = '/home/RunFromHere/logs/%s_%s' % (test_numb, sut_ip)
-    f = open(f_path, 'w+b')
-    f.write(bytes(header, 'UTF-8'))
-    
-    ### configupload
-    cfgupload_status = cofra.cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0)
-    if "Terminated" in cfgupload_status:
-        print("\n"+"#"*80+"\n")
-        print('Could not connect to remote host. Configupload failed')
-        print("#"*80+"\n")
-        f.write(bytes(cfgupload_status, 'UTF-8'))
-        sys.exit()
-    else:
-        f.write(bytes(cfgupload_status, 'UTF-8'))
-        
-    ### configdefault
-    cfgdflt = cs.config_default()
+    ###### set up the log file info
+    ##f_path = '/home/RunFromHere/logs/%s_%s' % (test_numb, sut_ip)
+    ##f = open(f_path, 'w+b')
+    ##f.write(bytes(header, 'UTF-8'))
+    ##
+    ##### configupload
+    ##cfgupload_status = cofra.cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0)
+    ##if "Terminated" in cfgupload_status:
+    ##    print("\n"+"#"*80+"\n")
+    ##    print('Could not connect to remote host. Configupload failed')
+    ##    print("#"*80+"\n")
+    ##    f.write(bytes(cfgupload_status, 'UTF-8'))
+    ##    sys.exit()
+    ##else:
+    ##    f.write(bytes(cfgupload_status, 'UTF-8'))
+    ##    
+    ##### configdefault
+    ##cfgdflt = cs.config_default()
     
     ### Check if FCR Status is disabled (default setting)
     fcr_status = si.fcr_enabled()
-    if fcr_status is True:
-        print("\n"+"#"*80+"\n")
-        print('FC Routing Service is still enabled. Test Failed')
-        print("#"*80+"\n")
-        f.write(bytes(fcr_status, 'UTF-8'))
-        sys.exit()
-    else:
-        print("\n"+"#"*80+"\n")
-        print('FC Routing Service is disabled as it should be.')
-        print("#"*80+"\n")
-        f.write(bytes(fcr_status, 'UTF-8'))
+    ##if fcr_status is True:
+    ##    print("\n"+"*"*80+"\n")
+    ##    print('FC Routing Service is still enabled. Test Failed')
+    ##    print("*"*80+"\n")
+    ##    f.write(bytes(fcr_status, 'UTF-8'))
+    ##    sys.exit()
+    ##else:
+    ##    print("\n"+"*"*80+"\n")
+    ##    print('FC Routing Service is disabled as it should be.')
+    ##    print("*"*80+"\n")
+    ##    f.write(bytes(fcr_status, 'UTF-8'))
         
-    ### FCR functionality persists
-    
-    ###### This should be last bit of code as it puts switch back to starting config
-    cfgdownload_status = cofra.cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0)
-    if "Terminated" in cfgupload_status:
-        print("\n"+"#"*80+"\n")
-        print('Could not connect to remote host. Configdownload failed')
-        print("#"*80+"\n")
-        f.write(bytes(cfgupload_status, 'UTF-8'))
+    # FCR Functionality Persist
+    if fcr_status is True:
+        print('FCR IS ENABLED')
     else:
-        f.write(bytes(cfgdownload_status, 'UTF-8'))
-        print("\n"+"#"*80+"\n")
-        f.write(bytes("ALL TESTS PASSED"))
-        print("#"*80+"\n")
-        f.close()
+        anturlar.fos_cmd("fosconfig --enable fcr")
+        
+    #fcr_state = fcrinfo.fcr_state_persist_enabled()
+    #if fcr_state == True:
+    #    print('TRUE')
+    #else:
+    #    print("FALSE")
+    
+    ####### This should be last bit of code as it puts switch back to starting config
+    #cfgdownload_status = cofra.cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0)
+    #if "Terminated" in cfgdownload_status:
+    #    print("\n"+"*"*80+"\n")
+    #    print('Could not connect to remote host. Configdownload failed')
+    #    print("*"*80+"\n")
+    #    f.write(bytes(cfgdownload_status, 'UTF-8'))
+    #else:
+    #    f.write(bytes(cfgdownload_status, 'UTF-8'))
+    #    f.write(bytes("\n"+"*"*80+"\n", 'UTF-8'))
+    #    f.write(bytes("ALL TESTS PASSED\n", 'UTF-8'))
+    #    f.write(bytes("*"*80+"\n", 'UTF-8'))
+    #    f.close()
+    #    print("*"*80+"\n")
+    #    print("\n"+"*"*80+"\n")
+    #    print("ALL TESTS PASSED\n")
+    #    print("*"*80+"\n")
+    #    state = si.switch_state()
+    #    if state == "Offline":
+    #        anturlar.fos_cmd("switchenable")
+    #    else:
+    #        pass
     sys.exit()
 
 ###############################################################################

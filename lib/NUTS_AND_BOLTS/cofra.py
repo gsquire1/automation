@@ -371,15 +371,15 @@ class SwitchUpdate():
     """
     def __init__(self, ip, user, passw, chas_name, file_name):
         self.ip = ip
-        self.user = user
-        self.passw = passw
-        self.chas_name = chas_name
-        self.filename = file_name
         
-        host = sys.argv[1]
-        user = sys.argv[2]
-        password = sys.argv[7]
+    def playback_licenses_to_switch():
+        """
+        Replay Licenses back to switch. The ""Switch_Info_for_playback_",switch_ip,".txt" ""
+        must already be written and available in logs/ file.
+        """
+        
         si = anturlar.SwitchInfo()
+        cs = anturlar.configSwitch()
         switch_ip = si.ipaddress()
     
         f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
@@ -387,23 +387,20 @@ class SwitchUpdate():
             with open(f, 'r') as file:
                 a = file.read()
         except IOError:
-            print("\n\nThere was a problem opening the file" , f)
+            print("\n\nThere was a problem opening the file:" , f)
             sys.exit()
-        #ras = re.findall('LICENSE LIST\s+:\s+(\[.+\])', a)
         ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
         b = ras[0]
         c = b.split(",")
         for i in c:
-            d = i.strip(" '")
             anturlar.fos_cmd("licenseadd %s" % i)
-            #liabhar.JustSleep(1)
-        anturlar.fos_cmd("echo y | reboot") ##### Not sure if we need reboot here or somwhere else in the class
-        print('\n\nSleeping: 150')
-        liabhar.JustSleep(150)   
-        anturlar.connect_tel_noparse(host, user, password)
+        a = cs.reboot()
+        if a != "Online":
+            anturlar.fos_cmd("switchenable")    
         anturlar.fos_cmd('licenseshow')
         return(True)
-        
+    
+    
     
 ###############################################################################
 def bladeportmap_Info(blade = 0):
@@ -1270,38 +1267,38 @@ def get_info_from_the_switch():
     
     return(switch_dict)
     
-def playback_info_from_the_switch():
-    """
-    scratch area for SwitchUpdate class
-    """
-    
-    host = sys.argv[1]
-    user = sys.argv[2]
-    password = sys.argv[7]
-    si = anturlar.SwitchInfo()
-    switch_ip = si.ipaddress()
-
-    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
-    try:
-        with open(f, 'r') as file:
-            a = file.read()
-    except IOError:
-        print("\n\nThere was a problem opening the file:" , f)
-        sys.exit()
-    #ras = re.findall('LICENSE LIST\s+:\s+(\[.+\])', a)
-    ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
-    b = ras[0]
-    c = b.split(",")
-    for i in c:
-        d = i.strip(" '")
-        anturlar.fos_cmd("licenseadd %s" % i)
-        #liabhar.JustSleep(1)
-    anturlar.fos_cmd("echo y | reboot") ##### Not sure if we need reboot here or somwhere else in the class
-    print('\n\nSleeping: 150')
-    liabhar.JustSleep(150)   
-    anturlar.connect_tel_noparse(host, user, password)
-    anturlar.fos_cmd('licenseshow')
-    return(True)
+#def playback_info_from_the_switch():
+#    """
+#    scratch area for SwitchUpdate class
+#    """
+#    
+#    host = sys.argv[1]
+#    user = sys.argv[2]
+#    password = sys.argv[7]
+#    si = anturlar.SwitchInfo()
+#    switch_ip = si.ipaddress()
+#
+#    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+#    try:
+#        with open(f, 'r') as file:
+#            a = file.read()
+#    except IOError:
+#        print("\n\nThere was a problem opening the file:" , f)
+#        sys.exit()
+#    #ras = re.findall('LICENSE LIST\s+:\s+(\[.+\])', a)
+#    ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
+#    b = ras[0]
+#    c = b.split(",")
+#    for i in c:
+#        #d = i.strip(" '")
+#        anturlar.fos_cmd("licenseadd %s" % i)
+#        #liabhar.JustSleep(1)
+#    #anturlar.fos_cmd("echo y | reboot") ##### Not sure if we need reboot here or somwhere else in the class
+#    #print('\n\nSleeping: 150')
+#    #liabhar.JustSleep(150)   
+#    #anturlar.connect_tel_noparse(host, user, password)
+#    anturlar.fos_cmd('licenseshow')
+#    return(True)
     
     
     
