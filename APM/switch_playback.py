@@ -775,18 +775,18 @@ def main():
     ####time.sleep(360)
     ###cons_out = sw_set_pwd_timeout(usr_psswd)
     
-    #tn.close()
+    tn.close()
     
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
    
-    
+    print(my_ip)
     
     cc = cofra.SwitchUpdate(my_ip)
     cons_out = cc.playback_licenses_to_switch()
     
-    
+    print(cons_out)
     
     tn.write(b"exit\n")
     tn.close()

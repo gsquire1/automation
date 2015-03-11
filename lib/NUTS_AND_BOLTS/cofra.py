@@ -380,7 +380,7 @@ class SwitchUpdate():
         """
         
         si = anturlar.SwitchInfo()
-        cs = anturlar.configSwitch()
+        cs = anturlar.ConfigSwitch()
         switch_ip = si.ipaddress()
     
         f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
