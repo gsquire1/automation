@@ -369,9 +369,15 @@ class SwitchUpdate():
     Grab switch info needed for a complete rebuild. This includes ?????????
     
     """
+<<<<<<< HEAD
+    def __init__(self, ip, user = "root", password = "password"):
+=======
     global tn
     def __init__(self, ip):
+>>>>>>> 62afecf1f66331873ca94c26fb6e41afd432159d
         self.ip = ip
+        self.user = user
+        self.password = password
         
     def playback_licenses_to_switch(self):
         """
@@ -402,12 +408,9 @@ class SwitchUpdate():
         return(True)
     
     def reboot(self):
-        host = sys.argv[1]
-        user = sys.argv[2]
-        password = sys.argv[7]
         fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
-        connect_tel_noparse(host, user, password)
+        connect_tel_noparse(self.ip, self.user, self.password)
         liabhar.count_down(10)
         state = SwitchInfo.switch_state(self)
         return(state)
