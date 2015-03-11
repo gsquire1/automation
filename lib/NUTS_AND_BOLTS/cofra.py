@@ -369,7 +369,7 @@ class SwitchUpdate():
     Grab switch info needed for a complete rebuild. This includes ?????????
     
     """
-    def __init__(self, ip, user, passw, chas_name, file_name):
+    def __init__(self, ip):
         self.ip = ip
         
     def playback_licenses_to_switch():
@@ -399,6 +399,18 @@ class SwitchUpdate():
             anturlar.fos_cmd("switchenable")    
         anturlar.fos_cmd('licenseshow')
         return(True)
+    
+    def reboot(self):
+        host = sys.argv[1]
+        user = sys.argv[2]
+        password = sys.argv[7]
+        fos_cmd("echo Y | reboot")
+        liabhar.count_down(120)
+        connect_tel_noparse(host, user, password)
+        liabhar.count_down(10)
+        state = SwitchInfo.switch_state(self)
+        return(state)
+
     
     
     
