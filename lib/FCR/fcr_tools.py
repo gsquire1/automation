@@ -27,10 +27,13 @@ GLOBAL_CONSTANT_NAME            ClassName
 """
 
 def test_anturlar_functions():
+    #a = ex_port_list()
     #fcri = anturlar.FcrInfo()
-    si = anturlar.SwitchInfo()
-    a = si.allow_xisl()
-    print(a)
+    #si = anturlar.SwitchInfo()
+    su = cofra.SwitchUpdate
+    #a = si.allow_xisl()
+    b = su.playback_licenses_to_switch()
+    print(b)
     sys.exit()
 
 def bb_fabric_switch_status():
@@ -79,17 +82,12 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
         configdownload [- all ] [-p scp | -scp ] ["host","user","path"]
         
     """
-    #### capture maps config all FIDS
-    #### capture flow config all FIDS
-    ####
-    
     sw_info = anturlar.SwitchInfo()
     sw_info_ls = sw_info.ls()
     fid_now = sw_info.ls_now()
     
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
-     
     
     f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
     
@@ -195,67 +193,6 @@ def configdl(clear = 0):
     
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
-     
-    
-    #f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
-    #
-    #if clear == 1 :
-    #    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-    #else:
-    #    ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
-    #    
-    #header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",sw_ip, "\n==============================\n\n")  
-    #ff.write(header)
-    #ff.close()
-    #
-    #ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-    #ff.write(str(sw_info_ls))
-    #ff.write("\n"*2)
-    
-    #for i in sw_info_ls:
-    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
-    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("\nMAPS CONFIG::"+i+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("relayconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #ff.write("="*80+"\n")
-    #ff.write("\n"*10)
     
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
     #cons_out = anturlar.fos_cmd(" ")
@@ -325,10 +262,53 @@ def switch_status():
     switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
     return (switch_info)
 
+#def ex_deconfig():
+#    fcri = anturlar.FcrInfo()
+#    test = fcri.ex_deconfig()
+#    print('\n\nAll EX_ports found are now deconfigured.')
+
+def ex_port_list():
+    """
+    Grabs only ONLINE EX-Ports. Parses "switchshow" for EX-Ports.
+    """
+    si = anturlar.SwitchInfo()
+    ex_list = si.ex_ports()
+    #print('*************')
+    #print(ex_list)
+    
+   
 def ex_deconfig():
-    fcri = anturlar.FcrInfo()
-    test = fcri.ex_deconfig()
+    """
+    Find all EX-Ports AND VEX-Ports on either director or pizzabox and deconfigure.
+    This parses "portcfgshow" command for any EX-Port, online or not, and deconfigures. This includes
+    VEX ports as well.
+    """
+    si = anturlar.SwitchInfo()
+    anturlar.fos_cmd("switchdisable")
+    portlist =  si.all_ports()
+    if si.am_i_director:
+        for i in portlist:
+            slot = i[0]
+            port = i[1]
+            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+            cmd = anturlar.fos_cmd("portcfgshow %a/%a" % (slot, port))
+            ex = pattern.search(cmd)
+            if ex:
+                anturlar.fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2"))
+                anturlar.fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a2"))
+    else: 
+        for i in portlist:
+            print(i)
+            port = i[1]
+            pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+            cmd = anturlar.fos_cmd("portcfgshow %a" % port)
+            ex = pattern.search(cmd)
+            if ex:
+                anturlar.fos_cmd("portcfgexport %s %s"%(port,"-a2"))
+                anturlar.fos_cmd("portcfgvexport %s %s"%(port,"-a2"))
+    cmd_cap = anturlar.fos_cmd("switchenable")
     print('\n\nAll EX_ports found are now deconfigured.')
+    return(cmd_cap)
 
 def ex_slots_find():
     """

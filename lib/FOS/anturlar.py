@@ -915,6 +915,31 @@ class SwitchInfo:
         sn = str(ras[0])
         return(sn)
     
+    def switch_status(self):
+        """
+            Retrieve FCR fabric and return info. Variable #'s:
+            0) Switch name
+            1) IP address
+            1) Chassis or Pizza Box
+            2) VF or not
+            3) FCR Enabled
+            4) Base Configured
+            
+            return dictionary with {switch_name, ipaddr, chassis, vf_enabled, base, fcr_enabled}}
+        """
+        fcrinfo = anturlar.FcrInfo()
+        initial_checks = fcrinfo.sw_basic_info()
+        print('\n\n'+ '='*20)
+        print("Switch Name :  %s" % initial_checks[0])
+        print("IP address :  %s" % initial_checks[1])
+        print("Chassis :  %s" % initial_checks[2])
+        print("VF enabled :  %s" % initial_checks[3])
+        print("FCR enabled :  %s" % initial_checks[4])
+        print("Base configured :  %s" % initial_checks[5])
+        print('='*20 + '\n\n')
+        switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
+        return (switch_info)
+    
     def switch_type(self ):
         """
            get the current switch type number from switchshow
@@ -1006,33 +1031,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
         backbone_ip = self.fcr_backbone_ip()
         return(backbone_ip)
     
-    def ex_deconfig(self):
-        """
-        Find all EX-Ports AND VEX-Ports on either director or pizzabox and deconfigure.   
-        """
-        fos_cmd("switchdisable")
-        portlist =  self.all_ports()
-        if self.am_i_director:
-            for i in portlist:
-                slot = i[0]
-                port = i[1]
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2"))
-                    fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a2"))
-        else: 
-            for i in portlist:
-                pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
-                cmd = fos_cmd("portcfgshow %a" % i)
-                ex = pattern.search(cmd)
-                if ex:
-                    fos_cmd("portcfgexport "+i+" -a2")
-                    fos_cmd("portcfgvexport "+i+" -a2")
-        cmd_cap = fos_cmd("switchenable")        
-        return(cmd_cap)
-    
+
     def get_fabwide_ip(self):
         """
         OBSOLETE ###################
@@ -1485,9 +1484,17 @@ class configSwitch(SwitchInfo):
         liabhar.count_down(10)
         state = SwitchInfo.switch_state(self)
         return(state)
-        
-                      
     
+    def reboot(self):
+        host = sys.argv[1]
+        user = sys.argv[2]
+        password = sys.argv[7]
+        fos_cmd("echo Y | reboot")
+        liabhar.count_down(120)
+        connect_tel_noparse(host, user, password)
+        liabhar.count_down(10)
+        state = SwitchInfo.switch_state(self)
+        return(state)
 
 class Maps(SwitchInfo):
     
