@@ -636,9 +636,6 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
     all_list += [ras_base]
     all_list += [ras_switchname]
         
-        
-      
-    sys.exit()
     
     return(all_list)
 
@@ -745,58 +742,58 @@ def main():
     
  
     
-    
-    l_list = replay_from_file(my_ip, license)
-    for l in l_list:
-        print("#"*44)
-        cons_out = send_cmd("licenseadd %s " % l)
-        
-    print("@"*44)
-    
-    print(l_list)  
-        
+ 
         
 ###############################################################################
 ####
 ####  reboot and find the command prompt
 ####
-    sys.exit()
+     
     
     
-    cons_out = stop_at_cmd_prompt(9)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print(cons_out)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    cons_out = env_variables(sw_type, 9)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    print(cons_out)
-    load_kernel(sw_type, my_ip, pa.firmware)
+    ###cons_out = stop_at_cmd_prompt(9)
+    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    ###print(cons_out)
+    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    ###cons_out = env_variables(sw_type, 9)
+    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    ###print(cons_out)
+    ###load_kernel(sw_type, my_ip, pa.firmware)
+    ###
+    ###for pp in range(0, len(power_pole_info), 2):
+    ###    print('POWERPOLE')
+    ###    print(power_pole_info[pp])
+    ###    print(power_pole_info[pp+1])
+    ###    
+    ###    
+    ###    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
+    ###
+    ####### is there another way to tell if switch is ready ??
+    ####### instead of waiting 
+    ####time.sleep(360)
+    ###cons_out = sw_set_pwd_timeout(usr_psswd)
     
-    for pp in range(0, len(power_pole_info), 2):
-        print('POWERPOLE')
-        print(power_pole_info[pp])
-        print(power_pole_info[pp+1])
-        
-        
-        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
+    #tn.close()
     
-    #### is there another way to tell if switch is ready ??
-    #### instead of waiting 
-    #time.sleep(360)
-    cons_out = sw_set_pwd_timeout(usr_psswd)
+    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    
+    print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
+   
     
     
+    cc = cofra.SwitchUpdate(my_ip)
+    cons_out = cc.playback_licenses_to_switch()
     
-    cc = cofra.SwitchUpdate()
     
     
     tn.write(b"exit\n")
     tn.close()
-    
-    
-    
+     
+    dt = liabhar.dateTimeStuff()
+    date_is = dt.current()
+    print(date_is)
     
 if __name__ == '__main__':
     

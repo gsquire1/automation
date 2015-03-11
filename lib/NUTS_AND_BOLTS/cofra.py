@@ -369,12 +369,17 @@ class SwitchUpdate():
     Grab switch info needed for a complete rebuild. This includes ?????????
     
     """
+<<<<<<< HEAD
     def __init__(self, ip, user = "root", password = "password"):
+=======
+    global tn
+    def __init__(self, ip):
+>>>>>>> 62afecf1f66331873ca94c26fb6e41afd432159d
         self.ip = ip
         self.user = user
         self.password = password
         
-    def playback_licenses_to_switch():
+    def playback_licenses_to_switch(self):
         """
         Replay Licenses back to switch. The ""Switch_Info_for_playback_",switch_ip,".txt" ""
         must already be written and available in logs/ file.
