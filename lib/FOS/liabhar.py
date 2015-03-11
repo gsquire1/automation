@@ -32,20 +32,20 @@ class dateTimeStuff:
     def __init__(self):
         pass
     
-    def current():
+    def current(self):
         i = datetime.datetime.today()  #### ISO format 2013-02-21 06:35:45.707450
         return i 
     
-    def stamp():
+    def stamp(self):
         t = time.time()  #### timestamp in form 1361446545.52
                          #### use datetime.dat e.fromtimestamp(t) to get a date 2013-02-21
         return t
     
-    def simple():
+    def simple(self):
         s = datetime.date.today()  #### format is 2013-02-21
         return s
     
-    def ordinal():
+    def ordinal(self):
         o = today.toordinal() #### format is 734920
         return o
 
