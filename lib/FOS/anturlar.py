@@ -1540,9 +1540,13 @@ class Maps(SwitchInfo):
         ras = re.compile('([_\w\d]+)\s+(?=:)')
         ras = ras.findall(capture_cmd)
         i = 0
-        while i <=2:
-            ras.pop(0)
-            i +=1
+        try:
+            while i <=2:
+                ras.pop(0)
+                i +=1
+        except IndexError:
+            return("")
+            
         ras_str = str(ras)
         ras_str = ras_str.replace("'","")
         ras_str = ras_str.replace("[","")

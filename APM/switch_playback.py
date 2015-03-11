@@ -22,7 +22,7 @@ import anturlar
 import liabhar
 import cofra
 import csv
-
+import time
 
 ###############################################################################
 ####
@@ -228,7 +228,7 @@ def env_variables(swtype, db=0):
     bootargs  = "ip=off"
     ethrotate = "no"
     server_ip = "10.38.2.40"
-    ethact    = "ENETO"
+    ethact    = "ENET0"
     
     if swtype == 133:
         print("ODIN")
@@ -267,37 +267,43 @@ def env_variables(swtype, db=0):
 def pwr_cycle(pwr_ip, pp, db=0):
     
     tnn = anturlar.connect_tel_noparse_power(pwr_ip, 'user', 'pass', db)
-    anturlar.power_cmd("cd access/1\t/1\t%s" % pp )
+    anturlar.power_cmd("cd access/1\t/1\t%s" % pp ,10)
      
-    anturlar.power_cmd("show\r\n" )
+    anturlar.power_cmd("show\r\n" ,10)
     
-    anturlar.power_cmd("cycle")
-    anturlar.power_cmd("yes")
+    anturlar.power_cmd("cycle" ,10)
+    anturlar.power_cmd("yes", 10)
     
     
     liabhar.JustSleep(10)
-    anturlar.power_cmd("exit")
+    anturlar.power_cmd("exit", 10)
      
+    print("\r\n"*10)
+    print("Waiting for the switch to boot")
+    print("\r\n"*5)
+    
     return(0) 
     
 def load_kernel(switch_type, sw_ip, frm_version):
     
     reg_list = [ b"=>"]
     reg_bash = [ b"bash-2.04#"]
+    reg_linkup = [ b"link is up"]
+    
     #### set tftp command
     ras = re.compile('([\.a-z0-9]+)(?:_)')
     ras = ras.search(frm_version)
     frm_no_bld = ras.group(1)
     
     
-    if switch_type == 133:  ####  ODIN
+    if switch_type == '133':  ####  ODIN
         nbt = "tftpboot 0x1000000 net_install26_odin.img\r\n"
         tn.write(nbt.encode('ascii'))
         capture = tn.expect(reg_list, 300)
         tn.write(b"bootm 0x1000000\r\n")
         capture = tn.expect(reg_bash, 300)
         
-    if (switch_type == 66 or switch_type == 71 or switch_type == 118 or switch_type == 109):
+    if (switch_type == '66' or switch_type == '71' or switch_type == '118' or switch_type == '109'):
         #### 5100  Stinger   tomahawk  tom_too
         nbt = "tftpboot 0x1000000 net_install_v7.2.img\r\n"
         tn.write(nbt.encode('ascii'))
@@ -305,7 +311,7 @@ def load_kernel(switch_type, sw_ip, frm_version):
         tn.write(b"bootm 0x1000000\r\n")
         capture = tn.expect(reg_bash, 300)
         
-    if (switch_type == 120 or switch_tyep == 121 or switch_type == 64 or switch_type == 83):
+    if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83'):
         ####  DCX zentron  pluto zentron  thor  7800
         nbt = "tftpboot 0x1000000 net_install26_8548.img\r\n"
         tn.write(nbt.encode('ascii'))
@@ -314,44 +320,47 @@ def load_kernel(switch_type, sw_ip, frm_version):
         capture = tn.expect(reg_bash, 300)
         
         
-    if switch_type == 148:  #### SKYBOLT
+    if switch_type == '148':  #### SKYBOLT
         tn.write(b"makesinrec 0x1000000 \r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x2000000  skybolt/uImage \r\n")
+        tn.write(b"tftpboot 0x2000000  skybolt/uImage\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt \r\n")
+        tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb \r\n")
+        tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \r\n")
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
         caputure = tn.expect(reg_bash,300)
         
-    if (switch_type == 141 or switch_type == 142):  #### YODA 
+    if (switch_type == '141' or switch_type == '142'):  #### YODA 
         tn.write(b"makesinrec 0x1000000 \r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x2000000 yoda/uImage \r\n")
+        tn.write(b"tftpboot 0x2000000 yoda/uImage\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x3000000 yoda/ramdisk.yoda \r\n")
+        tn.write(b"tftpboot 0x3000000 yoda/ramdisk.yoda\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x4000000 yoda/silkworm_yoda.dtb \r\n")
+        tn.write(b"tftpboot 0x4000000 yoda/silkworm_yoda.dtb\r\n")
         capture = tn.expect(reg_bash,300)
-        tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \r\n")
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
         caputure = tn.expect(reg_bash,300)
         
         
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
     capture = tn.expect(reg_bash, 300)
-    tn.write(b"ifconfig eth0 %s netmask 255.255.240.0 \r\n" % sw_ip )
+    i = "ifconfig eth0 %s netmask 255.255.240.0\r\n" % sw_ip 
+    tn.write(i.encode('ascii'))
     capture = tn.expect(reg_bash, 300)
-    tn.write(b"route add default gw 10.38.32.1 \r\n")
+    tn.write(b"route add default gw 10.38.32.1\r\n")
+    capture = tn.expect(reg_linkup,60)
+    tn.write(b"\r\n")
     capture = tn.expect(reg_bash, 300)
     tn.write(b"mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n")
     capture = tn.expect(reg_bash, 300)
     ### firmwarepath
-    firmpath = "cd /loadSQA/fos/%s/%s" % (frm_no_bld, frm_version)
+    firmpath = "cd /load/SQA/fos/%s/%s\r\n" % (frm_no_bld, frm_version)
     tn.write(firmpath.encode('ascii'))
     capture = tn.expect(reg_bash,600)
-    
+    #### need to capture when this hangs anc was not able to connect to the server  
     tn.write(b"./install release\r\n")
     capture = tn.expect(reg_bash,600)
 
@@ -494,7 +503,9 @@ def pwr_pole_info(chassis_name):
             if pwer4_ip:
                 p += [pwer4_ip]
                 p += [pwer4_prt]
-                
+            
+
+    
     return(p)
 
 def get_user_and_pass(chassis_name):
@@ -520,7 +531,6 @@ def get_user_and_pass(chassis_name):
             
     return(u_and_p)
  
-
 def get_ip_from_file(chassis_name):
     """
     
@@ -539,7 +549,100 @@ def get_ip_from_file(chassis_name):
             ip = (line['IP Address'])
                         
     return(ip)
+
+def sw_set_pwd_timeout(pswrd):
    
+    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
+    reg_login = [ b"login:"]
+    reg_assword = [ b"assword: ", b"root> "]
+    reg_change_pass = [ b"key to proceed", b"incorrect" ]
+    reg_complete   = [ b"zation completed"]
+    reg_linertn    = [ b"\\r\\n" ]
+    
+    capture = tn.expect(reg_complete, 600)
+    tn.write(b"\r\n")
+    capture = tn.expect(reg_linertn)
+    capture = tn.expect(reg_login, 60)
+    
+    tn.write(b"root\r\n")
+    capture = tn.expect(reg_assword, 20)
+    tn.write(b"fibranne\r\n")
+    capture = tn.expect(reg_change_pass, 20)
+    tn.write(b"\r\n")
+    capture = tn.expect(reg_linertn)
+    
+    while True:    
+        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
+        #### if root is found break out 
+        if capture[0] == 1:
+            print(capture)
+            print("this found root")
+            break
+        tn.write(b"password\r\n")
+  
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"root\r\n")
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"password\r\n")
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"timeout 0 \r\n")
+    capture = tn.expect(reg_list, 20)
+    
+    return(tn)
+   
+def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
+    """
+        open the log file for reading and add the following
+        1. license
+        2. create fids and base switch is previously set
+        3. put ports into the FIDS
+        4. update domains
+        5. update switch name
+        6. enable fcr
+        7.
+    """
+    
+    ff = ""
+    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+    print(f)
+    
+    try:
+        with open(f, 'r') as file:
+            ff = file.read()
+    except IOError:
+        print("\n\nThere was a problem opening the file" , f)
+        sys.exit()
+        
+    print("look for the info\r\n")
+    print(ff)
+    ras_license     = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', ff)
+    
+    print(ras_license)
+    ras_ls_list     = re.findall('LS LIST\s+:\s+\[(.+)\]', ff)
+    ras_base        = re.findall('BASE SWITCH\s+:\s+\[(.+)\]', ff)
+    ras_switchname  = re.findall('SWITCH NAME\s+:\s+\[(.+)\]', ff)
+    ras_vf          = re.findall('VF SETTING\s+:\s+\[(.+)\]', ff)
+    ras_fcr         = re.findall('FCR ENABLED\s+:\s+\[(.+)\]', ff)
+    ras_xisl        = re.findall('ALLOW XISL\s+:\s+\[(.+)\]', ff)
+    ras_ports       = re.findall('Ports\s+:\s+\[(.+)\]', ff)
+    
+    ll = ras_license[0]
+    ll.replace("'","")        #### remove the comma with string command  
+    lic_list = ll.split(",")  #### change the data from string to list
+
+    all_list = []
+    all_list += [lic_list]
+    all_list += [ras_ls_list]
+    all_list += [ras_base]
+    all_list += [ras_switchname]
+        
+        
+      
+    sys.exit()
+    
+    return(all_list)
+
+    
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -587,7 +690,7 @@ def main():
     #### pass to login procedure
     #### already have username password
     
-    cons_out = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
     sw_dict = cofra.get_info_from_the_switch()
     #print("\n\n\nGET IP")
@@ -634,20 +737,31 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
-     
+    
     anturlar.close_tel()
+
     connect_console(console_ip, user_name, usr_pass, console_port)
     cons_out = send_cmd("switchshow")
-    #print("**************************************************************")
-    #print("\n\n\n\n\n\n\n\n\n\n")
-    #cmd_list = ["switchshow", "fabricshow", "mapsdb --show"]
-    #for c in cmd_list:
-    #    cons_out = send_cmd(c)
-
+    
+ 
+    
+    
+    l_list = replay_from_file(my_ip, license)
+    for l in l_list:
+        print("#"*44)
+        cons_out = send_cmd("licenseadd %s " % l)
+        
+    print("@"*44)
+    
+    print(l_list)  
+        
+        
 ###############################################################################
 ####
 ####  reboot and find the command prompt
 ####
+    sys.exit()
+    
     
     cons_out = stop_at_cmd_prompt(9)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
@@ -667,6 +781,16 @@ def main():
         
         
         pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
+    
+    #### is there another way to tell if switch is ready ??
+    #### instead of waiting 
+    #time.sleep(360)
+    cons_out = sw_set_pwd_timeout(usr_psswd)
+    
+    
+    
+    cc = cofra.SwitchUpdate()
+    
     
     tn.write(b"exit\n")
     tn.close()
