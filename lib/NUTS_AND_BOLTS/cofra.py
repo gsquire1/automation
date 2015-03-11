@@ -398,18 +398,19 @@ class SwitchUpdate():
         c = b.split(",")
         for i in c:
             anturlar.fos_cmd("licenseadd %s" % i)
-        a = cs.reboot()
+        self.reboot()
         if a != "Online":
             anturlar.fos_cmd("switchenable")    
         anturlar.fos_cmd('licenseshow')
         return(True)
     
     def reboot(self):
-        fos_cmd("echo Y | reboot")
+        anturlar.fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
-        connect_tel_noparse(self.ip, self.user, self.password)
+        anturlar.connect_tel_noparse(self.ip, self.user, self.password)
         liabhar.count_down(10)
-        state = SwitchInfo.switch_state(self)
+        si = anturlar.SwitchInfo()
+        state = si.switch_state()
         return(state)
 
     
