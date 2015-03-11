@@ -369,12 +369,9 @@ class SwitchUpdate():
     Grab switch info needed for a complete rebuild. This includes ?????????
     
     """
-<<<<<<< HEAD
+
     def __init__(self, ip, user = "root", password = "password"):
-=======
-    global tn
-    def __init__(self, ip):
->>>>>>> 62afecf1f66331873ca94c26fb6e41afd432159d
+
         self.ip = ip
         self.user = user
         self.password = password
