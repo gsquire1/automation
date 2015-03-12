@@ -407,17 +407,18 @@ class SwitchUpdate():
     def reboot(self):
         anturlar.fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
-        connect_tel_noparse(self.ip, self.user, self.password)
-        #liabhar.count_down(10)
-        state = SwitchInfo.switch_state(self)
-        while state == ("Offline"):
+        try:
+            tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
+            si = anturlar.SwitchInfo()
+            state = si.synchronized()
+        except:
+            pass
+        while state:
             liabhar.JustSleep(30)
-            state = SwitchInfo.switch_state(self) 
-        anturlar.connect_tel_noparse(self.ip, self.user, self.password)
-        liabhar.count_down(10)
-        si = anturlar.SwitchInfo()
-        state = si.switch_state()
-        return(state)
+            state = si.synchronized()
+        #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
+        #liabhar.count_down(10)
+        return(tn)
 
     
     
