@@ -408,8 +408,11 @@ class SwitchUpdate():
         fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
         connect_tel_noparse(self.ip, self.user, self.password)
-        liabhar.count_down(10)
+        #liabhar.count_down(10)
         state = SwitchInfo.switch_state(self)
+        while state == ("Offline"):
+            liabhar.JustSleep(30)
+            state = SwitchInfo.switch_state(self) 
         return(state)
 
     
