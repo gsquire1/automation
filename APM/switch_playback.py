@@ -788,8 +788,9 @@ def main():
     
     print(cons_out)
     
-    tn.write(b"exit\n")
-    tn.close()
+    anturlar.close_tel()
+    #tn.write(b"exit\n")
+    #tn.close()
      
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
