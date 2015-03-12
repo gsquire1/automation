@@ -468,20 +468,21 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     anturlar.fos_cmd('licenseshow')
     return(True)
 
-def reboot_sequence(iterations):
-    cs = anturlar.ConfigSwitch()
+def reboot_sequence(iterations, ip):
+    """
+    """
+    cs = cofra.SwitchUpdate(ip)
     while iterations >= 1:
-        a = cs.reboot()
+        cs.reboot_reconnect()
         iterations -= 1
-        print(a)
-        print('NUMBERNUMBER')
+        #print(a)
+        #print('NUMBERNUMBER')
         print(iterations) 
-        if a == ("Online"):
-            c = anturlar.fos_cmd("lsanzoneshow - s | grep Configured")
-            if c:
-                print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-                print(c)
-                sys.exit(0)
+        cons_out = anturlar.fos_cmd("lsanzoneshow - s | grep Configured")
+        if cons_out == ("Configured"):
+            print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+            print(c)
+            sys.exit(0)
         
         
         

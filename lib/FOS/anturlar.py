@@ -613,7 +613,7 @@ class SwitchInfo:
 
     def director(self):
         """
-            return a 1 if this switch is a director
+            return a True if this switch is a director
         """
         return(self.am_i_director)
     
@@ -1491,17 +1491,17 @@ class ConfigSwitch(SwitchInfo):
         state = SwitchInfo.switch_state(self)
         return(state)
     
-    def reboot(self):
-        host = sys.argv[1]
-        user = sys.argv[2]
-        password = sys.argv[7]
-        fos_cmd("echo Y | reboot")
-        liabhar.count_down(120)
-        connect_tel_noparse(host, user, password)
-        liabhar.count_down(10)
-        
-        state = SwitchInfo.switch_state(self)
-        return(state)
+    #def reboot(self):
+    #    host = sys.argv[1]
+    #    user = sys.argv[2]
+    #    password = sys.argv[7]
+    #    fos_cmd("echo Y | reboot")
+    #    liabhar.count_down(120)
+    #    connect_tel_noparse(host, user, password)
+    #    liabhar.count_down(10)
+    #    
+    #    state = SwitchInfo.switch_state(self)
+    #    return(state)
 
 class Maps(SwitchInfo):
     

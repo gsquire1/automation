@@ -404,20 +404,44 @@ class SwitchUpdate():
         anturlar.fos_cmd('licenseshow')
         return(True)
     
-    def reboot(self):
+    def reboot_reconnect(self):
         anturlar.fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
         try:
             tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
             si = anturlar.SwitchInfo()
-            state = si.synchronized()
+            
+            chassis = si.director()
+            print("**********************************")
+            print(chassis)
+
+            if chassis:
+                state = si.synchronized()
+            else:
+                state = si.switch_state()
+                print(")))))))))))))))")
+                print(state)
+                print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                if state == ("Online"):
+                    state = True
+                    print(state)
+                else:
+                    state = False
+                    
         except:
             pass
-        while state:
-            liabhar.JustSleep(30)
-            state = si.synchronized()
+        while not state:
+            liabhar.count_down(33)
+            if chassis:
+                state = si.synchronized()
+            else:
+                state = si.switch_state()
+                if state == ("Online"):
+                    state = True
+                else:
+                    state = False
+            #state = si.synchronized()
         #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
-        #liabhar.count_down(10)
         return(tn)
 
     
