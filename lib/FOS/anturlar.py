@@ -124,7 +124,7 @@ class FabricInfo:
         fablist_base = fablist
         #for f in fablist_base:
         #print("\n\n\n\n\nFCR FAB BASE LIST   ", fablist_base, "\n\n\n\n")
-        conn_value = connect_tel(pa,pw)
+        conn_value = connect_tel(pa,pw)  #### requires FID ??
         capture_cmd = fos_cmd("")
         capture_cmd = fos_cmd("fcrfabricshow")
         ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
@@ -592,11 +592,11 @@ class SwitchInfo:
         ras = ras.findall(cn)
         return(ras)
     
-    def d_ports(self):
-        """
-            this does not work because the getportlist requires the port
-        """ 
-        return(self.__getportlist__("D-Port"))
+    #def d_ports(self):
+    #    """
+    #        this does not work because the getportlist requires the port
+    #    """ 
+    #    return(self.__getportlist__("D-Port"))
      
     def default_switch(self):
         """
@@ -933,7 +933,7 @@ class SwitchInfo:
             
             return dictionary with {switch_name, ipaddr, chassis, vf_enabled, base, fcr_enabled}}
         """
-        fcrinfo = anturlar.FcrInfo()
+        fcrinfo = self.FcrInfo()
         initial_checks = fcrinfo.sw_basic_info()
         print('\n\n'+ '='*20)
         print("Switch Name :  %s" % initial_checks[0])
@@ -946,7 +946,7 @@ class SwitchInfo:
         switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
         return (switch_info)
     
-    def switch_type(self ):
+    def switch_type(self):
         """
            get the current switch type number from switchshow
            return the type number

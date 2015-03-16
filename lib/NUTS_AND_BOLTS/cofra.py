@@ -184,7 +184,7 @@ class DoSupportsave():
 
 class DoFirmwaredownloadChoice():
     """
-        do a firmware download to 7.3.x or 7.2.1 builds depending on what
+        do a firmware download to 7.4.x or 7.3.1 builds depending on what
         is already on the switch
         
     """
@@ -192,6 +192,7 @@ class DoFirmwaredownloadChoice():
         self.firmdown = firmdown
         self.firmup = firmup
         #self.check_version()
+        
         self.start()
         
     
@@ -238,10 +239,10 @@ class DoFirmwaredownloadChoice():
         print("RAS IS     %s\n"%(ras))
         if ras != self.firmup:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmup)
         else:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.1/%s,fwdlacct"%(self.firmdown)
         reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
                        b'with new firmware', b'Firmware has been downloaded']
         
@@ -398,7 +399,7 @@ class SwitchUpdate():
         c = b.split(",")
         for i in c:
             anturlar.fos_cmd("licenseadd %s" % i)
-        self.reboot()
+        self.reboot_reconnect()
         if a != "Online":
             anturlar.fos_cmd("switchenable")    
         anturlar.fos_cmd('licenseshow')
