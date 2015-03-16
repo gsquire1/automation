@@ -29,11 +29,11 @@ GLOBAL_CONSTANT_NAME            ClassName
 def test_anturlar_functions():
     #a = ex_port_list()
     #fcri = anturlar.FcrInfo()
-    #si = anturlar.SwitchInfo()
+    si = anturlar.SwitchInfo()
     su = cofra.SwitchUpdate
-    #a = si.allow_xisl()
-    b = su.playback_licenses_to_switch()
-    print(b)
+    a = si.switch_status()
+    #b = su.playback_licenses_to_switch()
+    print(a)
     sys.exit()
 
 def bb_fabric_switch_status():
@@ -470,19 +470,27 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
 
 def reboot_sequence(iterations, ip):
     """
+    iterations and IP are passed in via the .txt file referred to in initial CLI.
     """
+    try:
+        while True:
+            number = (int(input('Enter the number of iterations you would ike to run: ')))
+            print(number)
+    except EOFError:
+        pass
+    print("The End")
+    sys.exit(0)
+    #print("WTF!!")
     cs = cofra.SwitchUpdate(ip)
+    iteration = iterations
     while iterations >= 1:
         cs.reboot_reconnect()
         iterations -= 1
-        #print(a)
-        #print('NUMBERNUMBER')
-        print(iterations) 
-        cons_out = anturlar.fos_cmd("lsanzoneshow - s | grep Configured")
-        if cons_out == ("Configured"):
-            print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-            print(c)
-            sys.exit(0)
+        cons_out = anturlar.fos_cmd("lsanzoneshow -s | grep Invalid")
+        print(cons_out)
+        print("NUMBER OF ITERATIONS LEFT: %s" % iterations)
+    print("Numer of iterations run without error is %s" % iteration)
+    sys.exit(0)
         
         
         

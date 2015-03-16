@@ -933,8 +933,8 @@ class SwitchInfo:
             
             return dictionary with {switch_name, ipaddr, chassis, vf_enabled, base, fcr_enabled}}
         """
-        fcrinfo = anturlar.FcrInfo()
-        initial_checks = fcrinfo.sw_basic_info()
+        #fcrinfo = FcrInfo()
+        initial_checks = self.__sw_basic_info__()
         print('\n\n'+ '='*20)
         print("Switch Name :  %s" % initial_checks[0])
         print("IP address :  %s" % initial_checks[1])
