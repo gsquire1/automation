@@ -1,4 +1,4 @@
-#!/opt/python3/bin/python3
+#!/usr/bin/env python3
 
 ###############################################################################
 #### Home location is
@@ -1723,7 +1723,7 @@ def tc_02_01_01_01():
     
     #fid_now = en.currentFID()
     
-    f = cofra.DoSupportsave('10.38.38.138','ftp2','ftp','chassisname')
+    f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','chassisname')
     
     x = 5555
     while x <= 3600:
@@ -1841,10 +1841,11 @@ def mem_monitor_test():
 
  
  
-def firmwaredownload(frmdwn ):
+def firmwaredownload(frmdwn, frmup):
     """
         uses cofra firmwaredownload to do testing for update to
         newest code
+        
         
     """
     
@@ -1861,7 +1862,7 @@ def firmwaredownload(frmdwn ):
     while True:
     #f = cofra.doFirmwareDownload(frmdwn)
         capture_cmd = anturlar.fos_cmd("version")
-        f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
+        f = cofra.DoFirmwaredownloadChoice(frmdwn,frmup)
         
         #
         #print("value of f is :  ")
@@ -1877,7 +1878,7 @@ def firmwaredownload(frmdwn ):
         en = anturlar.SwitchInfo()
         capture_cmd = anturlar.fos_cmd("version")
         
-        f = cofra.DoFirmwaredownloadChoice('v7.2.1c','v7.3.0b_rc1_bld06')
+        f = cofra.DoFirmwaredownloadChoice(frmdwn, frmup)
     
         anturlar.connect_tel_noparse(myip, 'root', 'password')
         en = anturlar.SwitchInfo()

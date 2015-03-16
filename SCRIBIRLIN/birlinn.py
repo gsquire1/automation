@@ -31,6 +31,7 @@ import fcr_tools
 import fos_gen_tc_0
 import traffic_tools
 import flow_tools
+import regression_python
 
 ###############################################################################
 ####   Print the summary of what will be tested                            ####
