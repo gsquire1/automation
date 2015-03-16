@@ -32,47 +32,47 @@ def chck_a():
     
     si = anturlar.SwitchInfo()
     does_allow_xisl   = si.allow_xisl()
-    #show_all_ports    = si.all_ports()
-    #show_all_ports_fc = si.all_ports_fc_only()
-    #base_y_n          = si.base_check()
-    #blade_8G          = si.blade_search_8GB()
-    #blades            = si.blades()
-    #blade_blank       = si.blank_type()
-    #fid_now           = si.currentFID()
-    #chass_name        = si.chassisname()
-    #dport             = si.d_ports()
-    #dflt_switch       = si.default_switch()
-    #dir_y_n           = si.director()
-    #disbled_ports     = si.disabled_ports()
-    #eports            = si.e_ports()
-    #exports           = si.ex_ports()
-    #vexports          = si.vex_ports()
-    #fports            = si.f_ports()
-    #fans              = si.fan_count()
-    #fcr_y_n           = si.fcr_enabled()
-    #gports            = si.g_ports()
-    #lic_lst           = si.getLicense()
-    #sw_ip             = si.ipaddress()
-    #lport             = si.loopback()
-    #ls_lst            = si.ls()
-    #ls_crnt           = si.ls_now()
-    #nports            = si.n_ports()
-    #pdports           = si.persistent_disabled_ports()
-    #sensors_lst_t     = si.sensor_t_f_ps("t")
-    #sensors_lst_t     = si.sensor_t_f_ps("f")
-    #sensors_lst_t     = si.sensor_t_f_ps("ps")
-    #sfpinfo           = si.sfp_info()
-    #sports            = si.sim_ports()
-    #swstate           = si.switch_state()
-    #sw_id             = si.switch_id()
-    #sw_name           = si.switch_name()
+    show_all_ports    = si.all_ports()
+    show_all_ports_fc = si.all_ports_fc_only()
+    base_y_n          = si.base_check()
+    blade_8G          = si.blade_search_8GB()
+    blades            = si.blades()
+    blade_blank       = si.blank_type()
+    fid_now           = si.currentFID()
+    chass_name        = si.chassisname()
+    dport             = si.d_ports()
+    dflt_switch       = si.default_switch()
+    dir_y_n           = si.director()
+    disbled_ports     = si.disabled_ports()
+    eports            = si.e_ports()
+    exports           = si.ex_ports()
+    vexports          = si.vex_ports()
+    fports            = si.f_ports()
+    fans              = si.fan_count()
+    fcr_y_n           = si.fcr_enabled()
+    gports            = si.g_ports()
+    lic_lst           = si.getLicense()
+    sw_ip             = si.ipaddress()
+    lport             = si.loopback()
+    ls_lst            = si.ls()
+    ls_crnt           = si.ls_now()
+    nports            = si.n_ports()
+    pdports           = si.persistent_disabled_ports()
+    sensors_lst_t     = si.sensor_t_f_ps("t")
+    sensors_lst_t     = si.sensor_t_f_ps("f")
+    sensors_lst_t     = si.sensor_t_f_ps("ps")
+    sfpinfo           = si.sfp_info()
+    sports            = si.sim_ports()
+    swstate           = si.switch_state()
+    sw_id             = si.switch_id()
+    sw_name           = si.switch_name()
     ##sw_status         = si.switch_status()  ### fcr info
-    #sw_type           = si.switch_type()
-    #sw_sync           = si.synchronized()
-    #sw_tmp            = si.temp_sensors()
-    #vf_y_n            = si.vf_enabled()
+    sw_type           = si.switch_type()
+    sw_sync           = si.synchronized()
+    sw_tmp            = si.temp_sensors()
+    vf_y_n            = si.vf_enabled()
     
-    ####  Fabric
+    ###  Fabric
     
     fi = anturlar.FabricInfo()
     sid_nums          = fi.sid_numbers()
@@ -84,9 +84,9 @@ def chck_a():
     fab_memb          = fi.fabric_members()
     fab_zone          = fi.zone_info()
     
-
-    ####  FCIP info
     
+    #####  FCIP info
+    #
     fc = anturlar.FcipInfo()
     fc_ge_ports        = fc.all_online_ge_ports()
     fc_ge_ports_dble   = fc.all_ge_port_disabled()
@@ -95,9 +95,24 @@ def chck_a():
     fc_ge_ports        = fc.ge_ports()
     
     
-
-
-
+    ####  DATE TIME STUFF
+    ####
+    
+    dt = liabhar.dateTimeStuff()
+    crrnt_date         = dt.current()
+    time_stamp         = dt.stamp()
+    time_simple        = dt.simple()
+ 
+    
+    print("\r\n"*5)
+    print(crrnt_date)
+    print(time_stamp)
+    print(time_simple)
+  
+    
+    liabhar.cls()
+    liabhar.count_down(5)
+    
 
 
 
