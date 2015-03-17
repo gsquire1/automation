@@ -11,7 +11,7 @@
 import anturlar
 import re
 import liabhar
-
+import cofra
 
 """
 Naming conventions --
@@ -33,7 +33,7 @@ def chck_a():
     si = anturlar.SwitchInfo()
     does_allow_xisl   = si.allow_xisl()
     show_all_ports    = si.all_ports()
-    show_all_ports_fc = si.all_ports_fc_only()
+    show_all_ports_fc = si.all_ports_fc_only()    
     base_y_n          = si.base_check()
     blade_8G          = si.blade_search_8GB()
     blades            = si.blades()
@@ -103,6 +103,9 @@ def chck_a():
     time_stamp         = dt.stamp()
     time_simple        = dt.simple()
  
+    ####  other stuff
+    
+    
     
     print("\r\n"*5)
     print(crrnt_date)
@@ -113,12 +116,38 @@ def chck_a():
     liabhar.cls()
     liabhar.count_down(5)
     
+    some_string_0 = "this is to compare different text strings"
+    some_string_1 = "this is to compare diff erent text strings"
+    some_string_2 = "this is to compare different text strings"
+    
+    case_1_diff  = liabhar.diff_compare(some_string_0, some_string_1)
+    case_2_diff   = liabhar.diff_compare(some_string_0, some_string_2)
+    
+    print("result of case 1 diff test   %s   " % case_1_diff  )
+    print("result of case 2 diff test   %s   " % case_2_diff  )
+
+    this_pltfrm_is  = liabhar.platform()
+    print("this platform is  %s  "  % this_pltfrm_is )
+    
+    print(liabhar.random_number())
+    print(liabhar.random_number_int(23))
+    
 
 
-
-
-
-
+    #### COFRA
+    
+    bld_port_map_info   = cofra.bladeportmap_Info(3)
+    port_stats_0        = cofra.PortStats()
+    fid_to_check        = "24"
+    fids_0              = cofra.fids_check(fid_to_check)
+    print("THIS IS FID CHECK %s  is on the switch  %s  " % (fid_to_check, fids_0 ))
+    print("Blade Port Map Info ")
+    print(bld_port_map_info)
+    print("PORT STATS  ")
+    print(port_stats_0)
+    
+    
+    clr_stats           = cofra.clear_stats()
 
 
 
