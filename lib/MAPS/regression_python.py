@@ -114,7 +114,7 @@ def chck_a():
   
     
     liabhar.cls()
-    liabhar.count_down(5)
+    liabhar.count_down(3)
     
     some_string_0 = "this is to compare different text strings"
     some_string_1 = "this is to compare diff erent text strings"

@@ -604,6 +604,13 @@ def PortStats(counter="all", port_list = "all"):
         ras_porterrshow = re.compile('\s*\d+:\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)')
         ras_porterrshow = ras_porterrshow.findall(caputre_porterrshow)
             
+        print("@"*44)
+        print("@"*44)
+        print("@"*44)
+        print(ras_porterrshow)
+        print("@"*44)
+        print("@"*44)
+        print("@"*44)
         
         for i in counter_list:
             
@@ -824,59 +831,19 @@ def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
     return()
 ###############################################################################
 
-def fids_check_obsolete(self, fid, lscfgshow): 
-        """
-            Check if FID given is resident on switch.
-        """
-        self.fid = fid
-        self.lscfgshow = lscfgshow
-        #print("\n\n\nChecking if FID %s is a valid FID on switch.\n\n\n " % fid)
-        fids = re.findall('(\d{1,3})\(', lscfgshow)
-        #print("==================")
-        #print("Below is list of available FIDs: ")
-        #print(fids)
-        #print("==================")
-        b = (str(fid))
-        if b in fids:
-            #print("\n")
-            #print("="*20)
-            #print("%s is a valid FID on this switch " % fid)
-            #print("="*20)
-            return(True)
-        else:
-            #print("\n")
-            #print("="*20)
-            #print("%s is a NOT valid FID on this switch " % fid)
-            #print("="*20)
-            return(False)
-###############################################################################
 def fids_check( fid): 
         """
             Check if FID given is resident on switch.
         """
-        #self.fid  = fid
-        cons_out  = anturlar.fos_cmd("fcrlogclear")
-        #self.lscfgshow = lscfgshow
-        #print("\n\n\nChecking if FID %s is a valid FID on switch.\n\n\n " % fid)
+    
+        cons_out  = anturlar.fos_cmd("lscfg --show")
         fids = re.findall('(\d{1,3})\(', cons_out)
-        #print("==================")
-        #print("Below is list of available FIDs: ")
-        #print(fids)
-        #print("==================")
         b = (str(fid))
         if b in fids:
-            #print("\n")
-            #print("="*20)
-            #print("%s is a valid FID on this switch " % fid)
-            #print("="*20)
             return(True)
         else:
-            #print("\n")
-            #print("="*20)
-            #print("%s is a NOT valid FID on this switch " % fid)
-            #print("="*20)
             return(False)
-
+###############################################################################
 
 def waitForOnline(si):
     """
@@ -1382,39 +1349,7 @@ def get_info_from_the_switch():
     
     return(switch_dict)
     
-#def playback_info_from_the_switch():
-#    """
-#    scratch area for SwitchUpdate class
-#    """
-#    
-#    host = sys.argv[1]
-#    user = sys.argv[2]
-#    password = sys.argv[7]
-#    si = anturlar.SwitchInfo()
-#    switch_ip = si.ipaddress()
-#
-#    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
-#    try:
-#        with open(f, 'r') as file:
-#            a = file.read()
-#    except IOError:
-#        print("\n\nThere was a problem opening the file:" , f)
-#        sys.exit()
-#    #ras = re.findall('LICENSE LIST\s+:\s+(\[.+\])', a)
-#    ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
-#    b = ras[0]
-#    c = b.split(",")
-#    for i in c:
-#        #d = i.strip(" '")
-#        anturlar.fos_cmd("licenseadd %s" % i)
-#        #liabhar.JustSleep(1)
-#    #anturlar.fos_cmd("echo y | reboot") ##### Not sure if we need reboot here or somwhere else in the class
-#    #print('\n\nSleeping: 150')
-#    #liabhar.JustSleep(150)   
-#    #anturlar.connect_tel_noparse(host, user, password)
-#    anturlar.fos_cmd('licenseshow')
-#    return(True)
-    
+
     
     
     
