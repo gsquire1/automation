@@ -28,12 +28,15 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 def test_anturlar_functions():
     #a = ex_port_list()
-    #fcri = anturlar.FcrInfo()
-    si = anturlar.SwitchInfo()
-    su = cofra.SwitchUpdate
-    a = si.switch_status()
+    fcri = anturlar.FcrInfo()
+    #si = anturlar.SwitchInfo()
+    #su = cofra.SwitchUpdate
+    a = fcri.ipv4_plus_fcr_list()
     #b = su.playback_licenses_to_switch()
-    print(a)
+    if a == False:
+        print('IT BOMBED')
+    else:
+        print(a)
     sys.exit()
 
 def bb_fabric_switch_status():
