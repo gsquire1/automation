@@ -88,70 +88,46 @@ class FabricInfo:
             the current fabric
             Return none if nothing is matched
         """
-        self.__change_fid__()
+        #self.__change_fid__()
         capture_cmd = fos_cmd("fabricshow")
-        #### the next two lines would return each item from the fabricshow command
-        #ras = re.compile('\s?([0-9]{1,3}):\s+([\d\w]{6})\s+([:\d\w]{23})\s+([.\d]{7,15})\s+([.\d]{7,15})\s+(["_\w\d]+)')
-        #ras_result = ras.search(capture_cmd)
-        #### the above two lines not used here
-        
-        ### if used with the above line the next regex would return all the ipv4
-        ####  addresses  but with FCR there are 00.00.00.00 addresses these are not
-        ####   included with the current regex
-        #ras = re.compile('\s+([.\d]{7,15})\s+')
         ras = re.compile('(?:\s?[0-9]{1,3}:\s+[\d\w]{6}\s+[:\d\w]{23}\s+)([1-9][0-90-9].\d{1,3}.\d{1,3}.\d{1,3})')
         ras_result_all = ras.findall(capture_cmd)
-
-        print(ras_result_all)
-            
-        
+        #print(ras_result_all)
         if not ras_result_all:
-            ras_result_all = "none"
-           
-        return ras_result_all
+            ras_result_all = None
+            
+        return(ras_result_all)
     
     
-    def ipv4_plus_fcr_list(self, pa,pw):
+    #def ipv4_plus_fcr_list(self, pa,pw):
+    def ipv4_plus_fcr_list(self):
         """
             Return a string of the ipv4 plus switches attached via FCR
             Return none if nothing is matched with ipv4_list
             
         """
-        fablist = self.ipv4_list()
-        fablist_extended = []
-        fablist_nodup = []
-        #print("\n\n\n\n\nFABLIST IS AT THE START  ", fablist, "\n\n\n\n\n")
-        fablist_base = fablist
-        #for f in fablist_base:
-        #print("\n\n\n\n\nFCR FAB BASE LIST   ", fablist_base, "\n\n\n\n")
-        conn_value = connect_tel(pa,pw)  #### requires FID ??
-        capture_cmd = fos_cmd("")
+        bb_fablist = self.ipv4_list()
+        host = sys.argv[1]
+        user = sys.argv[2]
+        pw = sys.argv[7]
         capture_cmd = fos_cmd("fcrfabricshow")
         ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         ras_result_all = ras.findall(capture_cmd)
-        #print("\n\n\n\n\nFCR FAB SHOW LIST   ", ras_result_all, "\n\n\n\n")
-        #print("\n\n\n\n\nFABLIST IS  :  ", fablist, "\n\n\n\n\n")
-        
-        if ras_result_all:
-            for ip in ras_result_all:
-                #print("\n\n\n\n\nCURRENTLY ON IP ", ip , "\n\n\n\n")
-                orig_ip = pa.ip
-                pa.ip = ip
-                conn_value = connect_tel(pa,pw)
-                fablist_extended = self.ipv4_list()
-                #close_tel()
-                for n in fablist_extended:
-                    if n not in fablist:
-                        fablist.append(n)
-                pa.ip = orig_ip
-        #liabhar.cls()
-        #print("\n\n\nFABLIST \nList of IP in the Fabric :  ")
-        #for ip in fablist:
-            #print("    %s" % ip)
-        
-        #liabhar.count_down(10)
-        
-        return(fablist)
+        fablist_nodup = (list(set(ras_result_all)))
+        try:
+            if fablist_nodup:
+                for ip in fablist_nodup:
+                    print("\n\n\n\n\nCURRENTLY ON IP ", ip , "\n\n\n\n")
+                    conn_value = connect_tel_noparse(ip, user, pw)
+                    fablist_extended = self.ipv4_list()
+                    #print(fablist_nodup)
+                    for n in fablist_extended:
+                        if n not in fablist_nodup:
+                            fablist_nodup.append(n)
+        except:
+            return(False)
+            #sys.exit()
+        return(fablist_nodup)
     
     
     def name(self):
