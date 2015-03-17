@@ -46,9 +46,9 @@ class dateTimeStuff:
         s = datetime.date.today()  #### format is 2013-02-21
         return s
     
-    def ordinal(self):
-        o = today.toordinal() #### format is 734920
-        return o
+    #def ordinal(self):
+    #    o = today.ordinal() #### format is 734920
+    #    return o
 
 class FileStuff:
     """

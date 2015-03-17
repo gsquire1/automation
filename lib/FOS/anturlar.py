@@ -1277,10 +1277,10 @@ class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
             ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+(Disabled)')
             #ras = re.compile('(?:\s+([0-9]{1,2})\s{1,2})([xge]{1,3}\d{1,2})\s+id\s+([0-4]{1,2}G)\s+([_\w]{5,9})\s+.{3,4}\s+Disabled')
             ras = ras.findall(capture_cmd)
-            print(ras)
-            for i in ras:
-                print(i)
-            sys.exit()
+            #print(ras)
+            #for i in ras:
+            #    print(i)
+            #sys.exit()
             #    if "Disabled" in i:
             #        print(i)
             #        disabled_ports.append(i)

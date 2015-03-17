@@ -1872,7 +1872,7 @@ def firmwaredownload(frmdwn, frmup):
         #    sys.exit()
         
          
-        liabhar.count_down(10)
+        liabhar.count_down(600)
         
         anturlar.connect_tel_noparse(myip, 'root', 'password')
         en = anturlar.SwitchInfo()
