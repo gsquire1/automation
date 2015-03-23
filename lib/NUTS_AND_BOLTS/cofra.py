@@ -191,6 +191,21 @@ class DoFirmwaredownloadChoice():
     def __init__(self, firmdown, firmup):
         self.firmdown = firmdown
         self.firmup = firmup
+        ras = re.compile('([\.a-z0-9]+)(?:_)')
+        ras = ras.search(firmdown)
+        frm_no_bld_down = ras.group(1)
+        
+        ras_up = re.compile('([\.a-z0-9]+)(?:_)')
+        ras_up = ras_up.search(firmup)
+        frm_no_bld_up   = ras_up.group(1)
+        
+        if 'amp' in firmdown:
+            frm_no_bld_down = frm_no_bld_down + '_amp'
+        self.firmdown_folder = frm_no_bld_down   
+        if 'amp' in firmup:
+            frm_no_bld_up = frm_no_bld_up + '_amp'
+        self.firmup_folder = frm_no_bld_up
+        
         #self.check_version()
         
         self.start()
@@ -199,7 +214,7 @@ class DoFirmwaredownloadChoice():
     def check_status(self):
         capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
         if "firmware versions" in capture_cmd:
-            return("1")
+            return(True)
         else:
             liabhar.count_down(30)
             self.check_status()
@@ -239,10 +254,10 @@ class DoFirmwaredownloadChoice():
         print("RAS IS     %s\n"%(ras))
         if ras != self.firmup:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmup)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
         else:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.1/%s,fwdlacct"%(self.firmdown)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmdown_folder, self.firmdown)
         reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
                        b'with new firmware', b'Firmware has been downloaded']
         
@@ -394,15 +409,20 @@ class SwitchUpdate():
         except IOError:
             print("\n\nThere was a problem opening the file:" , f)
             sys.exit()
+        
         ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
-        b = ras[0]
-        c = b.split(",")
-        for i in c:
-            anturlar.fos_cmd("licenseadd %s" % i)
-        self.reboot_reconnect()
-        if a != "Online":
-            anturlar.fos_cmd("switchenable")    
-        anturlar.fos_cmd('licenseshow')
+        try:
+            b = ras[0]
+            c = b.split(",")
+            for i in c:
+                anturlar.fos_cmd("licenseadd %s" % i)
+            self.reboot_reconnect()
+            if a != "Online":
+                anturlar.fos_cmd("switchenable")    
+            anturlar.fos_cmd('licenseshow')
+        except:
+            pass
+        
         return(True)
     
     def reboot_reconnect(self):

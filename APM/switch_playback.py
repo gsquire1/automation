@@ -197,10 +197,12 @@ def stop_at_cmd_prompt(db=0):
     tn.set_debuglevel(db)
     print("\n\n\n\n\n\n\n\nlooking for stop autoboot\n\n")
     
-    cons_out = send_cmd("/sbin/reboot")
-    
+    #cons_out = send_cmd("/sbin/reboot")
+    #
+    #
     reg_list = [ b"Hit ESC to stop autoboot: "]
     
+    tn.write(b"/sbin/reboot\r\n")
     capture = tn.expect(reg_list, 3600)
     
     #tn.write( b"char(27)")  #### char(27) or \x1b are both ESC 
@@ -212,7 +214,6 @@ def stop_at_cmd_prompt(db=0):
     
     reg_list = [ b"=>"]
     capture = tn.expect(reg_list, 300)
-    
     
     return()
        
@@ -230,12 +231,12 @@ def env_variables(swtype, db=0):
     server_ip = "10.38.2.40"
     ethact    = "ENET0"
     
-    if swtype == 133:
-        print("ODIN")
+    if swtype == 148:
+        print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    if (swtype == 141 or swtype == 142):
-        print("YODA")
-        ethact = "FM2@DTSEC4"
+    #if (swtype == 141 or swtype == 142):
+    #    print("YODA")
+    #    ethact = "FM2@DTSEC4"
         
     a = ("setenv ethact %s \r\n" % ethact)
     tn.write(a.encode('ascii'))
@@ -264,18 +265,16 @@ def env_variables(swtype, db=0):
     
     return(capture)
 
-def pwr_cycle(pwr_ip, pp, db=0):
+def pwr_cycle(pwr_ip, pp, stage, db=0):
     
     tnn = anturlar.connect_tel_noparse_power(pwr_ip, 'user', 'pass', db)
     anturlar.power_cmd("cd access/1\t/1\t%s" % pp ,10)
-     
     anturlar.power_cmd("show\r\n" ,10)
     
-    anturlar.power_cmd("cycle" ,10)
-    anturlar.power_cmd("yes", 10)
+    anturlar.power_cmd(stage, 5)
+    anturlar.power_cmd("yes", 5)
     
-    
-    liabhar.JustSleep(10)
+    #liabhar.JustSleep(10)
     anturlar.power_cmd("exit", 10)
      
     print("\r\n"*10)
@@ -287,13 +286,16 @@ def pwr_cycle(pwr_ip, pp, db=0):
 def load_kernel(switch_type, sw_ip, frm_version):
     
     reg_list = [ b"=>"]
-    reg_bash = [ b"bash-2.04#"]
+    reg_bash = [ b"bash-2.04#", b"=>"]
     reg_linkup = [ b"link is up"]
     
     #### set tftp command
+    
     ras = re.compile('([\.a-z0-9]+)(?:_)')
     ras = ras.search(frm_version)
     frm_no_bld = ras.group(1)
+    if 'amp' in frm_version:
+        frm_no_bld = frm_no_bld + '_amp'
     
     
     if switch_type == '133':  ####  ODIN
@@ -351,10 +353,11 @@ def load_kernel(switch_type, sw_ip, frm_version):
     tn.write(i.encode('ascii'))
     capture = tn.expect(reg_bash, 300)
     tn.write(b"route add default gw 10.38.32.1\r\n")
-    capture = tn.expect(reg_linkup,60)
-    tn.write(b"\r\n")
-    capture = tn.expect(reg_bash, 300)
-    tn.write(b"mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n")
+    capture = tn.expect(reg_linkup,10)
+    #tn.write(b"\r\n")
+    capture = tn.expect(reg_bash, 10)
+    m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n"
+    tn.write(m.encode('ascii'))
     capture = tn.expect(reg_bash, 300)
     ### firmwarepath
     firmpath = "cd /load/SQA/fos/%s/%s\r\n" % (frm_no_bld, frm_version)
@@ -559,9 +562,9 @@ def sw_set_pwd_timeout(pswrd):
     reg_complete   = [ b"zation completed"]
     reg_linertn    = [ b"\\r\\n" ]
     
-    capture = tn.expect(reg_complete, 600)
+    capture = tn.expect(reg_complete, 1000)
     tn.write(b"\r\n")
-    capture = tn.expect(reg_linertn)
+        #capture = tn.expect(reg_linertn)
     capture = tn.expect(reg_login, 60)
     
     tn.write(b"root\r\n")
@@ -570,6 +573,7 @@ def sw_set_pwd_timeout(pswrd):
     capture = tn.expect(reg_change_pass, 20)
     tn.write(b"\r\n")
     capture = tn.expect(reg_linertn)
+
     
     while True:    
         capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
@@ -751,29 +755,39 @@ def main():
      
     
     
-    ###cons_out = stop_at_cmd_prompt(9)
-    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    ###print(cons_out)
-    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    ###cons_out = env_variables(sw_type, 9)
-    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    ###print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    ###print(cons_out)
-    ###load_kernel(sw_type, my_ip, pa.firmware)
-    ###
-    ###for pp in range(0, len(power_pole_info), 2):
-    ###    print('POWERPOLE')
-    ###    print(power_pole_info[pp])
-    ###    print(power_pole_info[pp+1])
-    ###    
-    ###    
-    ###    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1])
-    ###
-    ####### is there another way to tell if switch is ready ??
-    ####### instead of waiting 
-    ####time.sleep(360)
-    ###cons_out = sw_set_pwd_timeout(usr_psswd)
+    cons_out = stop_at_cmd_prompt(9)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print(cons_out)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    cons_out = env_variables(sw_type, 9)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print(cons_out)
+    load_kernel(sw_type, my_ip, pa.firmware)
+    
+    for pp in range(0, len(power_pole_info), 2):
+        print('POWERPOLE')
+        print(power_pole_info[pp])
+        print(power_pole_info[pp+1])
+        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
+        time.sleep(2)
+        
+    for pp in range(0, len(power_pole_info), 2):
+        print('POWERPOLE')
+        print(power_pole_info[pp])
+        print(power_pole_info[pp+1])
+        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
+        time.sleep(2)
+    #### is there another way to tell if switch is ready ??
+    #### instead of waiting
+    print("\r\n"*6)
+    print("@"*40)
+    print("wait here to login and change passwords")
+    print("\r\n"*6)     
+    #liabhar.count_down(300)
+    #time.sleep(360)
+    cons_out = sw_set_pwd_timeout(usr_psswd)
     
     tn.close()
     
@@ -783,7 +797,7 @@ def main():
    
     print(my_ip)
     
-    cc = cofra.SwitchUpdate(my_ip)
+    c = cofra.SwitchUpdate(my_ip)
     cons_out = cc.playback_licenses_to_switch()
     
     print(cons_out)
