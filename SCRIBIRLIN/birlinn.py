@@ -219,7 +219,7 @@ def main():
         conn_value = anturlar.connect_tel(pa, pw )
         si = anturlar.SwitchInfo
         fabi = anturlar.FabricInfo(pa.fid)
-        fablist = fabi.ipv4_plus_fcr_list(pa,pw)
+        fablist = fabi.ipv4_plus_fcr_list(pa.user,pw)
         anturlar.close_tel()
                 
         time.sleep(1)

@@ -100,33 +100,39 @@ class FabricInfo:
     
     
     #def ipv4_plus_fcr_list(self, pa,pw):
-    def ipv4_plus_fcr_list(self):
+    def ipv4_plus_fcr_list(self,usr,pw):
         """
             Return a string of the ipv4 plus switches attached via FCR
             Return none if nothing is matched with ipv4_list
             
         """
+        print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+        print(usr)
+        print(pw)
+        #sys.exit()
         bb_fablist = self.ipv4_list()
-        host = sys.argv[1]
-        user = sys.argv[2]
-        pw = sys.argv[7]
+        #host = sys.argv[1]
+        #user = sys.argv[2]
+        #pw = sys.argv[7]
         capture_cmd = fos_cmd("fcrfabricshow")
         ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         ras_result_all = ras.findall(capture_cmd)
         fablist_nodup = (list(set(ras_result_all)))
+        #tn.set_debuglevel(9)
         try:
             if fablist_nodup:
                 for ip in fablist_nodup:
-                    print("\n\n\n\n\nCURRENTLY ON IP ", ip , "\n\n\n\n")
-                    conn_value = connect_tel_noparse(ip, user, pw)
+                    #print("\n\n\n\n\nCURRENTLY ON IP ", ip , "\n\n\n\n")
+                    conn_value = connect_tel_noparse(ip, usr, pw)
                     fablist_extended = self.ipv4_list()
-                    #print(fablist_nodup)
                     for n in fablist_extended:
                         if n not in fablist_nodup:
                             fablist_nodup.append(n)
         except:
-            return(False)
-            #sys.exit()
+            #return(False)
+            print('^^^^^^^^^^^^^^^^^^^^^^^^^^')
+            print('connection failed')
+            sys.exit()
         return(fablist_nodup)
     
     
@@ -1968,6 +1974,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
  
 def connect_tel_noparse_traffic(HOST,usrname,password, *args):
     global tn
+    tn.set_debuglevel(9)
     try:
          
         usrn = usrname + '> '

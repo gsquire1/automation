@@ -38,6 +38,42 @@ def test_anturlar_functions():
     else:
         print(a)
     sys.exit()
+    
+def get_all_switch_info():
+    #f = (open('ini/connect.txt', 'r+b'))
+
+    with open('ini/connect.txt') as f:
+        while True:
+            content = (f.readline())
+            print(type(content))
+            print(content)
+        #for i in content:
+            #print('WTF')
+            #print(i)
+    sys.exit()
+    #ips = re.findall('(?:IPlist\s+)((\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\s{0,9})+', content)
+    #ips = re.findall(r'IPlist(\s{0,3}\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}\s{0,3))+', content)
+    ips = re.findall("(IPlist)( \.\\d)+", content)
+    print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
+    print(ips)
+    sys.exit()
+    f = (open('ini/connect.txt', 'r'))
+    my_list = []
+    f = f.readlines()
+    for line in f:
+        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
+        print(line)
+        my_list.append(line)
+        #my_list = my_list.split()
+    print(my_list)
+    #sys.exit()
+    #ras = re.findall('IPlist\s+:\s+\[(.+)\]', f)
+    #    b = ras[0]
+    #    c = b.split(",")
+    #    for i in c:
+    f.close()
+    sys.exit()
+    
 
 def bb_fabric_switch_status():
     """
@@ -106,51 +142,6 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
     ff.write(str(sw_info_ls))
     ff.write("\n"*2)
-    
-    #for i in sw_info_ls:
-    #    cons_out = anturlar.fos_cmd("setcontext "+i)   
-    #    cons_out = anturlar.fos_cmd("mapsconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("LOGICAL SWITCH :: " +i+"\n")
-    #    ff.write("="*80+"\n")
-    #    ff.write("\nMAPS CONFIG::"+i+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("mapspolicy --show -summary")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("flow --show -ctrlcfg")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("relayconfig --show")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #    cons_out = anturlar.fos_cmd("bottleneckmon --status")
-    #    ff.write("="*80+"\n")
-    #    ff.write(cons_out+"\n\n")
-    #    ff.write("#"*80+"\n")
-    #    ff.write("#"*80+"\n")
-    #    
-    #ff.write("="*80+"\n")
-    #ff.write("\n"*10)
     
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
     #cons_out = anturlar.fos_cmd(" ")
