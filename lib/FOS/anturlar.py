@@ -11,7 +11,7 @@ import liabhar
 from socket import error as SocketError
 import errno
 """
-Note: Naming conventions follow the typical Python conventions
+Note: Naming conventions follow the typical Python convention
 
 module_name                     package_name            
 method_name                     ExceptionName           

@@ -39,6 +39,24 @@ def test_anturlar_functions():
         print(a)
     sys.exit()
     
+def csv_functions_ip():
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    ips = []
+    try:
+        with open(test_file) as switch_matrix:
+            reader = csv.DictReader(switch_matrix)
+            for row in reader:
+                ip = (row['IP Address'])
+                if ip:
+                    if ip not in ips:
+                        ips.append(ip)
+            print("\n\n%s" % ips)
+            return(ips)
+
+    except FileNotFoundError:
+        print('\n\nFile Not Found (Line 58 in fcr_tools.py)')
+        return(False)
+    
 def get_all_switch_info():
     #f = (open('ini/connect.txt', 'r+b'))
 
