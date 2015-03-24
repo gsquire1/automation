@@ -504,24 +504,7 @@ def reboot_sequence(iterations, ip):
     print("Numer of iterations run without error is %s" % iteration)
     sys.exit(0)
         
-def csv_functions_ip():
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    ips = []
-    try:
-        with open(test_file) as switch_matrix:
-            reader = csv.DictReader(switch_matrix)
-            for row in reader:
-                ip = (row['IP Address'])
-                if ip:
-                    if ip not in ips:
-                        ips.append(ip)
-            print("\n\n%s" % ips)
-            return(ips)
 
-    except FileNotFoundError:
-        print('\n\nFile Not Found (Line 58 in fcr_tools.py)')
-        return(False)   
-        
     
 
 
