@@ -185,31 +185,6 @@ def Dictionary_Example():
         print(values)
               
 
-
-def genAll():
-    """
-    turn all ports to SIM ports and enable Flow genALL sys test
-    
-    """
-    #### send a fos command to configure
-    capture_cmd = anturlar.fos_cmd("flow --control -portidmode slotport ")
-    cons_out = anturlar.fos_cmd("flow --show")
-
-    si_maps = anturlar.maps()
-    si_maps_sim = si_maps.toggle_all("off")
-    
-    si_maps_gen = si_maps.genAll("on")
-    
-    cons_out = anturlar.fos_cmd("portcfgshow")
-    
-    si_maps_sim = si_maps.toggle_all("on")
-    
-    cons_out = anturlar.fos_cmd("portcfgshow")
-    cons_out = _anturlar.fos_cmd("flow --show")
-
-    si_maps_gen = si_maps.genAll("on")
-    cons_out = anturlar.fos_cmd("flow --show")
-
 def ports_disable(portlist = "", t=1, wait=10):
     """
      port disable for the number of time passed in
