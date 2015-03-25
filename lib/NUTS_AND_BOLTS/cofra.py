@@ -191,11 +191,13 @@ class DoFirmwaredownloadChoice():
     def __init__(self, firmdown, firmup):
         self.firmdown = firmdown
         self.firmup = firmup
-        ras = re.compile('([\.a-z0-9]+)(?:_)')
+        #ras = re.compile('([\.a-z0-9]+)(?:_)')
+        ras = re.compile('([\.a-z0-9]{6})')
         ras = ras.search(firmdown)
         frm_no_bld_down = ras.group(1)
         
-        ras_up = re.compile('([\.a-z0-9]+)(?:_)')
+        #ras_up = re.compile('([\.a-z0-9]+)(?:_)')
+        ras_up = re.compile('([\.a-z0-9]{6})')
         ras_up = ras_up.search(firmup)
         frm_no_bld_up   = ras_up.group(1)
         

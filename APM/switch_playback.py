@@ -81,9 +81,10 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
     #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
     #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
-    parser.add_argument('-c', '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
-    parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
-    
+    parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
+    parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
+    parser.add_argument('-cp',   '--cmdprompt',  help="switch is already at command prompt")
+    parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -99,6 +100,14 @@ def parse_args(args):
     if not args.chassis_name and not args.ipaddr:
         print("Chassis Name or IP address is required")
         sys.exit()
+        
+    if args.cmdprompt and not args.switchtype:
+        print("To start at the command prompt the switch type is needed.")
+        sys.exit()
+        
+    if not args.cmdprompt and args.switchtype:
+        print('To start at the command prompt both switch type and command prompt is requried')
+        sys.exit()
     #print("Connecting to IP :  " + args.ip)
     #print("user             :  " + args.user)
     #verbose    = args.verbose
@@ -107,9 +116,11 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def connect_console(HOST,usrname,password,port, *args):
+def connect_console(HOST,usrname,password,port,db=0, *args):
     
     global tn
+    
+    
     var = 1
     reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
     reg_list_r = [b".*\n", b":root> "]
@@ -130,8 +141,8 @@ def connect_console(HOST,usrname,password,port, *args):
     
     tn = telnetlib.Telnet(HOST,port)
     print("tn value is  ", tn)
+    tn.set_debuglevel(db)
     
-    tn.set_debuglevel(10)
     
     print("-------------------------------------------------ready to read lines")
     #############################################################################
@@ -148,7 +159,7 @@ def connect_console(HOST,usrname,password,port, *args):
     
     #############################################################################
     #### login to the switch
-    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: " ]  
+    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" ]  
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
@@ -175,7 +186,10 @@ def connect_console(HOST,usrname,password,port, *args):
             tn.write(b"\r\n")
             #capture = tn.expect(reg_list)
             #break
-            
+        if capture[0] == 5:
+            print(capture)
+            var += 4
+            break
         
         var += 1
       
@@ -667,6 +681,7 @@ def main():
     print(pa.quiet)
     print(pa.verbose)
     print(pa.firmware)
+    print(pa.cmdprompt)
     print("@"*40)
    
     ###########################################################################
@@ -690,59 +705,64 @@ def main():
     #### need to get the ipaddress from the file
     #### pass to login procedure
     #### already have username password
+    if not pa.cmdprompt:
+        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+        
+        sw_dict = cofra.get_info_from_the_switch()
+        my_ip                = sw_dict["switch_ip"]
+        sw_name              = sw_dict["switch_name"]
+        sw_chass_name        = sw_dict["chassis_name"]
+        sw_director_or_pizza = sw_dict["director"]
+        sw_domains           = sw_dict["domain_list"]
+        sw_ls_list           = sw_dict["ls_list"]
+        sw_base_fid          = sw_dict["base_sw"]
+        sw_xisl              = sw_dict["xisl_state"]
+        sw_type              = sw_dict["switch_type"]
+        sw_license           = sw_dict["license_list"]
+        sw_vf_setting        = sw_dict["vf_setting"]
+        sw_fcr_enabled       = sw_dict["fcr_enabled"]
+        sw_port_list         = sw_dict["port_list"]
     
-    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    
-    sw_dict = cofra.get_info_from_the_switch()
-    #print("\n\n\nGET IP")
-    my_ip                = sw_dict["switch_ip"]
-    #print("\n\n\nGET NAME")
-    sw_name              = sw_dict["switch_name"]
-    #print("\n\n\nGET CHASSIS_NAME")
-    sw_chass_name        = sw_dict["chassis_name"]
-    sw_director_or_pizza = sw_dict["director"]
-    sw_domains           = sw_dict["domain_list"]
-    sw_ls_list           = sw_dict["ls_list"]
-    sw_base_fid          = sw_dict["base_sw"]
-    sw_xisl              = sw_dict["xisl_state"]
-    sw_type              = sw_dict["switch_type"]
-    sw_license           = sw_dict["license_list"]
-    sw_vf_setting        = sw_dict["vf_setting"]
-    sw_fcr_enabled       = sw_dict["fcr_enabled"]
-    sw_port_list         = sw_dict["port_list"]
-
-    print("\n"*20)
-    print("SWITHC IP            : %s   " % my_ip)
-    print("SWITCH NAME          : %s   " % sw_name)
-    print("CHASSIS NAME         : %s   " % sw_chass_name)
-    print("DIRECTOR             : %s   " % sw_director_or_pizza)
-    print("SWITCH DOMAINS       : %s   " % sw_domains)
-    print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-    print("BASE FID             : %s   " % sw_base_fid)
-    print("XISL STATE           : %s   " % sw_xisl)
-    print("SWITCH TYPE          : %s   " % sw_type)
-    print("LICENSE LIST         : %s   " % sw_license)
-    print("VF SETTING           : %s   " % sw_vf_setting)
-    print("FCR SETTING          : %s   " % sw_fcr_enabled)
-    print("PORT LIST            : %s   " % sw_port_list)
+        print("\n"*20)
+        print("SWITHC IP            : %s   " % my_ip)
+        print("SWITCH NAME          : %s   " % sw_name)
+        print("CHASSIS NAME         : %s   " % sw_chass_name)
+        print("DIRECTOR             : %s   " % sw_director_or_pizza)
+        print("SWITCH DOMAINS       : %s   " % sw_domains)
+        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+        print("BASE FID             : %s   " % sw_base_fid)
+        print("XISL STATE           : %s   " % sw_xisl)
+        print("SWITCH TYPE          : %s   " % sw_type)
+        print("LICENSE LIST         : %s   " % sw_license)
+        print("VF SETTING           : %s   " % sw_vf_setting)
+        print("FCR SETTING          : %s   " % sw_fcr_enabled)
+        print("PORT LIST            : %s   " % sw_port_list)
+        print("@"*40)
+        print("CONSOLE INFO         : %s   " % cons_info)
+        print("@"*40)
+        print("POWER POLE INFO      : %s   " % power_pole_info)
+        
+        
+         
+    ###############################################################################
+    ####
+    ####  close telnet connection and 
+    ####  connect to the console
+    ####
+    ###############################################################################
+        
+        anturlar.close_tel()
+    else:
+        sw_type = pa.switchtype
+        my_ip   = ipaddr_switch
+        
     print("@"*40)
-    print("CONSOLE INFO         : %s   " % cons_info)
-    print("@"*40)
-    print("POWER POLE INFO      : %s   " % power_pole_info)
-    
-    
-     
-###############################################################################
-####
-####  close telnet connection and 
-####  connect to the console
-####
-###############################################################################
-    
-    anturlar.close_tel()
-
-    connect_console(console_ip, user_name, usr_pass, console_port)
-    cons_out = send_cmd("switchshow")
+    print("console_ip  %s  "  %  console_ip)
+    print("console port  %s  " %  console_port)
+    print("user name is   %s " %  user_name)
+    print("password       %s  " % usr_pass)
+    connect_console(console_ip, user_name, usr_pass, console_port, 10)
+    #cons_out = send_cmd("switchshow")
     
  
     
@@ -754,12 +774,13 @@ def main():
 ####
      
     
-    
-    cons_out = stop_at_cmd_prompt(9)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print(cons_out)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    if not pa.cmdprompt:
+        cons_out = stop_at_cmd_prompt(9)
+        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print(cons_out)
+        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        
     cons_out = env_variables(sw_type, 9)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
@@ -797,7 +818,7 @@ def main():
    
     print(my_ip)
     
-    c = cofra.SwitchUpdate(my_ip)
+    cc = cofra.SwitchUpdate(my_ip)
     cons_out = cc.playback_licenses_to_switch()
     
     print(cons_out)

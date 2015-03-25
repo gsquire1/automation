@@ -26,7 +26,7 @@ from email.mime.multipart import MIMEMultipart
 ##### variables
 #################################################################################
 tn =""
-cw_config_file_name = "logs\\FV_Monitor.txt"
+cw_config_file_name = "logs/FV_Monitor.txt"
 shelvename = "class-switchinfo"
 fieldnames = ('name', 'ipaddr', 'port')  #### 
 numerical_fieldnames = ( 'port' )
@@ -335,7 +335,7 @@ class FV(Tk):
                 entries[field].insert(0, repr(getattr(record, field)))
                 
         db.close()
-        return 0
+        return(0)
             
     def updateRecord(self):
         
@@ -343,7 +343,7 @@ class FV(Tk):
         key = entries['ID'].get()
         if key in db:
             record = db[key] # update existing record
-            return 0
+            return(0)
             #del db[key]
             
         else:
@@ -446,6 +446,7 @@ class MenuBar(Menu):
             #is_email = ""
             
             for line in open(cw_config_file_name,'rb').readlines():
+                
                 remains_line = str(line.strip(), encoding='utf8')
                 #print("\n\n====================\n")
                 #print(remains_line)
@@ -483,13 +484,19 @@ class MenuBar(Menu):
                     #print("\nftp password    :   ")
                     #print(ftppass)
                     #print("END FTP config DATA\n")
-           
-            email_list.set(eml)
-            v.set(doss)
-            ftpipaddr.set(ftpip)
-            ftpuser.set(ftpu)
-            ftppass.set(ftpp)
-            
+          
+            try:
+                email_list.set(eml)
+                v.set(doss)
+                ftpipaddr.set(ftpip)
+                ftpuser.set(ftpu)
+                ftppass.set(ftpp)
+            except UnboundLocalError:
+                email_list.set("smckie@brocade.com")
+                v.set("")
+                ftpipaddr.set("")
+                ftpuser.set("")
+                ftppass.set("")
             
     
         def quit(self):
@@ -827,7 +834,11 @@ def testproc(queue, ipaddr, cport_raw):
                     print("\n")
                     print(ftpp)    
                     print("\n\nFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTPFTP\n\n")
-    send_to = eml
+    try:
+        send_to = eml
+    except UnboundLocalError:
+        send_to = "smckie@brocade.com"
+        
     send_to += send_cc  #### to remove smckie from email remove this line
                         
     print("\n\n====================================")
@@ -855,8 +866,10 @@ def testproc(queue, ipaddr, cport_raw):
     #################################################################
     #### clear the log file
     ####
-    rasfile = "%s%s%s%s%s" % ("logs\\raslog", ip,".", cport, ".txt")  #### %s string  %d number
-    cons_capture_file = "%s%s%s%s%s" % ("logs\\cons_capture", ip,".", cport, ".txt") 
+    #rasfile = "%s%s%s%s%s" % ("logs\\raslog", ip,".", cport, ".txt")  #### %s string  %d number
+    #cons_capture_file = "%s%s%s%s%s" % ("logs\\cons_capture", ip,".", cport, ".txt")
+    rasfile = "%s%s%s%s%s" % ("logs/raslog", ip,".", cport, ".txt")  #### %s string  %d number
+    cons_capture_file = "%s%s%s%s%s" % ("logs/cons_capture", ip,".", cport, ".txt")
     #print("my rasfile is   \n==============================\n")
     #print(rasfile)
     #print("\n====================================\n\n")
@@ -967,11 +980,11 @@ def testproc(queue, ipaddr, cport_raw):
     #############################################################################
     chass_re = re.compile('([chassisname]{11})\\r\\n([a-zA-Z0-9_]{0,31})\\r\\n')
     chass_name = chass_re.search(capture)
-    #print("\n1111111111111111111111111111111111111111111111111111111111111111111\n")
+    print("\n1111111111111111111111111111111111111111111111111111111111111111111\n")
     print(chass_name.group(0))
-    #print("\n222222222222222222222222222222222222222222222222222222222222222222222\n")
+    print("\n222222222222222222222222222222222222222222222222222222222222222222222\n")
     print(chass_name.group(1))
-    #print("\n333333333333333333333333333333333333333333333333333333333333333333333\n")
+    print("\n333333333333333333333333333333333333333333333333333333333333333333333\n")
     print(chass_name.group(2))
     chass_name = chass_name.group(2)
     ras_message_dict = {"chassis_name":chass_name}
@@ -982,7 +995,8 @@ def testproc(queue, ipaddr, cport_raw):
     #### get the ip address  
     ####
     capture = ""
-    cmd = "ipaddrshow"
+    #cmd = "ipaddrshow"
+    cmd = "ifconfig"
     reg_ex_list_only_root = [b'(.*root> )']
     reg_ex_list_only_cmd = [ cmd.encode()]
     tn.write(cmd.encode('ascii') + b"\n")
@@ -991,32 +1005,42 @@ def testproc(queue, ipaddr, cport_raw):
     capture = capture[2]
     capture = capture.decode()
     #queue.put(capture)
-    ipaddr_re = re.compile('(ipaddrshow)\\r\\n([A-Za-z0-9 \\r\\n]+): ([0-9\.]{7,15})')
+    ipaddr_re = re.compile('(inet addr:)([\.0-9]{7,15})')
+    #ipaddr_re = re.compile('(ipaddrshow)\\r\\n([A-Za-z0-9 \\r\\n]+): ([0-9\.]{7,15})')
     ip_addr = ipaddr_re.search(capture)
     
-    print("\n0000000000000000000000000000000000000000000000000000000000000000\n")
+    print("4"*80)
     print(ip_addr.group(0))
-    print("\n1111111111111111111111111111111111111111111111111111111111111111111\n")
+    print("5"*80)
     print(ip_addr.group(1))
-    print("\n222222222222222222222222222222222222222222222222222222222222222222222\n")
+    print("6"*80)
     print(ip_addr.group(2))
-    print("\n333333333333333333333333333333333333333333333333333333333333333333333\n")
-    print(ip_addr.group(3))
-    print("\n4444444444444444444444444444444444444444444444444444444444444444444444\n")
-    ip_address = ip_addr.group(3)
+    print("7"*80)
+    print("\n"*5)
+    #print(ip_addr.group(3))
+    #print("\n4444444444444444444444444444444444444444444444444444444444444444444444\n")
+    ip_address = ip_addr.group(2)
     
     ras_message_dict["ip_address"] = ip_address
+    print("CHASSISNAME    :  %s  " % chass_name)
+    print("IPADDRESS      :  %s  " % ip_address)
+    
     ###################################################################
     ###################################################################
     ###################################################################
     ###################################################################
     capture = ""
     
+    
     while TRUE :
-        capture = tn.expect(reg_ex_list, 10)
-        capture = capture[2]
-        capture = capture.decode()
+        try:
+            capture = tn.expect(reg_ex_list, 10)
+            capture = capture[2]
+            capture = capture.decode()
         #queue.put(capture)
+        except:
+            capture = "ERROR:    UNICODE DECODE ERROR"
+            
         cons_log_file = fileStuff(cons_capture_file, 'a+b')
         cons_log_file.write(capture)
         cons_log_file.write("\n")
@@ -1138,7 +1162,11 @@ def testproc(queue, ipaddr, cport_raw):
                 ras_message_dict[ras.group(0)] = 1
             new_ras_message = "new"
             print("START SUPPORTSAVE")
-            dss = DoSupportsave(ftpip, ftpu, ftpp, chass_name )
+            try:
+                dss = DoSupportsave(ftpip, ftpu, ftpp, chass_name )
+            except UnboundLocalError:
+                print("ftp server info is not configured")
+            
             print("END SUPPORTSAVE")
             
             
