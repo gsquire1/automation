@@ -1846,7 +1846,8 @@ def firmwaredownload(frmdwn, frmup):
         uses cofra firmwaredownload to do testing for update to
         newest code
         
-        
+        the test will load first firmware and return to the other on a second
+        download command
     """
     
     capture_cmd = anturlar.fos_cmd("ipaddrshow")

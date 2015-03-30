@@ -12,6 +12,7 @@ import anturlar
 import re
 import liabhar
 import cofra
+import sys
 
 """
 Naming conventions --
@@ -66,24 +67,35 @@ def chck_a():
     swstate           = si.switch_state()
     sw_id             = si.switch_id()
     sw_name           = si.switch_name()
-    ##sw_status         = si.switch_status()  ### fcr info
+    sw_status         = si.switch_status()  ### fcr info
     sw_type           = si.switch_type()
     sw_sync           = si.synchronized()
     sw_tmp            = si.temp_sensors()
     vf_y_n            = si.vf_enabled()
     
-    ###  Fabric
+    ####  Fabric
     
     fi = anturlar.FabricInfo()
     sid_nums          = fi.sid_numbers()
     sw_cnt            = fi.switch_count()
     ipv4_lst          = fi.ipv4_list()
-    #ipv4_fcr          = fi.ipv4_plus_fcr_list('root','password')  
+     
+    print("$"*80)
+    print(ipv4_lst)
+    print("@"*80)
+    
+    ipv4_fcr          = fi.ipv4_plus_fcr_list('root','password')
+    
+    print("$"*80)
+    print(ipv4_fcr)
+    print("@"*80)
+    
+    
     fab_name          = fi.name()
     fab_all           = fi.all_info()
     fab_memb          = fi.fabric_members()
     fab_zone          = fi.zone_info()
-    
+
     
     #####  FCIP info
     #
@@ -152,7 +164,14 @@ def chck_a():
 
 
 
-
+def chck_fab():
+    ###########################################################################
+    ###########################################################################
+    ####
+    ####
+    ####
+    pass
+    
 
 
 

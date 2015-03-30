@@ -904,18 +904,21 @@ def testproc(queue, ipaddr, cport_raw):
     reg_ex_list = [b'root> ', b'.*\r\n']
     reg_ex_list_chassis = [b'.*\n']
     rasmessage_any = re.compile("[-/\d:]{3,26}, \[[A-Z0-9]{2,4}-[0-9]{4}],.*\\n")  #### tested
-    rasmessage_MAPS = re.compile("\[MAPS-[0-9]{4}],.*\\n")            #### tested
+    #rasmessage_MAPS = re.compile("\[MAPS-[0-9]{4}],[\\s\\d]+,[\\s\\d]+,\\s+[A_Z]+,.*\\n")            ####
+    rasmessage_MAPS = re.compile("(\[MAPS-[0-9]{4}]),[\\s\\d/]+,[CHASFID 0-9]+,\s+([A-Z]+)")            ####
     rasmessage_BNECK = re.compile("\[AN-10[1-9][0-9]],.*\\n")         #### tested 
     rasmessage_RTWR = re.compile("\[RTWR-[0-9]{4}],.*\\n")            #### tested
     rasmessage_ROUTE = re.compile("\[C[DR]{2}-5[0-9]{3}],.*\\n")      #### tested
     rasmessage_RPM = re.compile("\[RPM-710[0-9]],.*\\n")              #### tested 
     rasmessage_CxMSG = re.compile("\[C[2-9]-10[0-9]{2}],.*\\n")       #### tested
-    rasmessage_Cx5MSG = re.compile("\[C[2-9]-5[0-9]{3}],.*\\n")       #### tested  supportsave
+    #rasmessage_Cx5MSG = re.compile("\[C[2-9]-5[0-9]{3}],.*\\n")       #### tested  supportsave
+    rasmessage_Cx5MSG = re.compile("(\[C[2-9]-5[0-9]{3}]),[\\s\\d/]+,[CHASFID 0-9]+,\s+([A-Z]+)") 
     rasmessage_OOM = re.compile("\[RM-70[0-9]{2}],.*\\n")             #### tested
     rasmessage_IPRULE = re.compile("ERROR: Failed to enforce new iptables rules")
     
     
-    rasmessage_MAPS_short = rasmessage_MAPS = re.compile("\[MAPS-[0-9]{4}]") #### tested
+    #rasmessage_MAPS_short = rasmessage_MAPS = re.compile("\[MAPS-[0-9]{4}]") #### tested
+    rasmessage_MAPS_short                   = re.compile("\[MAPS-[0-9]{4}]") #### tested
     rasmessage_RTWR_short = rasmessage_RTWR = re.compile("\[RTWR-[0-9]{4}]") #### tested
     rasmessage_ERROR0_short = re.compile("\[FCIP-1000]|\[FCIP-5039]|\[FCIP-5665]|\[RPM-7100]|\[RPM-7101]|\[AUTH-1014],\
                                          |\[AUTH-1044]|\[SNMP-1004]|\[BLS-1000]|\[BLS-5024]|\[BLS-5039]|\[BLS-5665],\
@@ -978,16 +981,20 @@ def testproc(queue, ipaddr, cport_raw):
     print(capture, end="")
     #############################################################################
     #############################################################################
-    chass_re = re.compile('([chassisname]{11})\\r\\n([a-zA-Z0-9_]{0,31})\\r\\n')
-    chass_name = chass_re.search(capture)
-    print("\n1111111111111111111111111111111111111111111111111111111111111111111\n")
-    print(chass_name.group(0))
-    print("\n222222222222222222222222222222222222222222222222222222222222222222222\n")
-    print(chass_name.group(1))
-    print("\n333333333333333333333333333333333333333333333333333333333333333333333\n")
-    print(chass_name.group(2))
-    chass_name = chass_name.group(2)
-    ras_message_dict = {"chassis_name":chass_name}
+    try:
+        
+        chass_re = re.compile('([chassisname]{11})\\r\\n([a-zA-Z0-9_]{0,31})\\r\\n')
+        chass_name = chass_re.search(capture)
+        print("\n1111111111111111111111111111111111111111111111111111111111111111111\n")
+        print(chass_name.group(0))
+        print("\n222222222222222222222222222222222222222222222222222222222222222222222\n")
+        print(chass_name.group(1))
+        print("\n333333333333333333333333333333333333333333333333333333333333333333333\n")
+        print(chass_name.group(2))
+        chass_name = chass_name.group(2)
+        ras_message_dict = {"chassis_name":chass_name}
+    except AttributeError:
+        ras_message_dict = {"chassis_name":"backup_CP"}
     
     
     ###################################################################
@@ -1061,22 +1068,71 @@ def testproc(queue, ipaddr, cport_raw):
             ras_log_file.write(capture)
             ras_log_file.write("\n")
             
-            
-        elif rasmessage_MAPS.search(capture):                 #### tested 
+        
+##### ## ##   #   #####  #####      ###########################################
+##### ## ##  ###  #   #  #          ###########################################
+##### # # # #   # #####  #####      ###########################################
+##### #   # ##### #          #      ###########################################
+##### #   # #   # #      #####      ###########################################
+
+
+        
+        elif rasmessage_MAPS.search(capture):                 #### 
             ras_long = rasmessage_MAPS.search(capture)
-            ras = rasmessage_MAPS_short.search(capture)
+            ras = rasmessage_MAPS.search(capture)
             message_MAPS_ras = add_message_together(message_MAPS, ras.group(0))
             ras_log_file.write(capture)
             ras_log_file.write("\n")
            
-            if ras.group(0) in ras_message_dict :
-                count = ras_message_dict.get(ras.group(0))
+            #if ras.group(0) in ras_message_dict :
+            #    count = ras_message_dict.get(ras.group(0))
+            #    count += 1
+            #    ras_message_dict[ras.group(0)] = count
+            #else:
+            #    ras_message_dict[ras.group(0)] = 1
+            #new_ras_message = "new"
+            #
+            message_maps_combine  = ras.group(1) + " " + ras.group(2)
+            
+            
+            if message_maps_combine in ras_message_dict :
+                count = ras_message_dict.get(message_maps_combine)
                 count += 1
-                ras_message_dict[ras.group(0)] = count
+                ras_message_dict[message_maps_combine] = count
             else:
-                ras_message_dict[ras.group(0)] = 1
+                ras_message_dict[message_maps_combine] = 1
             new_ras_message = "new"
+            
+            print("MAPS"*25)
+            print(ras.group(0))
+            print(ras.group(1))
+            print(ras.group(2))
+            print(message_maps_combine)
+            print("MAPS"*25)
+        
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################     
                
+            
+            
+        #elif rasmessage_MAPS.search(capture):                 #### tested 
+        #    ras_long = rasmessage_MAPS.search(capture)
+        #    ras = rasmessage_MAPS_short.search(capture)
+        #    message_MAPS_ras = add_message_together(message_MAPS, ras.group(0))
+        #    ras_log_file.write(capture)
+        #    ras_log_file.write("\n")
+        #   
+        #    if ras.group(0) in ras_message_dict :
+        #        count = ras_message_dict.get(ras.group(0))
+        #        count += 1
+        #        ras_message_dict[ras.group(0)] = count
+        #    else:
+        #        ras_message_dict[ras.group(0)] = 1
+        #    new_ras_message = "new"
+        #       
                   
         elif rasmessage_BNECK.search(capture):                 #### need to test
             ras = rasmessage_BNECK.search(capture)
@@ -1153,21 +1209,26 @@ def testproc(queue, ipaddr, cport_raw):
             ras_log_file.write(capture)
             ras_log_file.write("\n")
             print("\n\nerror error  c3-5nnn message \n\n") 
-         
-            if ras.group(0) in ras_message_dict :
-                count = ras_message_dict.get(ras.group(0))
+            C5msg_combine  = ras.group(1) + " " + ras.group(2)
+            
+            if C5msg_combine in ras_message_dict :
+                count = ras_message_dict.get(C5msg_combine)
                 count += 1
-                ras_message_dict[ras.group(0)] = count
+                ras_message_dict[C5msg_combine] = count
             else:
-                ras_message_dict[ras.group(0)] = 1
+                ras_message_dict[C5msg_combine] = 1
             new_ras_message = "new"
             print("START SUPPORTSAVE")
-            try:
-                dss = DoSupportsave(ftpip, ftpu, ftpp, chass_name )
-            except UnboundLocalError:
-                print("ftp server info is not configured")
             
-            print("END SUPPORTSAVE")
+            #### do supportsave only if this is ERROR
+            #ras_string = str(rasmessage_Cx5MSG)
+            if "ERR**OR" in C5msg_combine:
+                try:
+                    dss = DoSupportsave(ftpip, ftpu, ftpp, chass_name )
+                except UnboundLocalError:
+                    print("ftp server info is not configured")
+            
+                print("END SUPPORTSAVE")
             
             
         #elif rasmessage_OOM.search(capture):          #### need to test 
@@ -1186,6 +1247,10 @@ def testproc(queue, ipaddr, cport_raw):
             ras_log_file.write("\n")
             print("\n\nERROR: FAILED to enforce new IPtables rule\n\n")
         
+        
+        
+        
+        ### need to add this back 
         #########################################################################    
         #### find any RAS log message not already captured above
         elif rasmessage_any.search(capture):
@@ -1195,6 +1260,18 @@ def testproc(queue, ipaddr, cport_raw):
             #ras_log_file.close
             print("\nfound a RAS LOG message with the second search\n\n")
             print(capture)
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
     ###################################################################
     ###################################################################

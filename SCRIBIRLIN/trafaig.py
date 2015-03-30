@@ -14,6 +14,8 @@
 import os,sys
 import csv
 import time
+import argparse
+import os.path
 from multiprocessing import Process
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
@@ -34,51 +36,64 @@ import anturlar
 
 import traffic_tools
 
+
+###############################################################################
+####  parser to get the filename 
+####
+###############################################################################
+
+def parent_parser():
+    
+    pp = argparse.ArgumentParser(add_help=False)
+    pp.add_argument("filename", help="Traffic config filename")
+    group = pp.add_mutually_exclusive_group()
+    group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
+    group.add_argument("-q", "--quiet", action="store_true")
+    return pp 
+
+def parse_args(args):
+    verb_value = "99"
+    parent_p = parent_parser()      
+    parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
+    args = parser.parse_args()
+        
+    return(parser.parse_args())
+
+
 ###############################################################################
 ####  Get the traffic info to start 
 ###############################################################################
 
-def get_switch_info():
-    
+def get_switch_info(trffilecsv):
 ###############################################################################
 #### read the csv file to get the switch info
 ####  return the ip, username and password 
 ###############################################################################
     server_list = []
     
-    with open('ini/traffic.csv', newline='') as csvfile:
+    with open('ini/%s' % trffilecsv, newline='') as csvfile:
         traff_options = csv.reader(csvfile, delimiter=' ', quotechar='|')
         i = 0
-        
         for row in traff_options:
-            
-            #print(i)
-            #print("\nLine %s " % i)
-            #print(', '.join(row))
             i += 1
-            
             server_list.append(', '.join(row))
     return(server_list)
-            
-    
-
-
+   
+###############################################################################
 
 
 def main():
-    
-    
-    
-    #my_ip = "10.38.39.43"
-    #user_name = "root"
-    #psswd = "pass"
-
+        
+    pa = parse_args(sys.argv)
+    if os.path.exists("ini/%s" % pa.filename):
+        pass
+        print("found the file")
+    else:
+        print("Could not find the file  %s  " % pa.filename)
     this_platform = liabhar.platform()
-
-    print("PLATFORM IS  :  %s  " % this_platform)
-
-    traff_to_start = get_switch_info()
-    print(traff_to_start)
+    #print("PLATFORM IS  :  %s  " % this_platform)
+    traff_to_start = get_switch_info(pa.filename)
+    #print(traff_to_start)
     for s in traff_to_start:
         print("SERVER COMMANDS ")
         print(s)
@@ -144,30 +159,24 @@ def main():
         print("command Options   :   %s " % cmd_options)
         print("start command is  :   %s " % strt_cmd)
           
-          
-
-    ######################
+    ###########################################################################
     #### commenting out for debug purpose
     ####
     ####
         #if t[2] != "Username":
         #  traffic_tools.traff_get_port_list(serv_ip, serv_usr, serv_pwd, strt_cmd)
-        
+    ###########################################################################
+    
         print("\n\n\n\n\n\n\n\n\n\n")
-        print(t[2])
-        
+        print(t[2])    
         if t[2] != "Username":
             os_ver = anturlar.remote_os_ver(serv_ip,9)
-    
             print("\n"*44)
             print(os_ver)
-          
-            
             p = Process(target=traffic_tools.traff_get_port_list, args=(serv_ip, serv_usr, serv_pwd, strt_cmd, os_ver))
             p.daemon = True
             p.start()
             #p.join()
-            
             time.sleep(35.2)
 
     time_traffic_run = 0

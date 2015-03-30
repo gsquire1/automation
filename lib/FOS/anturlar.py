@@ -1877,7 +1877,7 @@ def connect_tel(pa, pw):
         con_out = fos_cmd("setcontext %s"%(fid))
         print(con_out)
         
-        return capture      
+        return(capture)      
     
     except EOFError:
         print("========================")
