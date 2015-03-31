@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/opt/python3/bin/python3
+
 
 
 ###############################################################################
@@ -65,7 +66,7 @@ def parent_parser():
     
     pp = argparse.ArgumentParser(add_help=False)
     #pp.add_argument("--repeat", help="repeat repeat")
-    pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
+    #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
@@ -545,11 +546,17 @@ def get_ip_from_file(chassis_name):
     except OSError:
         print("Cannot find the file SwitchMatrix.csv")
         return(False)
-     
+    ips = [] 
     for line in csv_file:
-        chassis_name_from_file = (line['Nickname'])
-        if chassis_name_from_file == chassis_name:
-            ip = (line['IP Address'])
+        #chassis_name_from_file = (line['Nickname'])
+        #if chassis_name_from_file == chassis_name:
+        ip = (line['IP Address'])
+        print(type(ip))
+        print(ip)
+        if ip not in ips:
+            ips.append(ip)
+    print(ips)
+    sys.exit()
                         
     return(ip)
 
@@ -666,10 +673,10 @@ def main():
     print(pa.ipaddr)
     print(pa.quiet)
     print(pa.verbose)
-    print(pa.firmware)
+    #print(pa.firmware)
     print("@"*40)
     
-    sys.exit()
+    #sys.exit()
    
     ###########################################################################
     ###########################################################################
@@ -743,8 +750,8 @@ def main():
     
     anturlar.close_tel()
 
-    connect_console(console_ip, user_name, usr_pass, console_port)
-    cons_out = send_cmd("switchshow")
+    #connect_console(console_ip, user_name, usr_pass, console_port)
+    #cons_out = send_cmd("switchshow")
     
  
     
@@ -757,60 +764,60 @@ def main():
      
     
     
-    cons_out = stop_at_cmd_prompt(9)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print(cons_out)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    cons_out = env_variables(sw_type, 9)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    print(cons_out)
-    load_kernel(sw_type, my_ip, pa.firmware)
-    
-    for pp in range(0, len(power_pole_info), 2):
-        print('POWERPOLE')
-        print(power_pole_info[pp])
-        print(power_pole_info[pp+1])
-        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
-        time.sleep(2)
-        
-    for pp in range(0, len(power_pole_info), 2):
-        print('POWERPOLE')
-        print(power_pole_info[pp])
-        print(power_pole_info[pp+1])
-        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
-        time.sleep(2)
-    #### is there another way to tell if switch is ready ??
-    #### instead of waiting
-    print("\r\n"*6)
-    print("@"*40)
-    print("wait here to login and change passwords")
-    print("\r\n"*6)     
-    #liabhar.count_down(300)
-    #time.sleep(360)
-    cons_out = sw_set_pwd_timeout(usr_psswd)
-    
-    tn.close()
-    
-    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    
-    print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
-   
-    print(my_ip)
-    
-    c = cofra.SwitchUpdate(my_ip)
-    cons_out = cc.playback_licenses_to_switch()
-    
-    print(cons_out)
-    
-    anturlar.close_tel()
-    #tn.write(b"exit\n")
+    #cons_out = stop_at_cmd_prompt(9)
+    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    #print(cons_out)
+    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    #cons_out = env_variables(sw_type, 9)
+    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    #print(cons_out)
+    #load_kernel(sw_type, my_ip, pa.firmware)
+    #
+    #for pp in range(0, len(power_pole_info), 2):
+    #    print('POWERPOLE')
+    #    print(power_pole_info[pp])
+    #    print(power_pole_info[pp+1])
+    #    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
+    #    time.sleep(2)
+    #    
+    #for pp in range(0, len(power_pole_info), 2):
+    #    print('POWERPOLE')
+    #    print(power_pole_info[pp])
+    #    print(power_pole_info[pp+1])
+    #    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
+    #    time.sleep(2)
+    ##### is there another way to tell if switch is ready ??
+    ##### instead of waiting
+    #print("\r\n"*6)
+    #print("@"*40)
+    #print("wait here to login and change passwords")
+    #print("\r\n"*6)     
+    ##liabhar.count_down(300)
+    ##time.sleep(360)
+    #cons_out = sw_set_pwd_timeout(usr_psswd)
+    #
     #tn.close()
-     
-    dt = liabhar.dateTimeStuff()
-    date_is = dt.current()
-    print(date_is)
+    #
+    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    #
+    #print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
+    #
+    #print(my_ip)
+    #
+    #c = cofra.SwitchUpdate(my_ip)
+    #cons_out = cc.playback_licenses_to_switch()
+    #
+    #print(cons_out)
+    #
+    #anturlar.close_tel()
+    ##tn.write(b"exit\n")
+    ##tn.close()
+    # 
+    #dt = liabhar.dateTimeStuff()
+    #date_is = dt.current()
+    #print(date_is)
     
 if __name__ == '__main__':
     
