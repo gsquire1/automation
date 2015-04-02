@@ -80,9 +80,11 @@ def parse_args(args):
     verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
-    #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
-    parser.add_argument('-c', '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
+    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
+    #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
+    parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
+    parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
+    #parser.add_argument('-ip', '--ipaddr', type=list, help="IP address of target switch")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
     
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
@@ -409,6 +411,29 @@ def send_cmd(cmd, db=0):
     
     return(capture)
 
+def console_info_from_ip(ipaddr):
+    """
+    
+    """
+    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = 'ini/SwitchMatrix.csv'
+    try:
+        csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
+    except OSError:
+        print("Cannot find the file SwitchMatrix.csv")
+        return(False)
+    
+    for line in csv_file:
+        ip_address_from_file = (line['IP Address'])
+        
+        if ip_address_from_file == ipaddr:
+            swtch_name = (line['Chassisname'])
+         
+        else:
+            print("\r\n")
+        
+    return(swtch_name)
+
 def console_info(chassis_name):
     """
     
@@ -429,7 +454,7 @@ def console_info(chassis_name):
     #print("@"*80)
     
     for line in csv_file:
-        chassis_name_from_file = (line['Nickname'])
+        chassis_name_from_file = (line['Chassisname'])
         #print("@"*80)
         #print(chassis_name_from_file)
         #print(type(chassis_name_from_file))
@@ -480,7 +505,7 @@ def pwr_pole_info(chassis_name):
     #print("@"*80)
     
     for line in csv_file:
-        chassis_name_from_file = (line['Nickname'])
+        chassis_name_from_file = (line['Chassisname'])
         
         #if chassis_name_from_file == chassis_name[0]:
         if chassis_name_from_file == chassis_name:
@@ -526,7 +551,7 @@ def get_user_and_pass(chassis_name):
      
     u_and_p = []
     for line in csv_file:
-        chassis_name_from_file = (line['Nickname'])
+        chassis_name_from_file = (line['Chassisname'])
         if chassis_name_from_file == chassis_name:
             u = (line['Username'])
             p = (line['Password'])
@@ -548,17 +573,15 @@ def get_ip_from_file(chassis_name):
         return(False)
     ips = [] 
     for line in csv_file:
-        #chassis_name_from_file = (line['Nickname'])
+        #chassis_name_from_file = (line['Chassisname'])
         #if chassis_name_from_file == chassis_name:
         ip = (line['IP Address'])
-        print(type(ip))
-        print(ip)
         if ip not in ips:
             ips.append(ip)
     print(ips)
+    #sys.exit()
+    return(ips)
     sys.exit()
-                        
-    return(ip)
 
 def sw_set_pwd_timeout(pswrd):
    
@@ -668,76 +691,81 @@ def main():
 ####
 ###############################################################################
     pa = parse_args(sys.argv)
-    print(pa)
-    print(pa.chassis_name)
-    print(pa.ipaddr)
-    print(pa.quiet)
-    print(pa.verbose)
+    #print(pa)
+    #print(pa.chassis_name)
+    #print(pa.ipaddr)
+    #print(pa.quiet)
+    #print(pa.verbose)
     #print(pa.firmware)
-    print("@"*40)
-    
+    #print("@"*40)
     #sys.exit()
+
    
     ###########################################################################
     ###########################################################################
     ####
     #### hold the ip address from the command line
     ####  
-    ipaddr = pa.ipaddr
-    cons_info         = console_info(pa.chassis_name)
-    console_ip = cons_info[0]
-    console_port = cons_info[1]
-    power_pole_info   = pwr_pole_info(pa.chassis_name)    
-    usr_pass = get_user_and_pass(pa.chassis_name)
-    user_name = usr_pass[0]
-    usr_psswd = usr_pass[1]
-    ipaddr_switch = get_ip_from_file(pa.chassis_name)
+    if pa.ipaddr:
+        pa.chassis_name = console_info_from_ip(pa.ipaddr)
+    cons_info           = console_info(pa.chassis_name)
+    console_ip          = cons_info[0]
+    console_port        = cons_info[1]
     
-   
+    power_pole_info     = pwr_pole_info(pa.chassis_name)    
+    usr_pass            = get_user_and_pass(pa.chassis_name)
+    user_name           = usr_pass[0]
+    usr_psswd           = usr_pass[1]
+    if pa.csvall: ############################LOOK AT THIS #################
+        ipaddr_switch       = get_ip_from_file(pa.chassis_name)    
+    else:
+        ipaddr_switch       = [pa.ipaddr]
    
    
     #### need to get the ipaddress from the file
     #### pass to login procedure
     #### already have username password
-    
-    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    
-    sw_dict = cofra.get_info_from_the_switch()
-    #print("\n\n\nGET IP")
-    my_ip                = sw_dict["switch_ip"]
-    #print("\n\n\nGET NAME")
-    sw_name              = sw_dict["switch_name"]
-    #print("\n\n\nGET CHASSIS_NAME")
-    sw_chass_name        = sw_dict["chassis_name"]
-    sw_director_or_pizza = sw_dict["director"]
-    sw_domains           = sw_dict["domain_list"]
-    sw_ls_list           = sw_dict["ls_list"]
-    sw_base_fid          = sw_dict["base_sw"]
-    sw_xisl              = sw_dict["xisl_state"]
-    sw_type              = sw_dict["switch_type"]
-    sw_license           = sw_dict["license_list"]
-    sw_vf_setting        = sw_dict["vf_setting"]
-    sw_fcr_enabled       = sw_dict["fcr_enabled"]
-    sw_port_list         = sw_dict["port_list"]
-
-    print("\n"*20)
-    print("SWITHC IP            : %s   " % my_ip)
-    print("SWITCH NAME          : %s   " % sw_name)
-    print("CHASSIS NAME         : %s   " % sw_chass_name)
-    print("DIRECTOR             : %s   " % sw_director_or_pizza)
-    print("SWITCH DOMAINS       : %s   " % sw_domains)
-    print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-    print("BASE FID             : %s   " % sw_base_fid)
-    print("XISL STATE           : %s   " % sw_xisl)
-    print("SWITCH TYPE          : %s   " % sw_type)
-    print("LICENSE LIST         : %s   " % sw_license)
-    print("VF SETTING           : %s   " % sw_vf_setting)
-    print("FCR SETTING          : %s   " % sw_fcr_enabled)
-    print("PORT LIST            : %s   " % sw_port_list)
-    print("@"*40)
-    print("CONSOLE INFO         : %s   " % cons_info)
-    print("@"*40)
-    print("POWER POLE INFO      : %s   " % power_pole_info)
+    print(type(ipaddr_switch))
+    print(ipaddr_switch)
+    for i in ipaddr_switch:
+        tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+        
+        sw_dict = cofra.get_info_from_the_switch()
+        #print("\n\n\nGET IP")
+        my_ip                = sw_dict["switch_ip"]
+        #print("\n\n\nGET NAME")
+        sw_name              = sw_dict["switch_name"]
+        #print("\n\n\nGET CHASSIS_NAME")
+        sw_chass_name        = sw_dict["chassis_name"]
+        sw_director_or_pizza = sw_dict["director"]
+        sw_domains           = sw_dict["domain_list"]
+        sw_ls_list           = sw_dict["ls_list"]
+        sw_base_fid          = sw_dict["base_sw"]
+        sw_xisl              = sw_dict["xisl_state"]
+        sw_type              = sw_dict["switch_type"]
+        sw_license           = sw_dict["license_list"]
+        sw_vf_setting        = sw_dict["vf_setting"]
+        sw_fcr_enabled       = sw_dict["fcr_enabled"]
+        sw_port_list         = sw_dict["port_list"]
+        
+        print("\n"*20)
+        print("SWITHC IP            : %s   " % my_ip)
+        print("SWITCH NAME          : %s   " % sw_name)
+        print("CHASSIS NAME         : %s   " % sw_chass_name)
+        print("DIRECTOR             : %s   " % sw_director_or_pizza)
+        print("SWITCH DOMAINS       : %s   " % sw_domains)
+        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+        print("BASE FID             : %s   " % sw_base_fid)
+        print("XISL STATE           : %s   " % sw_xisl)
+        print("SWITCH TYPE          : %s   " % sw_type)
+        print("LICENSE LIST         : %s   " % sw_license)
+        print("VF SETTING           : %s   " % sw_vf_setting)
+        print("FCR SETTING          : %s   " % sw_fcr_enabled)
+        print("PORT LIST            : %s   " % sw_port_list)
+        print("@"*40)
+        print("CONSOLE INFO         : %s   " % cons_info)
+        print("@"*40)
+        print("POWER POLE INFO      : %s   " % power_pole_info)
     
     
      
