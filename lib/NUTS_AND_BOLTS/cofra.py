@@ -1231,6 +1231,7 @@ def get_info_from_the_switch():
     fi = anturlar.FlowV()
     
     switch_ip = si.ipaddress()
+    switch_cp_ips  = si.cp_ipaddrs_get()
     license_list = si.getLicense()
     ls_list = si.ls()
     first_ls = si.ls_now()
@@ -1301,6 +1302,7 @@ def get_info_from_the_switch():
     switch_dict["base_sw"]      = base_sw
     switch_dict["xisl_state"]   = d_xisl_state
     switch_dict["switch_type"]  = sw_type
+    switch_dict["cp_ip_list"]   = switch_cp_ips
     switch_dict["license_list"] = license_list
     switch_dict["vf_setting"]   = vf_enabled
     switch_dict["fcr_enabled"]  = fcr_state

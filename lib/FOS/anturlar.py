@@ -579,7 +579,27 @@ class SwitchInfo:
     #        this does not work because the getportlist requires the port
     #    """ 
     #    return(self.__getportlist__("D-Port"))
-     
+    
+    def cp_ipaddrs_get(self):
+        """
+            determine the current switch IP
+            Return the ipv4 address
+            Return 0 if no match found
+        """
+        capture_cmd = fos_cmd("ipaddrshow", 0)
+        try:
+            #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
+            ras = re.compile('Ethernet\s+IP\s+Address:\s+([0-9\.]{7,15})')
+            ras = ras.findall(capture_cmd)
+            return(ras)
+
+        except:
+            print("COULD NOT MATCH IP ADDRESS")
+            sys.exit()
+            return("COULD NOT MATCH IP ADDRESS")
+            
+        return(ras)
+    
     def default_switch(self):
         """
             Return default FID if found
