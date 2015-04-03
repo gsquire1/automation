@@ -389,22 +389,27 @@ class SwitchUpdate():
     """
 
     def __init__(self, ip, user = "root", password = "password"):
-
+        #### do we need to pass ip ????????????????
+        
         self.ip = ip
         self.user = user
         self.password = password
+        self.si = anturlar.SwitchInfo()
+        
         
     def playback_licenses_to_switch(self):
         """
         Replay Licenses back to switch. The ""Switch_Info_for_playback_",switch_ip,".txt" ""
         must already be written and available in logs/ file.
+        License might require a reboot but user can handle this
+        
         """
         
-        si = anturlar.SwitchInfo()
-        cs = anturlar.ConfigSwitch()
-        switch_ip = si.ipaddress()
+        #si = anturlar.SwitchInfo()
+        #cs = anturlar.ConfigSwitch()
+        switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -418,14 +423,76 @@ class SwitchUpdate():
             c = b.split(",")
             for i in c:
                 anturlar.fos_cmd("licenseadd %s" % i)
-            self.reboot_reconnect()
-            if a != "Online":
-                anturlar.fos_cmd("switchenable")    
-            anturlar.fos_cmd('licenseshow')
+            #self.reboot_reconnect()
+            #if a != "Online":
+            #    anturlar.fos_cmd("switchenable")    
+            #anturlar.fos_cmd('licenseshow')
         except:
             pass
         
         return(True)
+    
+    def playback_ls_to_switch(self):
+        """
+        
+        """
+        reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
+        switch_ip = self.si.ipaddress()
+    
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
+        ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals]+)', a)
+        
+        
+        try:
+            ls_list = ras[0]
+            c = ls_list.split(",")
+        
+            for i in c:
+                cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
+                if "n]?: " in cons_out:
+                    anturlar.fos_cmd("yes", 9)
+                else:
+                    print("\n\nFID was not created\n\n")
+                    anturlar.fos_cmd("", 9)
+        except:
+            print("There was an error attempting to create a FID in playback_ls_to_switch")
+            return(False)
+        return(True)
+        
+    def playback_switch_names(self):
+        """
+        
+        """
+        reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
+        switch_ip = self.si.ipaddress()
+    
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras = re.findall('SWITCH NAME\s+:\s+\{(.+)(?:})', a)
+        sn = ras[0]
+        sname_list = sn.split(",")
+        
+        for ss in sname_list:
+            ss_fid_name = ss.split(":")
+            for sw_fid_name in range(0,len(ss_fid_name),2):
+                anturlar.fos_cmd("setcontext %s" % ss_fid_name[0] ,0)
+                anturlar.fos_cmd("switchname %s" % ss_fid_name[1], 9)
+    
+        return(True)
+    
+    
     
     def reboot_reconnect(self):
         anturlar.fos_cmd("echo Y | reboot")
