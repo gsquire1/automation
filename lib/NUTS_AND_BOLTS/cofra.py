@@ -8,7 +8,7 @@ import re
 import liabhar
 import csv
 import os
-
+import ast
 
 
 class doFirmwareDownload():
@@ -397,7 +397,7 @@ class SwitchUpdate():
         self.si = anturlar.SwitchInfo()
         
         
-    def playback_licenses_to_switch(self):
+    def playback_licenses(self):
         """
         Replay Licenses back to switch. The ""Switch_Info_for_playback_",switch_ip,".txt" ""
         must already be written and available in logs/ file.
@@ -432,7 +432,7 @@ class SwitchUpdate():
         
         return(True)
     
-    def playback_ls_to_switch(self):
+    def playback_ls(self):
         """
         
         """
@@ -471,9 +471,9 @@ class SwitchUpdate():
         
         """
         reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
-        switch_ip = self.si.ipaddress()
+        #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -490,6 +490,93 @@ class SwitchUpdate():
                 anturlar.fos_cmd("setcontext %s" % ss_fid_name[0] ,0)
                 anturlar.fos_cmd("switchname %s" % ss_fid_name[1], 9)
     
+        return(True)
+    
+    def playback_switch_domains(self):
+        """
+        
+        """
+        reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
+        reg_ex_yes_no = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
+        #switch_ip = self.si.ipaddress()
+    
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras = re.findall('SWITCH DOMAIN\s+:\s+\{(.+)(?:})', a)
+        sn = ras[0]
+        sname_list = sn.split(",")
+        
+        for ss in sname_list:
+            ss_fid_domain = ss.split(": ")
+            for sw_fid_name in range(0,len(ss_fid_domain),2):
+                anturlar.fos_cmd("setcontext %s" % ss_fid_domain[0] ,0)
+                anturlar.fos_cmd("switchdisable", 9)
+                cons_out = anturlar.fos_cmd_regex("configure", reg_ex_yes_no, 9)
+                cons_out = anturlar.fos_cmd_regex("y", reg_ex_yes_no, 9)
+                cons_out = anturlar.fos_cmd_regex(ss_fid_domain[1], reg_ex_yes_no, 9)
+                #cons_out = anturlar.fos_cmd_regex("239", reg_ex_yes_no, 9)
+                if "re-enter" in cons_out:
+                    print("INPUT is NOT correct")
+                    #cons_out = anturlar.fos_cmd_regex("239", reg_ex_yes_no, 9)
+                    cons_out = anturlar.fos_cmd_regex("239", reg_ex_yes_no, 9)
+                
+                cons_out = anturlar.fos_cmd_regex("", reg_ex_yes_no, 9)
+                #anturlar.fos_cmd("\003", 9)  #### ctrl-C will negate the changes
+                #anturlar.fox_cmd("\004", 9)  #### ctrl-D  is EOF for telnet 
+                #anturlar.fos_cmd("\n"*35, 9)
+                #while not reg_ex_yes_no[3]:
+                while "root> " not in cons_out:
+                    cons_out = anturlar.fos_cmd_regex("", reg_ex_yes_no_root, 9)
+                     
+                    
+        return(True)
+    
+    def playback_add_ports(self):
+        """
+        
+        """
+        
+        reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
+        reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
+        #switch_ip = self.si.ipaddress()
+    
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras = re.findall('Ports\s+:\s+\{(.+)(?:})', a)
+        sn = ras[0]
+        sn = sn.split("'")
+        
+        for i in range(2,len(sn),2):
+            fid_for_ports = sn[i-1]
+            fid_ports = sn[i]
+            fid_ports = fid_ports.replace(": [","")
+            fid_ports = fid_ports.replace("[","")
+            fid_ports = fid_ports.replace("]],","")
+            fid_ports = fid_ports.replace(" ","")
+            fid_ports = fid_ports.replace("]","")
+            fid_ports = fid_ports.split(",")
+             
+            for s in range(0,len(fid_ports),2):
+                try:
+                    slot = fid_ports[s]
+                    port = fid_ports[s+1]
+                    #print("SLOT PORT_____%s_____%s___ " % (slot,port))
+                    cons_out = anturlar.fos_cmd_regex("lscfg --config %s -slot %s -port %s" % (fid_for_ports, slot,port) , reg_ex_yes_no, 0)
+                    cons_out = anturlar.fos_cmd("y",0)
+                 
+                except IndexError:
+                    print("No ports in this FID")
+                    
         return(True)
     
     

@@ -733,10 +733,12 @@ def main():
     print(ipaddr_switch)
     
     cc = cofra.SwitchUpdate(ipaddr_switch)
-    cons_out = cc.playback_licenses_to_switch()
-    cons_out  = cc.playback_ls_to_switch()
-    cons_out = cc.playback_switch_names()
-    tn       = cc.reboot()
+    #cons_out = cc.playback_licenses()
+    #cons_out  = cc.playback_ls()
+    #cons_out = cc.playback_switch_names()
+    #tn       = cc.reboot_reconnect()
+    #cons_out = cc.playback_switch_domains()
+    cons_out = cc.playback_add_ports()
     
     cons_out = anturlar.fos_cmd("switchshow")
     
