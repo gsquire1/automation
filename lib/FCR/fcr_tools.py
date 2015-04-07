@@ -32,12 +32,12 @@ def test_anturlar_functions():
     fcri = anturlar.FcrInfo()
     #si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate
-    a = fcri.ipv4_plus_fcr_list()
+    a = fcri.fcr_fab_wide_ip()
     #b = su.playback_licenses_to_switch()
-    if a == False:
-        print('IT BOMBED')
-    else:
-        print(a)
+    #if a == False:
+    #    print('IT BOMBED')
+    #else:
+    print(a)
     sys.exit()
     
 def csv_functions_ip():
