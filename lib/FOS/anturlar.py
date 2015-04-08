@@ -1090,7 +1090,14 @@ class FcrInfo(FabricInfo, SwitchInfo):
         else:
             get_fabric_ip = fcrcfg.ipv4_list()
         get_fcr_fabric = self.ipv4_fcr()
-        fcr_fab_ip_list = (get_fabric_ip + get_fcr_fabric)
+        try:
+            fcr_fab_ip_list = (get_fabric_ip + get_fcr_fabric)
+        except TypeError:
+            print("\n############################")
+            print("Either fcrfabricshow and/or fabricshow are coming up as not available or not there.")
+            print("Or this script must be run from a base switch if VF is set")
+            print("############################\n")
+            sys.exit()
         all_ips = []
         for ip in fcr_fab_ip_list:
             connect_tel_noparse(ip,'root','password')
