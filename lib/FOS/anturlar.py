@@ -1074,13 +1074,11 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def fcr_fab_wide_ip(self):
         """
-        ################################################
-        Testing Anturlar functions. Left off here.
-        Only Getting edge switch IPs!!!!!!!!!!!!!!
+            ******************MUST BE RUN IN BASE IF VF IS USED *******************************
             Runs fcrfabricshow and fabricshow against switches in a backbone fabric to determine all IPs then
             removes any duplicate entries.
             This includes both backbone and edge switches and any additional switches resident in edge fabrics.
-            Return is a set of IPs.
+            Return is a list of IPs.
         """
          
         fcrcfg = FcrInfo()
@@ -1092,25 +1090,17 @@ class FcrInfo(FabricInfo, SwitchInfo):
         else:
             get_fabric_ip = fcrcfg.ipv4_list()
         get_fcr_fabric = self.ipv4_fcr()
-        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
-        print(get_fabric_ip)
-        print(get_fcr_fabric)
-        sys.exit()
-        fcr_fab_ip_list = (set(get_fabric_ip + get_fcr_fabric))
-        
+        fcr_fab_ip_list = (get_fabric_ip + get_fcr_fabric)
         all_ips = []
-        get_fabric_ip = []
         for ip in fcr_fab_ip_list:
             connect_tel_noparse(ip,'root','password')
-            base = fcrcfg.base_check() # get the base FID number
-            if base is not False:
-                f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
-                get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
-            else:
-                get_fabric_ip = fcrcfg.ipv4_list()
-                all_ips.extend(get_fabric_ip)
-        all_ips_no_dups = (set(all_ips))
-        return(all_ips_no_dups)
+            get_fabric_ip = fcrcfg.ipv4_list()
+        entire_fcr_fab_ip_list = (get_fabric_ip + fcr_fab_ip_list)
+        all_ips = (set(entire_fcr_fab_ip_list))
+        final_ip_list = (list(all_ips))
+        return(final_ip_list)
+
+
 
     def fcr_proxy_dev(self):
         """
