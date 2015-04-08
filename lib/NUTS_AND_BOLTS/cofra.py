@@ -388,10 +388,10 @@ class SwitchUpdate():
     
     """
 
-    def __init__(self, ip, user = "root", password = "password"):
+    def __init__(self, user = "root", password = "password"):
         #### do we need to pass ip ????????????????
         
-        self.ip = ip
+        #self.ip = ip
         self.user = user
         self.password = password
         self.si = anturlar.SwitchInfo()
@@ -409,7 +409,8 @@ class SwitchUpdate():
         #cs = anturlar.ConfigSwitch()
         switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")) ###.bak????
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -442,7 +443,8 @@ class SwitchUpdate():
         reg_ex_root   = [b"cant catch this"]
         switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()

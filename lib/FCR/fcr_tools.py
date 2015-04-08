@@ -29,15 +29,15 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 def test_anturlar_functions():
     #a = ex_port_list()
-    fcri = anturlar.FcrInfo()
+    #fcri = anturlar.FcrInfo()
     #si = anturlar.SwitchInfo()
-    #su = cofra.SwitchUpdate
-    a = fcri.ipv4_plus_fcr_list()
-    #b = su.playback_licenses_to_switch()
-    if a == False:
-        print('IT BOMBED')
-    else:
-        print(a)
+    su = cofra.SwitchUpdate()
+    #a = fcri.fcr_fab_wide_ip()
+    b = su.playback_licenses()
+    #if a == False:
+    #    print('IT BOMBED')
+    #else:
+    print(b)
     sys.exit()
     
 def csv_functions_ip():
