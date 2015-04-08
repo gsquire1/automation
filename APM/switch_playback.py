@@ -819,7 +819,8 @@ def main():
         print("CP0                           %s  "    % my_cp_ip_list[1])
         print("CP1                           %s  "    % my_cp_ip_list[2])  
           
-    sys.exit()
+    #sys.exit()   stop here for getting the switch info only
+    
 ###################################################################################################################
 ###################################################################################################################
 ####
@@ -944,10 +945,16 @@ def main():
     print(my_ip)
     
     cc = cofra.SwitchUpdate(my_ip)
-    cons_out = cc.playback_licenses_to_switch()
     
+    cons_out = cc.playback_licenses()
+    cons_out  = cc.playback_ls()
+    cons_out = cc.playback_switch_names()
+    cons_out = cc.playback_switch_domains()
+    cons_out = cc.playback_add_ports()
+    tn       = cc.reboot_reconnect()
+    cons_out = anturlar.fos_cmd("switchshow")
     print(cons_out)
-    
+     
     anturlar.close_tel()
     #tn.write(b"exit\n")
     #tn.close()

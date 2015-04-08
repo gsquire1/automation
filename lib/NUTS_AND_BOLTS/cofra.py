@@ -436,7 +436,10 @@ class SwitchUpdate():
         """
         
         """
-        reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
+        
+        #reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
+        reg_ex_yes_no = [b"n\]\?: ", b"FID:\s+[0-9]+"]
+        reg_ex_root   = [b"cant catch this"]
         switch_ip = self.si.ipaddress()
     
         f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
@@ -450,20 +453,24 @@ class SwitchUpdate():
         ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals]+)', a)
         
         
-        try:
-            ls_list = ras[0]
-            c = ls_list.split(",")
-        
-            for i in c:
-                cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
-                if "n]?: " in cons_out:
-                    anturlar.fos_cmd("yes", 9)
-                else:
-                    print("\n\nFID was not created\n\n")
-                    anturlar.fos_cmd("", 9)
-        except:
-            print("There was an error attempting to create a FID in playback_ls_to_switch")
-            return(False)
+        #try:
+        ls_list = ras[0]
+        c = ls_list.split(",")
+    
+        for i in c:
+            cons_out = anturlar.fos_cmd("lscfg --create %s" % i , 9)
+            #cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
+            if "n]?: " in cons_out:
+                anturlar.fos_cmd("yes", 9)
+                
+            else:
+                print("\n\nFID was not created\n\n")
+                #anturlar.fos_cmd("",  9)
+                    
+                    
+        #except:
+        #    print("There was an error attempting to create a FID in playback_ls_to_switch")
+        #    return(False)
         return(True)
         
     def playback_switch_names(self):

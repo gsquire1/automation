@@ -2067,7 +2067,7 @@ def power_cmd(cmd, dl=0):
         print("========================")
 
 def fos_cmd_regex(cmd, reg,dblevel=0):
-     ###########################################################################
+    ###########################################################################
     ####   
     ####   to pass the reg make it a list and b style
     ####    reg_list = [b'[my reg expression]', b'second expression' ]
@@ -2267,7 +2267,9 @@ def fos_cmd_regex_gen(cmd, reg,dblevel=0):
         print("handle the EOF case here")
         print("========================")
         
-    
+
+
+
 def remote_os_ver(ip="127.0.0.1", dl=0):
     
     ###########################################################################

@@ -733,22 +733,20 @@ def main():
     print(ipaddr_switch)
     
     cc = cofra.SwitchUpdate(ipaddr_switch)
-    #cons_out = cc.playback_licenses()
-    #cons_out  = cc.playback_ls()
-    #cons_out = cc.playback_switch_names()
-    #tn       = cc.reboot_reconnect()
-    #cons_out = cc.playback_switch_domains()
+    cons_out = cc.playback_licenses()
+    cons_out  = cc.playback_ls()
+    sys.exit()
+    
+    cons_out = cc.playback_switch_names()
+    
+    cons_out = cc.playback_switch_domains()
     cons_out = cc.playback_add_ports()
     
-    cons_out = anturlar.fos_cmd("switchshow")
-    
-    
-    print(cons_out)
+    #tn       = cc.reboot_reconnect()
+    #cons_out = anturlar.fos_cmd("switchshow")
+    #print(cons_out)
     
     anturlar.close_tel()
-    #tn.write(b"exit\n")
-    #tn.close()
-     
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
     print(date_is)
