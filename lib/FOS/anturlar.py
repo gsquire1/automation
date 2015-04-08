@@ -1092,6 +1092,10 @@ class FcrInfo(FabricInfo, SwitchInfo):
         else:
             get_fabric_ip = fcrcfg.ipv4_list()
         get_fcr_fabric = self.ipv4_fcr()
+        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
+        print(get_fabric_ip)
+        print(get_fcr_fabric)
+        sys.exit()
         fcr_fab_ip_list = (set(get_fabric_ip + get_fcr_fabric))
         
         all_ips = []
