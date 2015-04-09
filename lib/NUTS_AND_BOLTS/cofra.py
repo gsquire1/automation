@@ -445,7 +445,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
