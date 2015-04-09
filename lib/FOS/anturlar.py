@@ -2269,7 +2269,45 @@ def fos_cmd_regex_gen(cmd, reg,dblevel=0):
         print("========================")
         
 
-
+def fos_cmd_regex_only(cmd, reg,dblevel=0):
+     ###########################################################################
+    ####   
+    ####   to pass the reg make it a list and b style
+    ####    reg_list = [b'[my reg expression]', b'second expression' ]
+    ####
+    ####    gen since teh user name is not needed
+    ###########################################################################
+ 
+    global tn
+    try: 
+        #usrn = var.sw_user + '> '
+        #usrn = usrn.encode()
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        
+        tn.set_debuglevel(dblevel)
+        reg = reg.encode()
+        #reg = reg.encode()
+        reg_ex_list = [reg ]
+        #reg_ex_list = reg
+        #reg_ex_list.append(usrn)
+        
+        capture = ""
+        print(cmd)
+        tn.write(cmd.encode('ascii') + b"\n")
+        
+        capture = tn.expect(reg_ex_list, 3600)
+        capture = capture[2]
+        capture = capture.decode()
+        print(capture, end="")
+        tn.set_debuglevel(0)
+        return(capture)
+ 
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
+        
 
 def remote_os_ver(ip="127.0.0.1", dl=0):
     

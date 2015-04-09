@@ -395,7 +395,7 @@ class SwitchUpdate():
         self.user = user
         self.password = password
         self.si = anturlar.SwitchInfo()
-        
+        self.switch_ip = self.si.ipaddress()
         
     def playback_licenses(self):
         """
@@ -407,10 +407,10 @@ class SwitchUpdate():
         
         #si = anturlar.SwitchInfo()
         #cs = anturlar.ConfigSwitch()
-        switch_ip = self.si.ipaddress()
+        #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")) ###.bak????
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt")) ###.bak????
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -439,12 +439,13 @@ class SwitchUpdate():
         """
         
         #reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
-        reg_ex_yes_no = [b"n\]\?: ", b"FID:\s+[0-9]+"]
+        #reg_ex_yes_no = [b"n\]\?: ", b"FID:\s+[0-9]+"]
+        reg_ex_yes_no = [b"n\]\?: " ]
         reg_ex_root   = [b"cant catch this"]
-        switch_ip = self.si.ipaddress()
+        #switch_ip = self.si.ipaddress()
     
-        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -452,27 +453,43 @@ class SwitchUpdate():
             print("\n\nThere was a problem opening the file:" , f)
             sys.exit()        
         ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
-        ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals]+)', a)
+        ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
+
+        print("@"*44)
+        print(ras_base)
+        print("@"*44)
         
+        try:
+            ls_list = ras[0]
+            c = ls_list.split(",")
         
-        #try:
-        ls_list = ras[0]
-        c = ls_list.split(",")
-    
-        for i in c:
-            cons_out = anturlar.fos_cmd("lscfg --create %s" % i , 9)
-            #cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
-            if "n]?: " in cons_out:
-                anturlar.fos_cmd("yes", 9)
+            for i in c:
                 
-            else:
-                print("\n\nFID was not created\n\n")
-                #anturlar.fos_cmd("",  9)
+                if ras_base[0] in i:
+                    cons_out = anturlar.fos_cmd_regex("lscfg --create %s -base" % i , reg_ex_yes_no, 9)
+                    if "n]?: " in cons_out:
+                        anturlar.fos_cmd("yes", 9)
+                    else:
+                        pass
                     
-                    
-        #except:
-        #    print("There was an error attempting to create a FID in playback_ls_to_switch")
-        #    return(False)
+                else:
+                    cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i ,reg_ex_yes_no,  9)
+                    print("@"*30)
+                    print("CONSOLE OUTPUT")
+                    print(cons_out)
+                    print("@"*30)
+                    #cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
+                    if "n]?: " in cons_out:
+                        anturlar.fos_cmd("yes", 9)
+                        
+                    else:
+                        #print("\n\nFID was not created\n\n")
+                        #anturlar.fos_cmd_regex_only("", "root> " , 9)
+                        pass   
+                        
+        except:
+            print("There was an error attempting to create a FID in playback_ls_to_switch")
+            return(False)
         return(True)
         
     def playback_switch_names(self):
@@ -482,7 +499,7 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -509,7 +526,7 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -554,7 +571,7 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -566,15 +583,19 @@ class SwitchUpdate():
         sn = sn.split("'")
         
         for i in range(2,len(sn),2):
+            
             fid_for_ports = sn[i-1]
             fid_ports = sn[i]
+            
             fid_ports = fid_ports.replace(": [","")
             fid_ports = fid_ports.replace("[","")
             fid_ports = fid_ports.replace("]],","")
             fid_ports = fid_ports.replace(" ","")
             fid_ports = fid_ports.replace("]","")
             fid_ports = fid_ports.split(",")
-             
+            print("@"*30)
+            print(fid_ports)
+            print("$"*44)
             for s in range(0,len(fid_ports),2):
                 try:
                     slot = fid_ports[s]
@@ -588,7 +609,10 @@ class SwitchUpdate():
                     
         return(True)
     
+    def playback_timeout(self, seconds=0 ):
+        anturlar.fos_cmd("timeout %s " % seconds)
     
+        return(True)
     
     def reboot_reconnect(self):
         anturlar.fos_cmd("echo Y | reboot")
