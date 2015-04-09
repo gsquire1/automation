@@ -737,10 +737,10 @@ def main():
     cons_out  = cc.playback_ls()
 
     
-    cons_out = cc.playback_switch_names()
+    #cons_out = cc.playback_switch_names()
     
-    cons_out = cc.playback_switch_domains()
-    cons_out = cc.playback_add_ports()
+    #cons_out = cc.playback_switch_domains()
+    #cons_out = cc.playback_add_ports()
     cons_out = cc.playback_timeout()
     tn       = cc.reboot_reconnect()
     cons_out = anturlar.fos_cmd("switchshow")

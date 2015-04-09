@@ -621,31 +621,40 @@ class SwitchUpdate():
         anturlar.fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
         state = False
-        try:
-            
-            tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
-            si = anturlar.SwitchInfo()
-            
-            chassis = si.director()
-            print("**********************************")
-            print(chassis)
-
-            if chassis:
-                state = si.synchronized()
-            else:
-                state = si.switch_state()
-                print(")))))))))))))))")
-                print(state)
-                print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-                if state == ("Online"):
-                    state = True
-                    print(state)
+        while True:
+            try:
+                print("@"*44)
+                print(self.switch_ip)
+                print(self.user)
+                print(self.password)
+                print("@"*44)
+                
+                tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
+                si = anturlar.SwitchInfo()
+                
+                chassis = si.director()
+                print("**********************************")
+                print(chassis)
+    
+                if chassis:
+                    state = si.synchronized()
                 else:
-                    state = False
-                    
-        except:
-            state = False
-            pass
+                    state = si.switch_state()
+                    print(")))))))))))))))")
+                    print(state)
+                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    if state == ("Online"):
+                        state = True
+                        print(state)
+                    else:
+                        state = False
+                       
+                break
+            
+            except:
+                print("Retry the Telnet connection")
+                liabhar.count_down(30)
+                pass
         
         while not state:
             liabhar.count_down(33)
@@ -661,7 +670,7 @@ class SwitchUpdate():
         #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
         return(tn)
 
-    
+        
     
     
 ###############################################################################
