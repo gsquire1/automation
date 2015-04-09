@@ -444,8 +444,8 @@ class SwitchUpdate():
         reg_ex_root   = [b"cant catch this"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -499,7 +499,8 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -526,7 +527,8 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -571,7 +573,8 @@ class SwitchUpdate():
         reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
         #switch_ip = self.si.ipaddress()
     
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
         try:
             with open(f, 'r') as file:
                 a = file.read()
