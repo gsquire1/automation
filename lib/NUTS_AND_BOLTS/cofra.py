@@ -617,7 +617,9 @@ class SwitchUpdate():
     def reboot_reconnect(self):
         anturlar.fos_cmd("echo Y | reboot")
         liabhar.count_down(120)
+        state = False
         try:
+            
             tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
             si = anturlar.SwitchInfo()
             
@@ -639,7 +641,9 @@ class SwitchUpdate():
                     state = False
                     
         except:
+            state = False
             pass
+        
         while not state:
             liabhar.count_down(33)
             if chassis:
