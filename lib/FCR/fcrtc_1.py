@@ -1,4 +1,4 @@
-#!/opt/python3/bin/python3
+#!/usr/bin/env python3
 
 def main():
     """
