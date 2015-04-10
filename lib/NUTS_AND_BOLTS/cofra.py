@@ -389,9 +389,7 @@ class SwitchUpdate():
     """
 
     def __init__(self, user = "root", password = "password"):
-        #### do we need to pass ip ????????????????
-        
-        #self.ip = ip
+       
         self.user = user
         self.password = password
         self.si = anturlar.SwitchInfo()
