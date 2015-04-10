@@ -775,7 +775,16 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
+    cc = cofra.SwitchUpdate()
     
+    cons_out = cc.playback_licenses()
+    cons_out  = cc.playback_ls()
+    cons_out = cc.playback_switch_names()
+    cons_out = cc.playback_switch_domains()
+    cons_out = cc.playback_add_ports()
+    tn       = cc.reboot_reconnect()
+    cons_out = anturlar.fos_cmd("switchshow")
+    print(cons_out)
     anturlar.close_tel()
 
     #connect_console(console_ip, user_name, usr_pass, console_port)
