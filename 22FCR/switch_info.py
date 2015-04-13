@@ -706,66 +706,66 @@ def main():
     ####
     #### hold the ip address from the command line
     ####  
-    if pa.ipaddr:
-        pa.chassis_name = console_info_from_ip(pa.ipaddr)
-    cons_info           = console_info(pa.chassis_name)
-    console_ip          = cons_info[0]
-    console_port        = cons_info[1]
-    
-    power_pole_info     = pwr_pole_info(pa.chassis_name)    
-    usr_pass            = get_user_and_pass(pa.chassis_name)
-    user_name           = usr_pass[0]
-    usr_psswd           = usr_pass[1]
-    if pa.csvall: ############################LOOK AT THIS #################
-        ipaddr_switch       = get_ip_from_file(pa.chassis_name)    
-    else:
-        ipaddr_switch       = [pa.ipaddr]
-   
-   
-    #### need to get the ipaddress from the file
-    #### pass to login procedure
-    #### already have username password
-    print(type(ipaddr_switch))
-    print(ipaddr_switch)
-    for i in ipaddr_switch:
-        tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
-        
-        sw_dict = cofra.get_info_from_the_switch()
-        #print("\n\n\nGET IP")
-        my_ip                = sw_dict["switch_ip"]
-        #print("\n\n\nGET NAME")
-        sw_name              = sw_dict["switch_name"]
-        #print("\n\n\nGET CHASSIS_NAME")
-        sw_chass_name        = sw_dict["chassis_name"]
-        sw_director_or_pizza = sw_dict["director"]
-        sw_domains           = sw_dict["domain_list"]
-        sw_ls_list           = sw_dict["ls_list"]
-        sw_base_fid          = sw_dict["base_sw"]
-        sw_xisl              = sw_dict["xisl_state"]
-        sw_type              = sw_dict["switch_type"]
-        sw_license           = sw_dict["license_list"]
-        sw_vf_setting        = sw_dict["vf_setting"]
-        sw_fcr_enabled       = sw_dict["fcr_enabled"]
-        sw_port_list         = sw_dict["port_list"]
-        
-        print("\n"*20)
-        print("SWITHC IP            : %s   " % my_ip)
-        print("SWITCH NAME          : %s   " % sw_name)
-        print("CHASSIS NAME         : %s   " % sw_chass_name)
-        print("DIRECTOR             : %s   " % sw_director_or_pizza)
-        print("SWITCH DOMAINS       : %s   " % sw_domains)
-        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-        print("BASE FID             : %s   " % sw_base_fid)
-        print("XISL STATE           : %s   " % sw_xisl)
-        print("SWITCH TYPE          : %s   " % sw_type)
-        print("LICENSE LIST         : %s   " % sw_license)
-        print("VF SETTING           : %s   " % sw_vf_setting)
-        print("FCR SETTING          : %s   " % sw_fcr_enabled)
-        print("PORT LIST            : %s   " % sw_port_list)
-        print("@"*40)
-        print("CONSOLE INFO         : %s   " % cons_info)
-        print("@"*40)
-        print("POWER POLE INFO      : %s   " % power_pole_info)
+    ##if pa.ipaddr:
+    ##    pa.chassis_name = console_info_from_ip(pa.ipaddr)
+    ##cons_info           = console_info(pa.chassis_name)
+    ##console_ip          = cons_info[0]
+    ##console_port        = cons_info[1]
+    ##
+    ##power_pole_info     = pwr_pole_info(pa.chassis_name)    
+    ##usr_pass            = get_user_and_pass(pa.chassis_name)
+    ##user_name           = usr_pass[0]
+    ##usr_psswd           = usr_pass[1]
+    ##if pa.csvall: ############################LOOK AT THIS #################
+    ##    ipaddr_switch       = get_ip_from_file(pa.chassis_name)    
+    ##else:
+    ##    ipaddr_switch       = [pa.ipaddr]
+    ##
+    ##
+    ###### need to get the ipaddress from the file
+    ###### pass to login procedure
+    ###### already have username password
+    ##print(type(ipaddr_switch))
+    ##print(ipaddr_switch)
+    ##for i in ipaddr_switch:
+    ##    tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+    ##    
+    ##    sw_dict = cofra.get_info_from_the_switch()
+    ##    #print("\n\n\nGET IP")
+    ##    my_ip                = sw_dict["switch_ip"]
+    ##    #print("\n\n\nGET NAME")
+    ##    sw_name              = sw_dict["switch_name"]
+    ##    #print("\n\n\nGET CHASSIS_NAME")
+    ##    sw_chass_name        = sw_dict["chassis_name"]
+    ##    sw_director_or_pizza = sw_dict["director"]
+    ##    sw_domains           = sw_dict["domain_list"]
+    ##    sw_ls_list           = sw_dict["ls_list"]
+    ##    sw_base_fid          = sw_dict["base_sw"]
+    ##    sw_xisl              = sw_dict["xisl_state"]
+    ##    sw_type              = sw_dict["switch_type"]
+    ##    sw_license           = sw_dict["license_list"]
+    ##    sw_vf_setting        = sw_dict["vf_setting"]
+    ##    sw_fcr_enabled       = sw_dict["fcr_enabled"]
+    ##    sw_port_list         = sw_dict["port_list"]
+    ##    
+    ##    print("\n"*20)
+    ##    print("SWITHC IP            : %s   " % my_ip)
+    ##    print("SWITCH NAME          : %s   " % sw_name)
+    ##    print("CHASSIS NAME         : %s   " % sw_chass_name)
+    ##    print("DIRECTOR             : %s   " % sw_director_or_pizza)
+    ##    print("SWITCH DOMAINS       : %s   " % sw_domains)
+    ##    print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+    ##    print("BASE FID             : %s   " % sw_base_fid)
+    ##    print("XISL STATE           : %s   " % sw_xisl)
+    ##    print("SWITCH TYPE          : %s   " % sw_type)
+    ##    print("LICENSE LIST         : %s   " % sw_license)
+    ##    print("VF SETTING           : %s   " % sw_vf_setting)
+    ##    print("FCR SETTING          : %s   " % sw_fcr_enabled)
+    ##    print("PORT LIST            : %s   " % sw_port_list)
+    ##    print("@"*40)
+    ##    print("CONSOLE INFO         : %s   " % cons_info)
+    ##    print("@"*40)
+    ##    print("POWER POLE INFO      : %s   " % power_pole_info)
     
     
      
@@ -775,7 +775,15 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
-    cc = cofra.SwitchUpdate()
+    ##cc = cofra.SwitchUpdate()
+    
+    switch_ip = ("10.38.36.55")
+    f = "%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")
+    cc = liabhar.FileStuff(f, 'r+b')
+    #print(ff)
+    #ff.close()
+    #sys.exit()
+    #cc = f.open('r + b')
     
     cons_out = cc.playback_licenses()
     cons_out  = cc.playback_ls()
@@ -785,6 +793,7 @@ def main():
     tn       = cc.reboot_reconnect()
     cons_out = anturlar.fos_cmd("switchshow")
     print(cons_out)
+    ff.close()
     anturlar.close_tel()
 
     #connect_console(console_ip, user_name, usr_pass, console_port)
