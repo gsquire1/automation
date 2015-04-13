@@ -11,6 +11,7 @@ import os
 import ast
 
 
+
 class doFirmwareDownload():
     """
         do a firmware download to 7.3.0 build of  firmware
