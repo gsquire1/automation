@@ -944,7 +944,7 @@ def main():
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
     print(my_ip)
     
-    cc = cofra.SwitchUpdate(my_ip)
+    cc = cofra.SwitchUpdate()
     
     cons_out = cc.playback_licenses()
     cons_out  = cc.playback_ls()
