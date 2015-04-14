@@ -462,8 +462,8 @@ def ex_deconfig():
             cmd = anturlar.fos_cmd("portcfgshow %a/%a" % (slot, port))
             ex = pattern.search(cmd)
             if ex:
-                anturlar.fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a2"))
-                anturlar.fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a2"))
+                anturlar.fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a 2"))
+                anturlar.fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a 2"))
     else: 
         for i in portlist:
             print(i)
@@ -472,8 +472,8 @@ def ex_deconfig():
             cmd = anturlar.fos_cmd("portcfgshow %a" % port)
             ex = pattern.search(cmd)
             if ex:
-                anturlar.fos_cmd("portcfgexport %s %s"%(port,"-a2"))
-                anturlar.fos_cmd("portcfgvexport %s %s"%(port,"-a2"))
+                anturlar.fos_cmd("portcfgexport %s %s"%(port,"-a 2"))
+                anturlar.fos_cmd("portcfgvexport %s %s"%(port,"-a 2"))
     cmd_cap = anturlar.fos_cmd("switchenable")
     print('\n\nAll EX_ports found are now deconfigured.')
     return(cmd_cap)
