@@ -4,7 +4,10 @@
 
 ###############################################################################
 ####
-####  net install a switch of any 
+####  Get switch config info and place in a file that
+####  can be used later to rebuild the switch to the same configuration.
+####  Options are single switch, entire fabric, entire fcr fabric and everything in
+####  switch matrix file
 ####
 ###############################################################################
 
@@ -86,6 +89,7 @@ def parse_args(args):
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
     #parser.add_argument('-ip', '--ipaddr', type=list, help="IP address of target switch")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
+    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
     
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
@@ -98,6 +102,7 @@ def parse_args(args):
     
     args = parser.parse_args()
     print(args)
+    #sys.exit()
     
     if not args.chassis_name and not args.ipaddr:
         print("Chassis Name or IP address is required")
@@ -705,7 +710,9 @@ def main():
     ##########################################################################
     ###
     ### hold the ip address from the command line
-    ###  
+    ###
+
+
     if pa.ipaddr:
         pa.chassis_name = console_info_from_ip(pa.ipaddr)
     cons_info           = console_info(pa.chassis_name)
@@ -716,26 +723,42 @@ def main():
     usr_pass            = get_user_and_pass(pa.chassis_name)
     user_name           = usr_pass[0]
     usr_psswd           = usr_pass[1]
-    if pa.csvall: ############################LOOK AT THIS #################
-        ipaddr_switch       = get_ip_from_file(pa.chassis_name)    
+    
+    tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
+    fi = anturlar.FabricInfo()
+    fcr = anturlar.FcrInfo()
+
+    #if pa.fid:
+        
+    if pa.fabwide:
+        ipaddr_switch   = fi.ipv4_list()
+        print(ipaddr_switch)
+    elif pa.csvall:
+        ipaddr_switch   = get_ip_from_file(pa.chassis_name)
+    elif pa.fcrwide:
+        anturlar.fos_cmd("setcontext %s" % fcr.base_check())
+        ipaddr_switch   = fcr.fcr_fab_wide_ip()
+
+        
+        #if ipaddr_switch != True:
+        #        print('\n\n\n'+"@"*40)        
+        #        print("\nThe -fcr operand must be run against FC router and/or base (if applicable).\n")
+        print("@"*40)
+        print(ipaddr_switch)
+        #sys.exit()       
     else:
         ipaddr_switch       = [pa.ipaddr]
+    anturlar.close_tel()
     
-    
-    #### need to get the ipaddress from the file
-    #### pass to login procedure
-    #### already have username password
-    print(type(ipaddr_switch))
-    print(ipaddr_switch)
+    #### pass ip(s)to login procedure
+    #### and write the file
+
     for i in ipaddr_switch:
         tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
         
         sw_dict = cofra.get_info_from_the_switch()
-        #print("\n\n\nGET IP")
-        my_ip                = sw_dict["switch_ip"]
-        #print("\n\n\nGET NAME")
+        switch_ip                = sw_dict["switch_ip"]
         sw_name              = sw_dict["switch_name"]
-        #print("\n\n\nGET CHASSIS_NAME")
         sw_chass_name        = sw_dict["chassis_name"]
         sw_director_or_pizza = sw_dict["director"]
         sw_domains           = sw_dict["domain_list"]
@@ -749,7 +772,7 @@ def main():
         sw_port_list         = sw_dict["port_list"]
         
         print("\n"*20)
-        print("SWITHC IP            : %s   " % my_ip)
+        print("SWITCH IP            : %s   " % switch_ip)
         print("SWITCH NAME          : %s   " % sw_name)
         print("CHASSIS NAME         : %s   " % sw_chass_name)
         print("DIRECTOR             : %s   " % sw_director_or_pizza)
@@ -766,8 +789,11 @@ def main():
         print("CONSOLE INFO         : %s   " % cons_info)
         print("@"*40)
         print("POWER POLE INFO      : %s   " % power_pole_info)
-    
-    
+        print("@"*40)        
+        print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
+        print("@"*40)
+    anturlar.close_tel()
+    sys.exit()
      
 ###############################################################################
 ####
@@ -775,18 +801,11 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
+
     cc = cofra.SwitchUpdate()
     
-    #switch_ip = ("10.38.36.55")
-    #f = "%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")
-    #cc = liabhar.FileStuff(f, 'r+b')
-    #print(ff)
-    #ff.close()
-    #sys.exit()
-    #cc = f.open('r + b')
-    
     cons_out = cc.playback_licenses()
-    cons_out  = cc.playback_ls()
+    cons_out = cc.playback_ls()
     cons_out = cc.playback_switch_names()
     cons_out = cc.playback_switch_domains()
     cons_out = cc.playback_add_ports()
@@ -851,7 +870,7 @@ def main():
     #
     #print(my_ip)
     #
-    #c = cofra.SwitchUpdate(my_ip)
+    #c = cofra.SwitchUpdate(switch_ip)
     #cons_out = cc.playback_licenses_to_switch()
     #
     #print(cons_out)
