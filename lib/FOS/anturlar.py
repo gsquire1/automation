@@ -1944,7 +1944,7 @@ def connect_tel_noparse(HOST,usrname,password, *args):
             sys.exit()
             
         print(capture)
-        return(capture)      
+        return(tn)      
     
     except EOFError:
         print("========================")

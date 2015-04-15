@@ -584,8 +584,14 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
-def sw_set_pwd_timeout(pswrd):
-   
+def sw_set_pwd_timeout(pswrd, tn):
+    """
+        while still on the console
+        login to the switch
+        
+    """
+     
+    
     reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
     reg_login = [ b"login:"]
     reg_assword = [ b"assword: ", b"root> "]
@@ -593,13 +599,17 @@ def sw_set_pwd_timeout(pswrd):
     reg_complete   = [ b"zation completed"]
     reg_linertn    = [ b"\\r\\n" ]
     
-    capture = tn.expect(reg_complete, 1000)
+    print("\n\nlooking for completed task\n\n")
+    capture = tn.expect(reg_complete, 10)
     tn.write(b"\r\n")
+    print("\n\nwrite to tn a newline \n\n")
+    print("\n\nlooking for login and send root\n\n")
         #capture = tn.expect(reg_linertn)
     capture = tn.expect(reg_login, 60)
     
     tn.write(b"root\r\n")
     capture = tn.expect(reg_assword, 20)
+    print("\n\nlooking for password and send fibranne\n\n")
     tn.write(b"fibranne\r\n")
     capture = tn.expect(reg_change_pass, 20)
     tn.write(b"\r\n")
@@ -608,7 +618,10 @@ def sw_set_pwd_timeout(pswrd):
     
     while True:    
         capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
-        #### if root is found break out 
+        #### if root is found break out
+        print("CAPTURE is  ")
+        print(capture)
+        
         if capture[0] == 1:
             print(capture)
             print("this found root")
@@ -623,7 +636,7 @@ def sw_set_pwd_timeout(pswrd):
     tn.write(b"timeout 0 \r\n")
     capture = tn.expect(reg_list, 20)
     
-    return(tn)
+    return(True)
    
 def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
     """
@@ -896,21 +909,34 @@ def main():
 ####  turn each port off then turn each port on (otherwise the delay between did not power cycle the switch)
 ####
 #######################################################################################################################
-    
-    for pp in range(0, len(power_pole_info), 2):
-        print('POWERPOLE')
-        print(power_pole_info[pp])
-        print(power_pole_info[pp+1])
-        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
-        time.sleep(2)
-        
-    for pp in range(0, len(power_pole_info), 2):
-        print('POWERPOLE')
-        print(power_pole_info[pp])
-        print(power_pole_info[pp+1])
-        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
-        time.sleep(2)
-        
+    try:
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
+            time.sleep(2)
+            
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
+            time.sleep(2)
+    except:
+        if  '' == power_pole_info[0]:
+            print("\n"*20)
+            print("NO POWER POLE INFO FOUND ")
+            print("HA "*10)
+            print("you have to walk to power cycle the switch")
+            print("I will wait ")
+            liabhar.JustSleep(30)
+        else:
+            print("POWER TOWER INFO")
+            print(power_pole_info[0])
+            print(power_pole_info)
+            liabhar.JustSleep(30)
+            
 #######################################################################################################################
 #######################################################################################################################
 ####
@@ -927,19 +953,24 @@ def main():
 
     print("\r\n"*6)
     print("@"*40)
-    print("wait here to login and change passwords")
+    print("Close Console sessions and login via telnet")
+    print("Sleep for a minute")
     print("\r\n"*6)     
     #liabhar.count_down(300)
     #time.sleep(360)
-    cons_out = sw_set_pwd_timeout(usr_psswd)
-    print("@"*40)
-    print("TN   TN    TN")
-    print(tn_list)
-    print("@"*40)
+    #cons_out = sw_set_pwd_timeout(usr_psswd,10)
+    #print("@"*40)
+    #print("TN   TN    TN")
+    #print(tn_list)
+    #print("@"*40)
     for tn in tn_list:
         tn.close()
 
-    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    
+    liabhar.JustSleep(420)
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    cons_out = sw_set_pwd_timeout(usr_psswd, tn)
+    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
     print(my_ip)
@@ -953,6 +984,8 @@ def main():
     cons_out = cc.playback_add_ports()
     tn       = cc.reboot_reconnect()
     cons_out = anturlar.fos_cmd("switchshow")
+    print(cons_out)
+    cons_out = anturlar.fos_cmd("timeout 0")
     print(cons_out)
      
     anturlar.close_tel()
