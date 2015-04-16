@@ -1554,13 +1554,17 @@ def get_info_from_the_switch():
     mi = anturlar.Maps()
     fi = anturlar.FlowV()
     
+    vdx = si.nos_check()
     switch_ip = si.ipaddress()
     switch_cp_ips  = si.cp_ipaddrs_get()
     license_list = si.getLicense()
     ls_list = si.ls()
     first_ls = si.ls_now()
     switch_id = si.switch_id()
-    theswitch_name = si.switch_name()
+    try:
+        theswitch_name = si.switch_name()
+    except IndexError:
+        pass
     chassis_name = si.chassisname()
     director_pizza = si.director()
     vf_enabled = si.vf_enabled()

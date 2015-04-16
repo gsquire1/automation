@@ -738,6 +738,18 @@ class SwitchInfo:
         except:
             return(0)
 
+    def nos_check(self):
+        """
+            Looks at switchshow output and if "Rbridge" is found, it is a NOS switch.
+        """
+        capture_cmd = fos_cmd("switchshow | grep Rbridge")
+        ras = re.search(r'Rbridge', capture_cmd)
+        print(ras)
+        if ras:
+            return True
+        else:
+            return False
+            
     def n_ports(self):
         """
             Return a list of N-Ports in the current FID
@@ -920,6 +932,7 @@ class SwitchInfo:
         capture_cmd = fos_cmd("switchshow")
         ras = re.compile('switchName:\s+([_\d\w]{1,30})') 
         ras = ras.findall(capture_cmd)
+        print(ras)
         sn = str(ras[0])
         return(sn)
     
