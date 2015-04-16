@@ -586,8 +586,8 @@ def get_ip_from_file(chassis_name):
 
 def sw_set_pwd_timeout(pswrd, tn):
     """
-        while still on the console
-        login to the switch
+        
+        set the password for the root, factory, admin user accounts
         
     """
      
@@ -967,7 +967,7 @@ def main():
         tn.close()
 
     
-    liabhar.JustSleep(420)
+    liabhar.JustSleep(600)
     tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
@@ -978,7 +978,7 @@ def main():
     cc = cofra.SwitchUpdate()
     
     cons_out = cc.playback_licenses()
-    cons_out  = cc.playback_ls()
+    cons_out = cc.playback_ls()
     cons_out = cc.playback_switch_names()
     cons_out = cc.playback_switch_domains()
     cons_out = cc.playback_add_ports()

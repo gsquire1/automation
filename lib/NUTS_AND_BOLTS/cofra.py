@@ -395,7 +395,31 @@ class SwitchUpdate():
         self.password = password
         self.si = anturlar.SwitchInfo()
         self.switch_ip = self.si.ipaddress()
+        self.chassis_name = self.chassis_name_from_ip()
+    
+    def chassis_name_from_ip(self):
+        """
+            read the csv file with the ip address to get the chassis name
+            
+        """
         
+        switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+        switchmatrix = 'ini/SwitchMatrix.csv'
+        try:
+            csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
+        except OSError:
+            print("Cannot find the file SwitchMatrix.csv")
+            return(False)
+        
+        for line in csv_file:
+            ip_address_from_file = (line['IP Address'])
+            
+            if ip_address_from_file == self.switch_ip:
+                swtch_name = (line['Chassisname'])
+            else:
+                print("\r\n")
+        return(swtch_name)
+     
     def playback_licenses(self):
         """
         Replay Licenses back to switch. The ""Switch_Info_for_playback_",switch_ip,".txt" ""
@@ -453,7 +477,11 @@ class SwitchUpdate():
             sys.exit()        
         ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
         ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
-
+        ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+        
+        if not ras_vf_enabled:
+            return(True)
+        
         print("@"*44)
         print(ras_base)
         print("@"*44)
@@ -615,6 +643,100 @@ class SwitchUpdate():
         anturlar.fos_cmd("timeout %s " % seconds)
     
         return(True)
+   
+    def power_pole_cmd(self, pwr_ip, pp, stage, db=0):
+        
+        tnn = anturlar.connect_tel_noparse_power(pwr_ip, 'user', 'pass', db)
+        anturlar.power_cmd("cd access/1\t/1\t%s" % pp ,10)
+        anturlar.power_cmd("show\r\n" ,10)
+        
+        anturlar.power_cmd(stage, 5)
+        anturlar.power_cmd("yes", 5)
+        
+        anturlar.power_cmd("exit", 10)
+         
+        print("\r\n"*10)
+        print("Waiting for the switch to boot")
+        print("\r\n"*5)
+        
+        return(0) 
+        
+    def power_cycle(self):
+        """
+            take the power pole IP and PORT LIST and turn each on off then on
+        
+        """
+        #### reason to turn each off then on instaed of cycle is timing
+        ####  between each port going off then back on when there are more
+        ####   then one ports in the list.. Therefore it is best to turn all
+        ####    off then all on for a clean power cycle
+        switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+        switchmatrix = 'ini/SwitchMatrix.csv'
+        try:
+            csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
+        except OSError:
+            print("Cannot find the file SwitchMatrix.csv")
+            return(False)
+        
+             
+        for line in csv_file:
+            chassis_name_from_file = (line['Chassisname'])
+            
+            if chassis_name_from_file == self.chassis_name:
+                
+                pwer1_ip = (line['Power1 IP'])
+                pwer2_ip = (line['Power2 IP'])
+                pwer3_ip = (line['Power3 IP'])
+                pwer4_ip = (line['Power4 IP'])
+                
+                pwer1_prt = (line['Power1 Port'])
+                pwer2_prt = (line['Power2 Port'])
+                pwer3_prt = (line['Power3 Port'])
+                pwer4_prt = (line['Power4 Port'])
+                
+                p = []
+                p =[pwer1_ip, pwer1_prt]
+                if pwer2_ip:
+                    p += [pwer2_ip]
+                    p += [pwer2_prt]
+                if pwer3_ip:
+                    p += [pwer3_ip]
+                    p += [pwer3_prt]
+                if pwer4_ip:
+                    p += [pwer4_ip]
+                    p += [pwer4_prt]
+                
+        power_pole_info = p
+        
+        try:
+            for pp in range(0, len(power_pole_info), 2):
+                print('POWERPOLE')
+                print(power_pole_info[pp])
+                print(power_pole_info[pp+1])
+                power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "off")
+                
+                time.sleep(2)
+                
+            for pp in range(0, len(power_pole_info), 2):
+                print('POWERPOLE')
+                print(power_pole_info[pp])
+                print(power_pole_info[pp+1])
+                power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "on")
+                time.sleep(2)
+        except:
+            if  '' == power_pole_info[0]:
+                print("\n"*20)
+                print("NO POWER POLE INFO FOUND ")
+                print("HA "*10)
+                print("you have to walk to power cycle the switch")
+                print("I will wait ")
+                liabhar.JustSleep(30)
+            else:
+                print("POWER TOWER INFO")
+                print(power_pole_info[0])
+                print(power_pole_info)
+                liabhar.JustSleep(30)
+        
     
     def reboot_reconnect(self):
         anturlar.fos_cmd("echo Y | reboot")

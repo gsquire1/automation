@@ -1926,7 +1926,7 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        #tn.set_debuglevel(9)
+        tn.set_debuglevel(9)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\n")
         if password:

@@ -542,6 +542,41 @@ def pwr_pole_info(chassis_name):
     
     return(p)
 
+def power_cycle(power_pole_info):
+    
+    try:
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
+            time.sleep(2)
+            
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
+            time.sleep(2)
+    except:
+        if  '' == power_pole_info[0]:
+            print("\n"*20)
+            print("NO POWER POLE INFO FOUND ")
+            print("HA "*10)
+            print("you have to walk to power cycle the switch")
+            print("I will wait ")
+            liabhar.JustSleep(30)
+        else:
+            print("POWER TOWER INFO")
+            print(power_pole_info[0])
+            print(power_pole_info)
+            liabhar.JustSleep(30)
+    
+    
+    
+    
+    
+    
 def get_user_and_pass(chassis_name):
     """
     
@@ -584,7 +619,7 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
-def sw_set_pwd_timeout(pswrd):
+def sw_set_pwd_timeout(pswrd,tn):
    
     reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
     reg_login = [ b"login:"]
@@ -593,13 +628,17 @@ def sw_set_pwd_timeout(pswrd):
     reg_complete   = [ b"zation completed"]
     reg_linertn    = [ b"\\r\\n" ]
     
-    capture = tn.expect(reg_complete, 1000)
+    print("\n\nlooking for completed task\n\n")
+    capture = tn.expect(reg_complete, 10)
     tn.write(b"\r\n")
+    print("\n\nwrite to tn a newline \n\n")
+    print("\n\nlooking for login and send root\n\n")
         #capture = tn.expect(reg_linertn)
     capture = tn.expect(reg_login, 60)
     
     tn.write(b"root\r\n")
     capture = tn.expect(reg_assword, 20)
+    print("\n\nlooking for password and send fibranne\n\n")
     tn.write(b"fibranne\r\n")
     capture = tn.expect(reg_change_pass, 20)
     tn.write(b"\r\n")
@@ -608,7 +647,10 @@ def sw_set_pwd_timeout(pswrd):
     
     while True:    
         capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
-        #### if root is found break out 
+        #### if root is found break out
+        print("CAPTURE is  ")
+        print(capture)
+        
         if capture[0] == 1:
             print(capture)
             print("this found root")
@@ -623,7 +665,13 @@ def sw_set_pwd_timeout(pswrd):
     tn.write(b"timeout 0 \r\n")
     capture = tn.expect(reg_list, 20)
     
-    return(tn)
+    return(True)
+    
+
+
+ 
+ 
+ 
    
 def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
     """
@@ -742,7 +790,16 @@ def main():
     #cons_out = cc.playback_switch_domains()
     #cons_out = cc.playback_add_ports()
     cons_out = cc.playback_timeout()
-    tn       = cc.reboot_reconnect()
+    #tn       = cc.reboot_reconnect()
+    cons_out = anturlar.fos_cmd("passwddefault")
+    cons_out = anturlar.fos_cmd("logout")
+    
+    liabhar.JustSleep(30)
+    cons_out = cc.power_cycle()
+    liabhar.JustSleep(300)
+   
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    cons_out = sw_set_pwd_timeout(usr_psswd, tn)
     cons_out = anturlar.fos_cmd("switchshow")
     print(cons_out)
     
