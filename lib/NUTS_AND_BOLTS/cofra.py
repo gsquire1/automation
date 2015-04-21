@@ -707,22 +707,24 @@ class SwitchUpdate():
                     p += [pwer4_prt]
                 
         power_pole_info = p
+        print("power pole info ")
+        print(power_pole_info)
         
         try:
+            print("Power cycle NOW ")
             for pp in range(0, len(power_pole_info), 2):
                 print('POWERPOLE')
                 print(power_pole_info[pp])
                 print(power_pole_info[pp+1])
-                power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "off")
-                
-                time.sleep(2)
+                self.power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "off")
+                liabhar.JustSleep(2)
                 
             for pp in range(0, len(power_pole_info), 2):
                 print('POWERPOLE')
                 print(power_pole_info[pp])
                 print(power_pole_info[pp+1])
-                power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "on")
-                time.sleep(2)
+                self.power_pole_cmd(power_pole_info[pp],power_pole_info[pp+1], "on")
+                liabhar.JustSleep(2)
         except:
             if  '' == power_pole_info[0]:
                 print("\n"*20)
@@ -732,6 +734,7 @@ class SwitchUpdate():
                 print("I will wait ")
                 liabhar.JustSleep(30)
             else:
+                print("There was an error with Power Cycle")
                 print("POWER TOWER INFO")
                 print(power_pole_info[0])
                 print(power_pole_info)

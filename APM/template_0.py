@@ -796,10 +796,12 @@ def main():
     
     liabhar.JustSleep(30)
     cons_out = cc.power_cycle()
-    liabhar.JustSleep(300)
-   
+    liabhar.JustSleep(600)
+    print("reconnect via telnet")
     tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
+    
     cons_out = anturlar.fos_cmd("switchshow")
     print(cons_out)
     

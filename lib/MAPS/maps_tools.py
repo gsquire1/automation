@@ -181,7 +181,10 @@ def configdl(clear = 0):
     cons_out = anturlar.fos_cmd(" ")
     configdown_cmd = "configupload -all -p ftp 10.38.38.138,ftp2,configupload_test.txt,ftp"
     cons_out = anturlar.fos_cmd (configdown_cmd)
-     
+    
+
+       
+  
  
 def mapsenable( pol, al, ml ):
     """
@@ -202,6 +205,7 @@ def mapsenable( pol, al, ml ):
     return 0
     
  
+        
 def mapscommand_list(options="0"):
     """
         returns a list fo the maps commands

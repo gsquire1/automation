@@ -83,7 +83,7 @@ def parse_args(args):
     #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
-    parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
+    parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt", action="store_true")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
@@ -122,8 +122,8 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     
     var = 1
-    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
-    reg_list_r = [b".*\n", b":root> "]
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: ", b"admin> "]   #### using b for byte string
+    reg_list_r = [b".*\n", b":root> ", b":admin> "]
     
     password = "pass"
     capture = ""
@@ -159,7 +159,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     #############################################################################
     #### login to the switch
-    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" ]  
+    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> "]  
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
@@ -418,7 +418,7 @@ def send_cmd(cmd, db=0):
     cmd_look = cmd.encode()
     
     #reg_ex_list = [b".*:root> "]
-    reg_ex_list = [b"root> "]
+    reg_ex_list = [b"root> ", b"admin> "]
     print(cmd)
     tn.write(cmd.encode('ascii') + b"\r\n")
     capture = tn.expect(reg_ex_list,3600)
@@ -810,7 +810,9 @@ def main():
     else:
         sw_type = pa.switchtype
         my_ip   = ipaddr_switch
-    
+        sw_director_or_pizza = False
+        my_cp_ip_list = []
+        
 ###################################################################################################################
 ###################################################################################################################
 ####
@@ -881,22 +883,23 @@ def main():
     ###########################################################################
     #### im a pizza box
     ###########################################################################
+         
         tn = connect_console(console_ip, user_name, usr_pass, console_port, 0)
         tn_list.append(tn)
-        cons_out = send_cmd("switchshow")
+       
      
 #######################################################################################################################
 ####
 ####  reboot and find the command prompt
 ####
         if not pa.cmdprompt:
-            cons_out = stop_at_cmd_prompt(0)
+            cons_out = stop_at_cmd_prompt(9)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             print(cons_out)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
-        cons_out = env_variables(sw_type, 0)
+        cons_out = env_variables(sw_type, 9)
         print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
         print(cons_out)
