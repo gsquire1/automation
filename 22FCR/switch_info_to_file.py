@@ -19,7 +19,7 @@ sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
 import telnetlib
 import getpass
-
+import ipaddress
 import argparse
 import re
 import anturlar
@@ -107,11 +107,16 @@ def parse_args(args):
     if not args.chassis_name and not args.ipaddr:
         print("Chassis Name or IP address is required")
         sys.exit()
-    #print("Connecting to IP :  " + args.ip)
-    #print("user             :  " + args.user)
-    #verbose    = args.verbose
-     
-     
+        
+            
+    #if args.cmdprompt and not args.switchtype:
+    #    print("To start at the command prompt the switch type is needed.")
+    #    sys.exit()
+    #    
+    #if not args.cmdprompt and args.switchtype:
+    #    print('To start at the command prompt both switch type and command prompt is requried')
+    #    sys.exit()
+
 
     return parser.parse_args()
 
@@ -416,10 +421,12 @@ def send_cmd(cmd, db=0):
     
     return(capture)
 
-def console_info_from_ip(ipaddr):
+def console_info_from_ip(ipaddr, chassis_name):
     """
     
     """
+    #####################################
+    # Check if file is available
     switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
     switchmatrix = 'ini/SwitchMatrix.csv'
     try:
@@ -428,6 +435,25 @@ def console_info_from_ip(ipaddr):
         print("Cannot find the file SwitchMatrix.csv")
         return(False)
     
+    #####################################
+    #Check if IP is in valid format
+    a = cofra.check_ip_format(ipaddr)
+    if a == True:
+        pass
+    else:
+        print("\nPLEASE CHECK YOUR IP ADDRESS AND TRY AGAIN")
+        sys.exit()
+        
+    #####################################
+    #Check if IP is in SwitchMatrix file
+    ipaddr_switch   = get_ip_from_file(chassis_name)
+    if ipaddr in ipaddr_switch:
+        print('IP ADDRESS FOUND IN SwitchMatrix file')
+    else:
+        print('\nIP ADDRESS NOT FOUND IN SwitchMatrix file.')
+        print('Are you sure this is your switch??\n')
+        sys.exit()
+        
     for line in csv_file:
         ip_address_from_file = (line['IP Address'])
         
@@ -436,7 +462,6 @@ def console_info_from_ip(ipaddr):
          
         else:
             print("\r\n")
-        
     return(swtch_name)
 
 def console_info(chassis_name):
@@ -711,10 +736,15 @@ def main():
     ###
     ### hold the ip address from the command line
     ###
-
+    #try:
+    #    ipaddr_test = ipaddress.ip_address(pa.ipaddr)
+    #    #print (ipaddr_test)
+    #except ValueError:
+    #    print("\nPLEASE CHECK YOUR IP ADDRESS AND TRY AGAIN")
+    #    sys.exit()
 
     if pa.ipaddr:
-        pa.chassis_name = console_info_from_ip(pa.ipaddr)
+        pa.chassis_name = console_info_from_ip(pa.ipaddr, pa.chassis_name)
     cons_info           = console_info(pa.chassis_name)
     console_ip          = cons_info[0]
     console_port        = cons_info[1]
@@ -728,9 +758,7 @@ def main():
     fi = anturlar.FabricInfo()
     si = anturlar.SwitchInfo()
     fcr = anturlar.FcrInfo()
-
-    #if pa.fid:
-        
+    
     if pa.fabwide:
         ipaddr_switch   = fi.ipv4_list()
         #print(ipaddr_switch)

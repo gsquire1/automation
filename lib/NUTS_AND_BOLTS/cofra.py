@@ -9,6 +9,7 @@ import liabhar
 import csv
 import os
 import ast
+import ipaddress
 
 
 
@@ -1703,6 +1704,13 @@ def get_info_from_the_switch():
     
     
     return(switch_dict)
+
+def check_ip_format(ipaddr):
+    try:
+        ipaddr_test = ipaddress.ip_address(ipaddr)
+        return(True)
+    except ValueError:
+        return(False)
     
 
     
