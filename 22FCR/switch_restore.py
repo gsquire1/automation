@@ -2,6 +2,7 @@
 
 
 
+
 ###############################################################################
 ####
 ####  Get switch config info and place in a file that
@@ -769,58 +770,76 @@ def main():
         ipaddr_switch   = fcr.fcr_fab_wide_ip()     
     else:
         ipaddr_switch       = [pa.ipaddr]
+
     anturlar.close_tel()
+
     
     #### pass ip(s)to login procedure
     #### and write the file
+    
+    ff = ""
+    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",pa.ipaddr,".txt"))
+    print(f)
+    
+    try:
+        with open(f, 'r') as file:
+            ff = file.read()
+    except IOError:
+        print("\n\nThere was a problem opening the file" , f)
+        sys.exit()
+    print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+    print(ff)
 
-    for i in ipaddr_switch:
-        tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
-        nos = si.nos_check()
-        if not nos:
-            sw_dict              = cofra.get_info_from_the_switch()
-            switch_ip            = sw_dict["switch_ip"]
-            sw_name              = sw_dict["switch_name"]
-            sw_chass_name        = sw_dict["chassis_name"]
-            sw_director_or_pizza = sw_dict["director"]
-            sw_domains           = sw_dict["domain_list"]
-            sw_ls_list           = sw_dict["ls_list"]
-            sw_base_fid          = sw_dict["base_sw"]
-            sw_xisl              = sw_dict["xisl_state"]
-            sw_type              = sw_dict["switch_type"]
-            sw_license           = sw_dict["license_list"]
-            sw_vf_setting        = sw_dict["vf_setting"]
-            sw_fcr_enabled       = sw_dict["fcr_enabled"]
-            sw_port_list         = sw_dict["port_list"]
+    #sys.exit()
+    
 
-            print("\n"*20)
-            print("SWITCH IP            : %s   " % switch_ip)
-            print("SWITCH NAME          : %s   " % sw_name)
-            print("CHASSIS NAME         : %s   " % sw_chass_name)
-            print("DIRECTOR             : %s   " % sw_director_or_pizza)
-            print("SWITCH DOMAINS       : %s   " % sw_domains)
-            print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-            print("BASE FID             : %s   " % sw_base_fid)
-            print("XISL STATE           : %s   " % sw_xisl)
-            print("SWITCH TYPE          : %s   " % sw_type)
-            print("LICENSE LIST         : %s   " % sw_license)
-            print("VF SETTING           : %s   " % sw_vf_setting)
-            print("FCR SETTING          : %s   " % sw_fcr_enabled)
-            print("PORT LIST            : %s   " % sw_port_list)
-            print("@"*40)
-            print("CONSOLE INFO         : %s   " % cons_info)
-            print("@"*40)
-            print("POWER POLE INFO      : %s   " % power_pole_info)
-            print("@"*40)        
-            print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
-            print("@"*40)
-        else:
-            print("\n"+"@"*40)
-            print('\nTHIS IS A NOS SWITCH> SKIPPING')
-            print("\n"+"@"*40)
-            pass
-    anturlar.close_tel()
-    sys.exit()
+    #for i in ipaddr_switch:
+    #    tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+    #    nos = si.nos_check()
+    #    if not nos:
+    #        sw_dict              = cofra.get_info_from_the_switch()
+    #        switch_ip            = sw_dict["switch_ip"]
+    #        sw_name              = sw_dict["switch_name"]
+    #        sw_chass_name        = sw_dict["chassis_name"]
+    #        sw_director_or_pizza = sw_dict["director"]
+    #        sw_domains           = sw_dict["domain_list"]
+    #        sw_ls_list           = sw_dict["ls_list"]
+    #        sw_base_fid          = sw_dict["base_sw"]
+    #        sw_xisl              = sw_dict["xisl_state"]
+    #        sw_type              = sw_dict["switch_type"]
+    #        sw_license           = sw_dict["license_list"]
+    #        sw_vf_setting        = sw_dict["vf_setting"]
+    #        sw_fcr_enabled       = sw_dict["fcr_enabled"]
+    #        sw_port_list         = sw_dict["port_list"]
+    #
+    #        print("\n"*20)
+    #        print("SWITCH IP            : %s   " % switch_ip)
+    #        print("SWITCH NAME          : %s   " % sw_name)
+    #        print("CHASSIS NAME         : %s   " % sw_chass_name)
+    #        print("DIRECTOR             : %s   " % sw_director_or_pizza)
+    #        print("SWITCH DOMAINS       : %s   " % sw_domains)
+    #        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+    #        print("BASE FID             : %s   " % sw_base_fid)
+    #        print("XISL STATE           : %s   " % sw_xisl)
+    #        print("SWITCH TYPE          : %s   " % sw_type)
+    #        print("LICENSE LIST         : %s   " % sw_license)
+    #        print("VF SETTING           : %s   " % sw_vf_setting)
+    #        print("FCR SETTING          : %s   " % sw_fcr_enabled)
+    #        print("PORT LIST            : %s   " % sw_port_list)
+    #        print("@"*40)
+    #        print("CONSOLE INFO         : %s   " % cons_info)
+    #        print("@"*40)
+    #        print("POWER POLE INFO      : %s   " % power_pole_info)
+    #        print("@"*40)        
+    #        print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
+    #        print("@"*40)
+    #    else:
+    #        print("\n"+"@"*40)
+    #        print('\nTHIS IS A NOS SWITCH> SKIPPING')
+    #        print("\n"+"@"*40)
+    #        pass
+    #anturlar.close_tel()
+    #sys.exit()
      
 ###############################################################################
 ####
@@ -828,7 +847,8 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
-
+    
+    tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
     cc = cofra.SwitchUpdate()
     
     cons_out = cc.playback_licenses()
@@ -918,4 +938,5 @@ if __name__ == '__main__':
 ###############################################################################
 #### END
 ###############################################################################
+
 
