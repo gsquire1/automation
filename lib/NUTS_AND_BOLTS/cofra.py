@@ -465,7 +465,7 @@ class SwitchUpdate():
         
         #reg_ex_yes_no = [b"n\]\?: ", b"view in use FIDS", b"FID:\s+[0-9]+"]
         #reg_ex_yes_no = [b"n\]\?: ", b"FID:\s+[0-9]+"]
-        reg_ex_yes_no = [b"n\]\?: " ]
+        reg_ex_yes_no = [b"n\]\?: ", b"N\]: " ]
         reg_ex_root   = [b"cant catch this"]
         #switch_ip = self.si.ipaddress()
     
@@ -482,7 +482,7 @@ class SwitchUpdate():
         ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
         
         if not ras_vf_enabled:
-            cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf", 9)
+            cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf",reg_ex_yes_no, 9)
             if "N]: " in cons_out:
                 cons_out = anturlar.fos_cmd("Y", 9)
             else:
