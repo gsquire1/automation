@@ -738,6 +738,17 @@ class SwitchInfo:
         except:
             return(0)
 
+    def ls_and_domain(self):
+        """
+            find the logical switch numbers and the domains
+        """
+        capture_cmd = fos_cmd("lscfg --show")
+        ras = re.compile('IDs\):\s+([\( 0-9bsd)]+)(?=\\r\\n)')  
+        ras = ras.findall(capture_cmd)
+        
+        return(ras)
+    
+
     def nos_check(self):
         """
             Looks at switchshow output and if "Rbridge" is found, it is a NOS switch.

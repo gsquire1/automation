@@ -14,8 +14,12 @@
 import anturlar
 import liabhar
 import re
+import sys
+import cofra
 
 import flow_tools
+import maps_tools
+
 """
 Naming conventions --
 
@@ -92,6 +96,59 @@ def send_cmds(filename , loops = 1):
     return 0
      
 
+def ha_failover_check_frame_log(times=1):
+    """
+    
+    """
+    
+    
+    sw_info = anturlar.SwitchInfo()
+    #fid_now = sw_info.ls_now()
+    ip_addr = sw_info.ipaddress()
+    go_or_not = sw_info.synchronized()
+    cons_out = anturlar.fos_cmd(" ")
+    username = 'root'
+    pwrd = 'password'
+    #counter = 1
+    new_connect = True
+  
+    liabhar.count_down(10)
+    
+ 
+            
+    while times > 0:
+        cofra.ha_failover(1)
+        
+        print("\n\n\n")
+        print("@"*60)
+        print("HA Failovers remaining -- %s " % times)
+        print("@"*60)
+        anturlar.connect_tel_noparse(ip_addr,'root','password')
+
+    
+        times -= 1
+    
+        flog_status = maps_tools.frameview_status()
+        print("$"*80)
+        print("$"*80)
+        print(flog_status)
+        print("$"*80)
+        print("$"*80)
+        
+        if 'Enabled' in flog_status:
+            print("Framelog is Enabled")
+        elif 'Disabled' in flog_status:
+            print("Framelog is Disabled")
+            sys.exit()
+        else:
+            print("Framelog State is UnKnown")
+        
+        
+        
+        
+    
+    return(flog_status)
+    
      
 def ha_failover_check_maps_flow_ras_porterrs(times=1):
     """
@@ -140,13 +197,17 @@ def fabric_switch_config_show():
     for ip in fab_ip_list:
         tnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
         
-        m_info = anturlar.Maps()
-        f_info = anturlar.FlowV()
-        maps_config = anturlar.fos_cmd("mapsconfig --show")
+        m_info       = anturlar.Maps()
+        f_info       = anturlar.FlowV()
+        maps_config  = anturlar.fos_cmd("mapsconfig --show")
         firmware_ver = check_version()
-        s_name = m_info.switch_name()
-        s_type = m_info.switch_type()
-        
+        s_name       = m_info.switch_name()
+        s_type       = m_info.switch_type()
+        ls_list      = m_info.ls()
+        switch_id    = m_info.switch_id()
+        ls_domain    = m_info.ls_and_domain()
+        chass_name   = m_info.chassisname()
+        vf_state     = m_info.vf_enabled()
         
         anturlar.close_tel()
 
@@ -155,9 +216,18 @@ def fabric_switch_config_show():
         ff.write("+"*80)
         ff.write("\r\n")
         ff.write("Switch ipv4         :    %s \r\n" % ip)
+        ff.write("Chassis Name        :    %s \r\n" % chass_name)
         ff.write("Firmware version    :    %s \r\n" % firmware_ver)
         ff.write("Switch Name         :    %s \r\n" % s_name)
         ff.write("Switch Type         :    %s \r\n" % s_type)
+        ff.write("VF State            :    %s \r\n" % vf_state)
+        ff.write("Logical Switches    :    %s \r\n" % ls_list)
+        ff.write("Switch ID           :    %s \r\n" % switch_id)
+        ff.write("ls and domain       :    %s \r\n" % ls_domain)
+        
+    
+    
+    
     
     
     
@@ -169,7 +239,7 @@ def check_version():
     
     
     ras = re.compile('Fabric OS:\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-z0-9]{6,18})(?:\\r\\n)')
+    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-z0-9]{6,24})(?:\\r\\n)')
     
     
     #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')

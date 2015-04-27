@@ -62,7 +62,8 @@ class doFirmwareDownload():
         #print("FIRMUP IS %s\n"%(self.firmup))
         #print("RAS IS     %s\n"%(ras))
         if ras != self.firmvrsn:
-            firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
+            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
         else:
             return "fail to perform Firmwaredownload since versions were the same"
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
@@ -74,9 +75,9 @@ class doFirmwareDownload():
             return(capture_own_regex)
         
         capture_cmd = anturlar.fos_cmd("Y")
-        close_tel()
+        anturlar.close_tel()
         liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
-        liabhar.count_down(1200) 
+        liabhar.count_down(360) 
         return(capture_cmd)
 ###############################################################################
 
@@ -481,6 +482,11 @@ class SwitchUpdate():
         ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
         
         if not ras_vf_enabled:
+            cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf", 9)
+            if "N]: " in cons_out:
+                cons_out = anturlar.fos_cmd("Y", 9)
+            else:
+                anturlar.fos_cmd("\n")
             return(True)
         
         print("@"*44)
@@ -1094,6 +1100,7 @@ def ha_failover( times=2):
             print("Attempting to reconnect shortly \n")
             print("===============================")
             liabhar.count_down(60)
+            
         if times == 0:
             new_connect = False   
      

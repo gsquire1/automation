@@ -5,6 +5,11 @@
 ####
 ###############################################################################
   
+  
+import anturlar
+import re
+  
+  
 def test_case_flow():
     """
         get the current flows on the SUT
@@ -184,7 +189,19 @@ def configdl(clear = 0):
     
 
        
-  
+def get_maps_config():
+    """
+        get the maps configuration to compare
+        
+    """
+    capture_cmd = anturlar.fos_cmd("" )
+    #ras = re.compile('([_ ,\//\(-=\.|<>A-Za-z0-9]+)(?=\))')
+    ras = re.compile('Status:\s+([A-Za-z]+)(?=\\r\\n)')
+    ras = ras.findall(capture_cmd)
+    
+    
+    return(maps_config)
+    
  
 def mapsenable( pol, al, ml ):
     """
@@ -844,7 +861,17 @@ def get_policy_rules( p = "None"):
     ras = ras.findall(capture_cmd)
     return(ras)
     
+def frameview_status():
+    """
     
+    """
+    
+    capture_cmd = anturlar.fos_cmd("framelog --status" )
+    #ras = re.compile('([_ ,\//\(-=\.|<>A-Za-z0-9]+)(?=\))')
+    ras = re.compile('Status:\s+([A-Za-z]+)(?=\\r\\n)')
+    ras = ras.findall(capture_cmd)
+    return(ras)
+
     
 def format_header(testcase):
     
