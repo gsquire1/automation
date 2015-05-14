@@ -774,7 +774,7 @@ def main():
     else:
         ipaddr_switch       = [pa.ipaddr]
 
-    anturlar.close_tel()
+    #anturlar.close_tel()
 
     
     #### pass ip(s)to login procedure
@@ -790,7 +790,7 @@ def main():
     #    print (cfg)
     #except TypeError:
     #    print('NONE')
-
+    anturlar.close_tel()
     sys.exit()
     
     
