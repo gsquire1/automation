@@ -314,7 +314,8 @@ def load_kernel(switch_type, sw_ip, frm_version):
     
     #### set tftp command
     
-    ras = re.compile('([\.a-z0-9]+)(?:_)?')
+    #ras = re.compile('([\.a-z0-9]+)(?:_)?')
+    ras = re.compile('([\.v0-9]+)(?:_)?')
     ras = ras.search(frm_version)
     frm_no_bld = ras.group(1)
     if 'amp' in frm_version:
@@ -336,7 +337,7 @@ def load_kernel(switch_type, sw_ip, frm_version):
         tn.write(b"bootm 0x1000000\r\n")
         capture = tn.expect(reg_bash, 300)
         
-    if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83'):
+    if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83' or switch_type == '62' or switch_type == '77'):
         ####  DCX zentron  pluto zentron  thor  7800
         nbt = "tftpboot 0x1000000 net_install26_8548.img\r\n"
         tn.write(nbt.encode('ascii'))
