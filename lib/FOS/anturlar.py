@@ -1199,7 +1199,8 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def portcfgfillword(self, cfgvalue):
         """
-            NOT WORKING. NEED TO FIGURE OUT HOW TO PASS IN CFGVALUE. applies user chosen setting (0-4) for portcfgfillword command.
+            NEED TO TEST DIRECTOR. PIZZA BOX WORKING
+            applies OPTION "3" TO portcfgfillword command. Suggested cfgvalue = 3
             Will try against all ports in given fid/switch with FOS rejecting
             all but C2 (8GB) ports.
         """
@@ -1210,13 +1211,14 @@ class FcrInfo(FabricInfo, SwitchInfo):
                 slot = i[0]
                 port = i[1]
                 fos_cmd("\r")
-                fos_cmd("portcfgfillword "+slot+"/"+port+" "+ cfgvalue )
+                #fos_cmd("portcfgfillword "+slot+"/"+port+" "+ cfgvalue )
+                fos_cmd("portcfgfillword %s"/"%s %s %" (slot, port, cfgvalue))
                 fos_cmd("\r")
         else: 
             for i in portlist:
+                port = str(i[1])
                 fos_cmd("\r")
-                fos_cmd("portcfgfillword "+i+" "+ cfgvalue )
-                fos_cmd("\r")
+                fos_cmd("portcfgfillword %s %s" % (port, cfgvalue))
         cmd_cap = fos_cmd("switchenable")
         return(cmd_cap)
         

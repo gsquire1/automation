@@ -29,15 +29,15 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 def test_anturlar_functions():
     #a = ex_port_list()
-    #fcri = anturlar.FcrInfo()
+    fcri = anturlar.FcrInfo()
     #si = anturlar.SwitchInfo()
-    su = cofra.SwitchUpdate()
-    #a = fcri.fcr_fab_wide_ip()
-    b = su.playback_licenses()
+    #su = cofra.SwitchUpdate()
+    a = fcri.portcfgfillword(3)
+    #b = su.playback_licenses()
     #if a == False:
     #    print('IT BOMBED')
     #else:
-    print(b)
+    print(a)
     sys.exit()
     
 def csv_functions_ip():
@@ -60,6 +60,31 @@ def csv_functions_ip():
     except FileNotFoundError:
         print('\n\nFile Not Found (Line 58 in fcr_tools.py)')
         return(False)
+    
+def file_diff():
+
+    a = "/home/RunFromHere/logs/File1.txt"
+    b = "/home/RunFromHere/logs/File2.txt"
+    with open (a) as File1:
+        #c = [line.rstrip('\n') for line in File1]
+        #c = list(File1)
+        c = File1.readlines()
+        print('CCCCCCCCCCCCCCC')
+        print(type(c))
+        print(c)
+        print(type(c))
+        sys.exit()
+    with open (b) as File2:
+        d = [line.rstrip('\n') for line in File2]
+        #d = list(File2)
+    e = liabhar.diff_compare(c,d)
+    print(e)
+    sys.exit()
+
+def portcfgfillword():
+    fcr = anturlar.FcrInfo()
+    portcfg = fcr.portcfgfillword(3)
+    
     
 def get_all_switch_info():
     #f = (open('ini/connect.txt', 'r+b'))
@@ -610,9 +635,13 @@ def fcr_state_persist_disabled():
     sys.exit(0)#######################
     
 def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
+    """
+    Ned to replace sys.argv statements as the order can change on the cli input by user
+    """
     host = sys.argv[1]
     user = sys.argv[2]
     password = sys.argv[7]
+    print(password)
     si = anturlar.SwitchInfo()
     cn = si.chassisname()
     test_file = '/home/RunFromHere/ini/SwitchLicenses.csv'
@@ -632,7 +661,7 @@ def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     anturlar.fos_cmd("echo y | reboot")
     print('\n\nSleeping: 150')
     liabhar.JustSleep(150)   
-    anturlar.connect_tel_noparse(host, user, password)
+    anturlar.connect_tel_noparse(host, user, "password")
     anturlar.fos_cmd('licenseshow')
     return(True)
 
