@@ -135,6 +135,32 @@ def count_down(stop):
     
     return 0
 
+def file_diff(a,b,c=""):
+    """
+    Compare two files for differences, print only differences to console and
+    put in a file in logs directory.
+    """
+
+    #a = "/home/RunFromHere/logs/10.38.36.67.txt"
+    #b = "/home/RunFromHere/logs/10.38.36.167.txt"
+    difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    z = filecmp.cmp(a,b)
+    if z == True:
+        print("\n\nThe files are the same")
+        return(True)
+    else:
+        with open (a) as File1:
+            c = File1.readlines() 
+        with open (b) as File2:
+            d = File2.readlines()
+    print('\n')
+    for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
+        print((line))
+    with open (difference, 'w') as differ:
+        for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
+            differ.write(line)    
+    sys.exit()
+
 def diff_compare(text_1, text_2):
     """
         compare string text line by line

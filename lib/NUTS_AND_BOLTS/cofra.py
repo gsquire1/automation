@@ -1442,7 +1442,7 @@ def switch_power_off_on(chassis_name, mode = 'on'):
             anturlar.close_tel()
     return(True)
 
-def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
+def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 1):
     """
         capture any information for testing of the configdownload 
         - including mapspolicy --show

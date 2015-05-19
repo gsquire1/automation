@@ -783,6 +783,7 @@ def main():
     #### This starts cfgup_cfg_down.py functionality
     #print(pa.ftp_ip, pa.ftp_usr, pa.ftp_pass)
     cfg = cofra.cfgupload(pa.ftp_ip, pa.ftp_usr, pa.ftp_pass)
+    print('************************************************')
     print (cfg)
 
     #try:

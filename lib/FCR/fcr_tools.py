@@ -13,7 +13,7 @@ import anturlar
 import liabhar
 import cofra
 import switch_playback
-import sys, os, csv, re
+import sys, os, csv, re, filecmp, difflib
 
 """
 Naming conventions --
@@ -61,25 +61,56 @@ def csv_functions_ip():
         print('\n\nFile Not Found (Line 58 in fcr_tools.py)')
         return(False)
     
-def file_diff():
+def file_diff(a,b,c=""):
+    """
+    Compare two files for differences, print to console and put in a file in logs directory
+    """
 
-    a = "/home/RunFromHere/logs/File1.txt"
-    b = "/home/RunFromHere/logs/File2.txt"
-    with open (a) as File1:
-        #c = [line.rstrip('\n') for line in File1]
-        #c = list(File1)
-        c = File1.readlines()
-        print('CCCCCCCCCCCCCCC')
-        print(type(c))
-        print(c)
-        print(type(c))
-        sys.exit()
-    with open (b) as File2:
-        d = [line.rstrip('\n') for line in File2]
-        #d = list(File2)
-    e = liabhar.diff_compare(c,d)
-    print(e)
+    #a = "/home/RunFromHere/logs/10.38.36.67.txt"
+    #b = "/home/RunFromHere/logs/10.38.36.167.txt"
+    difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    z = filecmp.cmp(a,b)
+    if z == True:
+        print("\n\nThe files are the same")
+        return(True)
+    else:
+        with open (a) as File1:
+            c = File1.readlines() 
+        with open (b) as File2:
+            d = File2.readlines()
+    print('\n')
+    for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
+        print((line))
+    with open (difference, 'w') as differ:
+        for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
+            differ.write(line)    
     sys.exit()
+    
+    
+    #diff = list(z.compare(c,d))
+    #for line in diff:
+    #    print("\n")
+    #    print(line)
+    #sys.exit()
+    #
+    #z = difflib.context_diff(c,d)
+    #diff = z.compare(c,d)
+    #print(diff)
+    #sys.stdout.writelines(diff)
+    #print('ZZZZZZZZZZZZZZZZZZZZZZZZ')
+    #print(z)
+    #y = ('\n'.join(diff))
+    #print(y)
+    #sys.exit()
+    #
+    #z = difflib.Differ()
+    #diff = z.compare(c,d)
+    #print(diff)
+    #print('ZZZZZZZZZZZZZZZZZZZZZZZZ')
+    #y = ('\n'.join(diff))
+    #print(y)
+    #sys.exit()
+
 
 def portcfgfillword():
     fcr = anturlar.FcrInfo()
