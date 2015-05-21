@@ -665,6 +665,43 @@ def fcr_state_persist_disabled():
 
     sys.exit(0)#######################
     
+def firmwaredownload(frmdwn, frmup):
+    """
+        uses cofra firmwaredownload to do testing for update to
+        newest code
+        
+        the test will load first firmware and return to the other on a second
+        download command
+    """
+    
+    capture_cmd = anturlar.fos_cmd("ipaddrshow")
+    #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
+    match = re.search('(?P<pre>([\s+\w+]+):\s?(?P<ip>[0-9\.]{1,15}))', capture_cmd)
+    if match:
+        myip = (match.group('ip'))
+        #return(myip)
+    else:
+        print("\n\n NO IP FOUND \n\n")
+        #return (0)
+    
+    while True:
+    #f = cofra.doFirmwareDownload(frmdwn)
+        capture_cmd = anturlar.fos_cmd("version")
+        f = cofra.DoFirmwaredownloadChoice(frmdwn,frmup)
+
+        liabhar.count_down(600)
+        
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        #en = anturlar.SwitchInfo()
+        capture_cmd = anturlar.fos_cmd("version")
+        
+        f = cofra.DoFirmwaredownloadChoice(frmdwn, frmup)
+    
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        #en = anturlar.SwitchInfo()
+
+    return(0)
+    
 def license_restore(): #### NEED TO ADD supportftp settings AND Timeserver
     """
     Ned to replace sys.argv statements as the order can change on the cli input by user
