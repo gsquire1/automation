@@ -257,8 +257,10 @@ def check_version():
             f= ras.group(1)
     except:
         pass
-    
-    f = ras[0]
+    try:
+        f = ras[0]
+    except:
+        f= "FOS unknown in check_version in fos_gen_tc_0 "
     #try:
     #    if ras_dir.group(0) != "none":
     #        f=ras_dir.group(1)
