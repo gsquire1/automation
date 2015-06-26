@@ -235,6 +235,7 @@ class DoFirmwaredownloadChoice():
         
         f=""
         capture_cmd = anturlar.fos_cmd("hashow")
+        print(capture_cmd)
         if "hashow: Not supported" in capture_cmd:
             f = ras.group(1)
         else:
