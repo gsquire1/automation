@@ -83,7 +83,7 @@ def parse_args(args):
     verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
+    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file. Must use at least on IP or Chassis name")    
     #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
