@@ -87,7 +87,6 @@ def parse_args(args):
     #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
-    #parser.add_argument('-ip', '--ipaddr', type=list, help="IP address of target switch")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
     parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
     
@@ -775,7 +774,10 @@ def main():
     #### and write the file
 
     for i in ipaddr_switch:
-        tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+        try: ###New
+            tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+        except OSError: ##New
+            print("Switch %s not available" % i)  ##New
         nos = si.nos_check()
         if not nos:
             sw_dict              = cofra.get_info_from_the_switch()

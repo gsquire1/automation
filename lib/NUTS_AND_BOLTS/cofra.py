@@ -1418,7 +1418,7 @@ def switch_power_off_on(chassis_name, mode = 'on'):
         return(False)
     
     for line in csv_file:
-        switch_name = (line['Nickname'])
+        switch_name = (line['Chassisname'])
         if switch_name == cn[0]:
             sn = (switch_name)
             power1 = (line['Power1 IP'])
