@@ -705,61 +705,124 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
     
     return(all_list)
 
-def fcr_state_persist():
-    pass
-
-def fcr_state_persist_enabled():
-    #print(sys.argv)
-    #host = pa.ipaddr
-    #user = usrname
-    #password = password
-    print('$$$$$$$$$$$$$$$$$$')
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    csv_file = csv.DictReader(open(test_file, 'r'), delimiter=',', quotechar='"')
-    fcr_state = sw_fcr_enabled()
-    print(fcr_state)
-    sys.exit()
-    state = fcr_state['fcr_enabled']
-    if state is True:
-        anturlar.fos_cmd("switchdisable")
-        print('\n\nSleeping: 10')
-        liabhar.JustSleep(10)
-        enabled = switch_status()
-        if enabled['fcr_enabled'] is True:
-            anturlar.fos_cmd("switchenable")
-            print('\n\nSleeping: 10')
-            liabhar.JustSleep(10)
-            print("\n\nENABLE/DISABLE TEST PASSED")
-        else:
-            pass
+def fcr_state_persist_enabled_switch_disable(fcr, si):
+    anturlar.fos_cmd("switchdisable")
+    print('\n\nSleeping: 10')
+    liabhar.count_down(10)
+    anturlar.fos_cmd("switchenable")
+    liabhar.count_down(3)
+    fcrstate = fcr_state(fcr)
+    if fcrstate is True:
+        print("\n\nENABLE/DISABLE TEST PASSED")
+        return(None)
     else:
         print("\n\nENABLE/DISABLE TEST FAILED")
-        print("Please enable fcr for this test and try again")
-        sys.exit(0)
-    print('\n\nSleeping: 10')
-    liabhar.JustSleep(10)
-    si = anturlar.SwitchInfo()
-    cn = si.chassisname()
-    a = cofra.switch_power_off_on(cn, 'off')
-    print('\n\nSleeping: 20')
-    liabhar.JustSleep(20)
-    a = cofra.switch_power_off_on(cn, 'on')
-    print('\n\nSleeping: 120')
-    liabhar.JustSleep(120)
-    #anturlar.connect_tel_noparse(host, user, password)
-    anturlar.connect_tel_noparse(pa.ipaddr, usrname, password)
-    si = anturlar.SwitchInfo()
-    print("GETTINGFCRSTATE")
-    fcr_state = switch_status()
-    state = fcr_state['fcr_enabled']
-    if state is True:
-        print('Reboot Complete. FCR State remains consistent')
-        print('TEST PASSED')
-    else:
-        print('FCR State changed.')
-        print('TEST FAILED')
+        print("Please check switch logs")
+        sys.exit()
+
+
+    #fcr_state(fcr)
+    #    enabled = switch_status()
+    #    if enabled['fcr_enabled'] is True:
+    #        
+    #        print('\n\nSleeping: 10')
+    #        liabhar.JustSleep(10)
+    #        
+    #    else:
+    #        pass
+    #else:
+
+    #    sys.exit(0)
+    #print('\n\nSleeping: 10')
+    #liabhar.JustSleep(10)
+    #cn = si.chassisname()
+    #a = cofra.switch_power_off_on(cn, 'off')
+    #print('\n\nSleeping: 20')
+    #liabhar.JustSleep(20)
+    #a = cofra.switch_power_off_on(cn, 'on')
+    #print('\n\nSleeping: 120')
+    #liabhar.JustSleep(120)
+    ##anturlar.connect_tel_noparse(host, user, password)
+    #anturlar.connect_tel_noparse(pa.ipaddr, usrname, password)
+    #si = anturlar.SwitchInfo()
+    #print("GETTINGFCRSTATE")
+    #fcr_state = switch_status()
+    #state = fcr_state['fcr_enabled']
+    #if state is True:
+    #    print('Reboot Complete. FCR State remains consistent')
+    #    print('TEST PASSED')
+    #else:
+    #    print('FCR State changed.')
+    #    print('TEST FAILED')
         
-def fcr_state_persist_disabled():
+def fcr_state_persist_enabled_hareboot(fcr, si):
+    #anturlar.fos_cmd('echo "y" | hareboot')
+    ############ NEED REBOOT/RECONNECT FUNCYIONALITY HERE!!!!!
+    result = cofra.ha_failover(1)
+    print(result)
+    #print('\n\nSleeping: 90')
+    #liabhar.count_down(90)
+    #fcrstate = fcr_state(fcr)
+    #print("**************************")
+    #print(result)
+    #if fcrstate is True:
+    #    print("\n\nHAREBOOT TEST PASSED")
+    #    return(None)
+    #else:
+    #    print("\n\nHAREBOOT TEST FAILED")
+    #    print("Please check switch logs")
+    sys.exit(0)
+
+
+    #fcr_state(fcr)
+    #    enabled = switch_status()
+    #    if enabled['fcr_enabled'] is True:
+    #        
+    #        print('\n\nSleeping: 10')
+    #        liabhar.JustSleep(10)
+    #        
+    #    else:
+    #        pass
+    #else:
+
+    #    sys.exit(0)
+    #print('\n\nSleeping: 10')
+    #liabhar.JustSleep(10)
+    #cn = si.chassisname()
+    #a = cofra.switch_power_off_on(cn, 'off')
+    #print('\n\nSleeping: 20')
+    #liabhar.JustSleep(20)
+    #a = cofra.switch_power_off_on(cn, 'on')
+    #print('\n\nSleeping: 120')
+    #liabhar.JustSleep(120)
+    ##anturlar.connect_tel_noparse(host, user, password)
+    #anturlar.connect_tel_noparse(pa.ipaddr, usrname, password)
+    #si = anturlar.SwitchInfo()
+    #print("GETTINGFCRSTATE")
+    #fcr_state = switch_status()
+    #state = fcr_state['fcr_enabled']
+    #if state is True:
+    #    print('Reboot Complete. FCR State remains consistent')
+    #    print('TEST PASSED')
+    #else:
+    #    print('FCR State changed.')
+    #    print('TEST FAILED')
+    
+def fcr_state_persist_enabled_switch_disable(fcr, si):
+    anturlar.fos_cmd("switchdisable")
+    print('\n\nSleeping: 10')
+    liabhar.count_down(10)
+    anturlar.fos_cmd("switchenable")
+    liabhar.count_down(3)
+    fcrstate = fcr_state(fcr)
+    if fcrstate == True:
+        print("\n\nENABLE/DISABLE TEST PASSED")
+    else:
+        print("\n\nENABLE/DISABLE TEST FAILED")
+        print("Please check switch logs")
+        sys.exit()
+        
+def fcr_state_persist_disabled(si):
     host = (sys.argv[1])
     user = sys.argv[2]
     password = sys.argv[7]
@@ -785,7 +848,6 @@ def fcr_state_persist_disabled():
         sys.exit(0)
     print('\n\nSleeping: 10')
     liabhar.JustSleep(10)
-    si = anturlar.SwitchInfo()
     cn = si.chassisname()
     a = cofra.switch_power_off_on(cn, 'off')
     print('\n\nSleeping: 20')
@@ -803,12 +865,21 @@ def fcr_state_persist_disabled():
         print('FCR State changed.')
         print('TEST FAILED')
 
-    sys.exit(0)#######################`
-def test_function(ss):
-    aa = ss.chassisname()
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAA")
-    print(aa)
-    return(aa)
+    sys.exit(0)#######################
+    
+#def test_function1(si):
+#    aa = si.chassisname()
+#    print("FUNCTION1")
+#    #print(aa)
+#    #print(bb)
+#    return(aa)
+
+def fcr_state(fcr):
+    bb = fcr.fcr_enabled()
+    #print("FUNCTION2")
+    #print(aa)
+    #print(bb)
+    return(bb)
 
 ###############################################################################
 ###############################################################################
@@ -827,14 +898,14 @@ def main():
 ####
 ###############################################################################
     pa = parse_args(sys.argv)
-    print("@"*40)
-    print(pa)
+    #print("@"*40)
+    #print(pa)
     #print(pa.chassis_name)
     #print(pa.ipaddr)
     #print(pa.quiet)
     #print(pa.verbose)
     #print(pa.firmware)
-    print("@"*40)
+    #print("@"*40)
     #sys.exit()
 
    
@@ -857,7 +928,7 @@ def main():
     
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
     fi = anturlar.FabricInfo()
-    si = anturlar.SwitchInfo()
+    si = anturlar.SwitchInfo() 
     fcr = anturlar.FcrInfo()
     
     if pa.fabwide:
@@ -929,16 +1000,28 @@ def main():
 ####  connect to the console
 ####
 ###############################################################################
-    print("&&&&&&&&&&&&&&&")
-    print(sw_fcr_enabled)
-    #sys.exit()
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    #fi = anturlar.FabricInfo()
-    #si = anturlar.SwitchInfo()
-    #fcr = anturlar.FcrInfo()
-    fcrstate = fcr.fcr_enabled()
-    chnm = test_function(si)
-    print(chnm)
+    fcrstate = fcr_state(fcr)
+    if fcrstate is True:
+        result = fcr_state_persist_enabled_switch_disable(fcr, si)
+        print("RESULTFROMSWITCH_DISABLE")
+        print(result)
+        if result is None:
+            print("SUCCESS")
+            fcr_state_persist_enabled_hareboot(fcr, si)
+        else:
+            print("FAILED")
+            sys.exit(0)       
+        
+    #   print("LASTONE")
+    #   print(a)
+    #else:
+    #    a = fcr_state_persist_disabled(si)
+    #    print("DISABLED")
+    #chnm = test_function1(si)
+    #print("CHNM")
+    #print(chnm)
+    #print("FCRSTATE")
+    #print(enabled)
 #cc = cofra.SwitchUpdate()
 #cons_out = cc.playback_licenses()
 #cons_out = cc.playback_ls()
