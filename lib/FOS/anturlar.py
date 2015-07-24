@@ -941,7 +941,7 @@ class SwitchInfo:
            return the current switchname
         """
         capture_cmd = fos_cmd("switchshow")
-        ras = re.compile('switchName:\s+([_\d\w]{1,30})') 
+        ras = re.compile('switchName:\s+([_\d\wA-Za-z]{1,30})') 
         ras = ras.findall(capture_cmd)
         print(ras)
         sn = str(ras[0])
@@ -961,16 +961,15 @@ class SwitchInfo:
         """
         #fcrinfo = FcrInfo()
         initial_checks = self.__sw_basic_info__()
-        print('\n\n'+ '='*20)
-        print("Switch Name :  %s" % initial_checks[0])
-        print("IP address :  %s" % initial_checks[1])
-        print("Chassis :  %s" % initial_checks[2])
-        print("VF enabled :  %s" % initial_checks[3])
-        print("FCR enabled :  %s" % initial_checks[4])
-        print("Base configured :  %s" % initial_checks[5])
-        print('='*20 + '\n\n')
-        switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
-        return (switch_info)
+        #print("Switch Name :  %s" % initial_checks[0])
+        #print("IP address :  %s" % initial_checks[1])
+        #print("Chassis :  %s" % initial_checks[2])
+        #print("VF enabled :  %s" % initial_checks[3])
+        #print("FCR enabled :  %s" % initial_checks[4])
+        #print("Base configured :  %s" % initial_checks[5])
+        #print('='*20 + '\n\n')
+        #switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
+        return (initial_checks)
     
     def switch_type(self):
         """
@@ -1519,18 +1518,6 @@ class ConfigSwitch(SwitchInfo):
         liabhar.count_down(10)
         state = SwitchInfo.switch_state(self)
         return(state)
-    
-    #def reboot(self):
-    #    host = sys.argv[1]
-    #    user = sys.argv[2]
-    #    password = sys.argv[7]
-    #    fos_cmd("echo Y | reboot")
-    #    liabhar.count_down(120)
-    #    connect_tel_noparse(host, user, password)
-    #    liabhar.count_down(10)
-    #    
-    #    state = SwitchInfo.switch_state(self)
-    #    return(state)
 
 class Maps(SwitchInfo):
     
