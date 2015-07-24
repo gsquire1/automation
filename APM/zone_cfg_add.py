@@ -619,6 +619,60 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
+
+
+def add_zones(current_zone):
+    """
+    
+    """
+    switchmatrix = '/home/RunFromHere/ini/zones.csv'
+    switchmatrix = 'ini/zones.csv'
+    try:
+        csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
+    except OSError:
+        print("Cannot find the file SwitchMatrix.csv")
+        return(False)
+    print("\n\n\n")
+    print("ADD these ZONES NOW\n")
+    print("cfg name, zone name, wwn_1, wwn_2" )
+    print("\n"*4)
+    #cfg_name = next(csv_file)
+    #print(cfg_name)
+    
+    
+    #anturlar.fos_cmd('zonecreate %s, "%s;%s"' % ( "magic", "0,1", "1,0"))
+    #anturlar.fos_cmd('cfgcreate %s, "magic"' % cfg_name   )
+    
+    
+    for line in csv_file:
+        #chassis_name_from_file = (line['Chassisname'])
+        #if chassis_name_from_file == chassis_name:
+            #ip = (line['IP Address'])
+        cfg_name  = (line['CFG'])
+        zone_name = (line['Name'])
+        member_1  = (line['wwn_1'])
+        member_2  = (line['wwn_2'])
+        
+    ############################################################################
+    #### add and remove a zone
+    ############################################################################
+        anturlar.fos_cmd('zonecreate %s, "%s;%s"' % ( zone_name,member_1,member_2))
+        anturlar.fos_cmd("cfgcreate %s, %s" % (cfg_name, zone_name))
+        anturlar.fos_cmd("cfgadd %s, %s" % (cfg_name,zone_name))
+        
+        
+    #anturlar.fos_cmd("cfgadd %s, %s" % (current_zone,zone_name)) 
+        
+    anturlar.fos_cmd("sleep 20")
+    anturlar.fos_cmd_regex_only("cfgenable %s" % cfg_name , "no]")
+    anturlar.fos_cmd("yes")
+    anturlar.fos_cmd("cfgshow")
+    
+    
+    return()
+
+
+
 def sw_set_pwd_timeout(pswrd,tn):
    
     reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
@@ -780,29 +834,27 @@ def main():
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
     print(ipaddr_switch)
     
-    cc = cofra.SwitchUpdate()
-    #cons_out = cc.playback_licenses()
-    #cons_out  = cc.playback_ls()
-
+    en = anturlar.Maps()
+    fab_stuff = anturlar.FabricInfo(en.currentFID())
+    #fabmems = fab_stuff.fabric_members()
+    myzone_info = fab_stuff.zone_info()
+    try:
+        myzone = myzone_info[0][1]
+    except IndexError:
+        myzone = "NewZone"
     
-    #cons_out = cc.playback_switch_names()
+    #my_swid = en.switch_id()
+    print("\n\n")
+    #print("Fabric members and my switch ID")
+    #print(fabmems,  my_swid )
     
-    #cons_out = cc.playback_switch_domains()
-    #cons_out = cc.playback_add_ports()
-    cons_out = cc.playback_timeout()
-    #tn       = cc.reboot_reconnect()
-    #cons_out = anturlar.fos_cmd("passwddefault")
-    #cons_out = anturlar.fos_cmd("logout")
-    
-    liabhar.JustSleep(30)
-    #cons_out = cc.power_cycle()
     liabhar.JustSleep(10)
-    print("reconnect via telnet")
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    
-    #cons_out = sw_set_pwd_timeout(usr_psswd, tn)
-    
     cons_out = anturlar.fos_cmd("switchshow")
+   
+   
+    add_zones(myzone)
+    
+    
     print(cons_out)
     
     anturlar.close_tel()
