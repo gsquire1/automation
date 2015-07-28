@@ -32,7 +32,7 @@ def test_anturlar_functions():
     fcri = anturlar.FcrInfo()
     #si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
-    a = fcri.portcfgfillword(3)
+    a = fcri.playback_fosconfig_fcr()
     #b = su.playback_licenses()
     #if a == False:
     #    print('IT BOMBED')
@@ -66,8 +66,8 @@ def file_diff(a,b,c=""):
     Compare two files for differences, print to console and put in a file in logs directory
     """
 
-    #a = "/home/RunFromHere/logs/10.38.36.67.txt"
-    #b = "/home/RunFromHere/logs/10.38.36.167.txt"
+    #a = "/home/RunFromHere/logs/Switch_Info_for_playback_10.38.134.10.txt"
+    #b = "/home/RunFromHere/logs/Switch_Info_for_playback_10.38.134.30.txt"
     difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
     z = filecmp.cmp(a,b)
     if z == True:
@@ -84,7 +84,7 @@ def file_diff(a,b,c=""):
     with open (difference, 'w') as differ:
         for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
             differ.write(line)    
-    sys.exit()
+    return()
        
 
 def portcfgfillword():

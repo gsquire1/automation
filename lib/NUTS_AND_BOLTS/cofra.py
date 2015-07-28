@@ -425,6 +425,33 @@ class SwitchUpdate():
             else:
                 print("\r\n")
         return(swtch_name)
+    
+    def playback_fosconfig_fcr(self):
+        """
+        Enable/Disable FCR functionality per "logs/Switch_Info_for_playback_",self.switch_ip,".txt"
+        This function lives in cofra.switch_update()
+        """
+    
+        f = ("logs/Switch_Info_for_playback_10.38.134.30.txt")
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras_fcr = re.findall('FCR ENABLED\s+:\s+([TrueFals0-9]+)', a)
+        #ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
+        #ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+
+        print("@"*44)
+        print(ras_fcr)
+        print("@"*44)
+        
+        if ras_fcr:
+            anturlar.fos_cmd("fosconfig --enable fcr")
+        else:
+            anturlar.fos_cmd("fosconfig --disable fcr")
+        return(True)
      
     def playback_licenses(self):
         """
@@ -471,6 +498,7 @@ class SwitchUpdate():
         #reg_ex_yes_no = [b"n\]\?: ", b"FID:\s+[0-9]+"]
         reg_ex_yes_no = [b"n\]\?: ", b"N\]: " ]
         reg_ex_root   = [b"cant catch this"]
+        reg_ex_rebooting = [b"Your system"]
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
@@ -483,15 +511,17 @@ class SwitchUpdate():
             sys.exit()        
         ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
         ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
-        ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
-        
-        if not ras_vf_enabled:
-            cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf",reg_ex_yes_no, 9)
+        ras_vf_enabled = re.findall('VF SETTING\s+:\s+([TrueFals0-9]+)', a)
+        if ras_vf_enabled:
+            #cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf",reg_ex_yes_no, 9)
+            cons_out = anturlar.fos_cmd_regex("fosconfig --enable vf",reg_ex_yes_no, 9)
             if "N]: " in cons_out:
-                cons_out = anturlar.fos_cmd("Y", 9)
+                cons_out = anturlar.fos_cmd_regex("Y", reg_ex_rebooting,9)
+                self.reconnect()
             else:
                 anturlar.fos_cmd("\n")
-            return(True)
+                #sys.exit()
+                return(True)
         
         print("@"*44)
         print(ras_base)
@@ -519,7 +549,6 @@ class SwitchUpdate():
                     #cons_out = anturlar.fos_cmd_regex("lscfg --create %s" % i , reg_ex_yes_no, 9)
                     if "n]?: " in cons_out:
                         anturlar.fos_cmd("yes", 9)
-                        
                     else:
                         #print("\n\nFID was not created\n\n")
                         #anturlar.fos_cmd_regex_only("", "root> " , 9)
@@ -805,7 +834,57 @@ class SwitchUpdate():
         #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
         return(tn)
 
+    def reconnect(self, time=120):
+        liabhar.count_down(time)
+        state = False
+        while True:
+            try:
+                print("@"*44)
+                print(self.switch_ip)
+                print(self.user)
+                print(self.password)
+                print("@"*44)
+                
+                tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
+                si = anturlar.SwitchInfo()
+                
+                chassis = si.director()
+                print("**********************************")
+                print(chassis)
+    
+                if chassis:
+                    state = si.synchronized()
+                else:
+                    state = si.switch_state()
+                    print(")))))))))))))))")
+                    print(state)
+                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    if state == ("Online"):
+                        state = True
+                        print(state)
+                    else:
+                        state = False
+                       
+                break
+            
+            except:
+                print("Retry the Telnet connection")
+                liabhar.count_down(30)
+                pass
         
+        while not state:
+            liabhar.count_down(33)
+            if chassis:
+                state = si.synchronized()
+            else:
+                state = si.switch_state()
+                if state == ("Online"):
+                    state = True
+                else:
+                    state = False
+            #state = si.synchronized()
+        #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
+        return(tn)        
     
     
 ###############################################################################

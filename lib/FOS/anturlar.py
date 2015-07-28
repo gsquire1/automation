@@ -1220,6 +1220,34 @@ class FcrInfo(FabricInfo, SwitchInfo):
                 fos_cmd("portcfgfillword %s %s" % (port, cfgvalue))
         cmd_cap = fos_cmd("switchenable")
         return(cmd_cap)
+    
+    def playback_fosconfig_fcr(self):
+        """
+        Enable/Disable FCR functionality per "logs/Switch_Info_for_playback_",self.switch_ip,".txt"
+        This function lives in cofra.switch_update()
+        """
+    
+        f = ("logs/Switch_Info_for_playback_10.38.134.30.txt")
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras_fcr = re.findall('FCR ENABLED\s+:\s+([True0-9]+)', a)
+        #ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
+        #ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+
+        print("@"*44)
+        print(type(ras_fcr))
+        print(ras_fcr)
+        print("@"*44)
+        
+        if ras_fcr:
+            fos_cmd("fosconfig --enable fcr")
+        else:
+            fos_cmd("fosconfig --disable fcr")
+        return(True)
         
 class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
     """

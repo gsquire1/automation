@@ -787,7 +787,6 @@ def main():
     except IOError:
         print("\n\nThere was a problem opening the file" , f)
         sys.exit()
-    print('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
     print(ff)
 
     #sys.exit()
@@ -851,11 +850,12 @@ def main():
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
     cc = cofra.SwitchUpdate()
     
-    cons_out = cc.playback_licenses()
+    #cons_out = cc.playback_licenses()
     cons_out = cc.playback_ls()
     cons_out = cc.playback_switch_names()
     cons_out = cc.playback_switch_domains()
     cons_out = cc.playback_add_ports()
+    cons_out = cc.playback_fosconfig_fcr()
     tn       = cc.reboot_reconnect()
     cons_out = anturlar.fos_cmd("switchshow")
     print(cons_out)
