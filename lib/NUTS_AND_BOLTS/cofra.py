@@ -68,13 +68,16 @@ class doFirmwareDownload():
             return "fail to perform Firmwaredownload since versions were the same"
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
         reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
-        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list,9)
+        
+        #capture_own_regex = anturlar.fos_cmd_regex("Y", reg_ex_list)
+        
         if "the same firmware" in capture_own_regex:
             return(capture_own_regex)
         if "server is inaccessible" in capture_own_regex:
             return(capture_own_regex)
         
-        capture_cmd = anturlar.fos_cmd("Y")
+        capture_cmd = anturlar.fos_cmd_regex("Y",reg_ex_list,9)
         anturlar.close_tel()
         liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
         liabhar.count_down(360) 
@@ -1555,7 +1558,7 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     return(cons_out)
     
     
-def get_info_from_the_switch():
+def get_info_from_the_switch(extend_name=""):
     """
     
     """
@@ -1673,7 +1676,7 @@ def get_info_from_the_switch():
         print(kk,vv)    #### print switchnames
     print('*'*80)
     
-    f = "%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")
+    f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
                            "","", "==============================\n")  
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
