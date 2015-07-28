@@ -857,7 +857,7 @@ def main():
     ###################################################################################################################
     ####  put additional commands here before disconnecting from telnet
     ####
-    cons_out = anturlar.fos_cmd("mapsdb --show all")
+    #cons_out = anturlar.fos_cmd("mapsdb --show all")
     print(cons_out)
     
     
