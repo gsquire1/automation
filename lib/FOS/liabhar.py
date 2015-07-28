@@ -5,6 +5,7 @@ import smtplib
 import random
 import argparse
 import difflib
+import filecmp
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sys
@@ -135,7 +136,7 @@ def count_down(stop):
     
     return 0
 
-def file_diff(a,b,c=""):
+def file_diff(a,b,extend_name=""):
     """
     Compare two files for differences, print only differences to console and
     put in a file in logs directory.
@@ -143,7 +144,10 @@ def file_diff(a,b,c=""):
 
     #a = "/home/RunFromHere/logs/10.38.36.67.txt"
     #b = "/home/RunFromHere/logs/10.38.36.167.txt"
-    difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    #difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    difference = ("logs/difference_%s.txt" % extend_name)
+    #filecmp = difflib.Differ()
+    
     z = filecmp.cmp(a,b)
     if z == True:
         print("\n\nThe files are the same")
@@ -159,7 +163,8 @@ def file_diff(a,b,c=""):
     with open (difference, 'w') as differ:
         for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
             differ.write(line)    
-    sys.exit()
+    return(False) ## false would mean that there are differences 
+
 
 def diff_compare(text_1, text_2):
     """
