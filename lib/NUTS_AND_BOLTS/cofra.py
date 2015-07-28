@@ -425,6 +425,33 @@ class SwitchUpdate():
             else:
                 print("\r\n")
         return(swtch_name)
+    
+    def playback_fosconfig_fcr(self):
+        """
+        Enable/Disable FCR functionality per "logs/Switch_Info_for_playback_",self.switch_ip,".txt"
+        This function lives in cofra.switch_update()
+        """
+    
+        f = ("logs/Switch_Info_for_playback_10.38.134.30.txt")
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()        
+        ras_fcr = re.findall('FCR ENABLED\s+:\s+([TrueFals0-9]+)', a)
+        #ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
+        #ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+
+        print("@"*44)
+        print(ras_fcr)
+        print("@"*44)
+        
+        if ras_fcr:
+            anturlar.fos_cmd("fosconfig --enable fcr")
+        else:
+            anturlar.fos_cmd("fosconfig --disable fcr")
+        return(True)
      
     def playback_licenses(self):
         """
