@@ -24,7 +24,13 @@ class doFirmwareDownload():
                 3. the user prompt after firmware download is started
     """
     def __init__(self, firmvrsn ):
+        
+        ras_up = re.compile('([\.a-z0-9]{6})')
+        ras_up = ras_up.search(firmvrsn)
+        foldr_for_firmvrsn   = ras_up.group(1)
+        
         self.firmvrsn = firmvrsn
+        self.foldr    = foldr_for_firmvrsn
         self.start()
     
     def check_status(self):
@@ -63,7 +69,7 @@ class doFirmwareDownload():
         #print("RAS IS     %s\n"%(ras))
         if ras != self.firmvrsn:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
+            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.foldr, self.firmvrsn)
         else:
             return "fail to perform Firmwaredownload since versions were the same"
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
