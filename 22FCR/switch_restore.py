@@ -360,6 +360,18 @@ def load_kernel(switch_type, sw_ip, frm_version):
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
         caputure = tn.expect(reg_bash,300)
         
+    if (switch_type == '162'):  #### WEDGE
+        tn.write(b"makesinrec 0x1000000 \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x2000000 wedge/uImage.netinstall\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x3000000 wedge/ramdisk_v1.0.img\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x4000000 yoda/silkworm.dtb.netinstall\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
+        caputure = tn.expect(reg_bash,300)
+        
         
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
     capture = tn.expect(reg_bash, 300)
@@ -778,7 +790,7 @@ def main():
     #### and write the file
     
     ff = ""
-    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",pa.ipaddr,".txt"))
+    f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
     print(f)
     
     try:
