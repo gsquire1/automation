@@ -780,7 +780,7 @@ def main():
             print("Switch %s not available" % i)  ##New
         nos = si.nos_check()
         if not nos:
-            sw_dict              = cofra.get_info_from_the_switch()
+            sw_dict              = cofra.get_info_from_the_switch("restore")
             switch_ip            = sw_dict["switch_ip"]
             sw_name              = sw_dict["switch_name"]
             sw_chass_name        = sw_dict["chassis_name"]
@@ -814,7 +814,7 @@ def main():
             print("@"*40)
             print("POWER POLE INFO      : %s   " % power_pole_info)
             print("@"*40)        
-            print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
+            print("\nSwitch_Info has been written this file in logs/Switch_Info_%s_restore.txt\n" % switch_ip)
             print("@"*40)
         else:
             print("\n"+"@"*40)
