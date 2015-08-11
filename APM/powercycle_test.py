@@ -660,7 +660,7 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
     """
     
     ff = ""
-    f = ("%s%s%s"%("logs/Switch_Info_%s_for_playback.txt" % switch_ip))
+    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
     print(f)
     
     try:
@@ -696,26 +696,7 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
     
     return(all_list)
 
-   
-def user_start():
-    go = False
-    start = 'n'
-    while not go : 
-              
-        is_valid = 0
-        while not is_valid:
-            try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
-                is_valid = 1 
-            except:
-                print("\n\nthere was an error with the input")
-                #sys.exit()
-                
-        if start == 'y':
-            go = True
-        else:
-            sys.exit()
-############################################################################### 
+    
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
@@ -899,14 +880,14 @@ def main():
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
-            for tn in tn_list:
-                cons_out = env_variables(sw_type, 0)
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-                print(cons_out)
-                
-                load_kernel(sw_type, my_cp_ip_list[cnt], pa.firmware)
-                cnt += 1
+            #for tn in tn_list:
+                #cons_out = env_variables(sw_type, 0)
+                #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+                #print(cons_out)
+                #
+                #load_kernel(sw_type, my_cp_ip_list[cnt], pa.firmware)
+                #cnt += 1
         
     else:
     ###########################################################################
@@ -921,18 +902,18 @@ def main():
 ####
 ####  reboot and find the command prompt
 ####
-        if not pa.cmdprompt:
-            cons_out = stop_at_cmd_prompt(9)
-            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            print(cons_out)
-            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #if not pa.cmdprompt:
+        #    cons_out = stop_at_cmd_prompt(9)
+        #    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #    print(cons_out)
+        #    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
-        cons_out = env_variables(sw_type, 9)
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-        print(cons_out)
-        load_kernel(sw_type, my_ip, pa.firmware)
+        #cons_out = env_variables(sw_type, 9)
+        #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+        #print(cons_out)
+        #load_kernel(sw_type, my_ip, pa.firmware)
     
 #######################################################################################################################
 #######################################################################################################################
@@ -942,7 +923,14 @@ def main():
 ####
 #######################################################################################################################
     
-    liabhar.JustSleep(600)
+    liabhar.JustSleep(20)
+
+    for pp in range(0, len(power_pole_info), 2):
+        print('POWERPOLE')
+        print(power_pole_info[pp])
+        print(power_pole_info[pp+1])
+        pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off" ,10)
+        time.sleep(4)
 
     try:
         for pp in range(0, len(power_pole_info), 2):
@@ -1009,8 +997,6 @@ def main():
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    
-    user_start()
     
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
     print(my_ip)

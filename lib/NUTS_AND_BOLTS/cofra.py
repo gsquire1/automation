@@ -1594,41 +1594,46 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
 def get_info_from_the_switch(extend_name=""):
     """
     
-    """
     
-    #cons_out = anturlar.login()
+    """
     
     si = anturlar.SwitchInfo()
     mi = anturlar.Maps()
     fi = anturlar.FlowV()
     
-    vdx = si.nos_check()
-    switch_ip = si.ipaddress()
-    switch_cp_ips  = si.cp_ipaddrs_get()
-    license_list = si.getLicense()
-    ls_list = si.ls()
-    first_ls = si.ls_now()
-    switch_id = si.switch_id()
+    vdx                  = si.nos_check()
+    switch_ip            = si.ipaddress()
+    switch_cp_ips        = si.cp_ipaddrs_get()
+    license_list         = si.getLicense()
+    ls_list              = si.ls()
+    first_ls             = si.ls_now()
+    switch_id            = si.switch_id()
     try:
-        theswitch_name = si.switch_name()
+        theswitch_name   = si.switch_name()
     except IndexError:
         pass
-    chassis_name = si.chassisname()
-    director_pizza = si.director()
-    vf_enabled = si.vf_enabled()
-    sw_type = si.switch_type()
-    base_sw = si.base_check()
-    fcr_state = si.fcr_enabled()
-    ports_and_ls = si.all_ports_fc_only()
-    psw_reset_value = "YES"
-    xisl_st_per_ls = si.allow_xisl()
-    maps_policy_sum = mi.get_policies()
+    chassis_name         = si.chassisname()
+    director_pizza       = si.director()
+    vf_enabled           = si.vf_enabled()
+    sw_type              = si.switch_type()
+    base_sw              = si.base_check()
+    fcr_state            = si.fcr_enabled()
+    ports_and_ls         = si.all_ports_fc_only()
+    psw_reset_value      = "YES"
+    xisl_st_per_ls       = si.allow_xisl()
+    maps_policy_sum      = mi.get_policies()
     maps_non_dflt_policy = mi.get_nondflt_policies()
     
-    flow_per_ls = fi.flow_names()
+    flow_per_ls          = fi.flow_names()
+    blades               = si.blades()
+    deflt_switch         = si.default_switch()
+    sfp_info             = si.sfp_info()
+    
+    
     
     #############################################################
-    #### create a dict for ls and ports in the ls
+    #### create a dict for ls and ports in the ls or anything that could be different
+    ####    from each logical switch
     ####
     k = str(first_ls)    #### craete a key with the command name
                                #### and pid added together
@@ -1636,33 +1641,39 @@ def get_info_from_the_switch(extend_name=""):
                          #### is a string and extend command later on will fail
     d_port_list = {k:v}     #### create the first dictionary entry ras[0]
     #v_sn = theswitch_name
-    d_switch_name = {k:theswitch_name}
-    d_domain_list = {k:switch_id}
-    d_xisl_state  = {k:xisl_st_per_ls}
-    d_flow_names  = {k:flow_per_ls}
+    d_switch_name          = {k:theswitch_name}
+    d_domain_list          = {k:switch_id}
+    d_xisl_state           = {k:xisl_st_per_ls}
+    d_flow_names           = {k:flow_per_ls}
+    d_maps_policy          = {k:maps_policy_sum}
+    d_maps_non_dflt_policy = {k:maps_non_dflt_policy}
     
     ####
     ###########################################################################
     #### add logical switch specific values to a dictionary
     for ls in ls_list:
-        cons_out = anturlar.fos_cmd("setcontext %s " % ls)
-        ports_and_ls = si.all_ports_fc_only()
-        theswitch_name = si.switch_name()
-        domain_for_ls = si.switch_id()
-        xisl_st_per_ls = si.allow_xisl()
-        flow_per_ls = fi.flow_names()
+        cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
+        ports_and_ls         = si.all_ports_fc_only()
+        theswitch_name       = si.switch_name()
+        domain_for_ls        = si.switch_id()
+        xisl_st_per_ls       = si.allow_xisl()
+        flow_per_ls          = fi.flow_names()
+        maps_policy_sum      = mi.get_policies()
+        maps_non_dflt_policy = mi.get_nondflt_policies()
+
         
         if ls != str(first_ls):
             #value = []
             #value_sn = []
             #value = ports_and_ls
             #value_sn = theswitch_name
-            d_port_list[ls] = ports_and_ls       #### add the value to the key
-            d_switch_name[ls] = theswitch_name 
-            d_domain_list[ls] = domain_for_ls
-            d_xisl_state[ls] = xisl_st_per_ls
-            d_flow_names[ls] = flow_per_ls
-        
+            d_port_list[ls]            = ports_and_ls       #### add the value to the key
+            d_switch_name[ls]          = theswitch_name 
+            d_domain_list[ls]          = domain_for_ls
+            d_xisl_state[ls]           = xisl_st_per_ls
+            d_flow_names[ls]           = flow_per_ls
+            d_maps_policy[ls]          = maps_policy_sum
+            d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
     
     ###########################################################################
     ####
@@ -1683,6 +1694,7 @@ def get_info_from_the_switch(extend_name=""):
     switch_dict["vf_setting"]   = vf_enabled
     switch_dict["fcr_enabled"]  = fcr_state
     switch_dict["port_list"]    = d_port_list
+    
         
     ###########################################################################
     #### print the variables for review
@@ -1692,12 +1704,14 @@ def get_info_from_the_switch(extend_name=""):
     print("SWITCH NAME       :  %s  " % d_switch_name)
     print("SWITCH DOMAIN     :  %s  " % d_domain_list)
     print("LS LIST           :  %s  " % ls_list)
+    print("DEFAULT SWITCH    :  %s  " % deflt_switch)
     print("BASE SWITCH       :  %s  " % base_sw)
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   " )
     print("RESET PASSWORD    :  %s " % psw_reset_value)
     print("FCR ENABLED       :  %s " % fcr_state)
+    print("BLADES            :  %s " % blades)
     print("LICENSE LIST      :  %s  " % license_list)
     
     for kk, vv in d_port_list.items():
@@ -1714,10 +1728,11 @@ def get_info_from_the_switch(extend_name=""):
                            "","", "==============================\n")  
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
     ff.write(header)
-    #ff.write(str(switch_ip))
+    ####ff.write(str(switch_ip))
     ff.write("SWITCH IP                :  %s  \n" % switch_ip)
     ff.write("SWITCH DOMAIN            :  %s  \n" % d_domain_list)
     ff.write("LS LIST                  :  %s  \n" % ls_list)
+    ff.write("DEFAULT SWITCH           :  %s  \n" % deflt_switch)
     ff.write("BASE SWITCH              :  %s  \n" % base_sw)
     ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
     ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
@@ -1728,8 +1743,9 @@ def get_info_from_the_switch(extend_name=""):
     ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
     ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
     ff.write("ALLOW XISL               :  %s  \n" % d_xisl_state)
-    ff.write("Ports             :  %s  \n" % d_port_list)
-    ff.write("LICENSE LIST      :  %s  \n" % license_list)
+    ff.write("Ports                    :  %s  \n" % d_port_list)
+    ff.write("Blades                   :  %s  \n" % blades)
+    ff.write("LICENSE LIST             :  %s  \n" % license_list)
 
     ff.write("="*80)
     ff.write("\n")

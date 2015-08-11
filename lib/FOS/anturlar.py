@@ -2003,22 +2003,25 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         telnet_closed = telnet_closed.encode()
         bad_login = "Login incorrect"
         bad_login = bad_login.encode()
-        reg_ex_list = [b"cli->"]# b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
+        reg_ex_list = [b"cli->", b"\$ " ]# b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, b"cli->" ]
         #print(HOST)
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        #tn.set_debuglevel(9)
+        tn.set_debuglevel(9)
         tn.read_until(b"login: ")
-        tn.write(usrname.encode('ascii') + b"\n")
+        tn.write(usrname.encode('ascii') + b"\r\n")
         if password:
             tn.read_until(b"Password: ")
-            tn.write(password.encode('ascii') + b"\n")
+            tn.write(password.encode('ascii') + b"\r\n")
             capture = tn.expect(reg_ex_list)
             capture_t = capture
             capture = capture[2]
             badlog0 = capture_t[0]
-            capture = capture.decode()
+            #print("@"*80)
+            #print(capture)
+            #print("$"*80)
+            capture = capture.decode('ascii', 'ignore')
         if badlog0 == 6:
             print("Could not connect at this time")
             print("Try again with a correct username / password combination")
@@ -2094,10 +2097,11 @@ def power_cmd(cmd, dl=0):
         #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(dl)
-        reg_ex_list = [b" cli->", b"\(yes, no\)  : ", b"seconds.", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        tn.set_debuglevel(10)
+        reg_ex_list = [b"cli->", b"\(yes, no\)  : ", b"seconds.", b"\$ ", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
-        tn.write(cmd.encode('ascii') + b"\n")
+        tn.write(cmd.encode('ascii') + b"\r\n")
         capture = tn.expect(reg_ex_list)
         capture = capture[2]
         capture = capture.decode()
