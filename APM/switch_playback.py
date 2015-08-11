@@ -379,6 +379,19 @@ def load_kernel(switch_type, sw_ip, frm_version):
         caputure = tn.expect(reg_bash_only,30)
         
         
+    if (switch_type == '162'):  #### WEDGE
+        tn.write(b"makesinrec 0x1000000 \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x2000000 wedge/uImage.netinstall\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x3000000 wedge/ramdisk_v1.0.img\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x4000000 yoda/silkworm.dtb.netinstall\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
+        caputure = tn.expect(reg_bash,300)
+
+        
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
     capture = tn.expect(reg_bash, 30)
     i = "ifconfig eth0 %s netmask 255.255.240.0 up\r\n" % sw_ip 
