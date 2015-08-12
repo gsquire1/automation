@@ -680,7 +680,8 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
     """
     
     ff = ""
-    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+    #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+    f = ("%s%s%s"%("logs/Switch_Info_",switch_ip,"_restore.txt"))
     print(f)
     
     try:
@@ -860,7 +861,7 @@ def main():
 ###############################################################################
     
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
-    cc = cofra.SwitchUpdate()
+    cc = cofra.SwitchUpdate("restore")
     
     #cons_out = cc.playback_licenses()
     cons_out = cc.playback_ls()

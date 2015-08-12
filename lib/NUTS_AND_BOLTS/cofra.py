@@ -401,13 +401,14 @@ class SwitchUpdate():
     
     """
 
-    def __init__(self, user = "root", password = "password"):
+    def __init__(self, user = "root", password = "password", extend_name = ""):
        
         self.user = user
         self.password = password
         self.si = anturlar.SwitchInfo()
         self.switch_ip = self.si.ipaddress()
         self.chassis_name = self.chassis_name_from_ip()
+        self.extend_name = extend_name
     
     def chassis_name_from_ip(self):
         """
@@ -438,7 +439,7 @@ class SwitchUpdate():
         This function lives in cofra.switch_update()
         """
     
-        f = ("logs/Switch_Info_for_playback_10.38.134.30.txt")
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -472,7 +473,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt")) ###.bak????
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name) ###.bak????
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -507,7 +508,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -571,7 +572,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -599,7 +600,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -645,7 +646,7 @@ class SwitchUpdate():
         #switch_ip = self.si.ipaddress()
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-        f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".txt"))
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -1723,7 +1724,7 @@ def get_info_from_the_switch(extend_name=""):
         print(kk,vv)    #### print switchnames
     print('*'*80)
     
-    f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
+    f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
                            "","", "==============================\n")  
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
