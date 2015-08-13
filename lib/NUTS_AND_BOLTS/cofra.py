@@ -401,7 +401,7 @@ class SwitchUpdate():
     
     """
 
-    def __init__(self, user = "root", password = "password", extend_name = ""):
+    def __init__(self, extend_name = "" , user = "root", password = "password"):
        
         self.user = user
         self.password = password
@@ -1724,7 +1724,7 @@ def get_info_from_the_switch(extend_name=""):
         print(kk,vv)    #### print switchnames
     print('*'*80)
     
-    f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
+    f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
                            "","", "==============================\n")  
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
