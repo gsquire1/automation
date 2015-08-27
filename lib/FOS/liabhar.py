@@ -280,11 +280,17 @@ def email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" ):
         <p>Hi!<br>
            How are you?<br>
            Here is the <a href="http://www.python.org">link</a> you wanted.
+           <br>
+           
+           Message:<br>
+           replace_me
+           
+           
         </p>
       </body>
     </html>
     """
-
+    html = html.replace("replace_me", html_to_send)
 
     if htmlfile_path == "":
         msg = MIMEText(html, 'html')
