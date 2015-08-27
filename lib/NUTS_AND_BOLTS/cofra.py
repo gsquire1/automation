@@ -401,7 +401,7 @@ class SwitchUpdate():
     
     """
 
-    def __init__(self, extend_name = "" , user = "root", password = "password"):
+    def __init__(self, extend_name = "restore" , user = "root", password = "password"):
        
         self.user = user
         self.password = password
@@ -509,6 +509,7 @@ class SwitchUpdate():
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
         f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
+        print("WE ARE IN Playbac_LS)")
         try:
             with open(f, 'r') as file:
                 a = file.read()

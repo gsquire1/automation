@@ -861,9 +861,10 @@ def main():
 ###############################################################################
     
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
-    cc = cofra.SwitchUpdate("restore")
+    cc = cofra.SwitchUpdate()
+
     
-    #cons_out = cc.playback_licenses()
+    cons_out = cc.playback_licenses()
     cons_out = cc.playback_ls()
     cons_out = cc.playback_switch_names()
     cons_out = cc.playback_switch_domains()
