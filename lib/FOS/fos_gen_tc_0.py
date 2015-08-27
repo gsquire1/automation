@@ -208,9 +208,13 @@ def fabric_switch_config_show():
         ls_domain    = m_info.ls_and_domain()
         chass_name   = m_info.chassisname()
         vf_state     = m_info.vf_enabled()
+        non_dflt_policy = m_info.getnondflt_policies()
+        
         
         anturlar.close_tel()
-
+####
+####  leave as capturing data for only one FID at a time
+####   
         ff = liabhar.FileStuff(fname, 'a+b')
         ff.write("+"*80)
         ff.write("+"*80)
@@ -224,8 +228,12 @@ def fabric_switch_config_show():
         ff.write("Logical Switches    :    %s \r\n" % ls_list)
         ff.write("Switch ID           :    %s \r\n" % switch_id)
         ff.write("ls and domain       :    %s \r\n" % ls_domain)
+        ff.write("MAPS config         :    %s \r\n" % maps_config)
+        ff.write("MAPS Policy         :    %s \r\n" % non_dflt_policy)
         
-    
+        
+        
+    return(True)
     
     
     

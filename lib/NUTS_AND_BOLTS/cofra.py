@@ -63,6 +63,14 @@ class doFirmwareDownload():
         
         return(f)
 
+    def fail_print(self):
+        
+        print("\n"*5)
+        print("Firmware Download Failed for the following reason")
+        print("\n"*5)
+        
+        return()
+        
     def start(self):
         ras = self.check_version()
         #print("FIRMUP IS %s\n"%(self.firmup))
@@ -73,19 +81,29 @@ class doFirmwareDownload():
         else:
             return "fail to perform Firmwaredownload since versions were the same"
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
+        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', b'with new firmware.']
         capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list,9)
         
         #capture_own_regex = anturlar.fos_cmd_regex("Y", reg_ex_list)
-        
+    ###########################################################################
+    ###########################################################################
+    ####
+    ####  look for reasons firmwaredownload did not complete or FAILED  
+    ####
+    ###########################################################################
         if "the same firmware" in capture_own_regex:
             return(capture_own_regex)
         if "server is inaccessible" in capture_own_regex:
             return(capture_own_regex)
+        if "Cannot download" in capture_own_regex:
+            self.fail_print()
+            print(capture_own_regex)
+            return(capture_own_regex)
+        
         
         capture_cmd = anturlar.fos_cmd_regex("Y",reg_ex_list,9)
         anturlar.close_tel()
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  %s"%("IP ADDRESS HERE", self.firmvrsn))
         liabhar.count_down(360) 
         return(capture_cmd)
 ###############################################################################
@@ -430,6 +448,7 @@ class SwitchUpdate():
             if ip_address_from_file == self.switch_ip:
                 swtch_name = (line['Chassisname'])
             else:
+                swtch_name = (line['Chassisname'])
                 print("\r\n")
         return(swtch_name)
     
@@ -519,6 +538,10 @@ class SwitchUpdate():
         ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
         ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
         ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+        print("@"*80)
+        print(ras_vf_enabled)
+        print("setting the VF mode ")
+        print("$"*80)
         
         if not ras_vf_enabled:
             cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf",reg_ex_yes_no, 9)

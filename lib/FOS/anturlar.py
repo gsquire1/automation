@@ -979,7 +979,15 @@ class SwitchInfo:
         capture_cmd = fos_cmd("switchshow")
         ras = re.compile('switchType:\s+(\d{1,3})')
         ras = ras.findall(capture_cmd)
-        sn = str(ras[0])
+        try:
+            sn = str(ras[0])
+        except:
+            print("\r\n"*5)
+            print("I could not find the switchtype in anturlar.switch_type")
+            print("\nneed to exit now.")
+            print("\ntry running from the command prompt\n\n")
+            sys.exit()
+            
         return(sn)
     
     
