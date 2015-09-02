@@ -1167,13 +1167,6 @@ class FcrInfo(FabricInfo, SwitchInfo):
             ff.write(header)
             ff.write(cons_out+"\n")
             ff.close()
-            
-    def lsanzone_check(self):
-        """
-        Issue "lsanzoneshow -s" against switch.
-        """
-        capture_cmd = fos_cmd("lsanzoneshow -s")
-        return (capture_cmd)
         
 
     def ipv4_fcr(self):

@@ -66,8 +66,6 @@ def file_diff(a,b,c=""):
     Compare two files for differences, print to console and put in a file in logs directory
     """
 
-    #a = "/home/RunFromHere/logs/10.38.36.67.txt"
-    #b = "/home/RunFromHere/logs/10.38.36.167.txt"
     difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
     z = filecmp.cmp(a,b)
     if z == True:

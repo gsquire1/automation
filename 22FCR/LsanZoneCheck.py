@@ -776,39 +776,41 @@ def main():
         nos = si.nos_check()
         if not nos:
             fi=anturlar.FcrInfo()
-            lsanzone = fi.lsanzone_check()
+            lsanzone = anturlar.fos_cmd("lsanzoneshow -s")
+            fcrproxy = anturlar.fos_cmd("fcrproxydevshow")
+            fcrresource = anturlar.fos_cmd("fcrresourceshow")
             print(lsanzone)
-            f = "%s%s%s"%("logs/LsanZoneInfo_",pa.ipaddr,"_0.txt")
-            a = os.path.isfile(f)
+            print(fcrproxy)
+            print(fcrresource)
+            f1 = "%s%s%s"%("logs/LsanZoneInfo_",pa.ipaddr,"_base.txt")
+            a = os.path.isfile(f1)
             if not a:
                 print("Not there. Capturing file now")
                 header = "%s%s%s%s" % ("\nLsanZoneShow CAPTURE FILE \n",\
                            "","", "==============================\n")  
-                ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
+                ff = liabhar.FileStuff(f1, 'w+b')  #### open the log file for writing
                 ff.write(header)
                 ff.write(lsanzone)
+                ff.write(fcrproxy)
+                ff.write(fcrresource)
                 sys.exit(0)
             else:
-                f = "%s%s%s"%("logs/LsanZoneInfo_",pa.ipaddr,"_1.txt")
+                f2 = "%s%s%s"%("logs/LsanZoneInfo_",pa.ipaddr,"_after.txt")
                 header = "%s%s%s%s" % ("\nLsanZoneShow CAPTURE FILE \n",\
                            "","", "==============================\n")  
-                ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
+                ff = liabhar.FileStuff(f2, 'w+b')  #### open the log file for writing
                 ff.write(header)
                 ff.write(lsanzone)
+                ff.write(fcrproxy)
+                ff.write(fcrresource)
                 #sys.exit(0)
             
-            f0 = ("logs/LsanZoneInfo_",pa.ipaddr,"_0.txt")
-            f1 = ("logs/LsanZoneInfo_",pa.ipaddr,"_1.txt")
-            diff = fcr_tools.file_diff(f0,f1)
+            #f0 = ("logs/LsanZoneInfo_",pa.ipaddr,"_base.txt")
+            #f1 = ("logs/LsanZoneInfo_",pa.ipaddr,"_after.txt")
+            diff = fcr_tools.file_diff(f1,f2)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             print(diff)
             sys.exit()
-            try:
-                with open(f, 'r') as file:
-                    ff = file.read()
-            except IOError:
-                print("\n\nThere was a problem opening the file" , f)
-                sys.exit()
             
             #sw_dict              = cofra.get_info_from_the_switch()
             #switch_ip            = sw_dict["switch_ip"]
