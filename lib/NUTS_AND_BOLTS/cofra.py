@@ -493,6 +493,8 @@ class SwitchUpdate():
     
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
         f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name) ###.bak????
+        print("opening file  %s  " % f)
+        
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -501,6 +503,9 @@ class SwitchUpdate():
             sys.exit()
         
         ras = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', a)
+        print("license list is :")
+        print("ras")
+        print("@"*80)
         try:
             b = ras[0]
             c = b.split(",")
@@ -529,6 +534,8 @@ class SwitchUpdate():
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
         f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
         print("WE ARE IN Playbac_LS)")
+        print("opening file   %s  " % f)
+        
         try:
             with open(f, 'r') as file:
                 a = file.read()
@@ -537,16 +544,24 @@ class SwitchUpdate():
             sys.exit()        
         ras = re.findall('LS LIST\s+:\s+\[(.+)(?:])', a)
         ras_base = re.findall('BASE SWITCH\s+:\s+([TrueFals0-9]+)', a)
-        ras_vf_enabled = re.findall('VF SETTING\s+:\s([TrueFals0-9]+)', a)
+        ras_vf_enabled = re.findall('VF SETTING\s+:\s+([TrueFals0-9]+)', a)
         print("@"*80)
+        
         print(ras_vf_enabled)
+        print(ras_base)
+        print(ras)
         print("setting the VF mode ")
         print("$"*80)
         
         if not ras_vf_enabled:
             cons_out = anturlar.fos_cmd_regex("fosconfig --disable vf",reg_ex_yes_no, 9)
+            
             if "N]: " in cons_out:
                 cons_out = anturlar.fos_cmd("Y", 9)
+                
+                liabhar.count_down(120)
+                self.reboot_reconnect(False)
+                
             else:
                 anturlar.fos_cmd("\n")
             return(True)
@@ -810,10 +825,16 @@ class SwitchUpdate():
                 liabhar.JustSleep(30)
         
     
-    def reboot_reconnect(self):
-        anturlar.fos_cmd("echo Y | reboot")
-        liabhar.count_down(120)
+    def reboot_reconnect(self, doreboot=True):
+        
+        #### set the online state of the switch
+        ### to be checked later 
         state = False
+        
+        if doreboot:
+            anturlar.fos_cmd("echo Y | reboot")
+            liabhar.count_down(120)
+            
         while True:
             try:
                 print("@"*44)

@@ -724,9 +724,10 @@ def user_start():
                 print("\n\nthere was an error with the input")
                 #sys.exit()
                 
-        if start == 'y':
+        if start == 'y' :
             go = True
         else:
+            print("START VALUE is  %s" % start)
             sys.exit()
 ############################################################################### 
 #######################################################################################################################
@@ -1015,11 +1016,13 @@ def main():
         tn.close()
 
     
-    liabhar.JustSleep(600)
+    #liabhar.JustSleep(600)
+    liabhar.count_down(600)
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
     except:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
@@ -1027,6 +1030,16 @@ def main():
     
     print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
     print(my_ip)
+    
+    ###################################################################################################################
+    ####  
+    ####  ask the user which file to use
+    ####   prepopulate with the file from above
+    ####    check the existience of the file
+    ####    correct it or exit
+    ####
+    ###################################################################################################################
+    
     
     cc = cofra.SwitchUpdate("for_playback")
     

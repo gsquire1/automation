@@ -208,8 +208,8 @@ def fabric_switch_config_show():
         ls_domain    = m_info.ls_and_domain()
         chass_name   = m_info.chassisname()
         vf_state     = m_info.vf_enabled()
-        non_dflt_policy = m_info.getnondflt_policies()
-        
+        non_dflt_policy = m_info.get_nondflt_policies()
+    
         
         anturlar.close_tel()
 ####
