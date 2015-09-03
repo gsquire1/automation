@@ -1167,6 +1167,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
             ff.write(header)
             ff.write(cons_out+"\n")
             ff.close()
+        
 
     def ipv4_fcr(self):
         """
