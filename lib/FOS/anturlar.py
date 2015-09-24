@@ -1648,12 +1648,6 @@ class Maps(SwitchInfo):
         
         #output = ras.replace("|","")
         #output = output.split(" ")
-        print("R"*80)
-        print("R"*80)
-        print(ras)
-        print("U"*80)
-        print("U"*80)
-        
         
         if ras:
             return(ras.group())
@@ -1833,17 +1827,6 @@ class Maps(SwitchInfo):
         ####  use the calculation (total - free - buffers - cached)/ total
         ####    ( 1024096 - 351328 - 40884 - 379300 ) / 1024096 = 25%
         ####
-        print("MEM"*26)
-        print("MEM"*26)
-        print("MEM"*26)
-        print("MEM"*26)
-        print(ras)
-        print("USAGE"*25)
-        print("USAGE"*25)
-        print("USAGE"*25)
-        print("USAGE"*25)
-        
-       
         mem_calc = (ras.group()).split()
         mem_use = float( float(mem_calc[1]) - float(mem_calc[3]) - float(mem_calc[5]) - float(mem_calc[6]) )
         mem_use = (100 * round( mem_use / float(mem_calc[1]), 2))
@@ -2212,8 +2195,7 @@ def fos_cmd(cmd, dl=0):
         #capture = tn.expect(reg_ex_list, 60)
         capture = tn.expect(reg_ex_list)
         capture = capture[2]
-        #capture = capture.decode()
-        capture = capture.decode('ascii', 'ignore')
+        capture = capture.decode()
         print(capture, end="")
         return capture
  
