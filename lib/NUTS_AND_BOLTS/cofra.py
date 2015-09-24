@@ -29,6 +29,9 @@ class doFirmwareDownload():
         ras_up = ras_up.search(firmvrsn)
         foldr_for_firmvrsn   = ras_up.group(1)
         
+        if 'amp' in firmvrsn:
+            foldr_for_firmvrsn = foldr_for_firmvrsn + "_amp"
+        
         self.firmvrsn = firmvrsn
         self.foldr    = foldr_for_firmvrsn
         self.start()
@@ -971,6 +974,7 @@ def PortStats(counter="all", port_list = "all"):
     
     si  = anturlar.SwitchInfo()
     port_list = si.all_ports()
+    direct_pizza = si.am_i_director
     
     counter_list_capture = []
     
@@ -1037,8 +1041,11 @@ def PortStats(counter="all", port_list = "all"):
         print("port  %s   slot  %s " % (crnt_slot, crnt_port))
     
     
-    
-        caputre_porterrshow = anturlar.fos_cmd("porterrshow %s/%s | grep :" % (crnt_slot,crnt_port))
+        if direct_pizza:
+            caputre_porterrshow = anturlar.fos_cmd("porterrshow %s/%s | grep :" % (crnt_slot,crnt_port))
+        else:
+            caputre_porterrshow = anturlar.fos_cmd("porterrshow %s | grep :" % (crnt_port))
+        
         ras_porterrshow = re.compile('\s*\d+:\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)')
         ras_porterrshow = ras_porterrshow.findall(caputre_porterrshow)
             
@@ -1653,6 +1660,7 @@ def get_info_from_the_switch(extend_name=""):
     ls_list              = si.ls()
     first_ls             = si.ls_now()
     switch_id            = si.switch_id()
+    fid_now              = si.currentFID()
     try:
         theswitch_name   = si.switch_name()
     except IndexError:
@@ -1806,6 +1814,7 @@ def get_info_from_the_switch(extend_name=""):
     ff.write("\n"*2)
     ff.close()
     #switch_dict = ""
+    cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
     
     
     return(switch_dict)

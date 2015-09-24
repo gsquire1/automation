@@ -120,7 +120,8 @@ def tc_01_01_01_02():
     for cmd in cmds_list:
         console_out = anturlar.fos_cmd("%s" % cmd)
         f.write(console_out + "\r\n")
-        if "license not present" not in console_out:
+        #if "license not present" not in console_out:  #### 7.3 and earlier message
+        if "MAPS is not Licensed" not in console_out:
             test_result += cmd
             test_result += ' step1'
             test_result += ' Fail\n'
@@ -485,8 +486,8 @@ def tc_01_01_05_01():
     ####
     
     en = anturlar.Maps()
-    cofra.clear_stats()
-    
+    #cofra.clear_stats()
+    #liabhar.count_down(30)
     #### create a policy and rules
     ####
     flash_rule_name = "sqa_sw_res_flash_usage_down"
@@ -496,25 +497,33 @@ def tc_01_01_05_01():
     temp_rule_in    = "sqa_sw_temp_in"
     
     
-    cmd_flash = "mapsrule --create "+ flash_rule_name +" -group chassis\
+    cmd_flash    = "mapsrule --create "+ flash_rule_name +" -group chassis\
               -monitor flash_usage -value 30 -action email,raslog,snmp,sw_marginal\
               -op ge -policy environ_test" 
     
-    cmd_cpu= "mapsrule --create "+ cpu_rule_name +" -group chassis \
+    cmd_cpu      = "mapsrule --create "+ cpu_rule_name +" -group chassis \
                -monitor cpu -value 100 -action email,raslog,snmp\
                -op le -policy environ_test"
     
-    cmd_mem = "mapsrule --create "+ mem_rule_name +"  -group chassis \
+    cmd_mem      = "mapsrule --create "+ mem_rule_name +"  -group chassis \
               -monitor memory_usage -value 100 -action email,raslog,snmp  \
               -op le -policy environ_test"
     
-    cmd_temp = "mapsrule --create "+ temp_rule_out +" -group ALL_ts \
+    cmd_temp     = "mapsrule --create "+ temp_rule_out +" -group ALL_ts \
                -monitor temp -timebase none -value out_of_range \
                -action snmp,raslog,email -op eq -policy environ_test"
     
-    cmd_temp_in = "mapsrule --create " + temp_rule_in + " -group ALL_ts \
+    cmd_temp_in  = "mapsrule --create " + temp_rule_in + " -group ALL_ts \
                   -monitor temp -timebase none -value IN_range \
-                  -action snmp,raslog,email -op eq -policy environ_test" 
+                  -action snmp,raslog,email -op eq -policy environ_test"
+    
+    
+    cmd_flash_del   = "mapsrule --delete " + flash_rule_name  
+    cmd_cpu_del     = "mapsrule --delete " + cpu_rule_name  
+    cmd_mem_del     = "mapsrule --delete " + mem_rule_name 
+    cmd_temp_del    = "mapsrule --delete " + temp_rule_out 
+    cmd_temp_in_del = "mapsrule --delete " + temp_rule_in 
+    
     ###########################################################################
     #### setup the rules and policy for this test
     ####
@@ -526,26 +535,39 @@ def tc_01_01_05_01():
     anturlar.fos_cmd(cmd_temp)
     anturlar.fos_cmd(cmd_temp_in)
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
     anturlar.fos_cmd("mapspolicy --enable environ_test")
     ####
     #### do some steps here
     ####
     print("\n\nwaiting for maps actions to be triggered. . .")
-    liabhar.JustSleep(600)
+    #liabhar.JustSleep(600)
+     
+    liabhar.count_down(650)
+    #back2prompt = anturlar.fos_cmd("\n",9)
     ####  see if there is a ras log message for each rule
     mem_ras_message   = en.ras_message_search(mem_rule_name)
-    flash_ras_message = en.ras_message_search(flash_rule_name)
-    temp_ras_message  = en.ras_message_search(temp_rule_in)
-    cpu_ras_message   = en.ras_message_search(cpu_rule_name)
     
+    print("debug ")
+    print(mem_ras_message)
+    print("debug")
+    
+    flash_ras_message = en.ras_message_search(flash_rule_name)
+    
+    temp_ras_message  = en.ras_message_search(temp_rule_in)
+    
+    cpu_ras_message   = en.ras_message_search(cpu_rule_name)
+
     ####  see if there is a mapsdb entry for each r+= 1ule
     #mem_mapsdb_confirm = en.db_search(mem_rule_name)
     #mem_mapsdb_confirm = mem_mapsdb_confirm.replace("|","")
     #mem_confirm_final = mem_mapsdb_confirm.split(" ")
     mem_confirm       = en.db_search(mem_rule_name)
+    
     flash_confirm     = en.db_search(flash_rule_name)
+    
     cpu_confirm       = en.db_search(cpu_rule_name)
+    
     temp_confirm      = en.db_search(temp_rule_in)
     
     #### get the raw data from the switch
@@ -555,12 +577,30 @@ def tc_01_01_05_01():
     #/dev/root               495016    210188    259276  45% /
     #/dev/hda1               494984    210716    258720  45% /mnt
     ####
-    ####  no calculation needed since the use% is the correct number
+    ####  no calculation needanturlar.fos_cmd(cmd_temp_in_del)ed since the use% is the correct number
     ####
-    flash_df_command = anturlar.fos_cmd("df")
+    #back2prompt = anturlar.fos_cmd("\n",9)
+    
+    flash_df_command = anturlar.fos_cmd("df",9)
+    if flash_df_command == None:
+        print("did not find the flash df command output")
+        exit()
+        
     ras = re.compile('[\d]+(?=%)')
     flash_raw = ras.search(flash_df_command)
-    flash_usage = flash_raw.group()   
+    
+    print("@"*80)
+    print("@"*80)
+    print("@"*80)
+    print("@"*80)
+
+    print(flash_raw)
+    try:
+        flash_usage = flash_raw.group()   
+    except AttributeError:
+        print("did not find df output")
+        exit()
+    liabhar.count_down(30)
     
     ### equation to confirm mem usage
     #### using the command free returns these values
@@ -573,6 +613,12 @@ def tc_01_01_05_01():
     ####    ( 1024096 - 351328 - 40884 - 379300 ) / 1024096 = = 25%
     ####
     mem_usage = en.mem_usage()
+    
+    if mem_usage == None:
+        print("did not find the mem usage ")
+        exit()
+        
+    liabhar.count_down(30)
     #### equation for cpu usage
     #### cat /proc/stat - in the line containing cpu, the 4th number 
     ####   is the idle time.  The CPU usage is calculated as
@@ -585,8 +631,18 @@ def tc_01_01_05_01():
     # intr 44837986softirq 65577794 148267 24596931 0 38492796 0 2339800
     ####
     cpu_calc    = en.cpu_usage()
+    
+    if cpu_calc == None:
+        print("CPU usage was not found")
+        exit()
     temp_status = en.temp_status()
-     
+    
+    if temp_status == None:
+        print("Temp Status was not found")
+        exit()
+        
+    
+    
     
     ###########################################################################
     ###########################################################################
@@ -598,7 +654,15 @@ def tc_01_01_05_01():
     
     maps_tools.cleanup_policy(policy_user_list)
     policy_user_list_final = en.get_policies("s")
+
+    anturlar.fos_cmd(cmd_flash_del)
+    anturlar.fos_cmd(cmd_cpu_del)
+    #anturlar.fos_cmd(cmd_mem_del)
+    anturlar.fos_cmd(cmd_temp_del)
+    anturlar.fos_cmd(cmd_temp_in_del)
      
+    anturlar.fos_cmd("mapspolicy --enable dflt_moderate_policy")
+    anturlar.fos_cmd("mapspolicy --delete environ_test")
      
     print("\n\n\n\n\n")
     print("="*80)
@@ -629,8 +693,21 @@ def tc_01_01_05_01():
     print("calculated switch CPU             :  %s  " % cpu_calc)
     print("Temp Sensor info high-low-avg     :  %s  " % temp_status)
     
+    
+    ###################################################################################################################
+    ####
+    ####  check for all messages are present
+    ####   if not then the test case fails
+    ####
+    ###################################################################################################################
+    if "no match" in mem_ras_message:
+        print("TEST CASE FAILED")
+        exit()
+        return(False)
+    
+    
+    return(True)
 
-    return()
 
 def tc_01_01_05_02():
     """
@@ -739,7 +816,7 @@ def tc_01_01_05_02():
     
     
     en = anturlar.Maps()
-    anturlar.clear_stats()
+    cofra.clear_stats()
     
     ###########################################################################
     #### setup the rules and policy for this test
@@ -869,7 +946,7 @@ def tc_01_01_05_03():
     
     ####
     en = anturlar.Maps()
-    anturlar.clear_stats()
+    cofra.clear_stats()
     
     ###########################################################################
     #### setup the rules and policy for this test
@@ -983,7 +1060,7 @@ def tc_01_01_05_04():
     
     
     en = anturlar.Maps()
-    anturlar.clear_stats()
+    cofra.clear_stats()
     
     ###########################################################################
     #### setup the rules and policy for this test
@@ -1102,7 +1179,7 @@ def tc_01_01_05_05():
     
     #### create the object and clear stats
     en = anturlar.Maps()
-    anturlar.clear_stats()
+    cofra.clear_stats()
     
     ###########################################################################
     #### setup the rules and policy for this test
@@ -1518,13 +1595,15 @@ def tc_01_01_06_07():
     ####
     #### create the object and clear stats
     en = anturlar.Maps()
+    slot_list = en.blades(True)
+
     ####
     #fabmems = anturlar.fabric_members()
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
     #### add the slot numbers here
-    slot_numb = 0
+    slot_numb = int(slot_list[0])
     
     bld_map = cofra.bladeportmap_Info(slot_numb)
     print("\n\n\nBLADEPORTMAP INFO \n")

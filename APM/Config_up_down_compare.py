@@ -836,7 +836,7 @@ def main():
     
     if steps_to_run == 2 or steps_to_run == 3:
         liabhar.JustSleep(10)
-        cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_conservative_policy")
+        cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         switch_info = cofra.get_info_from_the_switch("compare")
     ###################################################################################################################
     #### path to the second file to compare
@@ -857,8 +857,8 @@ def main():
     ###################################################################################################################
     ####  put additional commands here before disconnecting from telnet
     ####
-    cons_out = anturlar.fos_cmd("mapsdb --show all")
-    print(cons_out)
+    #cons_out = anturlar.fos_cmd("mapsdb --show all")
+    #print(cons_out)
     
     
     anturlar.close_tel()

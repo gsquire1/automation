@@ -530,14 +530,23 @@ class SwitchInfo:
         else:
             return(0)
     
-    def blades(self):
+    def blades(self, L=False):
         """
             return the list of SW blades in the switch
             includes SW BLADES and AP BLADES
+            L option will return a list of the blade port numbers if set to true
+               if set to false it will return the port, type, ID and model
+               
         """
+        
+        
         if self.am_i_director:
             capture_cmd = fos_cmd("slotshow -m")
-            ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE)\s+(\d+)\s+([-FCOEX1032468]+)\s+(\w+)')
+            if L:
+                ras = re.compile('(\d+)\s+[SWAP]')
+            else:
+                ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE)\s+(\d+)\s+([-FCOEX1032468]+)\s+(\w+)')
+            
             ras = ras.findall(capture_cmd)
             return(ras)
         else:
@@ -1635,10 +1644,16 @@ class Maps(SwitchInfo):
         print("U"*80)
         print("U"*80)
         ras = re.compile(repattern)
-        ras = ras.search(capture_cmd)
+        ras = ras.search(str(capture_cmd))
         
         #output = ras.replace("|","")
         #output = output.split(" ")
+        print("R"*80)
+        print("R"*80)
+        print(ras)
+        print("U"*80)
+        print("U"*80)
+        
         
         if ras:
             return(ras.group())
@@ -1652,12 +1667,25 @@ class Maps(SwitchInfo):
            search the errlog for a specific pattern
            
         """
-        capture_cmd = fos_cmd("errdumpall")
+        cap = fos_cmd("tempshow", 9 )
+        print("TEMP"*20)
+        print("TEMP"*20)
+        print("TEMP"*20)
+        print(cap)
+        
+        
+        capture_cmd = fos_cmd("errdumpall", 9 )
+        
+        print("SHOW"*20)
+        print("SHOW"*20)
+        print("SHOW"*20)
+        print("SHOW"*20)
+        
+        
         ras = re.compile("(%s)" % pattern)
-        ras = ras.search(capture_cmd)
-        print("\n\n\nRAS PATTERN is  :  %s " % pattern)
-        print("\n\n %s " % ras)
          
+        ras = ras.search(str(capture_cmd))
+                 
         if ras:
             return(ras.group())
         else:
@@ -1805,6 +1833,17 @@ class Maps(SwitchInfo):
         ####  use the calculation (total - free - buffers - cached)/ total
         ####    ( 1024096 - 351328 - 40884 - 379300 ) / 1024096 = 25%
         ####
+        print("MEM"*26)
+        print("MEM"*26)
+        print("MEM"*26)
+        print("MEM"*26)
+        print(ras)
+        print("USAGE"*25)
+        print("USAGE"*25)
+        print("USAGE"*25)
+        print("USAGE"*25)
+        
+       
         mem_calc = (ras.group()).split()
         mem_use = float( float(mem_calc[1]) - float(mem_calc[3]) - float(mem_calc[5]) - float(mem_calc[6]) )
         mem_use = (100 * round( mem_use / float(mem_calc[1]), 2))
@@ -2173,7 +2212,8 @@ def fos_cmd(cmd, dl=0):
         #capture = tn.expect(reg_ex_list, 60)
         capture = tn.expect(reg_ex_list)
         capture = capture[2]
-        capture = capture.decode()
+        #capture = capture.decode()
+        capture = capture.decode('ascii', 'ignore')
         print(capture, end="")
         return capture
  
@@ -2189,11 +2229,12 @@ def fos_cmd(cmd, dl=0):
     #        print("handle the EOF case here")
     #        print("========================")           
     except:
-        print("========================")
-        print("\n\nTELNET ERROR\n\n")
-        print("========================")       
+        print("===============================================")
+        print("\n\nTHERE WAS AN ERROR WITH THE CAPTURE IN \n")
+        print("fos_cmd in anturlar.py    \n\n")
+        print("===============================================")       
 
-
+        sysexit()
 
 
 def traff_cmd(cmd, dl=0):
