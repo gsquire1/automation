@@ -121,7 +121,7 @@ def tc_01_01_01_02():
         console_out = anturlar.fos_cmd("%s" % cmd)
         f.write(console_out + "\r\n")
         #if "license not present" not in console_out:  #### 7.3 and earlier message
-        if "MAPS is not Licensed" not in console_out:
+        if ("MAPS is not Licensed" not in console_out) and ("Please install the license" not in console_out):
             test_result += cmd
             test_result += ' step1'
             test_result += ' Fail\n'
@@ -204,6 +204,9 @@ def tc_01_01_03_01():
     sut_ip = p.ipaddress()
     sw_rules = p.get_rules()
     
+    
+     
+    
      #### set up the log file info
     f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
     
@@ -217,8 +220,22 @@ def tc_01_01_03_01():
     df_rules = maps_tools.maps_default_rule()
     
     sw_rules = sw_rules.split()
-    df_rules = df_rules.split()
     
+    df_rules = df_rules.split()
+   
+   
+    #print("@"*80)
+    #print("@"*80)
+    #print(sw_rules)
+    #print("@"*80)
+    #print("@"*80)
+    #j = 0
+    #while j < len(sw_rules):
+    #    print(sw_rules[j])
+    #    j += 1
+    #    
+    
+   
     count_df = len(df_rules)
     count = len(sw_rules)
     if count < count_df:
@@ -230,7 +247,7 @@ def tc_01_01_03_01():
     while i < loop_count:
         print("\n\ncomparing switch rule with default rule ")
         print("%s      %s " % (sw_rules[i], i ))
-        if sw_rules[i] not in df_rules:
+        if sw_rules[i].rstrip() not in df_rules:
             rule_differ += 1
             test_result += sw_rules[i]
             test_result += ' step1'
@@ -348,7 +365,10 @@ def tc_01_01_03_02():
     ####   ALL_FLASH           ALL_CIRCUITS            SWITCH *     
     ####  CHASSIS *            ALL_D_PORTS
     
-    t1 = len(blade_count)
+    if "not a director" in blade_count:
+        t1 = -1
+    else:
+        t1 = len(blade_count)
     
     
     t_fports = (pgm.logicalgroup_count("ALL_PORTS"))
@@ -396,7 +416,8 @@ def tc_01_01_03_02():
     print("SFP summary  less SIM    : %s" % sfp_summary)
     print("SFP list of speed  -     : %s" % sfp_list)
 
-    print("blade_count is           : %s" % len(blade_count))
+    #print("blade_count is           : %s" % len(blade_count))
+    print("blade_count is           : %s" % t1)
     print("D ports   is             : %s" % len(d_ports))
     
     #print("Need the fan sensor output : %s " % port_list)
@@ -427,10 +448,20 @@ def tc_01_01_03_02():
     if t1 != t_swblade:
         test_result += "ALL_SW_BLADES"
         test_result += ' step1'
-        test_result += ' Fail\n'    
+        test_result += ' Fail\n'
+        
+    if int(t_fports) == len(port_list_no_ve):
+        test_result += "ALL PORT LIST"
+        test_result += ' step 1'
+        test_result += ' Fail\n'
+    
     
     if test_result == "":
         test_result = "PASS"
+    
+    print("debug all port list ")
+    print(t_fports)
+    print(len(port_list_no_ve))
     
     print("="*80)
     print("\n\nTEST RESULTS FOR Test Case   25.01.01.03.02 ")
@@ -657,7 +688,7 @@ def tc_01_01_05_01():
 
     anturlar.fos_cmd(cmd_flash_del)
     anturlar.fos_cmd(cmd_cpu_del)
-    #anturlar.fos_cmd(cmd_mem_del)
+    anturlar.fos_cmd(cmd_mem_del)
     anturlar.fos_cmd(cmd_temp_del)
     anturlar.fos_cmd(cmd_temp_in_del)
      

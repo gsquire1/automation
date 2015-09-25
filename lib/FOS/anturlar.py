@@ -481,7 +481,7 @@ class SwitchInfo:
         
         capture_cmd = fos_cmd("switchshow")
         if self.am_i_director:
-            ras = re.compile('(?:\d{1,4}\s{3,4})(?P<slotnumber>\d{1,2})\s+?(?P<port>\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN24816G]{2,3}\s+\w+\s+[FC]{2}') 
+            ras = re.compile('(?:\d{1,4}\s{3,4})(?P<slotnumber>\d{1,2})\s+?(?P<port>\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN234816G]{2,3}\s+\w+\s+[FC]{2}') 
             ras = ras.findall(capture_cmd)
             for i in ras:
                 ras_list.append(list(i))
@@ -490,7 +490,7 @@ class SwitchInfo:
                 i[1] = int(i[1])
             return(ras_list)
         else:
-            ras = re.compile('\s?\d{1,2}\s+(\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN24816G]{2,3}\s+\w+\s+[FC]{2}') 
+            ras = re.compile('\s?\d{1,2}\s+(\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN234816G]{2,3}\s+\w+\s+[FC]{2}') 
             ras = ras.findall(capture_cmd)
             for i in ras:
                 prt = [0, int(i)]
@@ -1576,6 +1576,9 @@ class Maps(SwitchInfo):
         ras = ras.replace("'","")
         ras = ras.replace("[","")
         ras = ras.replace("]","")
+        
+        ras = ras.replace("|,", "")
+        
         return(ras)
         
 
