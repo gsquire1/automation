@@ -32,7 +32,7 @@ def test_anturlar_functions():
     fcri = anturlar.FcrInfo()
     #si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
-    a = fcri.portcfgfillword(3)
+    a = fcri.__getportlist__("EX-Port")
     #b = su.playback_licenses()
     #if a == False:
     #    print('IT BOMBED')
