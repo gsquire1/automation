@@ -197,28 +197,28 @@ def fabric_switch_config_show():
     for ip in fab_ip_list:
         tnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
         
-        m_info       = anturlar.Maps()
-        f_info       = anturlar.FlowV()
-        maps_config  = anturlar.fos_cmd("mapsconfig --show")
-        firmware_ver = check_version()
-        s_name       = m_info.switch_name()
-        s_type       = m_info.switch_type()
-        ls_list      = m_info.ls()
-        switch_id    = m_info.switch_id()
-        ls_domain    = m_info.ls_and_domain()
-        chass_name   = m_info.chassisname()
-        vf_state     = m_info.vf_enabled()
+        m_info          = anturlar.Maps()
+        f_info          = anturlar.FlowV()
+        maps_config     = anturlar.fos_cmd("mapsconfig --show")
+        firmware_ver    = check_version()
+        s_name          = m_info.switch_name()
+        s_type          = m_info.switch_type()
+        ls_list         = m_info.ls()
+        switch_id       = m_info.switch_id()
+        ls_domain       = m_info.ls_and_domain()
+        chass_name      = m_info.chassisname()
+        vf_state        = m_info.vf_enabled()
         non_dflt_policy = m_info.get_nondflt_policies()
-    
+        flow_names      = f_info.flow_names()
+        flow_cnfg       = f_info.flow_config()
+        
         
         anturlar.close_tel()
 ####
 ####  leave as capturing data for only one FID at a time
 ####   
         ff = liabhar.FileStuff(fname, 'a+b')
-        ff.write("+"*80)
-        ff.write("+"*80)
-        ff.write("\r\n")
+        seperator(ff, ip)
         ff.write("Switch ipv4         :    %s \r\n" % ip)
         ff.write("Chassis Name        :    %s \r\n" % chass_name)
         ff.write("Firmware version    :    %s \r\n" % firmware_ver)
@@ -230,14 +230,33 @@ def fabric_switch_config_show():
         ff.write("ls and domain       :    %s \r\n" % ls_domain)
         ff.write("MAPS config         :    %s \r\n" % maps_config)
         ff.write("MAPS Policy         :    %s \r\n" % non_dflt_policy)
+        ff.write("FLOW Names list     :    %s \r\n" % flow_names)
+        ff.write("FLOW CONFIG         :    %s \r\n" % flow_cnfg)
+
         
         
         
     return(True)
     
+
+def seperator(f, name = ""):
+    """
+       print a few lines of special characters to seperate field in the output
+       
+    """ 
+    f.write("\r\n\r\n")
+    f.write("@"*120)
+    f.write("@"*120)
+    f.write("STARTING SWITCH INFO FOR   %s  \r\n" % name )
+    f.write("@"*120)
+    f.write("@"*120)
+    f.write("@"*120)
+    f.write("@"*120)
+    f.write("\r\n")
     
     
     
+    return()
     
     
 def check_version():

@@ -838,7 +838,7 @@ def tc_01_01_05_02():
                             -policy port_health_policy"
     
     
-    
+ 
     ####  list of commands
     cmd_list = [link_loss_cmd, sync_loss_cmd, loss_signal_cmd,\
                 port_state_change_cmd,\
@@ -859,8 +859,7 @@ def tc_01_01_05_02():
     anturlar.fos_cmd("mapspolicy --enable %s " % port_health_policy)
         
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,\
-                     SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
     
     anturlar.fos_cmd("porterrshow")
     
@@ -990,7 +989,7 @@ def tc_01_01_05_03():
     cmdrtn = anturlar.fos_cmd("mapspolicy --show -summary")    
         
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
     
     anturlar.fos_cmd("portshow fciptunnel ")
     anturlar.fos_cmd("portshow fcipcircuit ")
@@ -1103,8 +1102,7 @@ def tc_01_01_05_04():
     anturlar.fos_cmd("mapspolicy --enable %s " % perf_policy)
         
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,\
-                     SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
     
     anturlar.fos_cmd("mapsdb --show")
     
@@ -1222,8 +1220,8 @@ def tc_01_01_05_05():
     anturlar.fos_cmd("mapspolicy --enable %s " % fabric_state_policy)
         
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,\
-                     SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
+    
     anturlar.fos_cmd("mapsdb --show")
     
     ###########################################################################
@@ -1425,7 +1423,7 @@ def tc_01_01_05_06():
     #### create security rules and policy
     ####
     security_policy      = "security_policy"
-    cleanup_policy(security_policy)
+    #maps_tools.cleanup_policy(security_policy)
 
     telnet_violation     = "sqa_telnet_violation"
     http_violation       = "sqa_http_violaltion"
@@ -1524,7 +1522,7 @@ def tc_01_01_05_06():
     cmdrtn = anturlar.fos_cmd("mapspolicy --show -summary")    
         
     #### setup the actions
-    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL,SW_CRITICAL,SW_MARGINAL")
+    anturlar.fos_cmd("mapsconfig --actions RASLOG,SNMP,EMAIL")
     
     
     

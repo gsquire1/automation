@@ -1873,6 +1873,16 @@ class FlowV(SwitchInfo):
         print(ras)
         return(ras)
     
+    def flow_config(self):
+        """
+          the flow configuration
+          
+        """
+        
+        cmd_out = fos_cmd("flow --show")
+        
+        return(cmd_out)
+    
     def simPorts(self):
         
         return 0 
