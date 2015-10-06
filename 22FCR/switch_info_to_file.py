@@ -88,7 +88,7 @@ def parse_args(args):
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
-    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
+    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide including edge switches")
     
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
