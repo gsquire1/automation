@@ -88,7 +88,7 @@ def parse_args(args):
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
-    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
+    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide including edge switches")
     
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
@@ -794,6 +794,7 @@ def main():
             sw_vf_setting        = sw_dict["vf_setting"]
             sw_fcr_enabled       = sw_dict["fcr_enabled"]
             sw_port_list         = sw_dict["port_list"]
+            sw_ex_port_list      = sw_dict["ex_ports"]
 
             print("\n"*20)
             print("SWITCH IP            : %s   " % switch_ip)
@@ -809,6 +810,7 @@ def main():
             print("VF SETTING           : %s   " % sw_vf_setting)
             print("FCR SETTING          : %s   " % sw_fcr_enabled)
             print("PORT LIST            : %s   " % sw_port_list)
+            print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
             print("@"*40)
             print("CONSOLE INFO         : %s   " % cons_info)
             print("@"*40)
