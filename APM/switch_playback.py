@@ -215,9 +215,7 @@ def connect_console(HOST,usrname,password,port,db=9, *args):
         
 
     #capture = tn.expect(reg_list, 20)
-    print("ENDENDENDEND")
-    tn.close()
-    sys.exit()
+    
     return(tn)
 
     
