@@ -2208,7 +2208,7 @@ def fos_cmd(cmd, dl=0):
         #capture = tn.expect(reg_ex_list, 60)
         capture = tn.expect(reg_ex_list)
         capture = capture[2]
-        capture = capture.decode()
+        capture = capture.decode('ascii', 'ignore')
         print(capture, end="")
         return capture
  

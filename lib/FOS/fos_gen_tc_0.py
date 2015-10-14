@@ -244,15 +244,19 @@ def seperator(f, name = ""):
        print a few lines of special characters to seperate field in the output
        
     """ 
-    f.write("\r\n\r\n")
+    #f.write("\r\n\r\n")
+    f.write("@"*120 + "\r\n\r\n")
+    f.write("\r\n")
     f.write("@"*120)
-    f.write("@"*120)
-    f.write("STARTING SWITCH INFO FOR   %s  \r\n" % name )
-    f.write("@"*120)
-    f.write("@"*120)
-    f.write("@"*120)
+    f.write("\r\n@@@@@@@@@@@@@@@@@@@@@@@        STARTING SWITCH INFO FOR   %s  \r\n" % name )
     f.write("@"*120)
     f.write("\r\n")
+    f.write("@"*120)
+    f.write("\r\n")
+    f.write("@"*120)
+    f.write("\r\n")
+    f.write("@"*120)
+    f.write("\r\n\r\n")
     
     
     

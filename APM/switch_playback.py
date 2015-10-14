@@ -58,6 +58,9 @@ import time
 ####  142  Yoda pluto
 ####  148  Skybolt
 ####
+####  162  Wedge
+####
+####
 ###############################################################################
 
 
@@ -317,6 +320,7 @@ def load_kernel(switch_type, sw_ip, frm_version):
     
     reg_list = [ b"^=> "]
     reg_bash = [ b"bash-2.04", b"^=> "]
+    #reg_bash = [ b"bash-2.04", b"=> "]
     reg_bash_only = [ b"bash-2.04" ]
     reg_linkup = [ b"link is up"]
     
@@ -381,36 +385,49 @@ def load_kernel(switch_type, sw_ip, frm_version):
         
     if (switch_type == '162'):  #### WEDGE
         tn.write(b"makesinrec 0x1000000 \r\n")
-        capture = tn.expect(reg_bash,300)
+        capture = tn.expect(reg_bash,30)
         tn.write(b"tftpboot 0x2000000 wedge/uImage.netinstall\r\n")
-        capture = tn.expect(reg_bash,300)
+        capture = tn.expect(reg_bash,10)
         tn.write(b"tftpboot 0x3000000 wedge/ramdisk_v1.0.img\r\n")
-        capture = tn.expect(reg_bash,300)
-        tn.write(b"tftpboot 0x4000000 yoda/silkworm.dtb.netinstall\r\n")
-        capture = tn.expect(reg_bash,300)
+        capture = tn.expect(reg_bash,20)
+        tn.write(b"tftpboot 0x4000000 wedge/silkworm.dtb.netinstall\r\n")
+        capture = tn.expect(reg_bash,10)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
-        caputure = tn.expect(reg_bash,300)
+        caputure = tn.expect(reg_bash,60)
 
-        
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+####
+####  this section is common for all switches after the kernel is loaded
+####
+####
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
     capture = tn.expect(reg_bash, 30)
     i = "ifconfig eth0 %s netmask 255.255.240.0 up\r\n" % sw_ip 
     tn.write(i.encode('ascii'))
     capture = tn.expect(reg_bash, 30)
     tn.write(b"route add default gw 10.38.32.1\r\n")
-    capture = tn.expect(reg_linkup,10)
+    capture = tn.expect(reg_linkup,30)
     #tn.write(b"\r\n")
-    capture = tn.expect(reg_bash, 10)
+    capture = tn.expect(reg_bash, 20)
     m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n"
     tn.write(m.encode('ascii'))
     capture = tn.expect(reg_bash, 30)
     ### firmwarepath
     firmpath = "cd /load/SQA/fos/%s/%s\r\n" % (frm_no_bld, frm_version)
     tn.write(firmpath.encode('ascii'))
-    capture = tn.expect(reg_bash,600)
-    #### need to capture when this hangs anc was not able to connect to the server  
+    capture = tn.expect(reg_bash,160)
+    #### need to capture when this hangs anc was not able to connect to the server
+    ####  this appears to timeout and the last recieve string was
+    ####    \xco\xc0\x80  80 repeated 10 times
     tn.write(b"./install release\r\n")
-    capture = tn.expect(reg_bash,600)
+    capture = tn.expect(reg_bash,160)
+    ####  this does not capture the bash  and from the console the last recv b'30`\x00\x180\xf0
+    
 
     return(0)
 
@@ -713,6 +730,47 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
 def user_start():
     go = False
     start = 'n'
+    while not go : 
+              
+        is_valid = 0
+        while not is_valid:
+            try:
+                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+                is_valid = 1 
+            except:
+                print("\n\nthere was an error with the input")
+                #sys.exit()
+                
+        if start == 'y' :
+            go = True
+        else:
+            print("START VALUE is  %s" % start)
+            sys.exit()
+
+
+
+
+def enter_file_ext():
+    go = False
+    start = 'n'
+    ###################################################################################################################
+    ####
+    ####  enter a file extension for the replay file instead of the default
+    ####  otherwise use the defualt
+    ####  stop if the user pushes esc 
+    ####
+    ###################################################################################################################
+    
+    
+    
+#######################################################################################################################
+####
+####  standard way to handle user input
+####    - while loop looking for a valid 'go' variable
+####       - while loop waiting for a string input
+####       - if start variable is y set go to true and exit the procedure
+####
+#######################################################################################################################
     while not go : 
               
         is_valid = 0
