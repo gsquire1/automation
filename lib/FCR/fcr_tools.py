@@ -30,18 +30,18 @@ GLOBAL_CONSTANT_NAME            ClassName
 def test_anturlar_functions():
     #a = ex_port_list()
     fcri = anturlar.FcrInfo()
-    print("11111111111111111111111111111111")
-    anturlar.fos_cmd("setcontext %s" % fcri.base_check())
-    print("2222222222222222222222222222222")
-    #si = anturlar.SwitchInfo()
+    #print("11111111111111111111111111111111")
+    #anturlar.fos_cmd("setcontext %s" % fcri.base_check())
+    #print("2222222222222222222222222222222")
+    si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
-    a = fcri.__getportlist__("EX-Port")
-    #b = su.playback_licenses()
+    #a = fcri.__getportlist__("EX-Port")
+    b = si.allow_xisl()
     #if a == False:
     #    print('IT BOMBED')
     #else:
     print("3333333333333333333333333333333")
-    print(a)
+    print(b)
     sys.exit()
     
 def csv_functions_ip():

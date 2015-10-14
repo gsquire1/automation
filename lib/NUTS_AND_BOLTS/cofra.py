@@ -698,7 +698,9 @@ class SwitchUpdate():
         ras = re.findall('Ports\s+:\s+\{(.+)(?:})', a)
         sn = ras[0]
         sn = sn.split("'")
-        
+        print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+        print(sn)
+        sys.exit()
         for i in range(2,len(sn),2):
             
             fid_for_ports = sn[i-1]
@@ -1652,6 +1654,7 @@ def get_info_from_the_switch(extend_name=""):
     si = anturlar.SwitchInfo()
     mi = anturlar.Maps()
     fi = anturlar.FlowV()
+    fcr = anturlar.FcrInfo() ################################NEW
     
     vdx                  = si.nos_check()
     switch_ip            = si.ipaddress()
@@ -1670,6 +1673,7 @@ def get_info_from_the_switch(extend_name=""):
     vf_enabled           = si.vf_enabled()
     sw_type              = si.switch_type()
     base_sw              = si.base_check()
+    ex_ports             = fcr.all_ex_ports() ###########################NEW
     fcr_state            = si.fcr_enabled()
     ports_and_ls         = si.all_ports_fc_only()
     psw_reset_value      = "YES"
@@ -1680,7 +1684,7 @@ def get_info_from_the_switch(extend_name=""):
     flow_per_ls          = fi.flow_names()
     blades               = si.blades()
     deflt_switch         = si.default_switch()
-    sfp_info             = si.sfp_info()
+    #sfp_info             = si.sfp_info()
     
     
     
@@ -1740,6 +1744,7 @@ def get_info_from_the_switch(extend_name=""):
     switch_dict["domain_list"]  = d_domain_list
     switch_dict["ls_list"]      = ls_list
     switch_dict["base_sw"]      = base_sw
+    switch_dict["ex_ports"]     = ex_ports #############################NEW
     switch_dict["xisl_state"]   = d_xisl_state
     switch_dict["switch_type"]  = sw_type
     switch_dict["cp_ip_list"]   = switch_cp_ips
@@ -1759,6 +1764,7 @@ def get_info_from_the_switch(extend_name=""):
     print("LS LIST           :  %s  " % ls_list)
     print("DEFAULT SWITCH    :  %s  " % deflt_switch)
     print("BASE SWITCH       :  %s  " % base_sw)
+    print("EX_PORTS          :  %s  " % ex_ports)######################NEW
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   " )
@@ -1787,6 +1793,7 @@ def get_info_from_the_switch(extend_name=""):
     ff.write("LS LIST                  :  %s  \n" % ls_list)
     ff.write("DEFAULT SWITCH           :  %s  \n" % deflt_switch)
     ff.write("BASE SWITCH              :  %s  \n" % base_sw)
+    ff.write("EX_PORTS                 :  %s  \n" % ex_ports)############################NEW
     ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
     ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
     ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)

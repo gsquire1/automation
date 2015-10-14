@@ -1057,9 +1057,9 @@ class FcrInfo(FabricInfo, SwitchInfo):
 
     def all_ex_ports(self):
         """
-            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command 
+            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
         """
-        
+        fos_cmd("setcontext %s" % self.base_check()) ###################NEW
         capture_cmd = self.__getportlist__("EX-Port")
         return(capture_cmd)
     

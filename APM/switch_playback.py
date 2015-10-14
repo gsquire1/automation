@@ -116,7 +116,7 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def connect_console(HOST,usrname,password,port,db=0, *args):
+def connect_console(HOST,usrname,password,port,db=9, *args):
     
     global tn
     
@@ -141,21 +141,25 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     tn = telnetlib.Telnet(HOST,port)
     print("tn value is  ", tn)
-    tn.set_debuglevel(db)
+    tn.set_debuglevel(9)
     
     
     print("-------------------------------------------------ready to read lines")
+    tn.write(b"\r\n")
     #############################################################################
-    #### login 
-    capture = tn.read_until(b"login: ")
-    print(capture)
-    tn.write(usrname.encode('ascii') + b"\r\n")
-    #if password:
-    capture = tn.read_until(b"assword: ")
-    print(capture)
-    tn.write(password.encode('ascii') + b"\r\n")
-        
-    print("\n\n\n\n\n\n\n\n")
+    #### login
+    capture = tn.expect(reg_list)
+    #capture = tn.read_until(b"login: ")
+    #print(capture)
+    if capture[0] == 4:        
+        tn.write(usrname.encode('ascii') + b"\r\n")
+        #if password:
+        capture = tn.read_until(b"assword: ")
+        print(capture)
+        tn.write(password.encode('ascii') + b"\r\n")  
+        print("\n\n\n\n\n\n\n\n")
+    #tn.close()
+    #sys.exit()
     
     #############################################################################
     #### login to the switch
@@ -173,16 +177,18 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
             tn.write(b"root\r\n")
                 
         if capture[0] == 2:
-            tn.write(b"assword\r\n")
+            tn.write(b"password\r\n")
                     
         if capture[0] == 3:
-            print(capture)
+            #print(capture)
             print("this found root")
+            tn.write(b"\r\n")
             break
         
         if capture[0] == 4:
-            print(capture)
+            #print(capture)
             print("\n\n\n\n\n\nFOUND USERS: \n\n")
+            #capture = ""
             tn.write(b"\r\n")
             #capture = tn.expect(reg_list)
             #break
@@ -192,19 +198,26 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
             break
         
         var += 1
-      
+    capture = ""  
     capture = tn.expect(reg_list, 20)
+    #print("*********************")
+    #print(capture)
+    #print("*********************")    
     if capture[0] == 1 :
+        print("SENDINGROOT")
         tn.write(b"root\r\n")
         capture = tn.expect(reg_list, 20)
         tn.write(b"password\r\n")
         capture = tn.expect(reg_list, 20)
         
 
-    capture = tn.expect(reg_list, 20)
-    
+    #capture = tn.expect(reg_list, 20)
+    print("ENDENDENDEND")
+    tn.close()
+    sys.exit()
     return(tn)
 
+    
 def stop_at_cmd_prompt(db=0):
     global tn
     
@@ -818,6 +831,7 @@ def main():
         sw_vf_setting        = sw_dict["vf_setting"]
         sw_fcr_enabled       = sw_dict["fcr_enabled"]
         sw_port_list         = sw_dict["port_list"]
+        sw_ex_port_list      = sw_dict["ex_ports"]
 
 
         print("\n"*20)
@@ -835,6 +849,7 @@ def main():
         print("VF SETTING           : %s   " % sw_vf_setting)
         print("FCR SETTING          : %s   " % sw_fcr_enabled)
         print("PORT LIST            : %s   " % sw_port_list)
+        print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
         print("@"*40)
         print("@"*40)
         print("CONSOLE INFO         : %s   " % cons_info)
@@ -854,7 +869,7 @@ def main():
         my_ip   = ipaddr_switch
         sw_director_or_pizza = False
         my_cp_ip_list = []
-        
+    #sys.exit()    
 ###################################################################################################################
 ###################################################################################################################
 ####
@@ -876,7 +891,7 @@ def main():
         print("CP0                           %s  "    % my_cp_ip_list[1])
         print("CP1                           %s  "    % my_cp_ip_list[2])  
           
-    #sys.exit()   stop here for getting the switch info only
+    #sys.exit()   #stop here for getting the switch info only
     
 ###################################################################################################################
 ###################################################################################################################

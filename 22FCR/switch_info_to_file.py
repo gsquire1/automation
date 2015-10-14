@@ -794,6 +794,7 @@ def main():
             sw_vf_setting        = sw_dict["vf_setting"]
             sw_fcr_enabled       = sw_dict["fcr_enabled"]
             sw_port_list         = sw_dict["port_list"]
+            sw_ex_port_list      = sw_dict["ex_ports"]
 
             print("\n"*20)
             print("SWITCH IP            : %s   " % switch_ip)
@@ -809,6 +810,7 @@ def main():
             print("VF SETTING           : %s   " % sw_vf_setting)
             print("FCR SETTING          : %s   " % sw_fcr_enabled)
             print("PORT LIST            : %s   " % sw_port_list)
+            print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
             print("@"*40)
             print("CONSOLE INFO         : %s   " % cons_info)
             print("@"*40)
