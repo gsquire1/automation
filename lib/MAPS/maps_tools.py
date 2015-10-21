@@ -222,6 +222,46 @@ def mapsenable( pol, al, ml ):
     return 0
     
  
+ 
+def add_rules_each_monitor_type():
+    """
+    
+    """
+    
+    sw_info = anturlar.SwitchInfo()
+    fid_now = sw_info.ls_now()
+    cons_out = anturlar.fos_cmd(" ")
+    #sw_ip = sw_info.ipaddress()
+    #f = anturlar.FabricInfo(fid_now)
+    
+    
+    monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC" ,"RX_THPUT", "TX_THPUT", "RX_FCNT", "TX_FCNT", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
+    monitor_list_trafic_perf_fc_port = []
+    
+    fc_logical_group = "ALL_PORTS"
+    
+    timebase_list = ["min", "hour", "day"]
+    
+    operator_list = [ "l", "le", "g", "ge", "eq" ]
+    
+    cons_out = anturlar.fos_cmd("mapspolicy --create Nervio_test_1")
+    rule_name = "monitor_test_"
+    stopnow = 0
+    stophere = 10000
+    
+    while stopnow < stophere:
+        
+        for p in monitor_list_port_health_fc_port:
+            
+            rule_to_add = rule_name + str(stopnow)
+            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                    % (rule_to_add, fc_logical_group, p ,timebase_list[0], operator_list[2], ))
+    
+            stopnow += 1
+    
+    
+    
+    return(True)
         
 def mapscommand_list(options="0"):
     """

@@ -781,6 +781,7 @@ def tc_01_01_05_02():
     
     port_health_policy = "port_health_policy"
     
+    
     link_loss_rule         = "sqa_all_ports_LF_N_1"
     sync_loss_rule         = "sqa_all_ports_loss_sync_N_1"
     loss_signal_rule       = "sqa_all_ports_loss_sig_N_1"
@@ -869,7 +870,7 @@ def tc_01_01_05_02():
     print("check for maps messages") 
     print("")
     
-    print("use the db command to poke for one test, \
+    print("use the port_health_policy = db command to poke for one test, \
            \nuse the finisar for confirmation")
     
     
@@ -1625,10 +1626,13 @@ def tc_01_01_06_07():
     #### create the object and clear stats
     en = anturlar.Maps()
     slot_list = en.blades(True)
-
+    if "not a" in slot_list:
+        slot_list = [0]
+    print("slot list   %s " % slot_list )
     ####
     #fabmems = anturlar.fabric_members()
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
+    cmdrtn = anturlar.fos_cmd("mapspolicy --enable Nervio_test_1")
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
     #### add the slot numbers here
@@ -1904,7 +1908,7 @@ def tc_01_01_template():
     
     #fid_now = en.currentFID()
     
-    f = cofra.DoSupportsave('10.38.38.138','ftp2','ftp','chassisname')
+    f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','chassisname')
     
     x = 0
     while x <= 3600:
@@ -1999,7 +2003,20 @@ def credit_recovery():
     pass
 
 
-
+def add_monitor_types():
+    """
+    
+    """
+    
+    ###########################################################################
+    #### start testing
+    ####
+    #### create the object and clear stats
+    en = anturlar.Maps()
+    ####
+    maps_tools.add_rules_each_monitor_type()
+    
+    
 
 
 def end():

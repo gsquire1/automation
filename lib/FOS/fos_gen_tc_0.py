@@ -190,6 +190,16 @@ def fabric_switch_config_show():
     fab_ip_list = fab.ipv4_list()
     fname = "%s%s" % ("logs/fabric_info_switch" ,".txt")  #### %s string  %d number
     ff = liabhar.FileStuff(fname, 'w+b')
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("\r\n")
+    for ip in fab_ip_list:
+        ff.write(ip)
+        ff.write("\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n\r\n\r\n")
     ff.close()
     
     

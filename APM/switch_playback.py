@@ -207,7 +207,7 @@ def connect_console(HOST,usrname,password,port,db=9, *args):
     #print(capture)
     #print("*********************")    
     if capture[0] == 1 :
-        print("SENDINGROOT")
+        #print("SENDINGROOT")
         tn.write(b"root\r\n")
         capture = tn.expect(reg_list, 20)
         tn.write(b"password\r\n")
