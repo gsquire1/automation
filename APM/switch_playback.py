@@ -755,7 +755,11 @@ def user_start():
             go = True
         else:
             print("START VALUE is  %s" % start)
-            sys.exit()
+            if start == 'no':
+                sys.exit()
+            else:
+                start = 'n'           
+    return()
 
 
 
@@ -786,17 +790,19 @@ def enter_file_ext():
         is_valid = 0
         while not is_valid:
             try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/no] : "))
                 is_valid = 1 
             except:
                 print("\n\nthere was an error with the input")
-                #sys.exit()
-                
+                #sys.exit()        
         if start == 'y' :
             go = True
         else:
             print("START VALUE is  %s" % start)
-            sys.exit()
+            if start == 'no':
+                sys.exit()
+            else:
+                start = 'n'
 ############################################################################### 
 #######################################################################################################################
 #######################################################################################################################
