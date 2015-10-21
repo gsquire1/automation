@@ -745,7 +745,7 @@ def user_start():
         is_valid = 0
         while not is_valid:
             try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/no] : "))
                 is_valid = 1 
             except:
                 print("\n\nthere was an error with the input")
@@ -857,7 +857,8 @@ def main():
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
     ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
     gw_octet = ras.findall(ipaddr_switch)
-    if gw_octet >= ['129']:
+    gw_octet = int(gw_octet[0])
+    if gw_octet >= 129:
         gateway_ip = "10.38.128.1"
     else:
         gateway_ip = "10.38.32.1"
@@ -1044,7 +1045,7 @@ def main():
 ####
 #######################################################################################################################
     
-    liabhar.JustSleep(60)
+    liabhar.JustSleep(600)
 
     try:
         for pp in range(0, len(power_pole_info), 2):
