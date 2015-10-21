@@ -44,6 +44,24 @@ def test_anturlar_functions():
     print(b)
     sys.exit()
     
+def find_gateway():
+    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    ips = []
+    try:
+        with open(test_file) as switch_matrix:
+            reader = csv.DictReader(switch_matrix)
+            for row in reader:
+                ip = (row['IP Address'])
+                print(ip)
+            #    if ip:
+            #        if ip not in ips:
+            #            ips.append(ip)
+            #print("\n\n%s" % ips)
+            ##return(ips)
+            #for ip in ips:
+            #    get_info_from_the_switch(ip)
+            #return(ips)
+    
 def csv_functions_ip():
     test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
     ips = []

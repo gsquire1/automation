@@ -58,7 +58,7 @@ import time
 ####  142  Yoda pluto
 ####  148  Skybolt
 ####
-####  162  Wedge
+####  162.0  Wedge
 ####
 ####
 ###############################################################################
@@ -119,7 +119,7 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def connect_console(HOST,usrname,password,port,db=9, *args):
+def connect_console(HOST,usrname,password,port,db=0, *args):
     
     global tn
     
@@ -144,7 +144,7 @@ def connect_console(HOST,usrname,password,port,db=9, *args):
     
     tn = telnetlib.Telnet(HOST,port)
     print("tn value is  ", tn)
-    tn.set_debuglevel(9)
+    tn.set_debuglevel(0)
     
     
     print("-------------------------------------------------ready to read lines")
@@ -245,60 +245,58 @@ def stop_at_cmd_prompt(db=0):
     
     return()
        
-def env_variables(swtype, db=0):
-    
+def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
+
     liabhar.JustSleep(60)
     
     tn.set_debuglevel(db)
     tn.write(b"printenv\r\n")
     reg_list = [b"=>"]
-    capture = tn.expect(reg_list, 300)
-    
-    gateway   = "10.38.32.1"
+    capture = tn.expect(reg_list, 120)
     netmask   = "255.255.240.0"
-    bootargs  = "ip=off"
+    bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
     ethrotate = "no"
-    server_ip = "10.38.2.40"
+    server_ip = "10.38.2.40" #Pass server in as a varialble for a later date
+                              # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
     if swtype == 148:
         print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    #if (swtype == 141 or swtype == 142):
-    #    print("YODA")
-    #    ethact = "FM2@DTSEC4"
+    #if (swtype == 162.0): # NO PARENTHESIS HERE?????? HANDLE WEDGE HERE?????????????
+    #    print("WEDGE")
+    #    bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
         
     a = ("setenv ethact %s \r\n" % ethact)
     tn.write(a.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
-    
-    g = ("setenv gatewayip %s \r\n" % gateway)
+    capture = tn.expect(reg_list, 30) #######Changed all these to 30
+    g = ("setenv gatewayip %s \r\n" % gateway_ip)
     tn.write(g.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     n = ("setenv netmask %s\r\n"%netmask)
     tn.write(n.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     b = ("setenv bootargs %s\r\n"%bootargs)
     tn.write(b.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     e = ("setenv ethrotate %s\r\n"%ethrotate)
     tn.write(e.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     s = ("setenv serverip %s\r\n"%server_ip)
     tn.write(s.encode('ascii'))
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     
     tn.write(b"saveenv\r\n")
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     tn.write(b"printenv\r\n")    
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     
     liabhar.JustSleep(60)
     
-    p = ("ping %s  \r\n" % gateway)
+    p = ("ping %s  \r\n" % gateway_ip)
     tn.write(p.encode('ascii'))
     tn.write(b"\r\n")
-    capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list, 30)
     
     print("oh my \r\n")
     
@@ -327,7 +325,7 @@ def pwr_cycle(pwr_ip, pp, stage, db=10):
     
     return(0) 
     
-def load_kernel(switch_type, sw_ip, frm_version):
+def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
     
     reg_list = [ b"^=> "]
     reg_bash = [ b"bash-2.04", b"^=> "]
@@ -421,11 +419,12 @@ def load_kernel(switch_type, sw_ip, frm_version):
     i = "ifconfig eth0 %s netmask 255.255.240.0 up\r\n" % sw_ip 
     tn.write(i.encode('ascii'))
     capture = tn.expect(reg_bash, 30)
-    tn.write(b"route add default gw 10.38.32.1\r\n")
+    gw = "route add default gw %s \r\n" % gateway_ip
+    tn.write(gw.encode('ascii'))
     capture = tn.expect(reg_linkup,30)
     #tn.write(b"\r\n")
     capture = tn.expect(reg_bash, 20)
-    m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n"
+    m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n" ####CHANGE SERVER TO VARIABLE
     tn.write(m.encode('ascii'))
     capture = tn.expect(reg_bash, 30)
     ### firmwarepath
@@ -804,7 +803,9 @@ def enter_file_ext():
 #######################################################################################################################
 #######################################################################################################################   
 
- 
+#def find_gateway(switch_ip)
+#    if switch
+    
     
 def main():
 
@@ -824,7 +825,7 @@ def main():
     print(pa.firmware)
     print(pa.cmdprompt)
     print("@"*40)
-    #sys.exit(0)
+    #sys.exit()
 ###################################################################################################################
 ###################################################################################################################
 ####
@@ -848,7 +849,16 @@ def main():
     user_name         = usr_pass[0]
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
+    ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
+    gw_octet = ras.findall(ipaddr_switch)
+    if gw_octet >= ['129']:
+        gateway_ip = "10.38.128.1"
+    else:
+        gateway_ip = "10.38.32.1"
+    print(gateway_ip)
+    #sys.exit()
 
+        
 ###################################################################################################################
 ###################################################################################################################
 #### if the switch is NOT at the command prompt 
@@ -858,7 +868,7 @@ def main():
 #### If the switch is at the command prompt
 ####  then args -cp must be used
 ####
-    if not pa.cmdprompt:
+    if not pa.cmdprompt: #Only run if NOT at Command prompt????
         try:
             tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
         except OSError:
@@ -972,7 +982,7 @@ def main():
     
 #######################################################################################################################
 ####
-####  reboot and find the command prompt
+####  reboot and find the command prompt 
 ####
         cnt = 1
     
@@ -985,12 +995,12 @@ def main():
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
             for tn in tn_list:
-                cons_out = env_variables(sw_type, 0)
+                cons_out = env_variables(sw_type,gateway_ip, 0)
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
                 print(cons_out)
                 
-                load_kernel(sw_type, my_cp_ip_list[cnt], pa.firmware)
+                load_kernel(sw_type, my_cp_ip_list[cnt], gateway_ip, pa.firmware)
                 cnt += 1
         
     else:
@@ -1013,11 +1023,12 @@ def main():
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
-        cons_out = env_variables(sw_type, 9)
+        cons_out = env_variables(sw_type, gateway_ip, 9)
         print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
         print(cons_out)
-        load_kernel(sw_type, my_ip, pa.firmware)
+        load_kernel(sw_type, my_ip, gateway_ip, pa.firmware)
+        #Need to check for BASH prompt here "bash-2.04#"
     
 #######################################################################################################################
 #######################################################################################################################
@@ -1027,7 +1038,7 @@ def main():
 ####
 #######################################################################################################################
     
-    liabhar.JustSleep(600)
+    liabhar.JustSleep(60)
 
     try:
         for pp in range(0, len(power_pole_info), 2):
@@ -1088,7 +1099,7 @@ def main():
 
     
     #liabhar.JustSleep(600)
-    liabhar.count_down(600)
+    liabhar.count_down(60)
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
     except:
