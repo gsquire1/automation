@@ -43,24 +43,100 @@ def test_anturlar_functions():
     print("3333333333333333333333333333333")
     print(b)
     sys.exit()
+
+def user_start():
+    #go = False
+    #start = 'n'
+    #while not go : ##Not False
+    #    is_valid = 0 ##set is_valid to 0
+    #    while not is_valid: ## while not 0
+            try:
+                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
+                #is_valid = 1 ##change is_valid to 1 to break out of loop
+            except:
+                print("\n\nthere was an error with the input")
+                sys.exit()
+                
+def enter_file_ext():
+    go = False
+    start = 'n'
+    ###################################################################################################################
+    ####
+    ####  enter a file extension for the replay file instead of the default
+    ####  otherwise use the defualt
+    ####  stop if the user pushes esc 
+    ####
+    ###################################################################################################################
     
-def find_gateway():
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    ips = []
-    try:
-        with open(test_file) as switch_matrix:
-            reader = csv.DictReader(switch_matrix)
-            for row in reader:
-                ip = (row['IP Address'])
-                print(ip)
-            #    if ip:
-            #        if ip not in ips:
-            #            ips.append(ip)
-            #print("\n\n%s" % ips)
-            ##return(ips)
-            #for ip in ips:
-            #    get_info_from_the_switch(ip)
-            #return(ips)
+    
+    
+#######################################################################################################################
+####
+####  standard way to handle user input
+####    - while loop looking for a valid 'go' variable
+####       - while loop waiting for a string input
+####       - if start variable is y set go to true and exit the procedure
+####
+#######################################################################################################################
+    while not go : 
+              
+        is_valid = 0
+        while not is_valid:
+            try:
+                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/no] : "))
+                is_valid = 1 
+            except:
+                print("\n\nthere was an error with the input")
+                #sys.exit()        
+        if start == 'y' :
+            go = True
+        else:
+            print("START VALUE is  %s" % start)
+            if start == 'no':
+                sys.exit()
+            else:
+                start = 'n'
+
+#def user_start():
+#    go = False
+#    start = 'n'
+#    while not go : ##Not False
+#        is_valid = 0 ##set is_valid to 0
+#        while not is_valid: ## while not 0
+#            try:
+#                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
+#                is_valid = 1 ##change is_valid to 1 to break out of loop
+#            except:
+#                print("\n\nthere was an error with the input")
+#                #sys.exit()
+#                
+#        if start == 'y' : ### User inputs "y" makes go = true
+#            go = True
+#        else:
+#            print("START VALUE is  %s" % start)
+#            if start == 'no':
+#                sys.exit()
+#            else:
+#                start = 'n'           
+#    return()
+    
+#def find_gateway():
+#    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+#    ips = []
+#    try:
+#        with open(test_file) as switch_matrix:
+#            reader = csv.DictReader(switch_matrix)
+#            for row in reader:
+#                ip = (row['IP Address'])
+#                print(ip)
+#            #    if ip:
+#            #        if ip not in ips:
+#            #            ips.append(ip)
+#            #print("\n\n%s" % ips)
+#            ##return(ips)
+#            #for ip in ips:
+#            #    get_info_from_the_switch(ip)
+#            #return(ips)
     
 def csv_functions_ip():
     test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
