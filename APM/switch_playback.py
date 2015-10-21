@@ -857,12 +857,15 @@ def main():
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
     ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
     gw_octet = ras.findall(ipaddr_switch)
-    if gw_octet >= ['129']:
+    print(gw_octet)
+    print(type(gw_octet))
+    if int(gw_octet[0]) >= 129:
         gateway_ip = "10.38.128.1"
     else:
         gateway_ip = "10.38.32.1"
     print(gateway_ip)
-    #sys.exit()
+    
+    sys.exit()
 
         
 ###################################################################################################################
@@ -1044,7 +1047,7 @@ def main():
 ####
 #######################################################################################################################
     
-    liabhar.JustSleep(60)
+    liabhar.JustSleep(600)
 
     try:
         for pp in range(0, len(power_pole_info), 2):

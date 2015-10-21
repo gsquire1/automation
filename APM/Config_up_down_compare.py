@@ -801,6 +801,8 @@ def main():
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
     steps_to_run      = pa.steps
  
+    fid_to_compare    = 128
+    
     ###################################################################################################################
     #### if the user does not enter a value for which steps to run prompt for user input value
     ####
@@ -813,7 +815,7 @@ def main():
     if steps_to_run == 1 or steps_to_run == 3:
         
         cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        switch_info = cofra.get_info_from_the_switch("compare_orig")
+        switch_info = cofra.get_info_from_the_switch(fid_to_compare, "compare_orig")
     #switch_data_0 = "logs/Switch_Info_for_playback_",pa.ipaddr,".orig.txt" # this failed the compare
                                                                             #  the because it sees it
                                                                             #  as a tuple
@@ -875,7 +877,7 @@ def main():
         liabhar.JustSleep(10)
         cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         cons_out = anturlar.fos_cmd("mapspolicy --enable test_policy")
-        switch_info = cofra.get_info_from_the_switch("compare")
+        switch_info = cofra.get_info_from_the_switch(fid_to_compare, "compare")
     ###################################################################################################################
     #### path to the second file to compare
         switch_data_1 = "logs/Switch_Info_%s_compare.txt" % pa.ipaddr
@@ -897,7 +899,7 @@ def main():
     ####
     #cons_out = anturlar.fos_cmd("mapsdb --show all")
     #print(cons_out)
-    
+    cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
     
     anturlar.close_tel()
     dt = liabhar.dateTimeStuff()

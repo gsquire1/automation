@@ -1645,7 +1645,7 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     return(cons_out)
     
     
-def get_info_from_the_switch(extend_name=""):
+def get_info_from_the_switch(fid = 128, extend_name=""):
     """
     
     
@@ -1708,29 +1708,51 @@ def get_info_from_the_switch(extend_name=""):
     ####
     ###########################################################################
     #### add logical switch specific values to a dictionary
-    for ls in ls_list:
-        cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
-        ports_and_ls         = si.all_ports_fc_only()
-        theswitch_name       = si.switch_name()
-        domain_for_ls        = si.switch_id()
-        xisl_st_per_ls       = si.allow_xisl()
-        flow_per_ls          = fi.flow_names()
-        maps_policy_sum      = mi.get_policies()
-        maps_non_dflt_policy = mi.get_nondflt_policies()
+    ####  change to save one FID per run
+    ####
+    #for ls in ls_list:
+    #    cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
+    #    ports_and_ls         = si.all_ports_fc_only()
+    #    theswitch_name       = si.switch_name()
+    #    domain_for_ls        = si.switch_id()
+    #    xisl_st_per_ls       = si.allow_xisl()
+    #    flow_per_ls          = fi.flow_names()
+    #    maps_policy_sum      = mi.get_policies()
+    #    maps_non_dflt_policy = mi.get_nondflt_policies()
+    #
+    #    
+    #    if ls != str(first_ls):
+    #        #value = []
+    #        #value_sn = []
+    #        #value = ports_and_ls
+    #        #value_sn = theswitch_name
+    #        d_port_list[ls]            = ports_and_ls       #### add the value to the key
+    #        d_switch_name[ls]          = theswitch_name 
+    #        d_domain_list[ls]          = domain_for_ls
+    #        d_xisl_state[ls]           = xisl_st_per_ls
+    #        d_flow_names[ls]           = flow_per_ls
+    #        d_maps_policy[ls]          = maps_policy_sum
+    #        d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
+            
+            
+            
+    ls = fid
+    cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
+    ports_and_ls         = si.all_ports_fc_only()
+    theswitch_name       = si.switch_name()
+    domain_for_ls        = si.switch_id()
+    xisl_st_per_ls       = si.allow_xisl()
+    flow_per_ls          = fi.flow_names()
+    maps_policy_sum      = mi.get_policies()
+    maps_non_dflt_policy = mi.get_nondflt_policies()
 
-        
-        if ls != str(first_ls):
-            #value = []
-            #value_sn = []
-            #value = ports_and_ls
-            #value_sn = theswitch_name
-            d_port_list[ls]            = ports_and_ls       #### add the value to the key
-            d_switch_name[ls]          = theswitch_name 
-            d_domain_list[ls]          = domain_for_ls
-            d_xisl_state[ls]           = xisl_st_per_ls
-            d_flow_names[ls]           = flow_per_ls
-            d_maps_policy[ls]          = maps_policy_sum
-            d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
+    d_port_list[ls]            = ports_and_ls       #### add the value to the key
+    d_switch_name[ls]          = theswitch_name 
+    d_domain_list[ls]          = domain_for_ls
+    d_xisl_state[ls]           = xisl_st_per_ls
+    d_flow_names[ls]           = flow_per_ls
+    d_maps_policy[ls]          = maps_policy_sum
+    d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
     
     ###########################################################################
     ####
