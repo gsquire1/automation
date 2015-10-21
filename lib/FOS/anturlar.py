@@ -709,7 +709,8 @@ class SwitchInfo:
         """
         try:
             capture_cmd = fos_cmd("licenseshow")
-            ras = re.compile('([\w\d]{16,37})(?=:\\r\\n)')
+            #ras = re.compile('([\w\d]{16,37})(?=:\\r\\n)')
+            ras = re.compile('\n([\w\d]*[A-Z,a-z,0-9])(?=:\s)')
             ras = ras.findall(capture_cmd)
             return(ras)
         except:
