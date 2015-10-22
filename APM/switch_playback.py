@@ -863,6 +863,7 @@ def main():
     else:
         gateway_ip = "10.38.32.1"
     print(gateway_ip)
+    
     #sys.exit()
 
         
