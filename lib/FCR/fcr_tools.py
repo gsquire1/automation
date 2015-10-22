@@ -50,12 +50,12 @@ def user_start():
     #while not go : ##Not False
     #    is_valid = 0 ##set is_valid to 0
     #    while not is_valid: ## while not 0
-            try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
-                #is_valid = 1 ##change is_valid to 1 to break out of loop
-            except:
-                print("\n\nthere was an error with the input")
-                sys.exit()
+    try:
+        start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
+        #is_valid = 1 ##change is_valid to 1 to break out of loop
+    except:
+        print("\n\nthere was an error with the input")
+        sys.exit()
                 
 def enter_file_ext():
     go = False
@@ -87,7 +87,7 @@ def enter_file_ext():
                 is_valid = 1 
             except:
                 print("\n\nthere was an error with the input")
-                #sys.exit()        
+                sys.exit()        
         if start == 'y' :
             go = True
         else:
