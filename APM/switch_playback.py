@@ -252,20 +252,24 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     tn.set_debuglevel(db)
     tn.write(b"printenv\r\n")
     reg_list = [b"=>"]
+    reg_list_done = [b"done"]
+
     capture = tn.expect(reg_list, 120)
     netmask   = "255.255.240.0"
-    bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
+    #### for all switches except WEDGE (for now) need the bootargs ip=off setting
+    ###  the exceptions are below for skybolt and wedge
+    bootargs  = "bootargs ip=off"
+    
     ethrotate = "no"
     server_ip = "10.38.2.40" #Pass server in as a varialble for a later date
                               # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
-    if swtype == 148:
-        print("SKYBOLT")
+    if swtype == 148:   #### HANDLE SKYBOLT ethact here
+        #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    #if (swtype == 162.0): # NO PARENTHESIS HERE?????? HANDLE WEDGE HERE?????????????
-    #    print("WEDGE")
-    #    bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
+    if swtype == 162:   #### HANDLE WEDGE bootargs here
+        bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
         
     a = ("setenv ethact %s \r\n" % ethact)
     tn.write(a.encode('ascii'))
@@ -287,9 +291,10 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     capture = tn.expect(reg_list, 30)
     
     tn.write(b"saveenv\r\n")
+    capture = tn.expect(reg_list_done,60)
     capture = tn.expect(reg_list, 30)
     tn.write(b"printenv\r\n")    
-    capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list, 90)
     
     liabhar.JustSleep(60)
     
@@ -739,6 +744,7 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
    
 def user_start():
     go = False
+    go = True
     start = 'n'
     while not go : 
               
@@ -890,7 +896,7 @@ def main():
             print("\t133      6520/Odin\n\t148      Skybolt ")
             print("\n"*5)
             sys.exit()
-        sw_dict = cofra.get_info_from_the_switch("for_playback")
+        sw_dict = cofra.get_info_from_the_switch("for_playback", 128)
         my_ip                = sw_dict["switch_ip"]
         my_cp_ip_list        = sw_dict["cp_ip_list"]
         sw_name              = sw_dict["switch_name"]
@@ -1045,7 +1051,15 @@ def main():
 ####  turn each port off then turn each port on (otherwise the delay between did not power cycle the switch)
 ####
 #######################################################################################################################
-    
+    reg_list_bash = [b"bash-2.04#"]
+    cons_out = tn.expect(reg_list_bash,60)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")
+    print(cons_out)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+        
     liabhar.JustSleep(600)
 
     try:
@@ -1107,7 +1121,7 @@ def main():
 
     
     #liabhar.JustSleep(600)
-    liabhar.count_down(60)
+    liabhar.count_down(600)
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
     except:
