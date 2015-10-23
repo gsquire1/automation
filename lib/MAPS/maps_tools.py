@@ -225,7 +225,8 @@ def mapsenable( pol, al, ml ):
  
 def add_rules_each_monitor_type():
     """
-    
+        create rules with each different combination of monitor for each type of logical group
+        
     """
     
     sw_info = anturlar.SwitchInfo()
@@ -234,10 +235,14 @@ def add_rules_each_monitor_type():
     #sw_ip = sw_info.ipaddress()
     #f = anturlar.FabricInfo(fid_now)
     
+    #### this list goes with FC Ports as the type of group
+    monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
+    #### this list goes with FLOW as the type of group
+    monitor_list_perf_flow_port = ["TX_THPUT", "RX_THPUT", "RX_FCNT", "TX_FCNT"]
     
-    monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC" ,"RX_THPUT", "TX_THPUT", "RX_FCNT", "TX_FCNT", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
-    monitor_list_trafic_perf_fc_port = []
     
+    
+    flow_logical_group  = "sys_mon_all_fports" 
     fc_logical_group = "ALL_PORTS"
     
     timebase_list = ["min", "hour", "day"]
@@ -245,22 +250,26 @@ def add_rules_each_monitor_type():
     operator_list = [ "l", "le", "g", "ge", "eq" ]
     
     cons_out = anturlar.fos_cmd("mapspolicy --create Nervio_test_1")
-    rule_name = "monitor_test_"
+    rule_name = "monitor_test_and_extra_characters___"
     stopnow = 0
     stophere = 10000
     
     while stopnow < stophere:
         
         for p in monitor_list_port_health_fc_port:
-            
             rule_to_add = rule_name + str(stopnow)
             cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
                                     % (rule_to_add, fc_logical_group, p ,timebase_list[0], operator_list[2], ))
-    
+             
             stopnow += 1
-    
-    
-    
+         
+        for p in monitor_list_perf_flow_port: 
+            rule_to_add = rule_name + str(stopnow)
+            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                    % (rule_to_add, flow_logical_group, p ,timebase_list[0], operator_list[2], ))
+             
+            stopnow += 1
+     
     return(True)
         
 def mapscommand_list(options="0"):
@@ -1429,7 +1438,7 @@ def cleanup_policy( policy_list):
     capture_cmd = anturlar.fos_cmd("mapspolicy --enable dflt_moderate_policy")
      
     for p in policy_list:
-        r = get_policy_rules(p)
+        r = get_policy_rules(policy_list)
         print("\n\n\n\n")
         print(r)
         print("\n\n")
@@ -1442,11 +1451,11 @@ def cleanup_policy( policy_list):
             print(rn)
             print("\n\n")
             
-            capture_cmd = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s" % (p,rn[0]))
+            capture_cmd = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s" % (policy_list,rn[0]))
             capture_cmd = anturlar.fos_cmd("mapsrule --delete %s " % rn[0])
            
         capture_cmd = anturlar.fos_cmd("mapspolicy --delete %s" % p)
-        
+
     return(0)
   
 def get_policy_rules( p = "None"):
@@ -1457,9 +1466,50 @@ def get_policy_rules( p = "None"):
  
     capture_cmd = anturlar.fos_cmd("mapspolicy --show %s " % p)
     #ras = re.compile('([_ ,\//\(-=\.|<>A-Za-z0-9]+)(?=\))')
-    ras = re.compile('([_A-Za-z]+)(?=\s+\w+,)')
+    ras = re.compile('([A-Za-z0-9_]{1,40})\\s+\|[a-zA-Z]')
+    #ras = re.compile('([monitor]+)')
     ras = ras.findall(capture_cmd)
+    
+    
+    print("@"*80)
+    print("@"*80)
+    print("@"*80)
+    print(ras)
+    print("@"*80)
+    print("@"*80)
+    print("@"*80)
+    
     return(ras)
+
+def cleanup_all_rules():
+    """
+    """
+    capture_cmd = anturlar.fos_cmd("mapspolicy --enable dflt_moderate_policy")
+    
+    r = get_non_default_rules()
+ 
+    for s in r:
+    
+        rn = " ".join(s.split())
+        rn = rn.split(",")
+        if "def" not in rn[0]:
+            capture_cmd = anturlar.fos_cmd("mapsrule --delete %s -f " % rn[0])
+    
+    return()
+    
+
+def get_non_default_rules():
+    """
+    
+    """
+    
+    capture_cmd = anturlar.fos_cmd("mapsrule --show -all")
+    ras = re.compile('([a-zA-Z0-9_]{1,40})\\s+\|[a-zA-Z]')
+    
+    ras = ras.findall(capture_cmd)
+    
+    return(ras)
+    
     
 def frameview_status():
     """
