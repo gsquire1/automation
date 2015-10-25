@@ -15,6 +15,7 @@ import os,sys
 
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
+sys.path.append('/home/automation/lib/FCR')
 sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
 import telnetlib
@@ -27,6 +28,7 @@ import liabhar
 import cofra
 import csv
 import time
+import fcr_tools
 
 ###############################################################################
 ####
@@ -102,7 +104,7 @@ def parse_args(args):
     #parser.add_argument("user", help="username for SUT")
     
     args = parser.parse_args()
-    print(args)
+    #print(args)
     #sys.exit()
     
     if not args.chassis_name and not args.ipaddr:
@@ -439,6 +441,7 @@ def console_info_from_ip(ipaddr, chassis_name):
     #####################################
     #Check if IP is in valid format
     a = cofra.check_ip_format(ipaddr)
+    print(a)
     if a == True:
         pass
     else:
@@ -722,13 +725,13 @@ def main():
 ####
 ###############################################################################
     pa = parse_args(sys.argv)
-    #print(pa)
+    print(pa)
     #print(pa.chassis_name)
     #print(pa.ipaddr)
     #print(pa.quiet)
     #print(pa.verbose)
     #print(pa.firmware)
-    #print("@"*40)
+    print("@"*40)
     #sys.exit()
 
    
@@ -773,42 +776,74 @@ def main():
         tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
         nos = si.nos_check()
         if not nos:
-            sw_dict              = cofra.get_info_from_the_switch()
-            switch_ip            = sw_dict["switch_ip"]
-            sw_name              = sw_dict["switch_name"]
-            sw_chass_name        = sw_dict["chassis_name"]
-            sw_director_or_pizza = sw_dict["director"]
-            sw_domains           = sw_dict["domain_list"]
-            sw_ls_list           = sw_dict["ls_list"]
-            sw_base_fid          = sw_dict["base_sw"]
-            sw_xisl              = sw_dict["xisl_state"]
-            sw_type              = sw_dict["switch_type"]
-            sw_license           = sw_dict["license_list"]
-            sw_vf_setting        = sw_dict["vf_setting"]
-            sw_fcr_enabled       = sw_dict["fcr_enabled"]
-            sw_port_list         = sw_dict["port_list"]
-
-            print("\n"*20)
-            print("SWITCH IP            : %s   " % switch_ip)
-            print("SWITCH NAME          : %s   " % sw_name)
-            print("CHASSIS NAME         : %s   " % sw_chass_name)
-            print("DIRECTOR             : %s   " % sw_director_or_pizza)
-            print("SWITCH DOMAINS       : %s   " % sw_domains)
-            print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-            print("BASE FID             : %s   " % sw_base_fid)
-            print("XISL STATE           : %s   " % sw_xisl)
-            print("SWITCH TYPE          : %s   " % sw_type)
-            print("LICENSE LIST         : %s   " % sw_license)
-            print("VF SETTING           : %s   " % sw_vf_setting)
-            print("FCR SETTING          : %s   " % sw_fcr_enabled)
-            print("PORT LIST            : %s   " % sw_port_list)
-            print("@"*40)
-            print("CONSOLE INFO         : %s   " % cons_info)
-            print("@"*40)
-            print("POWER POLE INFO      : %s   " % power_pole_info)
-            print("@"*40)        
-            print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
-            print("@"*40)
+            def ex_deconfig():
+                """
+                Find all EX-Ports AND VEX-Ports on either director or pizzabox and deconfigure.
+                This parses "portcfgshow" command for any EX-Port, online or not, and deconfigures. This includes
+                VEX ports as well.
+                """
+            si = anturlar.SwitchInfo()
+            anturlar.fos_cmd("switchdisable")
+            portlist =  si.all_ports()
+            if si.am_i_director:
+                for i in portlist:
+                    slot = i[0]
+                    port = i[1]
+                    pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                    cmd = anturlar.fos_cmd("portcfgshow %a/%a" % (slot, port))
+                    ex = pattern.search(cmd)
+                    if ex:
+                        anturlar.fos_cmd("portcfgexport %s/%s %s"%(slot,port,"-a 2"))
+                        anturlar.fos_cmd("portcfgvexport %s/%s %s"%(slot,port,"-a 2"))
+            else: 
+                for i in portlist:
+                    print(i)
+                    port = i[1]
+                    pattern = re.compile(r'(?:\EX\sPort\s+)(?P<state> ON)')
+                    cmd = anturlar.fos_cmd("portcfgshow %a" % port)
+                    ex = pattern.search(cmd)
+                    if ex:
+                        anturlar.fos_cmd("portcfgexport %s %s"%(port,"-a 2"))
+                        anturlar.fos_cmd("portcfgvexport %s %s"%(port,"-a 2"))
+            cmd_cap = anturlar.fos_cmd("switchenable")
+            print('\n\nAll EX_ports found are now deconfigured.')
+    #return(cmd_cap)
+        #    sw_dict              = cofra.get_info_from_the_switch()
+        #    switch_ip            = sw_dict["switch_ip"]
+        #    sw_name              = sw_dict["switch_name"]
+        #    sw_chass_name        = sw_dict["chassis_name"]
+        #    sw_director_or_pizza = sw_dict["director"]
+        #    sw_domains           = sw_dict["domain_list"]
+        #    sw_ls_list           = sw_dict["ls_list"]
+        #    sw_base_fid          = sw_dict["base_sw"]
+        #    sw_xisl              = sw_dict["xisl_state"]
+        #    sw_type              = sw_dict["switch_type"]
+        #    sw_license           = sw_dict["license_list"]
+        #    sw_vf_setting        = sw_dict["vf_setting"]
+        #    sw_fcr_enabled       = sw_dict["fcr_enabled"]
+        #    sw_port_list         = sw_dict["port_list"]
+        #
+        #    print("\n"*20)
+        #    print("SWITCH IP            : %s   " % switch_ip)
+        #    print("SWITCH NAME          : %s   " % sw_name)
+        #    print("CHASSIS NAME         : %s   " % sw_chass_name)
+        #    print("DIRECTOR             : %s   " % sw_director_or_pizza)
+        #    print("SWITCH DOMAINS       : %s   " % sw_domains)
+        #    print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+        #    print("BASE FID             : %s   " % sw_base_fid)
+        #    print("XISL STATE           : %s   " % sw_xisl)
+        #    print("SWITCH TYPE          : %s   " % sw_type)
+        #    print("LICENSE LIST         : %s   " % sw_license)
+        #    print("VF SETTING           : %s   " % sw_vf_setting)
+        #    print("FCR SETTING          : %s   " % sw_fcr_enabled)
+        #    print("PORT LIST            : %s   " % sw_port_list)
+        #    print("@"*40)
+        #    print("CONSOLE INFO         : %s   " % cons_info)
+        #    print("@"*40)
+        #    print("POWER POLE INFO      : %s   " % power_pole_info)
+        #    print("@"*40)        
+        #    print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
+        #    print("@"*40)
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
