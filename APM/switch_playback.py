@@ -265,10 +265,10 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
                               # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
-    if swtype == 148:   #### HANDLE SKYBOLT ethact here
+    if swtype == '148':   #### HANDLE SKYBOLT ethact here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    if swtype == 162:   #### HANDLE WEDGE bootargs here
+    if swtype == '162':   #### HANDLE WEDGE bootargs here
         bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
         
     a = ("setenv ethact %s \r\n" % ethact)

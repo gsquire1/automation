@@ -2005,7 +2005,8 @@ def credit_recovery():
 
 def add_monitor_types():
     """
-    
+        add rules to a switch until the limit is reach
+        
     """
     
     ###########################################################################
@@ -2016,8 +2017,39 @@ def add_monitor_types():
     ####
     maps_tools.add_rules_each_monitor_type()
     
-    
+    return()
 
+def cleanup_rules():
+    """
+    
+    """
+    
+    ###########################################################################
+    ###########################################################################
+    ####
+    ####
+    ####  start
+    
+    en = anturlar.Maps()
+    ######
+    maps_tools.cleanup_policy("Nervio_test_1")
+    
+    return()
+    
+def cleanup_non_def_rules():
+    """
+    
+    """
+    
+    en = anturlar.Maps()
+    
+    maps_tools.cleanup_all_rules()
+    
+    
+    return()
+    
+    
+    
 
 def end():
     pass
