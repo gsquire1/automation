@@ -90,7 +90,7 @@ def parse_args(args):
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt", action="store_true")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     parser.add_argument('-f',    '--filename',   help="File name to use instead of the default file", default="for_playback")
-    
+    parser.add_argument('-d',    '--cust_date',      help=argparse.SUPPRESS, )
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name", required=True)
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -98,8 +98,8 @@ def parse_args(args):
     #group.add_argument("-q", "--quiet", action="store_true")
     #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
     #parser.add_argument("ip", help="IP address of SUT")
-    #parser.add_argument("user", help="username for SUT")
-    
+    #parser.add_argument("user", help="username for SUT")    
+        
     args = parser.parse_args()
     print(args)
     
@@ -115,9 +115,7 @@ def parse_args(args):
         print('To start at the command prompt both switch type and command prompt is requried')
         sys.exit()
     
-    d = liabhar.dateTimeStuff()
-    d_simple = d.simple_no_dash()
-    print(d_simple)
+    
     #sys.exit()
     #print("Connecting to IP :  " + args.ip)
     #print("user             :  " + args.user)
@@ -125,7 +123,7 @@ def parse_args(args):
      
      
 
-    return parser.parse_args()
+    return(parser.parse_args())
 
 def connect_console(HOST,usrname,password,port,db=0, *args):
     
@@ -843,6 +841,7 @@ def enter_file_ext():
 def main():
 
     global tn
+     
     
 #######################################################################################################################
 ####
@@ -859,8 +858,17 @@ def main():
     print(pa.cmdprompt)
     print(pa.file_action)
     print(pa.filename)
+    print(pa.cust_date)
     print("@"*40)
-    #sys.exit()
+    
+    d = liabhar.dateTimeStuff()
+    pa.cust_date = d.simple_no_dash()
+    pa.cust_date = d.current_no_dash()
+    pa.filename = pa.cust_date + pa.filename
+    print(pa.filename)
+    print(pa.cust_date)
+    print("++++++++++++++++++++++++++")
+    
 ###################################################################################################################
 ###################################################################################################################
 ####
