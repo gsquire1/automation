@@ -1052,7 +1052,7 @@ def main():
 ####
 #######################################################################################################################
     reg_list_bash = [b"bash-2.04#"]
-    cons_out = tn.expect(reg_list_bash,60)
+    cons_out = tn.expect(reg_list_bash,600)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
     print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")
@@ -1060,7 +1060,19 @@ def main():
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
         
-    liabhar.JustSleep(600)
+    cons_out = tn.expect(reg_list_bash,600)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")
+    print(cons_out)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("IF WE SEE BASH PROMPT HAS BEEN DETECTED WE CAN TAKE OUT THE WAIT 600")
+    print("SEARCH FOR LOOKHERE ")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    
+    #liabhar.JustSleep(600)
+
+
 
     try:
         for pp in range(0, len(power_pole_info), 2):
@@ -1107,7 +1119,7 @@ def main():
     print("\r\n"*6)
     print("@"*40)
     print("Close Console sessions and login via telnet")
-    print("Sleep for a minute")
+    print("Sleep for a minute at line 1122")
     print("\r\n"*6)     
     #liabhar.count_down(300)
     #time.sleep(360)
@@ -1116,19 +1128,43 @@ def main():
     #print("TN   TN    TN")
     #print(tn_list)
     #print("@"*40)
+
+
+    reg_list_after_reboot = [b"is in sync"]
+    cons_out = tn.expect(reg_list_after_reboot,600)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print("HERE WE ARE WAITING FOR THE SWITCH TO REBOOT SOMETIMES TOO LONG OTHERS NOT LONG ENOUGH")
+    print(cons_out)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("IF WE SEE BASH PROMPT HAS BEEN DETECTED WE CAN TAKE OUT THE WAIT 600")
+    print("SEARCH FOR LOOKLOOK ")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    
+    
     for tn in tn_list:
         tn.close()
-
-    
     #liabhar.JustSleep(600)
-    liabhar.count_down(600)
+    #liabhar.count_down(600)
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
+        
+        if tn == "":
+            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    
     except:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
     
+    
+    
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print("tn is   %s  " % tn )
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    
     
     user_start()
     
