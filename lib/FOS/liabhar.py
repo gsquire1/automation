@@ -36,16 +36,22 @@ class dateTimeStuff:
     
     def current(self):
         i = datetime.datetime.today()  #### ISO format 2013-02-21 06:35:45.707450
-        return i 
+        return(i) 
     
     def stamp(self):
         t = time.time()  #### timestamp in form 1361446545.52
                          #### use datetime.dat e.fromtimestamp(t) to get a date 2013-02-21
-        return t
+        return(t)
     
     def simple(self):
         s = datetime.date.today()  #### format is 2013-02-21
-        return s
+        return(s)
+    
+    def simple_no_dash(self):
+        s = datetime.date.today()  #### format is 2013-02-21
+        w = str(s)
+        ss = w.replace("-","")
+        return(ss)
     
     #def ordinal(self):
     #    o = today.ordinal() #### format is 734920
@@ -66,7 +72,7 @@ class FileStuff:
         self._f.close()
         
     def __iter__(self):
-        return self
+        return(self)
     
     def write(self, some_text):
         """
@@ -134,7 +140,7 @@ def count_down(stop):
         print("          ", end="\r")
         stop += -1
     
-    return 0
+    return(True)
 
 def file_diff(a,b,extend_name=""):
     """
@@ -250,7 +256,7 @@ def email_sender(who_to, who_from, subj, msg_to_send, txtfile_path = ""):
     else:
         print("No Errors on Sending Emails")
     
-    return 0
+    return(True)
 
 def email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" ):
     """
@@ -313,7 +319,7 @@ def email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" ):
     #s.sendmail(me, you, text)
     s.send_message(msg)
     s.quit()
-    return 0
+    return(True)
 
 def JustSleep(s):
     time.sleep(s)
@@ -354,7 +360,7 @@ def parent_parser():
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
     
-    return pp 
+    return(pp) 
 
 def parse_args(args):
     
@@ -392,7 +398,7 @@ def parse_args(args):
     #else:
     #    print("Using fid number :  %s " % fid)
 
-    return parser.parse_args()
+    return(parser.parse_args())
 
 def parse_args_fillword(args):
     global tn,sw_user
@@ -426,7 +432,7 @@ def parse_args_fillword(args):
     else:
         print("Using fid number :  %s " % fid)
 
-    return parser.parse_args()
+    return(parser.parse_args())
 
 
     
@@ -435,7 +441,7 @@ def random_number():
         returns a random number between 0.0 and 1.0 
     """
     n = random.random() #### random.randrange also
-    return n
+    return(n)
 
 def random_number_int(x):
     """
@@ -453,7 +459,9 @@ def space(a=8):
     """
     for i in range(a):
         print("\n") 
-    return 0
+    return(True)
+
+
 
     
 

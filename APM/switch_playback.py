@@ -69,7 +69,7 @@ def parent_parser():
     pp = argparse.ArgumentParser(add_help=False)
     #pp.add_argument("--repeat", help="repeat repeat")
     pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-    pp.add_argument("-fa", "--file_action", help="0 to stop after creating file 1 to create new file", type=int, default=0 )
+    pp.add_argument("-fa", "--file_action", help="0 to stop after creating file 1 to create new file and continue 2 skip file create and use your own file", type=int, default=0 )
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
@@ -90,7 +90,8 @@ def parse_args(args):
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt", action="store_true")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     parser.add_argument('-f',    '--filename',   help="File name to use instead of the default file", default="for_playback")
-    #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
+    
+    #parser.add_argument('-s', '--suite', type=str, help="Suite file name", required=True)
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
     #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -114,7 +115,10 @@ def parse_args(args):
         print('To start at the command prompt both switch type and command prompt is requried')
         sys.exit()
     
-    
+    d = liabhar.dateTimeStuff()
+    d_simple = d.simple_no_dash()
+    print(d_simple)
+    #sys.exit()
     #print("Connecting to IP :  " + args.ip)
     #print("user             :  " + args.user)
     #verbose    = args.verbose
@@ -901,102 +905,108 @@ def main():
 #### If the switch is at the command prompt
 ####  then args -cp must be used
 ####
-    if not pa.cmdprompt: #Only run if NOT at Command prompt????
-        try:
-            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-        except OSError:
-            print("\n  If the Switch is at the command prompt use the -cp and -t switch")
-            print("\n  ./APM/switch_playback.py -cp -t <no> -c <chassisname> <firmware>")
-            print("\n\n  Popular switch types are:\n")
-            print("       Type      Model\n")
-            print("\t62       DCX\n\t64       5300\n\t66       5100\n\t71       300 \n")
-            print("\t77       DCX-4S\n\t83       7800\n\t109      6510\n\t118      6505\n")
-            print("\t120      DCX 8510-8\n\t121      DCX 8510-4")
-            print("\t133      6520/Odin\n\t148      Skybolt ")
-            print("\n"*5)
-            sys.exit()
-            
-        #sw_dict = cofra.get_info_from_the_switch("for_playback", 128)
-        sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
-        my_ip                = sw_dict["switch_ip"]
-        my_cp_ip_list        = sw_dict["cp_ip_list"]
-        sw_name              = sw_dict["switch_name"]
-        sw_chass_name        = sw_dict["chassis_name"]
-        sw_director_or_pizza = sw_dict["director"]
-        sw_domains           = sw_dict["domain_list"]
-        sw_ls_list           = sw_dict["ls_list"]
-        sw_base_fid          = sw_dict["base_sw"]
-        sw_xisl              = sw_dict["xisl_state"]
-        sw_type              = sw_dict["switch_type"]
-        sw_license           = sw_dict["license_list"]
-        sw_vf_setting        = sw_dict["vf_setting"]
-        sw_fcr_enabled       = sw_dict["fcr_enabled"]
-        sw_port_list         = sw_dict["port_list"]
-        sw_ex_port_list      = sw_dict["ex_ports"]
 
-
-        print("\n"*20)
-        print("SWITHC IP            : %s   " % my_ip)
-        print("CP IP List           : %s   " % my_cp_ip_list)
-        print("SWITCH NAME          : %s   " % sw_name)
-        print("CHASSIS NAME         : %s   " % sw_chass_name)
-        print("DIRECTOR             : %s   " % sw_director_or_pizza)
-        print("SWITCH DOMAINS       : %s   " % sw_domains)
-        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-        print("BASE FID             : %s   " % sw_base_fid)
-        print("XISL STATE           : %s   " % sw_xisl)
-        print("SWITCH TYPE          : %s   " % sw_type)
-        print("LICENSE LIST         : %s   " % sw_license)
-        print("VF SETTING           : %s   " % sw_vf_setting)
-        print("FCR SETTING          : %s   " % sw_fcr_enabled)
-        print("PORT LIST            : %s   " % sw_port_list)
-        print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
-        print("@"*40)
-        print("@"*40)
-        print("CONSOLE INFO         : %s   " % cons_info)
-        print("\n")
-        print("POWER POLE INFO      : %s   " % power_pole_info)
-        
-        
-###################################################################################################################
-####
-####  close telnet connection 
-####
-###################################################################################################################
-        
-        anturlar.close_tel()
+    if pa.file_action == 2:
+        print("skip the file creation section")
     else:
-        sw_type = pa.switchtype
-        my_ip   = ipaddr_switch
-        sw_director_or_pizza = False
-        my_cp_ip_list = []
-    #sys.exit()    
-###################################################################################################################
-###################################################################################################################
-####
-#### if I am Director then get the CP0 and CP1 IP addresses
-####    before connecting to the console
-#### 
-###################################################################################################################
-###################################################################################################################
-    print("@"*40)
-    print("switch is a director          %s  "    % sw_director_or_pizza)
-    print("console_ip                    %s  "    %  console_ip)
-    print("console port                  %s  "    %  console_port)
-    print("user name is                  %s  "    %  user_name)
-    print("password                      %s  "    % usr_pass)
-    print("console_ip   backup           %s  "    % console_ip_bkup)
-    print("console port backup           %s  "    % console_port_bkup)
-    print("CP IP list (chassis CP0 CP1)  %s  "    % my_cp_ip_list)
-    if sw_director_or_pizza:
-        print("CP0                           %s  "    % my_cp_ip_list[1])
-        print("CP1                           %s  "    % my_cp_ip_list[2])  
-          
-
+        
+        if not pa.cmdprompt: #Only run if NOT at Command prompt????
+            try:
+                tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+            except OSError:
+                print("\n  If the Switch is at the command prompt use the -cp and -t switch")
+                print("\n  ./APM/switch_playback.py -cp -t <no> -c <chassisname> <firmware>")
+                print("\n\n  Popular switch types are:\n")
+                print("       Type      Model\n")
+                print("\t62       DCX\n\t64       5300\n\t66       5100\n\t71       300 \n")
+                print("\t77       DCX-4S\n\t83       7800\n\t109      6510\n\t118      6505\n")
+                print("\t120      DCX 8510-8\n\t121      DCX 8510-4")
+                print("\t133      6520/Odin\n\t148      Skybolt ")
+                print("\n"*5)
+                sys.exit()
+                
+            #sw_dict = cofra.get_info_from_the_switch("for_playback", 128)
+            sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
+            my_ip                = sw_dict["switch_ip"]
+            my_cp_ip_list        = sw_dict["cp_ip_list"]
+            sw_name              = sw_dict["switch_name"]
+            sw_chass_name        = sw_dict["chassis_name"]
+            sw_director_or_pizza = sw_dict["director"]
+            sw_domains           = sw_dict["domain_list"]
+            sw_ls_list           = sw_dict["ls_list"]
+            sw_base_fid          = sw_dict["base_sw"]
+            sw_xisl              = sw_dict["xisl_state"]
+            sw_type              = sw_dict["switch_type"]
+            sw_license           = sw_dict["license_list"]
+            sw_vf_setting        = sw_dict["vf_setting"]
+            sw_fcr_enabled       = sw_dict["fcr_enabled"]
+            sw_port_list         = sw_dict["port_list"]
+            sw_ex_port_list      = sw_dict["ex_ports"]
     
+    
+            print("\n"*20)
+            print("SWITHC IP            : %s   " % my_ip)
+            print("CP IP List           : %s   " % my_cp_ip_list)
+            print("SWITCH NAME          : %s   " % sw_name)
+            print("CHASSIS NAME         : %s   " % sw_chass_name)
+            print("DIRECTOR             : %s   " % sw_director_or_pizza)
+            print("SWITCH DOMAINS       : %s   " % sw_domains)
+            print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
+            print("BASE FID             : %s   " % sw_base_fid)
+            print("XISL STATE           : %s   " % sw_xisl)
+            print("SWITCH TYPE          : %s   " % sw_type)
+            print("LICENSE LIST         : %s   " % sw_license)
+            print("VF SETTING           : %s   " % sw_vf_setting)
+            print("FCR SETTING          : %s   " % sw_fcr_enabled)
+            print("PORT LIST            : %s   " % sw_port_list)
+            print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
+            print("@"*40)
+            print("@"*40)
+            print("CONSOLE INFO         : %s   " % cons_info)
+            print("\n")
+            print("POWER POLE INFO      : %s   " % power_pole_info)
+            
+            
+    ###################################################################################################################
+    ####
+    ####  close telnet connection 
+    ####
+    ###################################################################################################################
+            
+            anturlar.close_tel()
+        else:
+            sw_type = pa.switchtype
+            my_ip   = ipaddr_switch
+            sw_director_or_pizza = False
+            my_cp_ip_list = []
+        #sys.exit()    
+    ###################################################################################################################
+    ###################################################################################################################
+    ####
+    #### if I am Director then get the CP0 and CP1 IP addresses
+    ####    before connecting to the console
+    #### 
+    ###################################################################################################################
+    ###################################################################################################################
+        print("@"*40)
+        print("switch is a director          %s  "    % sw_director_or_pizza)
+        print("console_ip                    %s  "    %  console_ip)
+        print("console port                  %s  "    %  console_port)
+        print("user name is                  %s  "    %  user_name)
+        print("password                      %s  "    % usr_pass)
+        print("console_ip   backup           %s  "    % console_ip_bkup)
+        print("console port backup           %s  "    % console_port_bkup)
+        print("CP IP list (chassis CP0 CP1)  %s  "    % my_cp_ip_list)
+        if sw_director_or_pizza:
+            print("CP0                           %s  "    % my_cp_ip_list[1])
+            print("CP1                           %s  "    % my_cp_ip_list[2])  
+              
+              
     if pa.file_action == 0:
         print("Data for the switch is stored in logs directory ")
-        sys.exit()   #stop here for getting the switch info only
+        
+        
+    sys.exit()   #stop here for getting the switch info only
 
 
     
