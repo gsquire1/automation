@@ -971,7 +971,7 @@ def main():
         print("CP0                           %s  "    % my_cp_ip_list[1])
         print("CP1                           %s  "    % my_cp_ip_list[2])  
           
-    #sys.exit()   #stop here for getting the switch info only
+    sys.exit()   #stop here for getting the switch info only
     
 ###################################################################################################################
 ###################################################################################################################
