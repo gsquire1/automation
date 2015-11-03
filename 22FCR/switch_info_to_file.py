@@ -816,7 +816,7 @@ def main():
             print("@"*40)
             print("POWER POLE INFO      : %s   " % power_pole_info)
             print("@"*40)        
-            print("\nSwitch_Info has been written this file in logs/Switch_Info_%s_restore.txt\n" % switch_ip)
+            print("\nSwitch_Info has been written this file in logs/test/Switch_Info_%s_restore.txt\n" % switch_ip)
             print("@"*40)
         else:
             print("\n"+"@"*40)

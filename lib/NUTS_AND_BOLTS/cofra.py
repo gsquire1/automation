@@ -1811,7 +1811,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
         print(kk,vv)    #### print switchnames
     print('*'*80)
     
-    f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
+    f = "%s%s%s"%("logs/test/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
                            "","", "==============================\n")  
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing

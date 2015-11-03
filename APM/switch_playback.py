@@ -992,10 +992,13 @@ def main():
         print("CP0                           %s  "    % my_cp_ip_list[1])
         print("CP1                           %s  "    % my_cp_ip_list[2])  
           
+
     
     if pa.file_action == 0:
         print("Data for the switch is stored in logs directory ")
         sys.exit()   #stop here for getting the switch info only
+
+
     
 ###################################################################################################################
 ###################################################################################################################
