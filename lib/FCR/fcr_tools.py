@@ -43,20 +43,7 @@ def test_anturlar_functions():
     print("3333333333333333333333333333333")
     print(b)
     sys.exit()
-
-def user_start():
-    #go = False
-    #start = 'n'
-    #while not go : ##Not False
-    #    is_valid = 0 ##set is_valid to 0
-    #    while not is_valid: ## while not 0
-            try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
-                #is_valid = 1 ##change is_valid to 1 to break out of loop
-            except:
-                print("\n\nthere was an error with the input")
-                sys.exit()
-                
+    
 def enter_file_ext():
     go = False
     start = 'n'
@@ -87,7 +74,7 @@ def enter_file_ext():
                 is_valid = 1 
             except:
                 print("\n\nthere was an error with the input")
-                #sys.exit()        
+                sys.exit()        
         if start == 'y' :
             go = True
         else:
@@ -97,66 +84,141 @@ def enter_file_ext():
             else:
                 start = 'n'
 
-#def user_start():
-#    go = False
-#    start = 'n'
-#    while not go : ##Not False
-#        is_valid = 0 ##set is_valid to 0
-#        while not is_valid: ## while not 0
-#            try:
-#                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))##User input
-#                is_valid = 1 ##change is_valid to 1 to break out of loop
-#            except:
-#                print("\n\nthere was an error with the input")
-#                #sys.exit()
-#                
-#        if start == 'y' : ### User inputs "y" makes go = true
-#            go = True
-#        else:
-#            print("START VALUE is  %s" % start)
-#            if start == 'no':
-#                sys.exit()
-#            else:
-#                start = 'n'           
-#    return()
-    
-#def find_gateway():
-#    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
-#    ips = []
-#    try:
-#        with open(test_file) as switch_matrix:
-#            reader = csv.DictReader(switch_matrix)
-#            for row in reader:
-#                ip = (row['IP Address'])
-#                print(ip)
-#            #    if ip:
-#            #        if ip not in ips:
-#            #            ips.append(ip)
-#            #print("\n\n%s" % ips)
-#            ##return(ips)
-#            #for ip in ips:
-#            #    get_info_from_the_switch(ip)
-#            #return(ips)
+def user_start():
+    temperature = 115  
+    while temperature > 112: # first while loop code
+        print(temperature)
+        temperature = temperature - 1
+    print('The tea is cool enough.')
+    start = 'n'
+    go = False
+    while go == False : ##Not False
+        print("go is equal to FALSE")
+        try:
+            start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+            print(start)
+        except:
+            print("SOMETHING WRONG WITH INPUT")
+        go = True
+    print("OUT OF LOOP")
+    sys.exit()
+
+
     
 def csv_functions_ip():
-    test_file = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    user_start()
+    sys.exit()
+    start = (input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+    print(start)
+    sys.exit()
+    test_file = '/home/RunFromHere/ini/TBC_SwitchMatrix.csv'
     ips = []
+    #name = str(input("What's your name?  "))
+    #print(name)
+    #sys.exit()
     try:
         with open(test_file) as switch_matrix:
-            reader = csv.DictReader(switch_matrix)
-            for row in reader:
-                ip = (row['IP Address'])
-                if ip:
-                    if ip not in ips:
-                        ips.append(ip)
-            print("\n\n%s" % ips)
+            my_dict = csv.DictReader(switch_matrix)
+            for row in my_dict:
+                #print(row)
+                #sys.exit()
+                chassisname = (row['Chassisname'])      # Resource_type
+                ip = (row['IP Address'])                # IP
+                password = (row['Password'])            # Password
+                console_1 = (row['Console1 IP'])        # CP_0 Console IP
+                console_1_port = (row['Console1 Port']) # CP_0 Console Port
+                console_2 = (row['Console2 IP'])        # CP_1 Console IP
+                console_2_port = (row['Console2 Port']) # CP_1 Console Port
+                cp0_ip = (row['CP0 IP'])                # CP_0 IP
+                cp1_ip = (row['CP1 IP'])                # CP_1 IP
+                fabric_name = ("Need to get user input here")   #Fabric name
+                admin_pwd = ['password']                # Admin Password
+                root_pwd = ['password']                 # Root Password
+                pwr_1 = (row['Power1 IP'])              # Power_1
+                pwr_1_port = (row['Power1 Port'])       # Power_1_Port
+                pwr_2 = (row['Power2 IP'])              # Power_2
+                pwr_2_port = (row['Power2 Port'])       # Power_2_Port
+
+                print ('\n\n')
+                #sys.exit()
+                chassis_name = ("%s_resource_type       fos" % chassisname)
+                ip = "%s_ip                             %s" % (chassisname, ip)
+                console_1 = "%s_cp0_console             %s %s" % (chassisname, console_1, console_1_port)
+                cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
+                cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
+                if (console_2):
+                    console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
+                    cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
+                    cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
+
+                else:
+                    pass
+                #if (console_2) #############CP IPS NEED TO GO IN THIS LOOP
+                #print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+                #print(cp0_ip)
+                #print(cp1_ip)
+                #cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
+                #cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
+
+##############################################################
+                print (chassis_name)
+                print (ip)
+                print(console_1)
+                if (console_2):
+                    print (console_2)
+                    #print (console_2_port)
+                    print(cp0ip)
+                    print(cp1ip)
+                #print(console_2)
+                #print(cp0ip)
+                #print(cp1ip)
+            print("THEEND")
+            sys.exit()
+            if console_2 != '':
+                    #console_2 = (row['Console2 IP'])
+                    #console_2_port= (row['Console2 Port'])
+                    print("PPPPPPPPPPP")
+                    print(console_2)
+                    print(console_2_port)
+            else:
+                    #print("MUST BE A PIZZA BOX")
+                    pass
+            
+            #value = None
+            #keys = my_dict.keys()
+            #print (keys)
+            #keys_sorted = keys.sorted()
+            #print (keys_sorted)
+            #for row in my_dict:
+                #print
+                #if row in reader:
+                #    value = reader[key]
+                #    print("PPPPPPPPPPPPPPPPPPPPP")
+                #    print(value)
+                #chassisname = (row['Chassisname'])
+                #print(chassisname)
+                #if chassisname in row:
+                #    print("True")
+                #    #chassisname = (row['Chassisname'])
+                #    #print(chassisname)
+                #else:
+                #    print("NOT THERE")
+                #sys.exit()
+                #
+                #if ip:
+                #    if ip not in ips:
+                #        ips.append(ip)
+            #print("\n\n%s" % ips)
+            #print("\n\n%s" % row)
             #return(ips)
-            for ip in ips:
-                get_info_from_the_switch(ip)
-            return(ips)
+            #for ip in ips:
+                #get_info_from_the_switch(ip)
+            #return(ips)
+            return()
+
 
     except FileNotFoundError:
-        print('\n\nFile Not Found (Line 58 in fcr_tools.py)')
+        print('\n\nFile Not Found (Line 158 in fcr_tools.py)')
         return(False)
     
 def file_diff(a,b,c=""):

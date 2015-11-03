@@ -269,7 +269,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
     if swtype == '162':   #### HANDLE WEDGE bootargs here
-        bootargs  = "bootargs=root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600"
+        bootargs  = "bootargs=root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
     a = ("setenv ethact %s \r\n" % ethact)
     tn.write(a.encode('ascii'))
