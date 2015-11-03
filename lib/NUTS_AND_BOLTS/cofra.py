@@ -599,7 +599,7 @@ class SwitchUpdate():
                         
                     else:
                         #print("\n\nFID was not created\n\n")
-                        #anturlar.fos_cmd_regex_only("", "root> " , 9)
+                        anturlar.fos_cmd_regex_only("", "root> " , 9)
                         pass   
                         
         except:
@@ -629,7 +629,7 @@ class SwitchUpdate():
         for ss in sname_list:
             ss_fid_name = ss.split(":")
             for sw_fid_name in range(0,len(ss_fid_name),2):
-                anturlar.fos_cmd("setcontext %s" % ss_fid_name[0] ,0)
+                anturlar.fos_cmd("setcontext %s" % ss_fid_name[0], 9)
                 anturlar.fos_cmd("switchname %s" % ss_fid_name[1], 9)
     
         return(True)
