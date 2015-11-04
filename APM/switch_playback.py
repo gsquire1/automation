@@ -245,7 +245,7 @@ def stop_at_cmd_prompt(db=0):
     
     capture = tn.expect(reg_list)
     #tn.write(b"3\n")
-    tn.write(b"3\n")
+    tn.write(b"3\r\n")
     
     reg_list = [ b"=>"]
     capture = tn.expect(reg_list, 300)
@@ -861,13 +861,15 @@ def main():
     print(pa.cust_date)
     print("@"*40)
     
-    d = liabhar.dateTimeStuff()
-    pa.cust_date = d.simple_no_dash()
-    pa.cust_date = d.current_no_dash()
-    pa.filename = pa.cust_date + pa.filename
-    print(pa.filename)
-    print(pa.cust_date)
-    print("++++++++++++++++++++++++++")
+    
+    if pa.file_action != 2:
+        d = liabhar.dateTimeStuff()
+        pa.cust_date = d.simple_no_dash()
+        pa.cust_date = d.current_no_dash()
+        pa.filename = pa.cust_date + pa.filename
+        print(pa.filename)
+        print(pa.cust_date)
+        print("++++++++++++++++++++++++++")
     
 ###################################################################################################################
 ###################################################################################################################
@@ -916,6 +918,27 @@ def main():
 
     if pa.file_action == 2:
         print("skip the file creation section")
+        try:
+            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+            sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
+            my_ip                = sw_dict["switch_ip"]
+            my_cp_ip_list        = sw_dict["cp_ip_list"]
+            sw_name              = sw_dict["switch_name"]
+            sw_chass_name        = sw_dict["chassis_name"]
+            sw_director_or_pizza = sw_dict["director"]
+            sw_type              = sw_dict["switch_type"]
+            
+        except OSError:
+            print("\n  If the Switch is at the command prompt use the -cp and -t switch")
+            print("\n  ./APM/switch_playback.py -cp -t <no> -c <chassisname> <firmware>")
+            print("\n\n  Popular switch types are:\n")
+            print("       Type      Model\n")
+            print("\t62       DCX\n\t64       5300\n\t66       5100\n\t71       300 \n")
+            print("\t77       DCX-4S\n\t83       7800\n\t109      6510\n\t118      6505\n")
+            print("\t120      DCX 8510-8\n\t121      DCX 8510-4")
+            print("\t133      6520/Odin\n\t148      Skybolt ")
+            print("\n"*5)
+            sys.exit()
     else:
         
         if not pa.cmdprompt: #Only run if NOT at Command prompt????
@@ -1014,7 +1037,7 @@ def main():
         print("Data for the switch is stored in logs directory ")
         
         
-    sys.exit()   #stop here for getting the switch info only
+    #sys.exit()   #stop here for getting the switch info only
 
 
     
@@ -1233,7 +1256,7 @@ def main():
     print("USE USER INPUTED FILE NAME OR DEFAULT")
     
     #cc = cofra.SwitchUpdate("for_playback")
-    cc = cofra.SwitchUpdate(pa.user_file_name)
+    cc = cofra.SwitchUpdate(pa.filename)
     
     cons_out = cc.playback_licenses()
     cons_out = cc.playback_ls()
