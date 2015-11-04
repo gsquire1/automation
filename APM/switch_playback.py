@@ -1034,7 +1034,9 @@ def main():
               
               
     if pa.file_action == 0:
-        print("Data for the switch is stored in logs directory ")
+        complete_name = ("Switch_Info_%s_%s.txt" % (my_ip, pa.filename))
+        print("Data for the switch is stored in logs directory as: %s " % complete_name)
+        sys.exit()
         
         
     #sys.exit()   #stop here for getting the switch info only
