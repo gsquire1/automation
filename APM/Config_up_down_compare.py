@@ -504,6 +504,25 @@ def get_ip_from_file(chassis_name):
     return(ip)
 
  
+def slot_pwr_cycle(slot_list):
+    """
+    
+    """
+    
+    
+    for s in slot_list:
+    
+        capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
+        
+        liabhar.JustSleep(30)
+        
+    for s in slot_list:
+        capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
+        
+    liabhar.JustSleep(300)
+    return(True)
+    
+    
 
 def capture_switch_info(extend_name="", fid=128):
     """
@@ -551,7 +570,11 @@ def capture_switch_info(extend_name="", fid=128):
     maps_actions         = mi.get_actions()
     logical_groups       = mi.logicalgroup_count()
     relay_server_info    = mi.get_relay_server_info()
- 
+    credit_recov_info    = mi.credit_recovery()
+    dns_info             = mi.dns_config_info()
+    
+    
+    
         
     ###################################################################################################################
     ###################################################################################################################
@@ -618,13 +641,15 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("MAPS ACTIONS             :  %s  \n" % maps_actions)
     ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
     ff.write("RELAY SERVER HOST IP     :  %s  \n" % relay_server_info)
+    ff.write("CREDIT RECOVERY INFO     :  %s  \n" % credit_recov_info)
+    ff.write("DNS CONFIG INFO          :  %s  \n" % dns_info)
     ff.write("="*80)
     ff.write("\n")
     ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
     ff.write("\n"*2)
     ff.close()
     
-    cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
+    #cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
     
     
     return(True)
@@ -714,17 +739,35 @@ def main():
     ###################################################################################################################
     ####
     #### do configupload  or other test steps here
+    ####  make other changes here before configupload or other commands 
     ####
     ###################################################################################################################
     ####
+    ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
+    pp = cofra.SwitchUpdate()
+    tn = pp.reboot_reconnect()
+    
+    liabhar.count_down(60)
+    ###################################################################################################################
+    ####
+    #### hafailover
+    tn = cofra.ha_failover(1)
+    
+    liabhar.count_down(60)
+    
+    ####
+    #### power cycle slots
+    ####
+    ss = anturlar.SwitchInfo()
+    slot_list = ss.blades(True)
+    slot_pwr_cycle(slot_list)
+    
+     
+    ####
     #### 
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
+    #### other interrptioons
+    
+    
     ####
     ####
     ####
@@ -762,7 +805,18 @@ def main():
         
         liabhar.cls()
         #### compare the two files
-    
+        print("#"*80)
+        print("#"*80)
+        print("#######")
+        print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @@@@@")
+        print("#######     @  @    @       @      @   @   @        @")
+        print("#######     @@@     @@@@    @@@@   @   @   @        @")
+        print("#######     @  @    @           @  @   @   @        @")
+        print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @")
+        print("#"*80)
+        print("#"*80)
+        
+        
         diff_f  = liabhar.file_diff(switch_data_0,switch_data_1)
         print("#"*80)
         print("#"*80)

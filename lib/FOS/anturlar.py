@@ -609,6 +609,22 @@ class SwitchInfo:
             
         return(ras)
     
+    def credit_recovery(self):
+        """
+            returns the configuration setting for credit recovery
+            captures each line the has a line return at the end
+            
+        """
+        
+        capture_cmd = fos_cmd("creditrecovmode --show")
+        #cn = capture_cmd.replace(" ", '')
+        ras = re.compile('([ \'\w\d_]+)(?:\\r\\n)')
+        ras = ras.findall(capture_cmd)
+        return(ras)
+        
+    
+    
+    
     def default_switch(self):
         """
             Return default FID if found
@@ -634,6 +650,37 @@ class SwitchInfo:
         """
         return(self.__getportlist__("Disabled"))
     
+    def dns_config_info(self):
+        """
+                 Domain Name Server Configuration Information 
+         ____________________________________________ 
+
+         Domain Name            = englab.brocade.com
+         Name Server IP Address = 10.38.2.1
+         Name Server IP Address = 10.38.2.2
+        """
+        
+        reg_ex = [ b"4]"]
+        reg_ex_option = [ b"Enter option" ]
+        
+        capture_cmd = fos_cmd_regex("dnsconfig", reg_ex, 9)
+        
+        #cn = capture_cmd.replace(" ", '')
+        capture_cmd = fos_cmd_regex("1", reg_ex)
+        
+        ras_dname = re.compile('(Domain Name\s+=\s+[\.a-zA-z0-9]+)(?:\r\n)')
+        ras_ip = re.compile('(Name Server IP Address\s+=\s+[\.0-9:]+)(?:\r\n)')
+        ras_dname = ras_dname.findall(capture_cmd)
+        ras_ip = ras_ip.findall(capture_cmd)
+        
+        dns_info = str(ras_dname) + str(ras_ip)
+        
+        capture_cmd = fos_cmd("4")
+        
+        return(dns_info)
+        
+        
+        
     def e_ports(self):
         """
         `   Return a list of the E-ports in the current FID
@@ -999,10 +1046,21 @@ class SwitchInfo:
         """
         
         capture_cmd = fos_cmd("hashow")
+        
+        if "Not supported" in capture_cmd:
+            ss = self.switch_state()
+            if ss == "Online":
+             
+                return(True)
+            else:
+                return(False)
+            
         if "HA State synchronized" in capture_cmd:
             return True
         else:
             return False
+    
+    
     
     def temp_sensors(self, absent='no'):
         """
@@ -1616,7 +1674,12 @@ class Maps(SwitchInfo):
         ####  s or none = summary of policy
         
         if p == "s":
-            return(fos_cmd("mapspolicy --show -summary"))
+            capture_cmd = fos_cmd("mapspolicy --show -summary")
+            ras = re.compile('(dflt[_a-z]+\s+:\s+[0-9]+)')
+            ras = ras.findall(capture_cmd)
+            
+            return(ras)
+        
         elif p == "a":
             return(fos_cmd("mapspolicy --show -dflt_aggressive_policy"))
         elif p == "c":
@@ -1638,7 +1701,7 @@ class Maps(SwitchInfo):
         ras = ras.findall(capture_cmd)
         i = 0
         try:
-            while i <=2:
+            while i <=3:
                 ras.pop(0)
                 i +=1
         except IndexError:

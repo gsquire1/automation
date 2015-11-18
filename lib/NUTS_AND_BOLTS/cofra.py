@@ -1171,7 +1171,7 @@ def ha_failover( times=2):
                 print("@"*60)
                 print("HA Failovers remaining -- %s " % times)
                 print("@"*60)
-                anturlar.connect_tel_noparse(ip_addr,'root','password')
+                tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
                 liabhar.count_down(60)
                 sw_info = anturlar.SwitchInfo()
                 while sw_info.synchronized() is False:
@@ -1180,6 +1180,9 @@ def ha_failover( times=2):
                 sw_info = anturlar.fos_cmd("echo Y | hafailover")
                 ####  add error checking here
                 ####   get the same data as before the while loop and compare
+                if "Not supported" in sw_info:
+                    sw_info = anturlar.fos_cmd("hareboot")
+                
                 if "can't failover" in sw_info:
                     print("\n\n\nSwitch Not Ready")
                     print("Need to wait for LS/HA progress to complete\n\n")
@@ -1201,10 +1204,11 @@ def ha_failover( times=2):
             
         if times == 0:
             new_connect = False   
-     
+    
+    tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
     liabhar.count_down(300)
 
-    return()
+    return(tn)
 ###############################################################################
 
 def ha_failover_check_adjacent( adjacent_ipaddr, times=2, wait=300):
