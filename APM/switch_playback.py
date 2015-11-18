@@ -700,11 +700,19 @@ def sw_set_pwd_timeout(pswrd, tn):
     tn.write(b"root\n")
     capture = tn.expect(reg_assword, 20)
     print("\n\nlooking for password and send fibranne\n\n")
+    print("new login requires old password first\n\n")
+    
     tn.write(b"fibranne\n")
     capture = tn.expect(reg_change_pass, 20)
+    #### looking for message - press 'Enter' key to proceed. - so send \n  
     tn.write(b"\n")
     capture = tn.expect(reg_linertn)
 
+    #### looking for old password:
+    tn.write(b"fibranne\n")
+    capture = tn.expect(reg_assword)
+    
+    
     
     while True:    
         capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
@@ -716,8 +724,13 @@ def sw_set_pwd_timeout(pswrd, tn):
             print(capture)
             print("this found root")
             break
-        tn.write(b"password\n")
-  
+        if "old password" in capture:
+            tn.write(b"fibranne\n")
+        elif "Login Failure" in capture:    
+            tn.write(b"fibranne\n")
+        else:
+            tn.write(b"password\n")
+            
     capture = tn.expect(reg_list, 20)
     tn.write(b"root\n")
     capture = tn.expect(reg_list, 20)

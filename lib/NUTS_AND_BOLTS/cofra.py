@@ -1205,9 +1205,10 @@ def ha_failover( times=2):
         if times == 0:
             new_connect = False   
     
-    tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
+    
     liabhar.count_down(300)
-
+    tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
+    
     return(tn)
 ###############################################################################
 

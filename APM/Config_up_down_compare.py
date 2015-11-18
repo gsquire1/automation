@@ -744,24 +744,30 @@ def main():
     ###################################################################################################################
     ####
     ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
+    ####
     pp = cofra.SwitchUpdate()
     tn = pp.reboot_reconnect()
     
     liabhar.count_down(60)
     ###################################################################################################################
     ####
-    #### hafailover
-    tn = cofra.ha_failover(1)
+    #### hafailover or hareboot on pizza box
+    ####
+    tn = cofra.ha_failover(10)
     
     liabhar.count_down(60)
     
+    ###################################################################################################################
     ####
     #### power cycle slots
     ####
     ss = anturlar.SwitchInfo()
     slot_list = ss.blades(True)
-    slot_pwr_cycle(slot_list)
-    
+    #### skip if switch is a pizza box
+    if "not a d" not in slot_list:
+        slot_pwr_cycle(slot_list)
+    else:
+        print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
      
     ####
     #### 

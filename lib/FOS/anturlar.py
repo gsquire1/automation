@@ -550,7 +550,11 @@ class SwitchInfo:
             ras = ras.findall(capture_cmd)
             return(ras)
         else:
-            return("not a director")
+            if not self.am_i_director:
+                return("not a director")
+            else:
+                return("unknown")
+            
 
     def blank_type(self):
         """
@@ -2101,7 +2105,18 @@ def connect_tel(pa, pw):
             print("Could not connect at this time")
             print("Try again with a correct username / password combination")
             print("\n========================================================\n\n\n")
-            sys.exit()
+            tn.write(usrname.encode('ascii') + b"\n")
+            
+            if password:
+                tn.read_until(b"assword: ")
+                p_fibranne = "fibranne" 
+                tn.write(p_fibranne.encode('ascii') + b"\n")
+                capture = tn.expect(reg_ex_list, 10)
+                capture_t = capture
+                capture = capture[2]
+                badlog0 = capture_t[0]
+                capture = capture.decode()
+                #sys.exit()
             
         
         print(capture)
@@ -2152,7 +2167,18 @@ def connect_tel_noparse(HOST,usrname,password, *args):
             print("Could not connect at this time")
             print("Try again with a correct username / password combination")
             print("\n========================================================\n\n\n")
-            sys.exit()
+            tn.write(usrname.encode('ascii') + b"\n")
+            
+            if password:
+                tn.read_until(b"assword: ")
+                p_fibranne = "fibranne" 
+                tn.write(p_fibranne.encode('ascii') + b"\n")
+                capture = tn.expect(reg_ex_list, 10)
+                capture_t = capture
+                capture = capture[2]
+                badlog0 = capture_t[0]
+                capture = capture.decode()
+            #sys.exit()
             
         print(capture)
         return(tn)      
