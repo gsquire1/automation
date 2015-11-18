@@ -1569,6 +1569,29 @@ class Maps(SwitchInfo):
     def email_cfg(self, email_list ):
         return(fos_cmd("mapsconfig --emailcfg -address %s " % email_list))
 
+    def get_email_cfg(self):
+        """
+        
+        """
+        
+        capture_cmd = fos_cmd("mapsconfig --show")
+        ras = re.compile('Mail Recipient:\s+([\._@0-9a-zA-Z]+)')
+        ras = ras.findall(capture_cmd)
+        
+        return(ras)
+    
+    def get_actions(self):
+        """
+        """
+        
+        capture_cmd = fos_cmd("mapsconfig --show")
+        ras = re.compile('Notifications:\s+([\._@0-9a-zA-Z ,]+)')
+        ras = ras.findall(capture_cmd)
+        
+        return(ras)
+        
+    
+
     def get_rules(self):
         capture_cmd = fos_cmd("mapsrule --show -all")
         ras = re.compile('(def[_ ,\/\()-=\.|<>A-Za-z0-9]+)')
@@ -1600,6 +1623,8 @@ class Maps(SwitchInfo):
             return(fos_cmd("mapspolicy --show -dflt_conservative_policy"))
         elif p == "m":
             return(fos_cmd("mapspolicy --show -dflt_moderate_policy"))
+        elif p == "b":
+            return(fos_cmd("mapspolicy --show -dflt_base_policy"))
         else:
             return("Could not determine the type of policy")
     
@@ -1627,6 +1652,26 @@ class Maps(SwitchInfo):
         ras_final = ras_str.split(" ")
         
         return(ras_final)
+        
+    
+    def get_relay_server_info(self):
+        """
+            Relay Host: 
+            Relay Domain Name: 
+        """
+        
+        capture_cmd = fos_cmd("relayconfig --show")
+        ras_host = re.compile('Relay Host:\s+([\.0-9:]+)')
+        ras_domain = re.compile('Relay Domain Name:\s+([\.A-Za-z]+)')
+        ras_host = ras_host.findall(capture_cmd)
+        ras_domain = ras_domain.findall(capture_cmd)
+        
+        relay_info = str(ras_host) + " " + str(ras_domain)
+        
+        
+        return(relay_info)
+        
+    
         
     def db_search(self, pattern ):
         """
@@ -1692,7 +1737,7 @@ class Maps(SwitchInfo):
         return(0)
     
         
-    def logicalgroup_count(self, group):
+    def logicalgroup_count(self, group="ALL"):
         """
             return the count for the line group passed for any of the following
             
@@ -1707,23 +1752,48 @@ class Maps(SwitchInfo):
             CHASSIS             ALL_D_PORTS
             
         """
-        #### return a list of all the values ?
-        capture_cmd = fos_cmd("logicalgroup --show")
-            
-        #ras = re.compile("(ALL_SW_BLADES)\s+(?:\|)(Yes)\s+\|(Blade)\s+(?:\|)([0-9])\s+(?:\|)([,0-9])")
-        ras = re.compile("(%s)\s+\|Yes\s+\|[ \w]+\|([0-9]+)" % group)    
-        #ras = ras.search(capture_cmd)
-        ras = ras.findall(capture_cmd)
-        if not ras:
-            value = "-1"
+        ###############################################################################################################
+        ###############################################################################################################
+        ####
+        #### return a list of all the values
+        ####
+        ###############################################################################################################
+         
+         
+        if group == "ALL":
+            capture_cmd = fos_cmd("logicalgroup --show")
+            #ras = re.compile("(ALL_SW_BLADES)\s+(?:\|)(Yes)\s+\|(Blade)\s+(?:\|)([0-9])\s+(?:\|)([,0-9])")
+            ras = re.compile("([_A-Z0-9]+)\s+\|Yes\s+\|[ \w]+\|([0-9]+)")    
+            #ras = ras.search(capture_cmd)
+            ras = ras.findall(capture_cmd)
+            if not ras:
+                value = "-1"
+            else:
+                print("\nTHIS IS RAS  \n")
+                print(ras)
+             
+            #liabhar.JustSleep(110)
+             
+            return(ras)
+        
         else:
-            print("\nTHIS IS RAS  \n")
-            print(ras)
-            print("\nTHIS IS RAS GROUP \n")
-            print(ras[0][1])
-                   
-            value = ras[0][1]
-        return(value)
+            capture_cmd = fos_cmd("logicalgroup --show")
+                
+            #ras = re.compile("(ALL_SW_BLADES)\s+(?:\|)(Yes)\s+\|(Blade)\s+(?:\|)([0-9])\s+(?:\|)([,0-9])")
+            ras = re.compile("(%s)\s+\|Yes\s+\|[ \w]+\|([0-9]+)" % group)    
+            #ras = ras.search(capture_cmd)
+            ras = ras.findall(capture_cmd)
+            if not ras:
+                value = "-1"
+            else:
+                print("\nTHIS IS RAS  \n")
+                print(ras)
+                print("\nTHIS IS RAS GROUP \n")
+                print(ras[0][1])
+                       
+                value = ras[0][1]
+                #liabhar.JustSleep(10)
+            return(value)
 
     def cpu_usage(self):
         """

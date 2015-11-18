@@ -1728,18 +1728,18 @@ def get_info_from_the_switch(extend_name="", fid=128):
         maps_non_dflt_policy = mi.get_nondflt_policies()
     
         
-        if ls != str(first_ls):
+        #if ls != str(first_ls):
             #value = []
             #value_sn = []
             #value = ports_and_ls
             #value_sn = theswitch_name
-            d_port_list[ls]            = ports_and_ls       #### add the value to the key
-            d_switch_name[ls]          = theswitch_name 
-            d_domain_list[ls]          = domain_for_ls
-            d_xisl_state[ls]           = xisl_st_per_ls
-            d_flow_names[ls]           = flow_per_ls
-            d_maps_policy[ls]          = maps_policy_sum
-            d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
+        d_port_list[ls]            = ports_and_ls       #### add the value to the key
+        d_switch_name[ls]          = theswitch_name 
+        d_domain_list[ls]          = domain_for_ls
+        d_xisl_state[ls]           = xisl_st_per_ls
+        d_flow_names[ls]           = flow_per_ls
+        d_maps_policy[ls]          = maps_policy_sum
+        d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
             
             
             
@@ -1803,6 +1803,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     print("LICENSE LIST      :  %s  " % license_list)
     
     for kk, vv in d_port_list.items():
+        get_info_from_the_switch
         print(kk,vv)    #### print to the crt
         print("@"*60)
     print("*"*80)
@@ -1839,6 +1840,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     ff.write("="*80)
     ff.write("\n")
     ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
+    ff.write("MAPS POLICIES            :  %s  \n" % d_maps_policy )
     ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
     
     ff.write("="*80)

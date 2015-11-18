@@ -223,7 +223,7 @@ def mapsenable( pol, al, ml ):
     
  
  
-def add_rules_each_monitor_type():
+def add_rules_each_monitor_type(add_max=False, add_all=True):
     """
         create rules with each different combination of monitor for each type of logical group
         
@@ -235,40 +235,126 @@ def add_rules_each_monitor_type():
     #sw_ip = sw_info.ipaddress()
     #f = anturlar.FabricInfo(fid_now)
     
-    #### this list goes with FC Ports as the type of group
-    monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
-    #### this list goes with FLOW as the type of group
-    monitor_list_perf_flow_port = ["TX_THPUT", "RX_THPUT", "RX_FCNT", "TX_FCNT"]
+    #### this list goes with FC Ports as the type of logical group
+    #monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
+    #### this list goes with FLOW as the type of logical group
+    #monitor_list_perf_flow_port = ["TX_THPUT", "RX_THPUT", "RX_FCNT", "TX_FCNT"]
+    #### this list goes wtth SFP as the type of logical groups
+    monitor_list_for_ios  = ["RD_PENDING_IO_8K", "WR_PENDING_IO_8K", "RD_PENDING_IO_8_64K", "WR_PENDING_IO_8_64K", \
+                             "RD_PENDING_IO_64_512K", "WR_PENDING_IO_64_512K", "RD_PENDING_IO_GE_512K", "WR_PENDING_IO_GE_512K", \
+                             "RD_STATUS_TIME_8K", "WR_STATUS_TIME_8K", "RD_STATUS_TIME_8_64K", "WR_STATUS_TIME_8_64K", \
+                             "RD_STATUS_TIME_64_512K", "WR_STATUS_TIME_64_512K", "RD_STATUS_TIME_GE_512K", "WR_STATUS_TIME_GE_512K", \
+                             "RD_1stDATA_TIME_LE_8K", "WR_1stDATA_TIME_LE_8K", "RD_1stDATA_TIME_8_64K", "WR_1stDATA_TIME_8_64K", \
+                             "RD_1stDATA_TIME_64K_512K", "WR_1stDATA_TIME_64K_512K", "RD_1stDATA_TIME_GE_512K", "RD_1stDATA_TIME_GE_512K"]
     
     
+    monitor_list_for_monitor_type =  [ "CRC","ITW","LOSS_SYNC","LF","LOSS_SIGNAL","PE","LR","C3TXTO","STATE_CHG","CURRENT"," RXP","TXP"," VOLTAGE", \
+                                        "SFP_TEMP"," PWR_HRS","DEV_NPIV_LOGINS","GE_CRC","GE_INV_LEN","GE_LOS_OF_SIG","CRC", \
+                                        "ITW","LR"," BAD_OS","FRM_TRUNC"," FRM_LONG","CIR_STATE","CIR_UTIL","CIR_PKTLOSS","RTT", \
+                                        "JITTER","STATE_CHG","UTIL","PKTLOSS","IP_UTIL","IP_PKTLOSS","IP_RTT","IP_JITTER","TX_FCNT", \
+                                        "RX_FCNT","TX_THPUT","RX_THPUT","IO_RD","IO_WR","IO_RD_BYTES","IO_WR_BYTES", \
+                                        "RD_STATUS_TIME_8K","RD_STATUS_TIME_8_64K","RD_STATUS_TIME_64_512K","RD_STATUS_TIME_GE_512K", \
+                                        "WR_STATUS_TIME_8K","WR_STATUS_TIME_8_64K","WR_STATUS_TIME_64_512K","WR_STATUS_TIME_GE_512K", \
+                                        "RD_1stDATA_TIME_8K","RD_1stDATA_TIME_8_64K","RD_1stDATA_TIME_64_512K", \
+                                        "RD_1stDATA_TIME_GE_512K","WR_1stXFER_RDY_8K","WR_1stXFER_RDY_8_64K","WR_1stXFER_RDY_64_512K", \
+                                        "WR_1stXFER_RDY_GE_512K","RD_PENDING_IO_8K","RD_PENDING_IO_8_64K","RD_PENDING_IO_64_512K", \
+                                        "RD_PENDING_IO_GE_512K","WR_PENDING_IO_8K","WR_PENDING_IO_8_64K","WR_PENDING_IO_64_512K", \
+                                        "WR_PENDING_IO_GE_512K","SEC_DCC","SEC_HTTP","SEC_CMD","SEC_IDB","SEC_LV","SEC_CERT", \
+                                        "SEC_FCS","SEC_SCC","SEC_AUTH_FAIL","SEC_TELNET","SEC_TS","DAYS_TO_EXPIRE","EXPIRED_CERTS", \
+                                        "DID_CHG","FLOGI","FAB_CFG","EPORT_DOWN","FAB_SEG","ZONE_CHG","L2_DEVCNT_PER", \
+                                        "LSAN_DEVCNT_PER", "ZONE_CFGSZ_PER","BB_FCR_CNT","TEMP","FLASH_USAGE","CPU","MEMORY_USAGE", \
+                                        "ETH_MGMT_PORT_STATE","VTAP_IOPS","BAD_PWR","BAD_TEMP","BAD_FAN","FLASH_USAGE","MARG_PORTS", \
+                                        "FAULTY_PORTS","MISSING_SFP","ERR_PORTS","WWN_DOWN","DOWN_CORE","FAULTY_BLADE","HA_SYNC", \
+                                        "PS_STATE","FAN_STATE","SFP_STATE","BLADE_STATE","WWN","DEV_LATENCY_IMPACT", \
+                                        "BE_LATENCY_IMPACT","RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "ZONED_DEV_RATIO", "OVER_SUB_RATIO"]
+    
+    
+    ###################################################################################################################
+    ###################################################################################################################
+    ###################################################################################################################
+    ####
+    ####  GROUP LISTS
+    ####
+    ###################################################################################################################
+    ###################################################################################################################
     
     flow_logical_group  = "sys_mon_all_fports" 
     fc_logical_group = "ALL_PORTS"
+   
+    fc_logical_group_list = [ "ALL_PORTS", "NON_E_F_PORTS", "ALL_E_PORTS", "ALL_F_PORTS", "ALL_OTHER_F_PORTS", \
+                         "ALL_HOST_PORTS", "ALL_TARGET_PORTS" ]
+
+    sfp_group_list  = [ "ALL_SFP", "ALL_10GSWL_SFP", "ALL_10GLWL_SFP", "ALL_16GSWL_SFP", "ALL_16GLWL_SFP", \
+                   "ALL_QSFP", "ALL_OTHER_SFP", "ALL_2K_QSFP", "ALL_100M_16GSWL_QSFP" ]
+
+    circuit_group_list = [ "ALL_CIRCUITS", "ALL_CIRCUIT_F_QOS", "ALL_CIRCUIT_HIGH_QOS", "ALL_CIRCUIT_MED_QOS", "ALL_CIRCUIT_LOW_QOS" ]
+
+    tunnel_group_list  = [ "ALL_TUNNELS", "ALL_TUNNEL_F_QOS", "ALL_TUNNEL_HIGH_QOS", "ALL_TUNNEL_MED_QOS", "ALL_TUNNEL_LOW_QOS" ]
     
-    timebase_list = ["min", "hour", "day"]
+    ip_logical_group_list = [ "ALL_TUNNEL_IP_HIGH_QOS", "ALL_TUNNEL_IP_MED_QOS", "ALL_TUNNEL_IP_LOW_QOS", \
+                             "ALL_CIRCUIT_IP_HIGH_QOS", "ALL_CIRCUIT_IP_MED_QOS", "ALL_CIRCUIT_IP_HIGH_QOS" ]
+
+    ext_ge_group_list = [ "ALL_EXT_GE_PORTS"]
+
+    temp_sensor_group_list   = [ "ALL_TS" ]
+    fan_group_list           = [ "ALL_FAN" ] 
+    power_supply_group_list  = [ "ALL_PS" ]
+    wwn_group_list           = [ "ALL_WWN" ]                            
+    blade_group_list         = [ "ALL_SLOTS", "ALL_SW_BLADES", "ALL_CORE_BLADES" ]
+    flash_group_list         = [ "ALL_FLASH" ] 
+    switch_group_list        = [ "SWITCH" ]
+    chassis_group_list       = [ "CHASSIS" ]
+    d_group_list             = [ "ALL_D_PORTS" ]
+    be_ports_group_list      = [ "ALL_BE_PORTS" ]
+    quarantined_group_list   = [ "ALL_QUARANTINED_PORTS" ]
+    asic_group_list          = [ "ALL_ASICS" ]
+    certs_group_list         = [ "ALL_CERTS" ]
+    
+    timebase_list = ["min", "hour", "day", "none"]
     
     operator_list = [ "l", "le", "g", "ge", "eq" ]
+    
+    actions_lsit = [ "raslog", "email", "snmp", "fence", "decom", "fms", "none", ]  #### do we need other actions here - sddq 
     
     cons_out = anturlar.fos_cmd("mapspolicy --create Nervio_test_1")
     rule_name = "monitor_test_and_extra_characters___"
     stopnow = 0
     stophere = 10000
+    monitor_number = 0
     
-    while stopnow < stophere:
+    if add_all:
+        for r in fc_logical_group_list:
+            for p in monitor_list_for_ios:
+                rule_to_add  = rule_name + str(monitor_number)
+                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                        % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+                monitor_number += 1 
+     
+        for r in fc_logical_group_list:
+            for p in monitor_list_for_monitor_type:
+                rule_to_add  = rule_name + str(monitor_number)
+                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                        % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+                monitor_number += 1    
         
-        for p in monitor_list_port_health_fc_port:
-            rule_to_add = rule_name + str(stopnow)
-            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-                                    % (rule_to_add, fc_logical_group, p ,timebase_list[0], operator_list[2], ))
+    
+    
+    if add_max:
+        while stopnow < stophere:
+            
+            for p in monitor_list_port_health_fc_port:
+                rule_to_add = rule_name + str(stopnow)
+                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                        % (rule_to_add, fc_logical_group, p ,timebase_list[0], operator_list[2], ))
+                 
+                stopnow += 1
              
-            stopnow += 1
-         
-        for p in monitor_list_perf_flow_port: 
-            rule_to_add = rule_name + str(stopnow)
-            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-                                    % (rule_to_add, flow_logical_group, p ,timebase_list[0], operator_list[2], ))
-             
-            stopnow += 1
+            for p in monitor_list_perf_flow_port: 
+                rule_to_add = rule_name + str(stopnow)
+                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+                                        % (rule_to_add, flow_logical_group, p ,timebase_list[0], operator_list[2], ))
+                 
+                stopnow += 1
      
     return(True)
         
