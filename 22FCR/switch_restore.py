@@ -791,8 +791,8 @@ def main():
     #### and write the file
     
     ff = ""
-    #f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
-    f = ("logs/66_Switch_Info_10.38.134.66_for_playback.txt")
+    f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
+    #f = ("logs/66_Switch_Info_10.38.134.66_for_playback.txt")
     print(f)
     
     try:

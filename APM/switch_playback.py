@@ -262,7 +262,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     tn.set_debuglevel(db)
     #tn.write(b"printenv\n")
     reg_list = [b"=>"]
-    reg_list_done = [b"done"]
+    reg_list_done = [b"done",b"NVRAM..."]
     
     capture = tn.expect(reg_list, 120)
     print("env_variable - capture")
@@ -284,11 +284,16 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
                               # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
-    if swtype == '148':   #### HANDLE SKYBOLT ethact here
+    if swtype == '148':   #### HANDLE SKYBOLT and ethact here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    if swtype == '162':   #### HANDLE WEDGE bootargs here
-        bootargs  = "bootargs=root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+    if swtype == '162' or swtype == '166':   #### HANDLE WEDGE and Allegiance bootargs here
+        bootargs  = "bootargs=root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+    if swtype == '166': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
+        ethact = "FM2@DTSEC4"
+        a = ("setenv ethprime FM2@DTSEC4 \n")
+        tn.write(a.encode('ascii'))
+        capture = tn.expect(reg_list, 30)
         
     a = ("setenv ethact %s \n" % ethact)
     tn.write(a.encode('ascii'))
@@ -426,6 +431,18 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         tn.write(b"tftpboot 0x4000000 wedge/silkworm.dtb.netinstall\n")
         capture = tn.expect(reg_bash,10)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\n")
+        caputure = tn.expect(reg_bash,60)
+        
+    if (switch_type == '166'):  #### Allegiance
+        tn.write(b"makesinrec 0x1000000 \n")
+        capture = tn.expect(reg_bash,30)
+        tn.write(b"tftpboot 0x2000000 lando/uImage.netinstall\n")
+        capture = tn.expect(reg_bash,10)
+        tn.write(b"tftpboot 0x3000000 lando/ramdisk_v1.0.img\n")
+        capture = tn.expect(reg_bash,20)
+        tn.write(b"tftpboot 0xc00000 lando/silkworm.dtb.netinstall\n")
+        capture = tn.expect(reg_bash,10)
+        tn.write(b"bootm 0x2000000 0x3000000 0xc00000\n")
         caputure = tn.expect(reg_bash,60)
 
 #######################################################################################################################
