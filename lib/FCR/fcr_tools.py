@@ -44,6 +44,67 @@ def test_anturlar_functions():
     print(b)
     sys.exit()
     
+def playback_add_ports():
+#def playback_add_ports(self):
+    """
+    
+    """
+    
+    reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
+    reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
+    #switch_ip = self.si.ipaddress()
+
+    #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
+    #f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
+    f = ("logs/Switch_Info_10.38.134.65_2015_11_11_13_40_19_875006_65_VF_Wedge.txt")
+    try:
+        with open(f, 'r') as file:
+            a = file.read()
+            print(a)
+    except IOError:
+        print("\n\nThere was a problem opening the file:" , f)
+        sys.exit()
+    ras = re.findall('EX_PORTS\s+:\s+\{(.+)(?:})', a)
+    print(ras)
+    sys.exit()
+    sn = ras[0]
+    sn = sn.split("'")
+    print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+    print(sn)
+    sys.exit()
+    for i in range(2,len(sn),2):
+        
+        fid_for_ports = sn[i-1]
+        fid_ports = sn[i]
+        
+        fid_ports = fid_ports.replace(": [","")
+        fid_ports = fid_ports.replace("[","")
+        fid_ports = fid_ports.replace("]],","")
+        fid_ports = fid_ports.replace(" ","")
+        fid_ports = fid_ports.replace("]","")
+        fid_ports = fid_ports.split(",")
+        print("@"*30)
+        print(fid_ports)
+        print("$"*44)
+        for s in range(0,len(fid_ports),2):
+            try:
+                slot = fid_ports[s]
+                port = fid_ports[s+1]
+                #print("SLOT PORT_____%s_____%s___ " % (slot,port))
+                #### add pizza box vs director
+                #am_director = si.director()
+                if self.direct:
+                    cons_out = anturlar.fos_cmd_regex("lscfg --config %s -slot %s -port %s" % (fid_for_ports, slot,port) , reg_ex_yes_no, 0)
+                    cons_out = anturlar.fos_cmd("y",0)
+                else:
+                    cons_out = anturlar.fos_cmd_regex("lscfg --config %s -port %s" % (fid_for_ports, port) , reg_ex_yes_no, 0)
+                    cons_out = anturlar.fos_cmd("y",0)
+             
+            except IndexError:
+                print("No ports in this FID")
+                
+    return(True)
+    
 def enter_file_ext():
     go = False
     start = 'n'
