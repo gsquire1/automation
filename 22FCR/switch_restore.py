@@ -791,15 +791,15 @@ def main():
     #### and write the file
     
     ff = ""
-    f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
-    #f = ("logs/66_Switch_Info_10.38.134.66_for_playback.txt")
+    #f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
+    f = ("logs/Switch_Info_10.38.134.66_2015_11_10_10_47_29_961946_66_VF_Wedge.txt")
     print(f)
     
     try:
         with open(f, 'r') as file:
             ff = file.read()
     except IOError:
-        print("\n\nThere was a problem opening the file" , f)
+        print("\n\nThere was a problem opening the file:" , f)
         sys.exit()
     print(ff)
 
