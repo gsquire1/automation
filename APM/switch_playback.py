@@ -700,11 +700,19 @@ def sw_set_pwd_timeout(pswrd, tn):
     tn.write(b"root\n")
     capture = tn.expect(reg_assword, 20)
     print("\n\nlooking for password and send fibranne\n\n")
+    print("new login requires old password first\n\n")
+    
     tn.write(b"fibranne\n")
     capture = tn.expect(reg_change_pass, 20)
+    #### looking for message - press 'Enter' key to proceed. - so send \n  
     tn.write(b"\n")
     capture = tn.expect(reg_linertn)
 
+    #### looking for old password:
+    tn.write(b"fibranne\n")
+    capture = tn.expect(reg_assword)
+    
+    
     
     while True:    
         capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
@@ -716,8 +724,13 @@ def sw_set_pwd_timeout(pswrd, tn):
             print(capture)
             print("this found root")
             break
-        tn.write(b"password\n")
-  
+        if "old password" in capture:
+            tn.write(b"fibranne\n")
+        elif "Login Failure" in capture:    
+            tn.write(b"fibranne\n")
+        else:
+            tn.write(b"password\n")
+            
     capture = tn.expect(reg_list, 20)
     tn.write(b"root\n")
     capture = tn.expect(reg_list, 20)
@@ -911,6 +924,9 @@ def main():
     user_name         = usr_pass[0]
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
+    print("IPADDR")
+    print(ipaddr_switch)
+    print("@"*80)
     ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
     gw_octet = ras.findall(ipaddr_switch)
     gw_octet = int(gw_octet[0])
@@ -918,6 +934,7 @@ def main():
         gateway_ip = "10.38.128.1"
     else:
         gateway_ip = "10.38.32.1"
+    print("@"*80)
     print(gateway_ip)
     
     #sys.exit()
@@ -936,15 +953,20 @@ def main():
     if pa.file_action == 2:
         print("skip the file creation section")
         try:
+            print("SKIP FILE CREATE and the REQUIRED INFO HERE ")
             tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-            sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
-            my_ip                = sw_dict["switch_ip"]
-            my_cp_ip_list        = sw_dict["cp_ip_list"]
-            sw_name              = sw_dict["switch_name"]
-            sw_chass_name        = sw_dict["chassis_name"]
-            sw_director_or_pizza = sw_dict["director"]
-            sw_type              = sw_dict["switch_type"]
-            
+            si = anturlar.SwitchInfo()
+            sw_director_or_pizza = si.director()
+            sw_type = si.switch_type()
+            my_ip = si.ipaddress()
+            #sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
+            #my_ip                = sw_dict["switch_ip"]
+            #my_cp_ip_list        = sw_dict["cp_ip_list"]
+            #sw_name              = sw_dict["switch_name"]
+            #sw_chass_name        = sw_dict["chassis_name"]
+            #sw_director_or_pizza = sw_dict["director"]
+            #sw_type              = sw_dict["switch_type"]
+            anturlar.close_tel()
         except OSError:
             print("\n  If the Switch is at the command prompt use the -cp and -t switch")
             print("\n  ./APM/switch_playback.py -cp -t <no> -c <chassisname> <firmware>")
