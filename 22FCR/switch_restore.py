@@ -791,8 +791,10 @@ def main():
     #### and write the file
     
     ff = ""
-    #f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
-    f = ("logs/Switch_Info_10.38.134.66_2015_11_10_10_47_29_961946_66_VF_Wedge.txt")
+    f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
+    #f = ("logs/Switch_Info_10.38.134.66_VF_Wedge.txt")
+    #f = ("logs/Switch_Info_10.38.134.66_for_playback.txt")
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     print(f)
     
     try:
