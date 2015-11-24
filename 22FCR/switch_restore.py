@@ -792,14 +792,16 @@ def main():
     
     ff = ""
     f = ("%s%s%s"%("logs/Switch_Info_",pa.ipaddr,"_restore.txt"))
-    #f = ("logs/66_Switch_Info_10.38.134.66_for_playback.txt")
+    #f = ("logs/Switch_Info_10.38.134.66_VF_Wedge.txt")
+    #f = ("logs/Switch_Info_10.38.134.66_for_playback.txt")
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     print(f)
     
     try:
         with open(f, 'r') as file:
             ff = file.read()
     except IOError:
-        print("\n\nThere was a problem opening the file" , f)
+        print("\n\nThere was a problem opening the file:" , f)
         sys.exit()
     print(ff)
 
