@@ -498,7 +498,9 @@ class SwitchUpdate():
         #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".bak.txt"))
         f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name) ###.bak????
         print("opening file  %s  " % f)
-        
+        print(f)
+        print(self.switch_ip)
+        print(self.extend_name)
         try:
             with open(f, 'r') as file:
                 a = file.read()

@@ -517,8 +517,8 @@ def slot_pwr_cycle(slot_list):
         liabhar.JustSleep(30)
         
     for s in slot_list:
-        capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
-        
+        capture_cmd = anturlar.fos_cmd("slotpoweron %s " % s)
+        liabhar.JustSleep(60)
     liabhar.JustSleep(300)
     return(True)
     
@@ -765,7 +765,7 @@ def main():
     slot_list = ss.blades(True)
     #### skip if switch is a pizza box
     if "not a d" not in slot_list:
-        slot_pwr_cycle(slot_list)
+         slot_pwr_cycle(slot_list)
     else:
         print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
      
