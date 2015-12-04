@@ -202,6 +202,24 @@ def fabric_switch_config_show():
     ff.write("#############################################################\r\n\r\n\r\n")
     ff.close()
     
+    #ff = liabhar.FileStuff(fname, 'a+b')
+    #for ip in fab_ip_list:
+    #    tnnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+    #    firmware_ver = check_version()
+    #    
+    #    ip_firm_ver_pair = "%s      %s" % ( ip,firmware_ver)
+    # 
+    #    ff.write("\r\n")
+    #    ff.write(ip_firm_ver_pair)
+    #
+    #ff.write("\r\n")
+    #ff.write("#############################################################\r\n")
+    #ff.write("#############################################################\r\n")
+    #ff.write("#############################################################\r\n")
+    #ff.write("#############################################################\r\n")
+    #ff.write("#############################################################\r\n")
+    #ff.close()
+    
     
     fabric_data = []
     for ip in fab_ip_list:
@@ -244,8 +262,32 @@ def fabric_switch_config_show():
         ff.write("FLOW CONFIG         :    %s \r\n" % flow_cnfg)
 
         
+        ff.close()
         
+    
+    ff = liabhar.FileStuff(fname, 'a+b')
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    for ip in fab_ip_list:
+        tnnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+        firmware_ver = check_version()
+        m_info          = anturlar.Maps()
+        chass_name      = m_info.chassisname()
         
+        ip_firm_ver_pair = "%s\t\t%s\t\t%s " % ( ip,chass_name,firmware_ver)
+     
+        ff.write("\r\n")
+        ff.write(ip_firm_ver_pair)
+    
+    ff.write("\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.write("#############################################################\r\n")
+    ff.close()
+    
     return(True)
     
 
@@ -280,7 +322,7 @@ def check_version():
     
     
     ras = re.compile('Fabric OS:\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-z0-9]{6,24})(?:\\r\\n)')
+    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-zA-Z0-9]{6,24})(?:\\r\\n)')
     
     
     #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')

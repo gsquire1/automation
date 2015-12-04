@@ -195,11 +195,14 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     #############################################################################
     #### login to the switch
-    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> "]  
+    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> ", b"sh-2.04#"]  
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_list,20)
+        if capture == -1:
+            print(capture)
+            sys.exit()
         print(capture)
         
         if capture[0] == 0:
@@ -226,7 +229,15 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
             #break
         if capture[0] == 5:
             print(capture)
+            tn.write(b"\n")
             var += 4
+            break
+        
+        if capture[0] == 7:  #### at the bash prompt ready to power cycle
+            print("\n\nswitch is at the BASH prompt\n\n")
+            print("I was expecting the command prompt or FOS prompt\n\n")
+            #tn.write(b"\n")
+            sys.exit()
             break
         
         var += 1
@@ -287,6 +298,8 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     reg_list = [b"=>"]
     reg_list_done = [b"done",b"NVRAM..."]
     
+    tn.write(b"\n")
+    
     capture = tn.expect(reg_list, 120)
     print("env_variable - capture")
     print("@"*80)
@@ -310,10 +323,10 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     if swtype == '148':   #### HANDLE SKYBOLT and ethact here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    if swtype == '162' or swtype == '166':   #### HANDLE WEDGE and Allegiance bootargs here
-        bootargs  = "bootargs=root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+    if swtype == '162' or swtype == '166' or swtype == '165':   #### HANDLE WEDGE and Allegiance bootargs here
+        bootargs  = "root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
-    if swtype == '166': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
+    if swtype == '166' or swtype == '165': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
         ethact = "FM2@DTSEC4"
         a = ("setenv ethprime FM2@DTSEC4 \n")
         tn.write(a.encode('ascii'))
@@ -338,11 +351,16 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     tn.write(s.encode('ascii'))
     capture = tn.expect(reg_list, 30)
     
+    i = ("setenv ipaddr 10.38.34.223\n")
+    tn.write(i.encode('ascii'))
+    capture = tn.expect(reg_list, 30)
+    
     tn.write(b"saveenv\n")
     capture = tn.expect(reg_list_done,60)
     capture = tn.expect(reg_list, 30)
     tn.write(b"printenv\n")    
     capture = tn.expect(reg_list, 90)
+    
     
     #liabhar.JustSleep(60)
     
@@ -457,7 +475,7 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\n")
         caputure = tn.expect(reg_bash,60)
         
-    if (switch_type == '166'):  #### Allegiance
+    if (switch_type == '166' or switch_type == '165'):  #### Allegiance
         tn.write(b"makesinrec 0x1000000 \n")
         capture = tn.expect(reg_bash,30)
         tn.write(b"tftpboot 0x2000000 lando/uImage.netinstall\n")
@@ -548,36 +566,39 @@ def do_net_install(sw_info_filename):
     print(pa.filename)
      
      
-    
-    try:
-        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    except OSError:
-        info_help_OSError()
-        #### this will exit here
-    
-    sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
-    
-    anturlar.close_tel()
+    if not pa.cmdprompt:
+        try:
+            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+        except OSError:
+            info_help_OSError()
+            #### this will exit here
+        
+        sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
+        
+        anturlar.close_tel()
      
     
-    my_ip                = sw_dict["switch_ip"]
-    my_cp_ip_list        = sw_dict["cp_ip_list"]
-    sw_name              = sw_dict["switch_name"]
-    sw_chass_name        = sw_dict["chassis_name"]
-    sw_director_or_pizza = sw_dict["director"]
-    sw_domains           = sw_dict["domain_list"]
-    sw_ls_list           = sw_dict["ls_list"]
-    sw_base_fid          = sw_dict["base_sw"]
-    sw_xisl              = sw_dict["xisl_state"]
-    sw_type              = sw_dict["switch_type"]
-    sw_license           = sw_dict["license_list"]
-    sw_vf_setting        = sw_dict["vf_setting"]
-    sw_fcr_enabled       = sw_dict["fcr_enabled"]
-    sw_port_list         = sw_dict["port_list"]
-    sw_ex_port_list      = sw_dict["ex_ports"]
+        my_ip                = sw_dict["switch_ip"]
+        my_cp_ip_list        = sw_dict["cp_ip_list"]
+        sw_name              = sw_dict["switch_name"]
+        sw_chass_name        = sw_dict["chassis_name"]
+        sw_director_or_pizza = sw_dict["director"]
+        sw_domains           = sw_dict["domain_list"]
+        sw_ls_list           = sw_dict["ls_list"]
+        sw_base_fid          = sw_dict["base_sw"]
+        sw_xisl              = sw_dict["xisl_state"]
+        sw_type              = sw_dict["switch_type"]
+        sw_license           = sw_dict["license_list"]
+        sw_vf_setting        = sw_dict["vf_setting"]
+        sw_fcr_enabled       = sw_dict["fcr_enabled"]
+        sw_port_list         = sw_dict["port_list"]
+        sw_ex_port_list      = sw_dict["ex_ports"]
     
- 
-    
+    else:
+        sw_director_or_pizza = False
+        sw_type = pa.switchtype
+        my_ip = ipaddr_switch
+        print("SETTING THE DIRECTOR OR PIZZA BOX VARIABLE")
     #sys.exit()
  
 ###################################################################################################################
@@ -589,6 +610,7 @@ def do_net_install(sw_info_filename):
 ####     switch IP now needs to be the CP0 and CP1 values
 ####
     tn_list = []
+    print("\n\nCONNECT TO THE CONSOLE NOW\n\n")
     #if sw_director_or_pizza:
     tn_cp0 = connect_console(console_ip, user_name, usr_pass, console_port, 0)
     tn_list.append(tn_cp0)
@@ -597,24 +619,25 @@ def do_net_install(sw_info_filename):
         tn_cp1 = connect_console(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
         tn_list.append(tn_cp1)
     
-    for tn in tn_list:
-        cons_out = send_cmd("switchshow")
     
-
+    #for tn in tn_list:
+    #    cons_out = send_cmd("switchshow")
+    
+    print("\n\nOUT OF CONNECTION TO CONSOLE\n\n")
 #######################################################################################################################
 ####
 ####  reboot and find the command prompt 
 ####
     cnt = 1
-
-    for tn in tn_list:
-        cons_out = stop_at_cmd_prompt(0)
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("FIND THE COMMAND PROMPT    \n")
-        print(cons_out)
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("NOW SET THE ENV VARIABLES  ")
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    if not pa.cmdprompt:
+        for tn in tn_list:
+            cons_out = stop_at_cmd_prompt(0)
+            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            print("FIND THE COMMAND PROMPT    \n")
+            print(cons_out)
+            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            print("NOW SET THE ENV VARIABLES  ")
+            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     
     for tn in tn_list:
         cons_out = env_variables(sw_type,gateway_ip, 0)
@@ -1323,6 +1346,8 @@ def main():
 ####
 #### check the options and start 
 ####
+    if pa.cmdprompt:
+        do_net_install(pa.filename)
 
     if pa.file_action == 3:
         print("USER FILE and NO NETINSTALL")

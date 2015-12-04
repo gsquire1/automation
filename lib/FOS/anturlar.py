@@ -2231,6 +2231,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         print("========================")
         print("handle the EOF case here")
         print("========================")
+        sys.exit()
         pass
  
 def connect_tel_noparse_traffic(HOST,usrname,password, *args):
