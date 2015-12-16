@@ -2090,7 +2090,7 @@ def connect_tel(pa, pw):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        #tn.set_debuglevel(9)
+        tn.set_debuglevel(9)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\n")
         if password:
@@ -2124,11 +2124,12 @@ def connect_tel(pa, pw):
         con_out = fos_cmd("setcontext %s"%(fid))
         print(con_out)
         
-        return(capture)      
+        return(tn)      
     
     except EOFError:
         print("========================")
         print("handle the EOF case here")
+        print(" anturlar  connect_tel  ")
         print("========================")
         pass
         
@@ -2147,7 +2148,7 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         traff_prompt = " ~]# "
         traff_server = traff_server.encode()
         
-        reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server ]
+        reg_ex_list = [b"hlogin: ", b"assword: ", b"option :", b"root>", usrn, telnet_closed, bad_login, traff_server, b"key to proceed"]
         #print(HOST)
         #print(usrname)
         #print(password)
@@ -2160,7 +2161,9 @@ def connect_tel_noparse(HOST,usrname,password, *args):
             tn.write(password.encode('ascii') + b"\n")
             capture = tn.expect(reg_ex_list, 10)
             capture_t = capture
+             
             capture = capture[2]
+            
             badlog0 = capture_t[0]
             capture = capture.decode()
         if badlog0 == 6:
@@ -2175,11 +2178,42 @@ def connect_tel_noparse(HOST,usrname,password, *args):
                 tn.write(p_fibranne.encode('ascii') + b"\n")
                 capture = tn.expect(reg_ex_list, 10)
                 capture_t = capture
+                capture_k = capture
                 capture = capture[2]
                 badlog0 = capture_t[0]
                 capture = capture.decode()
             #sys.exit()
+            print("\n"*35)
+            print("\n========================================================\n"*20)
+            print("\nIN ANTURLAR  TELNET NOPARE login with fibranne  ")
+            print("\n========================================================\n"*20)
+            print(capture)
+            print(type(capture))
+            capture_k = capture_k[0]
+            print("CAPTURE K   \n\n")
+            print(capture_k)
+            print("CAPTURE K   \n\n\n\n\n\n")
             
+            if capture_k == 8:
+                print("FOUND THE key to proceed WORKDS")
+                print(capture_k)
+             
+            #if str("key to proceed") in capture:
+                tn.write(b"\n")
+                capture = tn.expect(reg_ex_list, 10)
+                print("\n=================== found the key ==========================="*10)
+                print(capture)
+                tn.write(b"fibranne\n")
+                capture = tn.expect(reg_ex_list, 10)
+                while capture[0] == 1:
+                    tn.write(password.encode('ascii') + b"\n")
+                    capture = tn.expect(reg_ex_list, 10)
+            else:
+                print("DID NOT       FIND Key to proceed")
+                print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"*20)
+                sys.exit()
+             
+        print("\nLEAVING LOGIN PROCEDURE             "*20)    
         print(capture)
         return(tn)      
     
@@ -2225,7 +2259,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
             sys.exit()
             
         print(capture)
-        return capture      
+        return(capture)      
     
     except EOFError:
         print("========================")
@@ -2346,9 +2380,10 @@ def fos_cmd_regex(cmd, reg,dblevel=0):
     except EOFError:
         print("========================")
         print("handle the EOF case here")
+        print(" in  fos_cmd_regex()    ")
         print("========================")
 
-def fos_cmd(cmd, dl=0):
+def fos_cmd(cmd, dl=10):
     global tn
     try: 
         usrn = var.sw_user + '> '
@@ -2361,7 +2396,7 @@ def fos_cmd(cmd, dl=0):
         #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(dl)
-        reg_ex_list = [b"hlogin: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
         tn.write(cmd.encode('ascii') + b"\n")
@@ -2370,27 +2405,32 @@ def fos_cmd(cmd, dl=0):
         capture = tn.expect(reg_ex_list)
         capture = capture[2]
         capture = capture.decode('ascii', 'ignore')
+        print("@@"*40)
+        print("CAPTURE\n\n")
         print(capture, end="")
-        return capture
+        return(capture)
  
-    #except EOFError:
-        #print("========================")
-        #print("handle the EOF case here")
-        #print("========================")
-    #except SocketError as e:
-    #        if e.errno != errno.ECONNRESET:
-    #            print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
-    #            raise 
-    #        print("========================")
-    #        print("handle the EOF case here")
-    #        print("========================")           
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("    in fos_cmd func     ")
+        print("========================")
+        
+    except SocketError as e:
+            if e.errno != errno.ECONNRESET:
+                print("\n\n\nCONNECTION ERROR TRYING TO RECONNECT\n\n\n")
+                raise 
+            print("========================")
+            print("handle the EOF case here")
+            print("   in  fos_cmd  func    ")
+            print("========================")           
     except:
         print("===============================================")
         print("\n\nTHERE WAS AN ERROR WITH THE CAPTURE IN \n")
         print("fos_cmd in anturlar.py    \n\n")
         print("===============================================")       
 
-        sysexit()
+        sys.exit()
 
 
 def traff_cmd(cmd, dl=0):

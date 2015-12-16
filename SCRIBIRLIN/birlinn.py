@@ -72,11 +72,20 @@ def testprocess( theargs, run_these, password ):
     #header(theargs, run_these)
     #print(theargs)
     #print(run_these)l = sys.argparse.Namespace
-
+    global tn
             
+    host_ip = theargs.ip
+    user    = theargs.user
                 
-    conn_value = anturlar.connect_tel(theargs, password )
-    
+    #tn = anturlar.connect_tel(theargs, password )
+    tn = anturlar.connect_tel_noparse(host_ip, user, password )
+    print("@@"*40)
+    print("IN BIRLINNN Just after the connect to telnet")
+    print("@@"*40)
+    conout = anturlar.fos_cmd("version")
+    print(conout)
+    print("@@"*40)
+
     for i in run_these:
         print("run these test   %s"%i )
         #test_to_run = "test_case_0."
@@ -94,7 +103,7 @@ def testprocess( theargs, run_these, password ):
             
         test_to_run = test_to_run + ")"
         #print("\n\n", test_to_run, "\n\nEND OF TEST TO RUN")
-        conout = anturlar.fos_cmd("switchshow")
+        #conout = anturlar.fos_cmd("switchshow")
         
         if paramlist == "" :
             eval(test_to_run)
@@ -150,6 +159,8 @@ def main():
     #### confirm you are in your $HOME directory
     ####  if not move to the user HOME directory and continue
     ####    ####    ####
+    global tn
+    
     liabhar.cls()
     print("@"*80)
     print("@"*80)

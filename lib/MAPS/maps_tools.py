@@ -7,6 +7,7 @@
   
   
 import anturlar
+import liabhar
 import re
   
   
@@ -227,6 +228,8 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     """
         create rules with each different combination of monitor for each type of logical group
         
+        
+        
     """
     
     sw_info = anturlar.SwitchInfo()
@@ -242,31 +245,33 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     #### this list goes wtth SFP as the type of logical groups
     monitor_list_for_ios  = ["RD_PENDING_IO_8K", "WR_PENDING_IO_8K", "RD_PENDING_IO_8_64K", "WR_PENDING_IO_8_64K", \
                              "RD_PENDING_IO_64_512K", "WR_PENDING_IO_64_512K", "RD_PENDING_IO_GE_512K", "WR_PENDING_IO_GE_512K", \
+                             
                              "RD_STATUS_TIME_8K", "WR_STATUS_TIME_8K", "RD_STATUS_TIME_8_64K", "WR_STATUS_TIME_8_64K", \
                              "RD_STATUS_TIME_64_512K", "WR_STATUS_TIME_64_512K", "RD_STATUS_TIME_GE_512K", "WR_STATUS_TIME_GE_512K", \
-                             "RD_1stDATA_TIME_LE_8K", "WR_1stDATA_TIME_LE_8K", "RD_1stDATA_TIME_8_64K", "WR_1stDATA_TIME_8_64K", \
-                             "RD_1stDATA_TIME_64K_512K", "WR_1stDATA_TIME_64K_512K", "RD_1stDATA_TIME_GE_512K", "RD_1stDATA_TIME_GE_512K"]
+                             
+                             "RD_1stDATA_TIME_LE_8K", "WR_1stXFER_RDY_LE_8K", "RD_1stDATA_TIME_8_64K", "WR_1stXFER_RDY_8_64K", \
+                             "RD_1stDATA_TIME_64_512K", "WR_1stXFER_RDY_64_512K", "RD_1stDATA_TIME_GE_512K", "WR_1stXFER_RDY_GE_512K" ]
     
     
-    monitor_list_for_monitor_type =  [ "CRC","ITW","LOSS_SYNC","LF","LOSS_SIGNAL","PE","LR","C3TXTO","STATE_CHG","CURRENT"," RXP","TXP"," VOLTAGE", \
-                                        "SFP_TEMP"," PWR_HRS","DEV_NPIV_LOGINS","GE_CRC","GE_INV_LEN","GE_LOS_OF_SIG","CRC", \
-                                        "ITW","LR"," BAD_OS","FRM_TRUNC"," FRM_LONG","CIR_STATE","CIR_UTIL","CIR_PKTLOSS","RTT", \
-                                        "JITTER","STATE_CHG","UTIL","PKTLOSS","IP_UTIL","IP_PKTLOSS","IP_RTT","IP_JITTER","TX_FCNT", \
-                                        "RX_FCNT","TX_THPUT","RX_THPUT","IO_RD","IO_WR","IO_RD_BYTES","IO_WR_BYTES", \
-                                        "RD_STATUS_TIME_8K","RD_STATUS_TIME_8_64K","RD_STATUS_TIME_64_512K","RD_STATUS_TIME_GE_512K", \
-                                        "WR_STATUS_TIME_8K","WR_STATUS_TIME_8_64K","WR_STATUS_TIME_64_512K","WR_STATUS_TIME_GE_512K", \
-                                        "RD_1stDATA_TIME_8K","RD_1stDATA_TIME_8_64K","RD_1stDATA_TIME_64_512K", \
-                                        "RD_1stDATA_TIME_GE_512K","WR_1stXFER_RDY_8K","WR_1stXFER_RDY_8_64K","WR_1stXFER_RDY_64_512K", \
-                                        "WR_1stXFER_RDY_GE_512K","RD_PENDING_IO_8K","RD_PENDING_IO_8_64K","RD_PENDING_IO_64_512K", \
-                                        "RD_PENDING_IO_GE_512K","WR_PENDING_IO_8K","WR_PENDING_IO_8_64K","WR_PENDING_IO_64_512K", \
-                                        "WR_PENDING_IO_GE_512K","SEC_DCC","SEC_HTTP","SEC_CMD","SEC_IDB","SEC_LV","SEC_CERT", \
-                                        "SEC_FCS","SEC_SCC","SEC_AUTH_FAIL","SEC_TELNET","SEC_TS","DAYS_TO_EXPIRE","EXPIRED_CERTS", \
-                                        "DID_CHG","FLOGI","FAB_CFG","EPORT_DOWN","FAB_SEG","ZONE_CHG","L2_DEVCNT_PER", \
-                                        "LSAN_DEVCNT_PER", "ZONE_CFGSZ_PER","BB_FCR_CNT","TEMP","FLASH_USAGE","CPU","MEMORY_USAGE", \
-                                        "ETH_MGMT_PORT_STATE","VTAP_IOPS","BAD_PWR","BAD_TEMP","BAD_FAN","FLASH_USAGE","MARG_PORTS", \
-                                        "FAULTY_PORTS","MISSING_SFP","ERR_PORTS","WWN_DOWN","DOWN_CORE","FAULTY_BLADE","HA_SYNC", \
-                                        "PS_STATE","FAN_STATE","SFP_STATE","BLADE_STATE","WWN","DEV_LATENCY_IMPACT", \
-                                        "BE_LATENCY_IMPACT","RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "ZONED_DEV_RATIO", "OVER_SUB_RATIO"]
+    monitor_list_for_traffic_perf =  [ "TX_FCNT", "RX_FCNT", "TX_THPUT", "RX_THPUT", "IO_RD", "IO_WR", "IO_RD_BYTES", "IO_WR_BYTES" ]
+    
+    monitor_list_for_monitor_type =  [ "CRC","ITW","LOSS_SYNC","LF","LOSS_SIGNAL","PE","LR","C3TXTO","STATE_CHG", \
+                                        "GE_CRC","GE_INV_LEN","GE_LOS_OF_SIG", \
+                                        "BAD_OS","FRM_TRUNC"," FRM_LONG","CIR_STATE","CIR_UTIL","CIR_PKTLOSS", \
+                                        "PKTLOSS","IP_UTIL","IP_PKTLOSS", \
+                                        "SEC_DCC","SEC_HTTP","SEC_CMD","SEC_IDB","SEC_LV","SEC_CERT", \
+                                        "SEC_FCS","SEC_SCC","SEC_AUTH_FAIL","SEC_TELNET","SEC_TS", \
+                                        "DID_CHG","FLOGI","FAB_CFG","EPORT_DOWN","FAB_SEG","ZONE_CHG", \
+                                        
+                                        "RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "ZONED_DEV_RATIO", "OVER_SUB_RATIO"]
+    
+    monitor_list_with_no_timebase =  [ "PWR_HRS", " RXP", "VOLTAGE", "CURRENT", "TXP", "SFP_TEMP", "VTAP_IOPS", "BE_LATENCY_IMPACT", \
+                                       "DAYS_TO_EXPIRE", "IP_JITTER", "IP_RTT", "JITTER", "RTT", "BLADE_STATE", "DEV_LATENCY_IMPACT", \
+                                       "DEV_NPIV_LOGINS", "FAN_STATE", "PS_STATE", "WWN", "TEMP", "BAD_FAN", "BAD_PWR", "BAD_TEMP", \
+                                       "CPU", "DOWN_CORE", "ETH_MGMT_PORT_STATE", "EXPIRED_CERTS", "FAULTY_BLADE", "FLASH_USAGE", \
+                                       "HA_SYNC", "MEMORY_USAGE", "WWN_DOWN", "BB_FCR_CNT", "ERR_PORTS", "FAULTY_PORTS", \
+                                       "L2_DEVCNT_PER", "LSAN_DEVCNT_PER", "MARG_PORTS", "MISSING_SFP", "ZONE_CFGSZ_PER", \
+                                       "SFP_STATE"  ]
     
     
     ###################################################################################################################
@@ -285,14 +290,15 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
                          "ALL_HOST_PORTS", "ALL_TARGET_PORTS" ]
 
     sfp_group_list  = [ "ALL_SFP", "ALL_10GSWL_SFP", "ALL_10GLWL_SFP", "ALL_16GSWL_SFP", "ALL_16GLWL_SFP", \
-                   "ALL_QSFP", "ALL_OTHER_SFP", "ALL_2K_QSFP", "ALL_100M_16GSWL_QSFP" ]
+                   "ALL_QSFP", "ALL_OTHER_SFP", "ALL_2K_QSFP", "ALL_100M_16GSWL_QSFP", "ALL_32GSWL_SFP", \
+                   "ALL_32GLWL_SFP", "ALL_32GSWL_QSFP", "ALL_25Km_16GLWL_SFP" ]
 
     circuit_group_list = [ "ALL_CIRCUITS", "ALL_CIRCUIT_F_QOS", "ALL_CIRCUIT_HIGH_QOS", "ALL_CIRCUIT_MED_QOS", "ALL_CIRCUIT_LOW_QOS" ]
 
     tunnel_group_list  = [ "ALL_TUNNELS", "ALL_TUNNEL_F_QOS", "ALL_TUNNEL_HIGH_QOS", "ALL_TUNNEL_MED_QOS", "ALL_TUNNEL_LOW_QOS" ]
     
     ip_logical_group_list = [ "ALL_TUNNEL_IP_HIGH_QOS", "ALL_TUNNEL_IP_MED_QOS", "ALL_TUNNEL_IP_LOW_QOS", \
-                             "ALL_CIRCUIT_IP_HIGH_QOS", "ALL_CIRCUIT_IP_MED_QOS", "ALL_CIRCUIT_IP_HIGH_QOS" ]
+                             "ALL_CIRCUIT_IP_HIGH_QOS", "ALL_CIRCUIT_IP_MED_QOS", "ALL_CIRCUIT_IP_LOW_QOS" ]
 
     ext_ge_group_list = [ "ALL_EXT_GE_PORTS"]
 
@@ -310,33 +316,123 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     asic_group_list          = [ "ALL_ASICS" ]
     certs_group_list         = [ "ALL_CERTS" ]
     
+    all_groups_list   = fc_logical_group_list + sfp_group_list + circuit_group_list + tunnel_group_list + ip_logical_group_list \
+                        + ext_ge_group_list + temp_sensor_group_list + fan_group_list + power_supply_group_list + wwn_group_list \
+                        + blade_group_list + flash_group_list + switch_group_list + chassis_group_list + d_group_list \
+                        + be_ports_group_list + quarantined_group_list + asic_group_list + certs_group_list
+    
+    monitor_list_combined  =  monitor_list_for_ios + monitor_list_for_traffic_perf + monitor_list_for_monitor_type + monitor_list_with_no_timebase
+    
     timebase_list = ["min", "hour", "day", "none"]
     
     operator_list = [ "l", "le", "g", "ge", "eq" ]
     
-    actions_lsit = [ "raslog", "email", "snmp", "fence", "decom", "fms", "none", ]  #### do we need other actions here - sddq 
+    actions_list = [ "raslog", "email", "snmp", "fence", "fence,decom", "fms", "none", "sfp_marginal", "sw_marginal", "sw_critical"]  #### do we need other actions here - sddq 
     
     cons_out = anturlar.fos_cmd("mapspolicy --create Nervio_test_1")
-    rule_name = "monitor_test_and_extra_characters___"
+    rule_name = "monitor_test__extra_characters_"
     stopnow = 0
-    stophere = 10000
+    stophere = 100000
     monitor_number = 0
     
-    if add_all:
-        for r in fc_logical_group_list:
-            for p in monitor_list_for_ios:
-                rule_to_add  = rule_name + str(monitor_number)
-                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-                                        % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-                monitor_number += 1 
-     
-        for r in fc_logical_group_list:
-            for p in monitor_list_for_monitor_type:
-                rule_to_add  = rule_name + str(monitor_number)
-                cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-                                        % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-                monitor_number += 1    
+    
+    f = "%s"%("logs/MAPS_RULES_ADD_ALL_CAPTURE_file.txt")
+    
+    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
         
+    header = "%s%s" % ("\nMAPS RULES   CAPTURE FILE \n", "  sw_info ipaddr \n==============================\n\n")  
+    ff.write(header)
+    ff.close()
+    
+    ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
+    #ff.write(str(sw_info_ls))
+    ff.write("\n"*2)
+    
+    
+    if add_all:
+        
+        for r in all_groups_list:
+            cleanup_all_rules()
+            
+            
+            for p in monitor_list_combined:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                    
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        
+        ff.close()
+        #
+        #for r in all_groups_list:
+        #    for p in monitor_list_for_ios:
+        #        for a in actions_list:
+        #            
+        #        
+        #            rule_to_add  = rule_name + str(monitor_number)
+        #            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        #                                    % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+        #            
+        #            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
+        #                monitor_number += 1 
+        #                ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
+        #
+        #
+        #for r in all_groups_list:
+        #    for p in monitor_list_for_traffic_perf:
+        #        rule_to_add  = rule_name + str(monitor_number)
+        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        #                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+        #        
+        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
+        #            monitor_number += 1    
+        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
+        ##for r in fc_logical_group_list:
+        ##    for p in monitor_list_for_ios:
+        ##        rule_to_add  = rule_name + str(monitor_number)
+        ##        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        ##                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+        ##        
+        ##        if "Invalid Monitor" not in cons_out:
+        ##            monitor_number += 1 
+        ##        ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
+        #
+        #for r in all_groups_list:
+        #    for p in monitor_list_for_monitor_type:
+        #        rule_to_add  = rule_name + str(monitor_number)
+        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        #                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+        #        
+        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
+        #            monitor_number += 1    
+        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
+        #     
+        #     
+        #for r in all_groups_list:
+        #    for p in monitor_list_with_no_timebase:
+        #        rule_to_add  = rule_name + str(monitor_number)
+        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        #                                % (rule_to_add, r, p , operator_list[2], ))
+        #        
+        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
+        #            monitor_number += 1    
+        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
+        ##for r in fc_logical_group_list:
+        ##    for p in monitor_list_for_monitor_type:
+        ##        rule_to_add  = rule_name + str(monitor_number)
+        ##        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
+        ##                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
+        ##        
+        ##        if "Invalid Monitor" not in cons_out:
+        ##            monitor_number += 1    
+        ##        ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
     
     
     if add_max:

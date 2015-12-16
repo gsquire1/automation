@@ -985,10 +985,13 @@ def sw_set_pwd_timeout(pswrd, tn):
     reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
     reg_login = [ b"login:"]
     reg_assword = [ b"assword: ", b"root> "]
-    reg_change_pass = [ b"key to proceed", b"incorrect" ]
+    reg_change_pass = [ b"key to proceed.", b"incorrect" ]
     reg_complete   = [ b"zation completed", b"root> "]
     reg_linertn    = [ b"\\r\\n" ]
     
+    
+    
+    print("@"*80)
     print("\n\nlooking for completed task or root>\n\n")
     capture = tn.expect(reg_complete, 10)
     tn.write(b"\n")
@@ -1038,6 +1041,10 @@ def sw_set_pwd_timeout(pswrd, tn):
     capture = tn.expect(reg_list, 20)
     tn.write(b"timeout 0 \n")
     capture = tn.expect(reg_list, 20)
+    
+    
+    #sys.exit()
+    
     
     return(True)
    
@@ -2004,6 +2011,7 @@ def main():
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
     print("HERE WE ARE WAITING FOR THE SWITCH TO REBOOT SOMETIMES TOO LONG OTHERS NOT LONG ENOUGH")
+    
     print(cons_out)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("IF WE SEE BASH PROMPT HAS BEEN DETECTED WE CAN TAKE OUT THE WAIT 600")
@@ -2028,15 +2036,18 @@ def main():
     ####
     ####  add the config from a file
     ####
+    ####  login 
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
         
-        if tn == "":
-            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    
+    #    if tn == "":
+    #        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    #
+        
     except:
-        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    
+        sys.exit()
+    #    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    #
     
     
     cons_out = sw_set_pwd_timeout(usr_psswd, tn)
