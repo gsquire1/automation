@@ -302,6 +302,8 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
 
     ext_ge_group_list = [ "ALL_EXT_GE_PORTS"]
 
+    ext_all_groups  = circuit_group_list + tunnel_group_list + ip_logical_group_list + ext_ge_group_list
+
     temp_sensor_group_list   = [ "ALL_TS" ]
     fan_group_list           = [ "ALL_FAN" ] 
     power_supply_group_list  = [ "ALL_PS" ]
@@ -316,13 +318,12 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     asic_group_list          = [ "ALL_ASICS" ]
     certs_group_list         = [ "ALL_CERTS" ]
     
-    all_groups_list   = fc_logical_group_list + sfp_group_list + circuit_group_list + tunnel_group_list + ip_logical_group_list \
-                        + ext_ge_group_list + temp_sensor_group_list + fan_group_list + power_supply_group_list + wwn_group_list \
+    all_other_groups_list   =  temp_sensor_group_list + fan_group_list + power_supply_group_list + wwn_group_list \
                         + blade_group_list + flash_group_list + switch_group_list + chassis_group_list + d_group_list \
                         + be_ports_group_list + quarantined_group_list + asic_group_list + certs_group_list
     
     monitor_list_combined  =  monitor_list_for_ios + monitor_list_for_traffic_perf + monitor_list_for_monitor_type + monitor_list_with_no_timebase
-    
+    monitor_list_quick_sfp =  monitor_list_with_no_timebase
     timebase_list = ["min", "hour", "day", "none"]
     
     operator_list = [ "l", "le", "g", "ge", "eq" ]
@@ -336,104 +337,116 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     monitor_number = 0
     
     
-    f = "%s"%("logs/MAPS_RULES_ADD_ALL_CAPTURE_file.txt")
-    
-    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-        
-    header = "%s%s" % ("\nMAPS RULES   CAPTURE FILE \n", "  sw_info ipaddr \n==============================\n\n")  
-    ff.write(header)
-    ff.close()
-    
-    ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-    #ff.write(str(sw_info_ls))
-    ff.write("\n"*2)
-    
+    #f = "%s"%("logs/MAPS_RULES_ADD_ALL_CAPTURE_file.txt")
+    #
+    #ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+    #    
+    #header = "%s%s" % ("\nMAPS RULES   CAPTURE FILE \n", "  sw_info ipaddr \n==============================\n\n")  
+    #ff.write(header)
+    #ff.close()
+    #
+    #ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
+    ##ff.write(str(sw_info_ls))
+    #ff.write("\n"*2)
+    if add_all:
+        f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS_quick_test.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in sfp_group_list:
+            cleanup_all_rules()
+            for p in monitor_list_quick_sfp:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        ff.close()
     
     if add_all:
-        
-        for r in all_groups_list:
+        f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in sfp_group_list:
             cleanup_all_rules()
-            
+            for p in monitor_list_combined:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        ff.close()
+        #
+        f = "%s" % ("logs/MAPS_RULES_PORT_GROUPS.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in fc_logical_group_list:
+            cleanup_all_rules()
+            for p in monitor_list_combined:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        ff.close()
+        
+        f = "%s" % ("logs/MAPS_RULES_EXT_GROUPS.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in ext_all_groups:
+            cleanup_all_rules()
+
             
             for p in monitor_list_combined:
                 cleanup_all_rules()
                 for t in timebase_list:
                     for o in operator_list:
                         for a in actions_list:
-                
                             rule_to_add  = rule_name + str(monitor_number)
                             cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
                                             % (rule_to_add, r, p, t, o, a ))
-                    
                             if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
-        
         ff.close()
-        #
-        #for r in all_groups_list:
-        #    for p in monitor_list_for_ios:
-        #        for a in actions_list:
-        #            
-        #        
-        #            rule_to_add  = rule_name + str(monitor_number)
-        #            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        #                                    % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-        #            
-        #            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
-        #                monitor_number += 1 
-        #                ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-        #
-        #
-        #for r in all_groups_list:
-        #    for p in monitor_list_for_traffic_perf:
-        #        rule_to_add  = rule_name + str(monitor_number)
-        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        #                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-        #        
-        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
-        #            monitor_number += 1    
-        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-        ##for r in fc_logical_group_list:
-        ##    for p in monitor_list_for_ios:
-        ##        rule_to_add  = rule_name + str(monitor_number)
-        ##        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        ##                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-        ##        
-        ##        if "Invalid Monitor" not in cons_out:
-        ##            monitor_number += 1 
-        ##        ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-        #
-        #for r in all_groups_list:
-        #    for p in monitor_list_for_monitor_type:
-        #        rule_to_add  = rule_name + str(monitor_number)
-        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        #                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-        #        
-        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
-        #            monitor_number += 1    
-        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-        #     
-        #     
-        #for r in all_groups_list:
-        #    for p in monitor_list_with_no_timebase:
-        #        rule_to_add  = rule_name + str(monitor_number)
-        #        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        #                                % (rule_to_add, r, p , operator_list[2], ))
-        #        
-        #        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out:
-        #            monitor_number += 1    
-        #            ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-        ##for r in fc_logical_group_list:
-        ##    for p in monitor_list_for_monitor_type:
-        ##        rule_to_add  = rule_name + str(monitor_number)
-        ##        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action raslog,email -policy Nervio_test_1" \
-        ##                                % (rule_to_add, r, p ,timebase_list[0], operator_list[2], ))
-        ##        
-        ##        if "Invalid Monitor" not in cons_out:
-        ##            monitor_number += 1    
-        ##        ff.write("\n--  %s  --  %s  --  %s    --END  "  %  (r, p, cons_out))
-    
+        
+        f = "%s" % ("logs/MAPS_RULES_ALL_OTHERS.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in all_other_groups_list:
+            cleanup_all_rules()
+            for p in monitor_list_combined:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        ff.close()
+        
+        
+        
+    ###################################################################################################################
+    ###################################################################################################################
+    ####
+    ####  this section adds rules to a switch until the max is reached.
+    ####
+    ####
+    ###################################################################################################################
+    ###################################################################################################################
     
     if add_max:
         while stopnow < stophere:

@@ -67,7 +67,7 @@ def header(theargs, these):
 ###############################################################################
 
 def testprocess( theargs, run_these, password ):
-    print("\n\n\n")
+    print("\n"*60)
     print("="*60)
     #header(theargs, run_these)
     #print(theargs)
@@ -79,12 +79,12 @@ def testprocess( theargs, run_these, password ):
                 
     #tn = anturlar.connect_tel(theargs, password )
     tn = anturlar.connect_tel_noparse(host_ip, user, password )
-    print("@@"*40)
-    print("IN BIRLINNN Just after the connect to telnet")
-    print("@@"*40)
-    conout = anturlar.fos_cmd("version")
-    print(conout)
-    print("@@"*40)
+    #print("@@"*40)
+    #print("IN BIRLINNN Just after the connect to telnet")
+    #print("@@"*40)
+    #conout = anturlar.fos_cmd("version")
+    #print(conout)
+    #print("@@"*40)
 
     for i in run_these:
         print("run these test   %s"%i )

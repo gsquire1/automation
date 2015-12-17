@@ -2153,7 +2153,7 @@ def connect_tel_noparse(HOST,usrname,password, *args):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        tn.set_debuglevel(9)
+        tn.set_debuglevel(0)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\n")
         if password:
@@ -2183,19 +2183,19 @@ def connect_tel_noparse(HOST,usrname,password, *args):
                 badlog0 = capture_t[0]
                 capture = capture.decode()
             #sys.exit()
-            print("\n"*35)
-            print("\n========================================================\n"*20)
-            print("\nIN ANTURLAR  TELNET NOPARE login with fibranne  ")
-            print("\n========================================================\n"*20)
-            print(capture)
-            print(type(capture))
-            capture_k = capture_k[0]
-            print("CAPTURE K   \n\n")
-            print(capture_k)
-            print("CAPTURE K   \n\n\n\n\n\n")
+            #print("\n"*35)
+            #print("\n========================================================\n"*20)
+            #print("\nIN ANTURLAR  TELNET NOPARE login with fibranne  ")
+            #print("\n========================================================\n"*20)
+            #print(capture)
+            #print(type(capture))
+            #capture_k = capture_k[0]
+            #print("CAPTURE K   \n\n")
+            #print(capture_k)
+            #print("CAPTURE K   \n\n\n\n\n\n")
             
             if capture_k == 8:
-                print("FOUND THE key to proceed WORKDS")
+                print("FOUND THE key to proceed WORDS")
                 print(capture_k)
              
             #if str("key to proceed") in capture:
@@ -2213,15 +2213,17 @@ def connect_tel_noparse(HOST,usrname,password, *args):
                 print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"*20)
                 sys.exit()
              
-        print("\nLEAVING LOGIN PROCEDURE             "*20)    
+        #print("\nLEAVING LOGIN PROCEDURE             "*20)    
         print(capture)
         return(tn)      
     
     except EOFError:
-        print("========================")
-        print("handle the EOF case here")
-        print("========================")
-        pass
+        print("==================================")
+        print("  handle the EOF case here        ")
+        print("   anturlar  connect_tel_no_parse ")
+        print("==================================")
+        sys.exit()
+        
     
 def connect_tel_noparse_power(HOST,usrname,password, *args):
     global tn
