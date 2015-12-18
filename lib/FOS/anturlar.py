@@ -260,7 +260,7 @@ class SwitchInfo:
         #tn.set_debuglevel(9)
         capture_cmd = fos_cmd("switchshow")
         if self.am_i_director:
-            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,4})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG123486]{2,4})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
         else:
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
             ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9a-f]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+((FC)\s*(?=\\n))')
@@ -275,11 +275,11 @@ class SwitchInfo:
         capture_cmd = fos_cmd("switchshow")
         if self.am_i_director :
             #ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+(FC)\s+([->\w]{6,8})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,8})([()-:\"_=\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,4})\s+([-\d]+)\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG123486]{2,4})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,8})([()-:\"_=\w\s\d]*?(?=\\n))')
         else:
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+(Online)\s+[FCVE]\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')  
             #ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+(FC)\s+([->\w]{6,14})\s+([()-:\"_\w\s\d]*?(?=\\n))')
-            ras = re.compile('\s?([0-9]{1,3})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG12486]{2,3})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
+            ras = re.compile('\s?([0-9]{1,4})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG123486]{2,4})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
         
@@ -301,7 +301,7 @@ class SwitchInfo:
         fcr = self.fcr_enabled()
         base = self.base_check()
         
-        return [switchname, ip_addr, director, vf, fcr, base]
+        return[switchname, ip_addr, director, vf, fcr, base]
         
         #Example on how to print Human readable results:
         #print('\n\n'+ '='*20)
@@ -348,7 +348,7 @@ class SwitchInfo:
                 return(myip)
             else:
                 print("\n\n NO IP FOUND \n\n")
-                return (0)
+                return(0)
         except:
             return("COULD NOT MATCH IP ADDRESS")
     
@@ -424,7 +424,7 @@ class SwitchInfo:
 
         if not ras_result:
             ras_result = "no port found"
-        return port_list
+        return(port_list)
     
     def allow_xisl(self):
         """
@@ -512,7 +512,7 @@ class SwitchInfo:
            base = (match.group('base'))
            return(base)
         else:
-           return (False)
+           return(False)
     
     def blade_search_8GB(self):
         """
@@ -640,7 +640,7 @@ class SwitchInfo:
             default = (match.group('default'))
             return(default)
         else:
-            return (0)
+            return(0)
 
     def director(self):
         """
@@ -818,9 +818,9 @@ class SwitchInfo:
         ras = re.search(r'Rbridge', capture_cmd)
         print(ras)
         if ras:
-            return True
+            return(True)
         else:
-            return False
+            return(False)
             
     def n_ports(self):
         """
@@ -1030,7 +1030,7 @@ class SwitchInfo:
         #print("Base configured :  %s" % initial_checks[5])
         #print('='*20 + '\n\n')
         #switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
-        return (initial_checks)
+        return(initial_checks)
     
     def switch_type(self):
         """
@@ -1060,9 +1060,9 @@ class SwitchInfo:
                 return(False)
             
         if "HA State synchronized" in capture_cmd:
-            return True
+            return(True)
         else:
-            return False
+            return(False)
     
     
     
@@ -1104,10 +1104,10 @@ class SwitchInfo:
         foscfg = re.search( '(requires)', capture_cmd, re.M|re.I)
         if foscfg:
             #print("\n\n\nVF not enabled on this switch\n\n\n")
-            return (False)
+            return(False)
         else:
             #print("\n\n\nVF is enabled on this switch\n\n\n")
-            return (True)
+            return(True)
 
 class FcrInfo(FabricInfo, SwitchInfo):
     """
@@ -1239,7 +1239,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
             ff.write(header)
             ff.write(cons_out+"\n")
             ff.close()
-        
+        return(True)
 
     def ipv4_fcr(self):
         """
@@ -1254,7 +1254,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
             
         if not ras_result_all:
             ras_result_all = None 
-        return ras_result_all
+        return(ras_result_all)
 
     def ipv4_fid_export_fcr(self):
         """
@@ -1267,7 +1267,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
         ras_result_all = ras.findall(capture_cmd) 
         if not ras_result_all:
             ras_result_all = None
-        return ras_result_all 
+        return(ras_result_all) 
 
     def portcfgfillword(self, cfgvalue):
         """
@@ -1581,6 +1581,8 @@ class ConfigSwitch(SwitchInfo):
                 for r in rl:
                     print(r)
                 print("2222222222222222222222222222222222222222222222")
+                ########'Are you sure you want to fail over to the standby '
+
                 #### create slot port pair from the list 
                 if len(rl) >= 2:
                     for index in range(0,len(rl),2):
@@ -2062,7 +2064,7 @@ def login(pw=""):
     if pw == "":
         pw = getpass.getpass()
     conn_value = connect_tel(pa,pw)
-    return conn_value
+    return(conn_value)
 
 def close_tel():
     global tn
