@@ -331,29 +331,39 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
     actions_list = [ "raslog", "email", "snmp", "fence", "fence,decom", "fms", "none", "sfp_marginal", "sw_marginal", "sw_critical"]  #### do we need other actions here - sddq 
     
     cons_out = anturlar.fos_cmd("mapspolicy --create Nervio_test_1")
-    rule_name = "monitor_test__extra_characters_"
+    rule_name = "monitor_test___"
     stopnow = 0
     stophere = 100000
     monitor_number = 0
     
     
-    #f = "%s"%("logs/MAPS_RULES_ADD_ALL_CAPTURE_file.txt")
-    #
-    #ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-    #    
-    #header = "%s%s" % ("\nMAPS RULES   CAPTURE FILE \n", "  sw_info ipaddr \n==============================\n\n")  
-    #ff.write(header)
-    #ff.close()
-    #
-    #ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-    ##ff.write(str(sw_info_ls))
-    #ff.write("\n"*2)
+ 
+    #if add_all:
+    #    f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS_quick_test.txt")
+    #    ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+    #    for r in sfp_group_list:
+    #        cleanup_all_rules()
+    #        for p in monitor_list_quick_sfp:
+    #            cleanup_all_rules()
+    #            for t in timebase_list:
+    #                for o in operator_list:
+    #                    for a in actions_list:
+    #                        rule_to_add  = rule_name + str(monitor_number)
+    #                        cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+    #                                        % (rule_to_add, r, p, t, o, a ))
+    #                        if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+    #                            monitor_number += 1 
+    #                            ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+    #    ff.close()
+    
     if add_all:
-        f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS_quick_test.txt")
+        f = "%s" % ("logs/MAPS_RULES_EXT_GROUPS.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-        for r in sfp_group_list:
+        for r in ext_all_groups:
             cleanup_all_rules()
-            for p in monitor_list_quick_sfp:
+
+            
+            for p in monitor_list_combined:
                 cleanup_all_rules()
                 for t in timebase_list:
                     for o in operator_list:
@@ -365,8 +375,24 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
         ff.close()
-    
-    if add_all:
+        #
+        f = "%s" % ("logs/MAPS_RULES_ALL_OTHERS.txt")
+        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        for r in all_other_groups_list:
+            cleanup_all_rules()
+            for p in monitor_list_combined:
+                cleanup_all_rules()
+                for t in timebase_list:
+                    for o in operator_list:
+                        for a in actions_list:
+                            rule_to_add  = rule_name + str(monitor_number)
+                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
+                                            % (rule_to_add, r, p, t, o, a ))
+                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
+                                monitor_number += 1 
+                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+        ff.close()
+        #
         f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
         for r in sfp_group_list:
@@ -400,50 +426,14 @@ def add_rules_each_monitor_type(add_max=False, add_all=True):
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
         ff.close()
-        
-        f = "%s" % ("logs/MAPS_RULES_EXT_GROUPS.txt")
-        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-        for r in ext_all_groups:
-            cleanup_all_rules()
-
-            
-            for p in monitor_list_combined:
-                cleanup_all_rules()
-                for t in timebase_list:
-                    for o in operator_list:
-                        for a in actions_list:
-                            rule_to_add  = rule_name + str(monitor_number)
-                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
-                                            % (rule_to_add, r, p, t, o, a ))
-                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
-                                monitor_number += 1 
-                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
-        ff.close()
-        
-        f = "%s" % ("logs/MAPS_RULES_ALL_OTHERS.txt")
-        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-        for r in all_other_groups_list:
-            cleanup_all_rules()
-            for p in monitor_list_combined:
-                cleanup_all_rules()
-                for t in timebase_list:
-                    for o in operator_list:
-                        for a in actions_list:
-                            rule_to_add  = rule_name + str(monitor_number)
-                            cons_out = anturlar.fos_cmd("mapsrule --create %s -group %s -monitor %s -timebase %s -op %s -value 0 -action %s -policy Nervio_test_1" \
-                                            % (rule_to_add, r, p, t, o, a ))
-                            if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
-                                monitor_number += 1 
-                                ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
-        ff.close()
-        
-        
-        
+        #
+        #
     ###################################################################################################################
     ###################################################################################################################
     ####
-    ####  this section adds rules to a switch until the max is reached.
-    ####
+    ####  this section adds rules to a switch until the max is reached.(it will continue after the max is reached)
+    ####    this failed for 'unable to communicate with deamon'  mdd in 8.0.0  and should be fixed in 8.0.1
+    ####    
     ####
     ###################################################################################################################
     ###################################################################################################################
