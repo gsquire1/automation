@@ -1820,7 +1820,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     for kk,vv in d_switch_name.items():
         print(kk,vv)    #### print switchnames
     print('*'*80)
-    sys.exit()
+    #sys.exit()
     
     f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
