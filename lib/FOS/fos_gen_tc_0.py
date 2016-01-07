@@ -269,17 +269,27 @@ def fabric_switch_config_show():
     ff.write("#############################################################\r\n")
     ff.write("#############################################################\r\n")
     ff.write("#############################################################\r\n")
+    #for ip in fab_ip_list:
+    #    tnnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+    #    firmware_ver = check_version()
+    #    m_info          = anturlar.Maps()
+    #    chass_name      = m_info.chassisname()
+    #    
+    #    ip_firm_ver_pair = "%s\t\t%s\t\t%s " % ( ip,chass_name,firmware_ver)
+    # 
+    #    ff.write("\r\n")
+    #    ff.write(ip_firm_ver_pair)
+    #
+    #ff.write("\n"*5)
+        
     for ip in fab_ip_list:
         tnnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
         firmware_ver = check_version()
         m_info          = anturlar.Maps()
         chass_name      = m_info.chassisname()
+        sf = "{0:18}   {1:25}   {2:25}"
+        print(sf.format( str(ip), str(chass_name), str(firmware_ver) ), file=ff)
         
-        ip_firm_ver_pair = "%s\t\t%s\t\t%s " % ( ip,chass_name,firmware_ver)
-     
-        ff.write("\r\n")
-        ff.write(ip_firm_ver_pair)
-    
     ff.write("\r\n")
     ff.write("#############################################################\r\n")
     ff.write("#############################################################\r\n")

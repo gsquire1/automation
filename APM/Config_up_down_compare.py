@@ -752,6 +752,7 @@ def main():
     ###################################################################################################################
     ####
     #### hafailover or hareboot on pizza box
+    ####  call the failover function from cofra and send the number of failovers
     ####
     tn = cofra.ha_failover(10)
     
@@ -800,6 +801,7 @@ def main():
     
     if steps_to_run == 2 or steps_to_run == 3:
         liabhar.JustSleep(10)
+        liabhar.count_down(360)
         #cons_out = anturlar.fos_cmd("setcontext 128")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
@@ -814,11 +816,11 @@ def main():
         print("#"*80)
         print("#"*80)
         print("#######")
-        print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @@@@@")
-        print("#######     @  @    @       @      @   @   @        @")
-        print("#######     @@@     @@@@    @@@@   @   @   @        @")
-        print("#######     @  @    @           @  @   @   @        @")
-        print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @")
+        print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @  ")
+        print("#######     @  @    @       @      @   @   @        @     @  ")
+        print("#######     @@@     @@@@    @@@@   @   @   @        @     @  ")
+        print("#######     @  @    @           @  @   @   @        @        ")
+        print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
         print("#"*80)
         print("#"*80)
         
