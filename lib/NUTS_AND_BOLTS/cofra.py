@@ -1668,7 +1668,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     si = anturlar.SwitchInfo()
     mi = anturlar.Maps()
     fi = anturlar.FlowV()
-    fcr = anturlar.FcrInfo() ################################NEW
+    fcr = anturlar.FcrInfo()
     
     vdx                  = si.nos_check()
     switch_ip            = si.ipaddress()
@@ -1687,7 +1687,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     vf_enabled           = si.vf_enabled()
     sw_type              = si.switch_type()
     base_sw              = si.base_check()
-    ex_ports             = fcr.all_ex_ports() ###########################NEW
+    ex_ports             = fcr.all_ex_ports() 
     fcr_state            = si.fcr_enabled()
     ports_and_ls         = si.all_ports_fc_only()
     psw_reset_value      = "YES"
@@ -1706,18 +1706,20 @@ def get_info_from_the_switch(extend_name="", fid=128):
     #### create a dict for ls and ports in the ls or anything that could be different
     ####    from each logical switch
     ####
-    k = str(first_ls)    #### craete a key with the command name
+    k = str(first_ls)    #### create a key with the command name
                                #### and pid added together
     v = ports_and_ls     #### create the value as a list otherwise the first one
                          #### is a string and extend command later on will fail
-    d_port_list = {k:v}     #### create the first dictionary entry ras[0]
-    #v_sn = theswitch_name
+    
+    d_port_list            = {k:v}     #### create the first dictionary entry ras[0]
     d_switch_name          = {k:theswitch_name}
     d_domain_list          = {k:switch_id}
     d_xisl_state           = {k:xisl_st_per_ls}
     d_flow_names           = {k:flow_per_ls}
     d_maps_policy          = {k:maps_policy_sum}
     d_maps_non_dflt_policy = {k:maps_non_dflt_policy}
+    #d_ex_ports             = {k:ex_ports}
+
     
     ####
     ###########################################################################
@@ -1733,7 +1735,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
         flow_per_ls          = fi.flow_names()
         maps_policy_sum      = mi.get_policies()
         maps_non_dflt_policy = mi.get_nondflt_policies()
-    
+        #ex_ports             = fcr.all_ex_ports()
         
         #if ls != str(first_ls):
             #value = []
@@ -1747,8 +1749,8 @@ def get_info_from_the_switch(extend_name="", fid=128):
         d_flow_names[ls]           = flow_per_ls
         d_maps_policy[ls]          = maps_policy_sum
         d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
-            
-            
+        if ls == base_sw: ###########################NEW 
+            d_ex_ports         = {base_sw:ex_ports}
             
     #ls = fid
     #cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
@@ -1780,7 +1782,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     switch_dict["domain_list"]  = d_domain_list
     switch_dict["ls_list"]      = ls_list
     switch_dict["base_sw"]      = base_sw
-    switch_dict["ex_ports"]     = ex_ports #############################NEW
+    switch_dict["ex_ports"]     = d_ex_ports
     switch_dict["xisl_state"]   = d_xisl_state
     switch_dict["switch_type"]  = sw_type
     switch_dict["cp_ip_list"]   = switch_cp_ips
@@ -1800,7 +1802,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     print("LS LIST           :  %s  " % ls_list)
     print("DEFAULT SWITCH    :  %s  " % deflt_switch)
     print("BASE SWITCH       :  %s  " % base_sw)
-    print("EX_PORTS          :  %s  " % ex_ports)######################NEW
+    print("EX_PORTS          :  %s  " % d_ex_ports)######################NEW
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   " )
@@ -1818,6 +1820,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     for kk,vv in d_switch_name.items():
         print(kk,vv)    #### print switchnames
     print('*'*80)
+    sys.exit()
     
     f = "%s%s%s"%("logs/Switch_Info_",switch_ip,"_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
@@ -1830,7 +1833,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     ff.write("LS LIST                  :  %s  \n" % ls_list)
     ff.write("DEFAULT SWITCH           :  %s  \n" % deflt_switch)
     ff.write("BASE SWITCH              :  %s  \n" % base_sw)
-    ff.write("EX_PORTS                 :  %s  \n" % ex_ports)############################NEW
+    ff.write("EX_PORTS                 :  %s  \n" % d_ex_ports)############################NEW
     ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
     ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
     ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)

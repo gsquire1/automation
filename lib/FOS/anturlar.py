@@ -1002,7 +1002,8 @@ class SwitchInfo:
            return the current switchname
         """
         capture_cmd = fos_cmd("switchshow")
-        ras = re.compile('switchName:\s+([_\d\wA-Za-z]{1,30})') 
+        #ras = re.compile('switchName:\s+([_\d\wA-Za-z]{1,30})')
+        ras = re.compile('switchName:\s+([_\-\d\wA-Za-z]{1,30})')###added "\-" to capture hyphen
         ras = ras.findall(capture_cmd)
         print(ras)
         sn = str(ras[0])
