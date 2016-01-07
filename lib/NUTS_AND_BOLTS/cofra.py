@@ -1173,25 +1173,60 @@ def ha_failover( times=2):
                 print("@"*60)
                 print("HA Failovers remaining -- %s " % times)
                 print("@"*60)
+                times -= 1
                 tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
                 liabhar.count_down(60)
                 sw_info = anturlar.SwitchInfo()
-                while sw_info.synchronized() is False:
+                do_the_failover = sw_info.synchronized()
+                print("\n\n")
+                print("@"*60)
+                print("VALUE OF do_the_failover is   --   %s   " % do_the_failover)
+                print("@"*60)
+                while  do_the_failover is False:
                     liabhar.count_down(360)
-                                
+                    do_the_failover = sw_info.synchronized()
+                    
+                    print("\n\n")
+                    print("@"*60)
+                    print("VALUE OF do_the_failover is   --   %s   " % do_the_failover)
+                    print("@"*60)
+                    
+                    
+                    
                 sw_info = anturlar.fos_cmd("echo Y | hafailover")
+                print("\n\n")
+                print("@"*60)
+                print("SENT THE FAILOVER COMMAND   \n")
+                print("VALUE OF sw_info  is   --   %s   " % sw_info)
+                print("@"*60)
+                #### looks like when the hafailover is sent the telnet disconnects.
+                ####   then the code below is not run because the script goes back to
+                ####    the try;  except: for the fos_cmd ?  telnet connections ?
+                ####
+                ####
+                anturlar.JustSleep(20)
                 ####  add error checking here
                 ####   get the same data as before the while loop and compare
                 if "Not supported" in sw_info:
                     sw_info = anturlar.fos_cmd("hareboot")
                 
+                
+                print("\n\n")
+                print("@"*60)
+                print("LOOKING FOR can't failover in sw_info  \n")
+                print("VALUE OF sw_info  is   --   %s   " % sw_info)
+                print("@"*60)
+                
                 if "can't failover" in sw_info:
                     print("\n\n\nSwitch Not Ready")
                     print("Need to wait for LS/HA progress to complete\n\n")
                     liabhar.count_down(300)
-                else:
-                    times -= 1
+                
+                
+                #times -= 1
                 #liabhar.count_down(30)
+                sw_info = ""
+                
         
         except:
         #except SocketError as e:
