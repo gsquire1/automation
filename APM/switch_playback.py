@@ -138,6 +138,7 @@ def info_help_OSError():
     print("\t77       DCX-4S\n\t83       7800\n\t109      6510\n\t118      6505\n")
     print("\t120      DCX 8510-8\n\t121      DCX 8510-4")
     print("\t133      6520/Odin\n\t148      Skybolt ")
+    print("\t165      Venator\n\t166      Allegiance ")
     print("\n"*5)
     sys.exit()
 
@@ -292,7 +293,13 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     
     db = 9
     capture = ""
-    
+    ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
+    gw_octet = ras.findall(gateway_ip)
+    gw_octet = int(gw_octet[0])
+    if gw_octet == 128:
+        fake_ip = "10.38.134.2"
+    else:
+        fake_ip = "10.38.34.100"
     tn.set_debuglevel(db)
     #tn.write(b"printenv\n")
     reg_list = [b"=>"]
@@ -324,7 +331,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
     if swtype == '162' or swtype == '166' or swtype == '165':   #### HANDLE WEDGE and Allegiance bootargs here
-        bootargs  = "root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+        bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
     if swtype == '166' or swtype == '165': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
         ethact = "FM2@DTSEC4"
@@ -351,7 +358,8 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     tn.write(s.encode('ascii'))
     capture = tn.expect(reg_list, 30)
     
-    i = ("setenv ipaddr 10.38.34.223\n")
+    #i = ("setenv ipaddr 10.38.134.2\n")
+    i = ("setenv ipaddr %s\n" % fake_ip)
     tn.write(i.encode('ascii'))
     capture = tn.expect(reg_list, 30)
     
@@ -2073,7 +2081,7 @@ def main():
     ####
     ###################################################################################################################
     print("USE USER INPUTED FILE NAME OR DEFAULT")
-    
+    sys.exit()
     #cc = cofra.SwitchUpdate("for_playback")
     cc = cofra.SwitchUpdate(pa.filename)
     
