@@ -1784,8 +1784,12 @@ def get_info_from_the_switch(extend_name="", fid=128):
         d_flow_names[ls]           = flow_per_ls
         d_maps_policy[ls]          = maps_policy_sum
         d_maps_non_dflt_policy[ls] = maps_non_dflt_policy
+        
+        d_ex_ports             =  {"NA"}
         if ls == base_sw: ###########################NEW 
             d_ex_ports         = {base_sw:ex_ports}
+        
+        
             
     #ls = fid
     #cons_out             = anturlar.fos_cmd("setcontext %s " % ls)
