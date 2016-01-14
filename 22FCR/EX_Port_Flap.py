@@ -65,96 +65,61 @@ import time
 ###############################################################################
 
 
-#def parent_parser():
-#    
-#    pp = argparse.ArgumentParser(add_help=False)
-#    #pp.add_argument("--repeat", help="repeat repeat")
-#    #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-#    #pp.add_argument("ip", help="IP address of SUT")
-#    #pp.add_argument("user", help="username for SUT")
-#    #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
-#    pp.add_argument('-iter', '--iterations', type=int, default = 1, help="Number of iterations to run")
-#    pp.add_argument('-t', '--time', type=int, default = 1, help="Time between interations in seconds")
-#    group = pp.add_mutually_exclusive_group()
-#    group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
-#    group.add_argument("-q", "--quiet", action="store_true")
-#    return pp
-
 def parent_parser():
     
     pp = argparse.ArgumentParser(add_help=False)
     #pp.add_argument("--repeat", help="repeat repeat")
     #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-    pp.add_argument("-fa", "--file_action", help="0 to stop after creating file 1 to create new file and continue 2 skip file create and use your own file", type=int, default=0 )
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
+    pp.add_argument('-iter', '--iterations', type=int, default = 1, help="Number of iterations to run")
+    pp.add_argument('-t', '--time', type=int, default = 1, help="Time between interations in seconds")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
-    return pp
-
-#def parse_args(args):
-#    
-#    parent_p = parent_parser()      
-#    parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-#    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
-#    #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
-#    parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
-#    parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
-#    parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
-#    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
-#    
-#    
-#    #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
-#    #parser.add_argument('-p', '--password', help="password")
-#    #group = parser.add_mutually_exclusive_group()
-#    #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
-#    #group.add_argument("-q", "--quiet", action="store_true")
-#    #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
-#    #parser.add_argument("ip", help="IP address of SUT")
-#    #parser.add_argument("user", help="username for SUT")
+    return pp 
 
 def parse_args(args):
     
-    verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
-    parser.add_argument('-fab', '--fabwide', action="store_true", help="Execute fabric wide")
-    parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
-    parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
-    parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt", action="store_true")
-    parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
-    parser.add_argument('-f',    '--filename',   help="File name to use instead of the default file", default="for_playback")
-    parser.add_argument('-d',    '--cust_date',      help=argparse.SUPPRESS, )
-    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
+    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
+    #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
+    parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
+    parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
+    parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
     parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
-    #parser.add_argument('-s', '--suite', type=str, help="Suite file name", required=True)
+    
+    
+    #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
     #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     #group.add_argument("-q", "--quiet", action="store_true")
     #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
     #parser.add_argument("ip", help="IP address of SUT")
-    #parser.add_argument("user", help="username for SUT")    
-        
+    #parser.add_argument("user", help="username for SUT")
+    
     args = parser.parse_args()
     print(args)
+    #sys.exit()
     
     if not args.chassis_name and not args.ipaddr:
         print("Chassis Name or IP address is required")
         sys.exit()
         
-    if args.cmdprompt and not args.switchtype:
-        print("To start at the command prompt the switch type is needed.")
-        sys.exit()
-        
-    if not args.cmdprompt and args.switchtype:
-        print('To start at the command prompt both switch type and command prompt is requried')
-        sys.exit()
+            
+    #if args.cmdprompt and not args.switchtype:
+    #    print("To start at the command prompt the switch type is needed.")
+    #    sys.exit()
+    #    
+    #if not args.cmdprompt and args.switchtype:
+    #    print('To start at the command prompt both switch type and command prompt is requried')
+    #    sys.exit()
 
-    return(parser.parse_args())
+
+    return parser.parse_args()
 
 def connect_console(HOST,usrname,password,port, *args):
     
@@ -757,14 +722,17 @@ def main():
 ####
 ###############################################################################
     pa = parse_args(sys.argv)
-    print(pa)
     print(pa.chassis_name)
     print(pa.ipaddr)
     print(pa.quiet)
     print(pa.verbose)
-    #print(pa.firmware)
+    print(pa.firmware)
+    print(pa.cmdprompt)
+    print(pa.file_action)
+    print(pa.filename)
+    print(pa.cust_date)
     print("@"*40)
-    #sys.exit()
+    sys.exit()
 
    
     ##########################################################################
@@ -803,19 +771,13 @@ def main():
     
     #### pass ip(s)to login procedure
     #### and write the file
-    
-    d = liabhar.dateTimeStuff()
-    pa.cust_date = d.simple_no_dash()
-    pa.cust_date = d.current_no_dash()
-    pa.filename = pa.cust_date + pa.filename
 
     for i in ipaddr_switch:
         tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
         nos = si.nos_check()
         if not nos:
-            sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
-            my_ip                = sw_dict["switch_ip"]
-            my_cp_ip_list        = sw_dict["cp_ip_list"]
+            sw_dict              = cofra.get_info_from_the_switch()
+            switch_ip            = sw_dict["switch_ip"]
             sw_name              = sw_dict["switch_name"]
             sw_chass_name        = sw_dict["chassis_name"]
             sw_director_or_pizza = sw_dict["director"]
@@ -828,12 +790,9 @@ def main():
             sw_vf_setting        = sw_dict["vf_setting"]
             sw_fcr_enabled       = sw_dict["fcr_enabled"]
             sw_port_list         = sw_dict["port_list"]
-            sw_ex_port_list      = sw_dict["ex_ports"]
-    
-    
+
             print("\n"*20)
-            print("SWITHC IP            : %s   " % my_ip)
-            print("CP IP List           : %s   " % my_cp_ip_list)
+            print("SWITCH IP            : %s   " % switch_ip)
             print("SWITCH NAME          : %s   " % sw_name)
             print("CHASSIS NAME         : %s   " % sw_chass_name)
             print("DIRECTOR             : %s   " % sw_director_or_pizza)
@@ -846,19 +805,20 @@ def main():
             print("VF SETTING           : %s   " % sw_vf_setting)
             print("FCR SETTING          : %s   " % sw_fcr_enabled)
             print("PORT LIST            : %s   " % sw_port_list)
-            print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
-            print("@"*40)
             print("@"*40)
             print("CONSOLE INFO         : %s   " % cons_info)
-            print("\n")
+            print("@"*40)
             print("POWER POLE INFO      : %s   " % power_pole_info)
+            print("@"*40)        
+            print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
+            print("@"*40)
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
             print("\n"+"@"*40)
             pass
     anturlar.close_tel()
-    sys.exit() ###### You are here. Need to grab EX-Ports then Port Flapping function next?????
+    sys.exit()
      
 ###############################################################################
 ####
