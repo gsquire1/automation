@@ -1154,14 +1154,21 @@ class FcrInfo(FabricInfo, SwitchInfo):
         """
         Runs fabricshow against backbone switches in a fabric to determine all IPs
         02/10/15 checked
+        #print('\n\n'+ '='*20)
+        #print("Switch Name :  %s" % initial_checks[0])
+        #print("IP address :  %s" % initial_checks[1])
+        #print("Chassis :  %s" % initial_checks[2])
+        #print("VF enabled :  %s" % initial_checks[3])
+        #print("FCR enabled :  %s" % initial_checks[4])
+        #print("Base configured :  %s" % initial_checks[5])
+        #print('='*20 + '\n\n')
         """
         fcrcfg = FcrInfo()
         fcrstatus = self.__sw_basic_info__()
-        #fcrstatus = self.__sw_basic_info__()
-        print("FCRSTATUS")
-        print(fcrstatus)
         if fcrstatus[5] is not False:  # Test if base config'd and if so
-            base = fcrcfg.base_check() # get the base FID number
+            print(fcrstatus[5])
+            sys.exit()
+            base = fcrstatus[5] ###fcrcfg.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
             get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
         else:
@@ -1440,21 +1447,6 @@ class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
             #        disabled_ports.append(i)
             ##print(online_ports)    
             return(disabled_ports)
-
-        #if self.am_i_director:
-        #    if base:
-        #        fos_cmd("setcontext " + base)
-        #        capture_cmd = fos_cmd("switchshow | grep -i ge")
-        #    else:
-        #        capture_cmd = fos_cmd("switchshow | grep -i ge")
-        ##capture_cmd = fos_cmd("switchshow | grep -i ge")
-        #if self.am_i_director:
-        #    ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+Disabled')#This needs changed for chassis
-        #else:
-        #    #ras = re.compile('(\s+[xge]{1,3}\d{1,2})\s+id\s+[0-4]{1,2}G\s+([_\w]{5,9})\s+FCIP')
-        #    ras = re.compile('(?:\s+)([xge]{1,3}\d{1,2})\s+[id-]{1,2}\s+([0-4]{1,2}G)\s+([_\w]{3,9})\s+.{3,4}\s+Disabled')## Pizza boxes
-        #ras = ras.findall(capture_cmd)
-        #self.online_ports = ras
         
     def vex_ports(self):
         """
@@ -1468,7 +1460,7 @@ class FcipInfo(FcrInfo, FabricInfo, SwitchInfo):
         """
         return(self.__getportlist__("EX-Port"))
     
-    def ge_ports(self):
+    def all_ge_ports(self):
         """
             Return a list of the ge-Ports in the current FID
         """
