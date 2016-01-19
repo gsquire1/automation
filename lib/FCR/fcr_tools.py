@@ -774,6 +774,15 @@ def switch_command_loop(iterations):
         iterations -= 1   
     print('DONEDONEDONEDONEDONE')
     sys.exit()
+    
+def timeserversetup():
+    cmd = anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    print(cmd)
+    return (cmd)
+
+def autoftpsetup():
+    cmd = anturlar.fos_cmd(supportftp -S)
+    print(cmd)
         
     
     
