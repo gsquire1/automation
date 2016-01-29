@@ -311,42 +311,6 @@ def portcfgfillword():
     portcfg = fcr.portcfgfillword(3)
     
     
-#def get_all_switch_info():
-#    #f = (open('ini/connect.txt', 'r+b'))
-#
-#    with open('ini/connect.txt') as f:
-#        while True:
-#            content = (f.readline())
-#            print(type(content))
-#            print(content)
-#        #for i in content:
-#            #print('WTF')
-#            #print(i)
-#    sys.exit()
-#    #ips = re.findall('(?:IPlist\s+)((\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\s{0,9})+', content)
-#    #ips = re.findall(r'IPlist(\s{0,3}\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}\s{0,3))+', content)
-#    ips = re.findall("(IPlist)( \.\\d)+", content)
-#    print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
-#    print(ips)
-#    sys.exit()
-#    f = (open('ini/connect.txt', 'r'))
-#    my_list = []
-#    f = f.readlines()
-#    for line in f:
-#        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
-#        print(line)
-#        my_list.append(line)
-#        #my_list = my_list.split()
-#    print(my_list)
-#    #sys.exit()
-#    #ras = re.findall('IPlist\s+:\s+\[(.+)\]', f)
-#    #    b = ras[0]
-#    #    c = b.split(",")
-#    #    for i in c:
-#    f.close()
-#    sys.exit()
-    
-
 def bb_fabric_switch_status():
     """
         OBSOLETE##############
@@ -465,157 +429,6 @@ def configdl(clear = 0):
     configdown_cmd = ("configdownload -all -p ftp 10.38.35.131,ftp1,/configs/%s.txt,ftp2") % (sw_ip)
     cons_out = anturlar.fos_cmd (configdown_cmd)
     
-#def get_info_from_the_switch(ip):
-#    """
-#    
-#    """
-#    
-#    #cons_out = anturlar.login()
-#    
-#    si = anturlar.SwitchInfo()
-#    mi = anturlar.Maps()
-#    fi = anturlar.FlowV()
-#    
-#    switch_ip = si.ipaddress()
-#    license_list = si.getLicense()
-#    ls_list = si.ls()
-#    first_ls = si.ls_now()
-#    switch_id = si.switch_id()
-#    theswitch_name = si.switch_name()
-#    chassis_name = si.chassisname()
-#    director_pizza = si.director()
-#    vf_enabled = si.vf_enabled()
-#    sw_type = si.switch_type()
-#    base_sw = si.base_check()
-#    fcr_state = si.fcr_enabled()
-#    ports_and_ls = si.all_ports_fc_only()
-#    psw_reset_value = "YES"
-#    xisl_st_per_ls = si.allow_xisl()
-#    maps_policy_sum = mi.get_policies()
-#    maps_non_dflt_policy = mi.get_nondflt_policies()
-#    
-#    flow_per_ls = fi.flow_names()
-#    
-#    #############################################################
-#    #### create a dict for ls and ports in the ls
-#    ####
-#    k = str(first_ls)    #### craete a key with the command name
-#                               #### and pid added together
-#    v = ports_and_ls     #### create the value as a list otherwise the first one
-#                         #### is a string and extend command later on will fail
-#    d_port_list = {k:v}     #### create the first dictionary entry ras[0]
-#    #v_sn = theswitch_name
-#    d_switch_name = {k:theswitch_name}
-#    d_domain_list = {k:switch_id}
-#    d_xisl_state  = {k:xisl_st_per_ls}
-#    d_flow_names  = {k:flow_per_ls}
-#    
-#    ####
-#    ###########################################################################
-#    #### add logical switch specific values to a dictionary
-#    for ls in ls_list:
-#        cons_out = anturlar.fos_cmd("setcontext %s " % ls)
-#        ports_and_ls = si.all_ports_fc_only()
-#        theswitch_name = si.switch_name()
-#        domain_for_ls = si.switch_id()
-#        xisl_st_per_ls = si.allow_xisl()
-#        flow_per_ls = fi.flow_names()
-#        
-#        if ls != str(first_ls):
-#            #value = []
-#            #value_sn = []
-#            #value = ports_and_ls
-#            #value_sn = theswitch_name
-#            d_port_list[ls] = ports_and_ls       #### add the value to the key
-#            d_switch_name[ls] = theswitch_name 
-#            d_domain_list[ls] = domain_for_ls
-#            d_xisl_state[ls] = xisl_st_per_ls
-#            d_flow_names[ls] = flow_per_ls
-#        
-#    
-#    ###########################################################################
-#    ####
-#    ####  Create a dictionary
-#    ####
-#    switch_dict = {"switch_ip":switch_ip}
-#    
-#    switch_dict["switch_name"]  = d_switch_name
-#    switch_dict["chassis_name"] = chassis_name
-#    switch_dict["director"]     = director_pizza
-#    switch_dict["domain_list"]  = d_domain_list
-#    switch_dict["ls_list"]      = ls_list
-#    switch_dict["base_sw"]      = base_sw
-#    switch_dict["xisl_state"]   = d_xisl_state
-#    switch_dict["switch_type"]  = sw_type
-#    switch_dict["license_list"] = license_list
-#    switch_dict["vf_setting"]   = vf_enabled
-#    switch_dict["fcr_enabled"]  = fcr_state
-#    switch_dict["port_list"]    = d_port_list
-#        
-#    ###########################################################################
-#    #### print the variables for review
-#    ####
-#    print("\n\n\n")
-#    print("SWITCH IP         :  %s  " % switch_ip)
-#    print("SWITCH NAME       :  %s  " % d_switch_name)
-#    print("SWITCH DOMAIN     :  %s  " % d_domain_list)
-#    print("LS LIST           :  %s  " % ls_list)
-#    print("BASE SWITCH       :  %s  " % base_sw)
-#    print("VF SETTING        :  %s  " % vf_enabled)
-#    print("SWITCH TYPE       :  %s  " % sw_type)
-#    print("TIMEOUT VALUE     :  0   " )
-#    print("RESET PASSWORD    :  %s " % psw_reset_value)
-#    print("FCR ENABLED       :  %s " % fcr_state)
-#    print("LICENSE LIST      :  %s  " % license_list)
-#    
-#    for kk, vv in d_port_list.items():
-#        print(kk,vv)    #### print to the crt
-#        print("@"*60)
-#    print("*"*80)
-#    print("\n\n\n")
-#    for kk,vv in d_switch_name.items():
-#        print(kk,vv)    #### print switchnames
-#    print('*'*80)
-#    
-#    f = "%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt")
-#    header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
-#                           "","", "==============================\n")  
-#    ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
-#    ff.write(header)
-#    #ff.write(str(switch_ip))
-#    ff.write("SWITCH IP                :  %s  \n" % switch_ip)
-#    ff.write("SWITCH DOMAIN            :  %s  \n" % d_domain_list)
-#    ff.write("LS LIST                  :  %s  \n" % ls_list)
-#    ff.write("BASE SWITCH              :  %s  \n" % base_sw)
-#    ff.write("SWITCH NAME              :  %s  \n" % d_switch_name)
-#    ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
-#    ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)
-#    ff.write("VF SETTING               :  %s  \n" % vf_enabled)
-#    ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
-#    ff.write("TIMEOUT VALUE            :  0   \n" )
-#    ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
-#    ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
-#    ff.write("ALLOW XISL               :  %s  \n" % d_xisl_state)
-#    ff.write("Ports             :  %s  \n" % d_port_list)
-#    ff.write("LICENSE LIST      :  %s  \n" % license_list)
-#
-#    ff.write("="*80)
-#    ff.write("\n")
-#    ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
-#    ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
-#    
-#    ff.write("="*80)
-#    ff.write("\n")
-#    ff.write("FLOW CONFIGURATION       :  %s  \n" % d_flow_names)
-#    
-#    
-#    
-#    ff.write("\n"*2)
-#    ff.close()
-#    #switch_dict = ""
-#    
-#    
-#    return(switch_dict)
 
 def fab_wide_proxy_device_numbers():
     """
@@ -626,6 +439,8 @@ def fab_wide_proxy_device_numbers():
     
     fcrinfo = anturlar.FcrInfo()
     backbone_ip = fcrinfo.fcr_backbone_ip()
+    print(backbone_ip)
+    sys.exit()
     bb_fab_num = (len(backbone_ip))
     proxy_dev_count = []
     for ip in backbone_ip:
@@ -646,7 +461,7 @@ def fab_wide_proxy_device_numbers():
     ff.write(proxy_dev_count)
     ff.close()
     print('\n\n'+ '='*20)        
-    print('Backbone Fabric consists of %s switches.' % bb_fab_num)
+    print('Backbone Fabric consists of %s switches.' % (len(bb_fab_num)))
     print('IP addresses: Number of proxy devices found')
     print(switch_list_with_proxy_dev)
     print('='*20 + '\n\n')
@@ -681,7 +496,7 @@ def switch_status():
     switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
     return (switch_info)
 
-#def ex_deconfig():
+#def ex_deconfig(): 
 #    fcri = anturlar.FcrInfo()
 #    test = fcri.ex_deconfig()
 #    print('\n\nAll EX_ports found are now deconfigured.')
@@ -740,14 +555,12 @@ def ex_slots_find():
     disabled_port_list = fcri.disabled_ports()
     ge_port_list = fcipi.all_ge_ports()
     print("PORTLISTPORTLIST")
-    print(vex_port_list)
+    print("VEX_PORTS: %s" % vex_port_list)
+    print("EX_PORTS: %s" % ex_port_list)
+    print("DISABLED_PORTS: %s" % disabled_port_list)
     sys.exit(0)
-    print(ex_port_list)
-    print(disabled_port_list)
+#################################
 
-    #################################
-    print(ex_port_list)
-    print(disabled_port_list)
     if self.am_i_director:
        for i in portlist:
             slot = i[0]
@@ -961,6 +774,15 @@ def switch_command_loop(iterations):
         iterations -= 1   
     print('DONEDONEDONEDONEDONE')
     sys.exit()
+    
+def timeserversetup():
+    cmd = anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    print(cmd)
+    return (cmd)
+
+def autoftpsetup():
+    cmd = anturlar.fos_cmd(supportftp -S)
+    print(cmd)
         
     
     
