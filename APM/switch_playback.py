@@ -16,7 +16,9 @@ sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
 import telnetlib
 import getpass
- 
+
+import struct
+
 import argparse
 import re
 import anturlar
@@ -144,6 +146,184 @@ def info_help_OSError():
 
 
 
+def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
+    
+    global tn
+    
+    
+    var = 1
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
+    reg_list_r = [b".*\n", b":root> "]
+    
+    password = "pass"
+    capture = ""
+    option = 1
+    #############################################################################
+    #### parse the user name for console login
+    ####
+    port = str(port)
+    usrname = parse_port(port)
+    print("connecting via Telnet to  " + HOST + " on port " + port )
+    print(HOST)
+    print(usrname)
+    print(password)
+    print(port)
+    
+    tn = telnetlib.Telnet(HOST,port)
+    print("tn value is  ", tn)
+    tn.set_debuglevel(db)
+    
+    #print("-------------------------------------------------ready to read lines")
+    #############################################################################
+    #### login
+    ####  start the login procedure 
+    capture = tn.read_until(b"login: ")
+    print(capture)
+    tn.write(usrname.encode('ascii') + b"\r\n")
+    #if password:
+    capture = tn.read_until(b"assword: ")
+    print(capture)
+    tn.write(password.encode('ascii') + b"\r\n")
+        
+    print("\n\n\n\n\n\n\n\n")
+    
+    #############################################################################
+    #### login to the console
+    ####
+    reg_list = [ b"Enter your option : ", b"login: ", b"assword: ", b"root> ", b"users: ", b"ogin incorrect", b"=>" , b"admin>", b"proceed.", b"Authentication failure" ]  
+    
+    capture = ""
+    capture = tn.expect(reg_list)
+    print(capture)
+     
+     
+    ###################################################################################################################
+    ####
+    ####  this sends number 1 when there are more than on user on the console
+    ####
+    ###################################################################################################################
+    if capture[0] == 0:
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a interger
+        capture = tn.expect(reg_list)
+        if capture[0] == 0:
+            #tn.write(struct.pack('b', 49))   #### use the struct to send a interger
+            pass
+        
+        capture = tn.expect(reg_list)
+        print("\n"*11)
+        print(capture)
+        print(capture[0])
+        tn.write(b"\n")
+        capture = tn.expect(reg_list)
+    
+    ###################################################################################################################
+    ####
+    ####  find login or the user that is logged in. 
+    ####
+    ###################################################################################################################
+    if capture[0] == 4:
+        capture = tn.expect(reg_list)
+    if capture[0] == 2:          #### if Password is found we did not enter the user name yet.
+        tn.write(b"\n")          ####  so send a \n so we can get the login prompt
+        capture = tn.expect(reg_list)
+
+
+    if capture[0] == 3:           ##### if root is logged in should be able to continue from here
+        print("FOUND ROOT : ")
+        
+        
+        
+    if capture[0] == 7:           #### if admin is found log out and see if passwords are changed and root is enabled
+        print("FOUND ADMIN : ")   #### 
+        tn.write(b"exit\n")
+        capture = tn.expect(reg_list)
+       
+    
+    if capture[0] == 1:            ####  found login login as root if this is successful go on
+        print("FOUND LOGIN : ")    ####   if root is disable loggin as admin and change the root permissions
+        tn.write(b"root\n")
+        capture = tn.expect(reg_list)
+        if capture[0] == 2:              ####  is password
+            print("FIND 2  "*10 )
+            tn.write(b"password\n")
+            capture = tn.expect(reg_list)
+            if capture[0] == 3:          ####  see the root prompt means root is configured and we can get out
+                print("@"*55)
+                #break
+                    
+            if capture[0] == 1:              #### is the login incorrect
+                print("FIND 5  "*10 )
+                tn.write(b"admin\n")
+                capture = tn.expect(reg_list)
+                if capture[0] == 2:              ####  is password
+                    print("FIND 2 after 5  "* 8 )
+                    tn.write(b"password\n")
+                    capture = tn.expect(reg_list)
+                    
+                    if capture[0] == 8:          #### if the user is asked to change password
+                        print("FIND  8  "* 10 )
+                        tn.write(b"\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")         #### old password for admin 
+                        capture = tn.expect(reg_list)
+                        tn.write(b"anything\n")         #### old password for admin 
+                        capture = tn.expect(reg_list)
+                        tn.write(b"anything\n")         #### old password for admin 
+                        capture = tn.expect(reg_list)
+                                           
+                                          
+                                           
+                        print("&"*88)
+                        print("&"*88)
+                        print("&"*88)
+                        #tn.write(b"\n")
+                        #capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        
+                        
+                      
+                        tn.write(b"userconfig --change root -e yes \n")
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"echo Y | rootaccess --set all \n")
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"exit\n")
+                        capture = tn.expect(reg_list)
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"root\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        
+    
+    print("\n"*8)
+    print("@"*30)
+    print("@"*30)
+    print("@"*30)
+    print(capture)
+    
+    tn.write(b"fabricshow\n")
+    capture = tn.expect(reg_list)
+    tn.write(b"timeout 0\n")
+    capture = tn.expect(reg_list)
+    print("\n"*10)
+    print(capture)
+    print("\n"*10)
+    liabhar.JustSleep(10)
+
+    
+    return(tn)
 
 
 
@@ -331,7 +511,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
     if swtype == '162' or swtype == '166' or swtype == '165':   #### HANDLE WEDGE and Allegiance bootargs here
-        bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+        bootargs  = "root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
     if swtype == '166' or swtype == '165': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
         ethact = "FM2@DTSEC4"
@@ -487,11 +667,11 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         tn.write(b"makesinrec 0x1000000 \n")
         capture = tn.expect(reg_bash,30)
         tn.write(b"tftpboot 0x2000000 lando/uImage.netinstall\n")
-        capture = tn.expect(reg_bash,10)
+        capture = tn.expect(reg_bash,30)
         tn.write(b"tftpboot 0x3000000 lando/ramdisk_v1.0.img\n")
-        capture = tn.expect(reg_bash,20)
+        capture = tn.expect(reg_bash,30)
         tn.write(b"tftpboot 0xc00000 lando/silkworm.dtb.netinstall\n")
-        capture = tn.expect(reg_bash,10)
+        capture = tn.expect(reg_bash,30)
         tn.write(b"bootm 0x2000000 0x3000000 0xc00000\n")
         caputure = tn.expect(reg_bash,60)
 
@@ -777,8 +957,18 @@ def do_net_install(sw_info_filename):
         tn.close()
     #liabhar.JustSleep(600)
     #liabhar.count_down(600)
-
+    tn_list = []
+    print("\n\nCONNECT TO THE CONSOLE NOW\n\n")
+    #if sw_director_or_pizza:
+    tn_cp0 = connect_console_update_root(console_ip, user_name, usr_pass, console_port, 0)
+    tn_list.append(tn_cp0)
     
+    if sw_director_or_pizza:
+        tn_cp1 = connect_console_update_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
+        tn_list.append(tn_cp1)
+    
+    for tn in tn_list:
+        tn.close()
     
     
     

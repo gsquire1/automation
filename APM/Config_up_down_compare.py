@@ -632,6 +632,7 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("Ports                    :  %s  \n" % ports_and_ls)
     ff.write("SIM PORTS                :  %s  \n" % sim_ports)
     ff.write("Blades                   :  %s  \n" % blades)
+    
     ff.write("LICENSE LIST             :  %s  \n" % license_list)
     ff.write("="*80)
     ff.write("\n")
@@ -758,15 +759,18 @@ def main():
     
     liabhar.count_down(60)
     
+    
+    
     ###################################################################################################################
     ####
     #### power cycle slots
     ####
+    
     ss = anturlar.SwitchInfo()
     slot_list = ss.blades(True)
     #### skip if switch is a pizza box
     if "not a d" not in slot_list:
-         slot_pwr_cycle(slot_list)
+         pc_result = slot_pwr_cycle(slot_list)
     else:
         print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
      
