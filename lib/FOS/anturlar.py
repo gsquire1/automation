@@ -545,7 +545,7 @@ class SwitchInfo:
             if L:
                 ras = re.compile('(\d+)\s+[SWAP]')
             else:
-                ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE)\s+(\d+)\s+([-FCOEX1032468]+)\s+(\w+)')
+                ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE|CP BLADE|CORE BLADE)\s+(\d+)\s+([-FCOSEX1032468]+)\s+(\w+)')
             
             ras = ras.findall(capture_cmd)
             return(ras)

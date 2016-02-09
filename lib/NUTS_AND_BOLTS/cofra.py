@@ -984,7 +984,7 @@ def PortStats(counter="all", port_list = "all"):
     
     
     si  = anturlar.SwitchInfo()
-    port_list = si.all_ports()
+    port_list = si.all_ports_fc_only()
     direct_pizza = si.am_i_director
     
     counter_list_capture = []
