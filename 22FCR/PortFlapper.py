@@ -60,7 +60,9 @@ import time
 ####  141  Yoda DCX
 ####  142  Yoda pluto
 ####  148  Skybolt
-####
+####  164????
+####  165????Venator
+####  166????Allegience 
 ###############################################################################
 
 
@@ -772,8 +774,79 @@ def main():
             print("Switch %s not available" % i)  ##New
         nos = si.nos_check()
         if not nos:
-            anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
-            anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+            print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            ports = fcr.all_ex_ports()
+            devices = fcr.fcr_proxy_dev()
+            backbone_ip = fcr.fcr_backbone_ip()
+            all_ip = fcr.fcr_fab_wide_ip()
+            #edge_ip = all_ip.symmetric_difference(backbone_ip)
+            edge_ip = fcr.ipv4_fcr()
+            print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            print(edge_ip)
+            #sys.exit()
+            #a = (len(ports))
+            #print(ports)
+            #print(devices)
+            f = ('logs/PortFlapper.txt')
+            try:
+                with open(f, 'w') as file:
+                    file.write("EX-Ports = %s\n" % str(ports))
+                    file.write("Proxy Devices = %s\n" % str(devices))
+                    file.write("Backbone_IPs = %s\n" % str(backbone_ip))
+                    file.write("Fabric Wide IPs = %s\n" % str(all_ip))
+            except IOError:
+                print("\n\nThere was a problem opening the file:" , f)
+                sys.exit()
+            file.close()
+            sys.exit()
+            for i in range(0,a):
+                print(ports[i])
+                slot = (ports[i][0])
+                print(slot)
+                port = (ports[i][1])
+                print(port)
+                anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
+                liabhar.count_down(15)
+                anturlar.fos_cmd("portenable %s/%s" % (slot, port))
+                liabhar.count_down(15)
+                devices_check =  fcr.fcr_proxy_dev()
+                if devices_check != devices:
+                    print ("WTF")
+                    #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
+                    liabhar.email_sender_html("gsquire1@msn.com", "gsquire1@brocade.com", "portflapper failed", "portflapper failed")
+                    sys.exit()
+            sys.exit()
+                
+            
+            port = [ports[0]]
+            print(a)
+            print(devices)
+            print(ports)
+            print(ports[0])
+
+            while a >= 1:
+                print("Q")
+                a = a-1
+            
+            
+            sys.exit()
+            #swinfo = si.__sw_basic_info__()
+            #if swinfo[5] is not False:
+            #    #base = swinfo[5]
+            #    #anturlar.fos_cmd("setcontext %s" % base)
+            #    ports = fcr.all_ex_ports() 
+            #    devices = fcr.fcr_proxy_dev()
+            #    for i in ports:
+            #        print (i)
+            #else:
+            #    ports = fcr.all_ex_ports()
+            #    devices = fcr.fcr_proxy_dev()
+            #a = [len(ports)]
+            #print(a)
+            #print(devices)
+            #sys.exit()
+            #anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
+            #anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
@@ -790,6 +863,8 @@ if __name__ == '__main__':
 ###############################################################################
 #### END
 ###############################################################################
+
+
 
 
 

@@ -4,8 +4,7 @@
 
 ###############################################################################
 ####
-####  Get switch config info and place in a file that
-####  can be used later to rebuild the switch to the same configuration.
+####  Run simple timeserver and supportftp setup commands
 ####  Options are single switch, entire fabric, entire fcr fabric and everything in
 ####  switch matrix file
 ####
@@ -61,7 +60,9 @@ import time
 ####  141  Yoda DCX
 ####  142  Yoda pluto
 ####  148  Skybolt
-####
+####  164????
+####  165????Venator
+####  166????Allegience 
 ###############################################################################
 
 
@@ -73,8 +74,6 @@ def parent_parser():
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
-    pp.add_argument('-iter', '--iterations', type=int, default = 1, help="Number of iterations to run")
-    pp.add_argument('-t', '--time', type=int, default = 1, help="Time between interations in seconds")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
@@ -82,15 +81,15 @@ def parent_parser():
 
 def parse_args(args):
     
+    verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
+    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file. Must use at least on IP or Chassis name")    
     #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
-    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
-    
+    parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide including edge switches")
     
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
@@ -722,17 +721,14 @@ def main():
 ####
 ###############################################################################
     pa = parse_args(sys.argv)
-    print(pa.chassis_name)
-    print(pa.ipaddr)
-    print(pa.quiet)
-    print(pa.verbose)
-    print(pa.firmware)
-    print(pa.cmdprompt)
-    print(pa.file_action)
-    print(pa.filename)
-    print(pa.cust_date)
-    print("@"*40)
-    sys.exit()
+    #print(pa)
+    #print(pa.chassis_name)
+    #print(pa.ipaddr)
+    #print(pa.quiet)
+    #print(pa.verbose)
+    #print(pa.firmware)
+    #print("@"*40)
+    #sys.exit()
 
    
     ##########################################################################
@@ -759,12 +755,11 @@ def main():
     
     if pa.fabwide:
         ipaddr_switch   = fi.ipv4_list()
-        #print(ipaddr_switch)
     elif pa.csvall:
         ipaddr_switch   = get_ip_from_file(pa.chassis_name)
     elif pa.fcrwide:
         anturlar.fos_cmd("setcontext %s" % fcr.base_check())
-        ipaddr_switch   = fcr.fcr_fab_wide_ip()     
+        ipaddr_switch   = fcr.fcr_fab_wide_ip()
     else:
         ipaddr_switch       = [pa.ipaddr]
     anturlar.close_tel()
@@ -773,45 +768,26 @@ def main():
     #### and write the file
 
     for i in ipaddr_switch:
-        tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+        try: ###New
+            tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+        except OSError: ##New
+            print("Switch %s not available" % i)  ##New
         nos = si.nos_check()
+        a = 10000
         if not nos:
-            sw_dict              = cofra.get_info_from_the_switch()
-            switch_ip            = sw_dict["switch_ip"]
-            sw_name              = sw_dict["switch_name"]
-            sw_chass_name        = sw_dict["chassis_name"]
-            sw_director_or_pizza = sw_dict["director"]
-            sw_domains           = sw_dict["domain_list"]
-            sw_ls_list           = sw_dict["ls_list"]
-            sw_base_fid          = sw_dict["base_sw"]
-            sw_xisl              = sw_dict["xisl_state"]
-            sw_type              = sw_dict["switch_type"]
-            sw_license           = sw_dict["license_list"]
-            sw_vf_setting        = sw_dict["vf_setting"]
-            sw_fcr_enabled       = sw_dict["fcr_enabled"]
-            sw_port_list         = sw_dict["port_list"]
-
-            print("\n"*20)
-            print("SWITCH IP            : %s   " % switch_ip)
-            print("SWITCH NAME          : %s   " % sw_name)
-            print("CHASSIS NAME         : %s   " % sw_chass_name)
-            print("DIRECTOR             : %s   " % sw_director_or_pizza)
-            print("SWITCH DOMAINS       : %s   " % sw_domains)
-            print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-            print("BASE FID             : %s   " % sw_base_fid)
-            print("XISL STATE           : %s   " % sw_xisl)
-            print("SWITCH TYPE          : %s   " % sw_type)
-            print("LICENSE LIST         : %s   " % sw_license)
-            print("VF SETTING           : %s   " % sw_vf_setting)
-            print("FCR SETTING          : %s   " % sw_fcr_enabled)
-            print("PORT LIST            : %s   " % sw_port_list)
-            print("@"*40)
-            print("CONSOLE INFO         : %s   " % cons_info)
-            print("@"*40)
-            print("POWER POLE INFO      : %s   " % power_pole_info)
-            print("@"*40)        
-            print("\nSwitch_Info has been written this file in logs/Switch_Info_for_playback_%s.txt\n" % switch_ip)
-            print("@"*40)
+            while a >= 0:
+                print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                cmd = anturlar.fos_cmd("sloterrshow -u -c 1")
+                if "sts_ftb_type1_miss" in cmd:
+                    anturlar.fos_cmd("tracedump -n")
+                    print("Saw type 1 miss, grabbing tracedump and then exit")
+                    sys.exit()
+                else:
+                    print("\n\nNothing found yet")
+                    print(a)
+                    liabhar.count_down(90)
+                    a = a-1
+            sys.exit()
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
@@ -819,95 +795,7 @@ def main():
             pass
     anturlar.close_tel()
     sys.exit()
-     
-###############################################################################
-####
-####  close telnet connection and 
-####  connect to the console
-####
-###############################################################################
 
-    cc = cofra.SwitchUpdate()
-    
-    cons_out = cc.playback_licenses()
-    cons_out = cc.playback_ls()
-    cons_out = cc.playback_switch_names()
-    cons_out = cc.playback_switch_domains()
-    cons_out = cc.playback_add_ports()
-    tn       = cc.reboot_reconnect()
-    cons_out = anturlar.fos_cmd("switchshow")
-    print(cons_out)
-    anturlar.close_tel()
-
-    #connect_console(console_ip, user_name, usr_pass, console_port)
-    #cons_out = send_cmd("switchshow")
-    
- 
-    
- 
-        
-###############################################################################
-####
-####  reboot and find the command prompt
-####
-     
-    
-    
-    #cons_out = stop_at_cmd_prompt(9)
-    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    #print(cons_out)
-    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    #cons_out = env_variables(sw_type, 9)
-    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    #print(cons_out)
-    #load_kernel(sw_type, my_ip, pa.firmware)
-    #
-    #for pp in range(0, len(power_pole_info), 2):
-    #    print('POWERPOLE')
-    #    print(power_pole_info[pp])
-    #    print(power_pole_info[pp+1])
-    #    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
-    #    time.sleep(2)
-    #    
-    #for pp in range(0, len(power_pole_info), 2):
-    #    print('POWERPOLE')
-    #    print(power_pole_info[pp])
-    #    print(power_pole_info[pp+1])
-    #    pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
-    #    time.sleep(2)
-    ##### is there another way to tell if switch is ready ??
-    ##### instead of waiting
-    #print("\r\n"*6)
-    #print("@"*40)
-    #print("wait here to login and change passwords")
-    #print("\r\n"*6)     
-    ##liabhar.count_down(300)
-    ##time.sleep(360)
-    #cons_out = sw_set_pwd_timeout(usr_psswd)
-    #
-    #tn.close()
-    #
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    #
-    #print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
-    #
-    #print(my_ip)
-    #
-    #c = cofra.SwitchUpdate(switch_ip)
-    #cons_out = cc.playback_licenses_to_switch()
-    #
-    #print(cons_out)
-    #
-    #anturlar.close_tel()
-    ##tn.write(b"exit\n")
-    ##tn.close()
-    # 
-    #dt = liabhar.dateTimeStuff()
-    #date_is = dt.current()
-    #print(date_is)
-    
 if __name__ == '__main__':
     
     main()
@@ -916,5 +804,10 @@ if __name__ == '__main__':
 ###############################################################################
 #### END
 ###############################################################################
+
+
+
+
+
 
 

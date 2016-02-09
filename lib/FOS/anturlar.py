@@ -1135,21 +1135,6 @@ class FcrInfo(FabricInfo, SwitchInfo):
         backbone_ip = self.fcr_backbone_ip()
         return(backbone_ip)
     
-
-    def get_fabwide_ip(self):
-        """
-        OBSOLETE ###################
-        Get all IP addresses of backbone switches and edge switches 
-        """
-        #fcrcfg = anturlar.FcrInfo()
-        #fab_ip_list = list(fcr_fab_wide_ip())
-        fab_ip_list = self.fcr_fab_wide_ip()
-        print(fab_ip_list)
-        sys.exit()
-        print("\n\n\n\n\nFABLIST with NO DUPLICATES IS  :  ",fab_ip_list,"\n\n\n\n\n")
-        return(fab_ip_list)
-    
-        
     def fcr_backbone_ip(self):
         """
         Runs fabricshow against backbone switches in a fabric to determine all IPs
@@ -1166,15 +1151,13 @@ class FcrInfo(FabricInfo, SwitchInfo):
         fcrcfg = FcrInfo()
         fcrstatus = self.__sw_basic_info__()
         if fcrstatus[5] is not False:  # Test if base config'd and if so
-            print(fcrstatus[5])
-            sys.exit()
             base = fcrstatus[5] ###fcrcfg.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
             get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
         else:
             get_fabric_ip = fcrcfg.ipv4_list()
         return(get_fabric_ip)
-
+    
     def fcr_fab_wide_ip(self):
         """
             ******************MUST BE RUN IN BASE IF VF IS USED *******************************
@@ -1210,22 +1193,13 @@ class FcrInfo(FabricInfo, SwitchInfo):
         final_ip_list = (list(all_ips))
         return(final_ip_list)
 
-
-
     def fcr_proxy_dev(self):
         """
         Get number of proxy devices reported by a switch
-        02/10/15 Checked
+        
         """
-        if self.am_i_director == True:
-            base = self.base_check()
-            if base is not False:
-                fos_cmd("setcontext " + base)
-            else:
-                pass
-        else:
-            pass
-        cmd_capture = fos_cmd("fcrproxydevshow | grep device")
+        fos_cmd("setcontext %s" % self.base_check())
+        cmd_capture = fos_cmd("fcrproxydevshow -a | grep device")
         print(cmd_capture)
         device_number = re.findall(':\s([0-9]{1,4})', cmd_capture)
         return(device_number)
@@ -1255,6 +1229,7 @@ class FcrInfo(FabricInfo, SwitchInfo):
             to FCR Router thru EX-Port
         """
         #self.__change_fid__()
+        fos_cmd("setcontext %s" % self.base_check())
         capture_cmd = fos_cmd("fcrfabricshow")
         
         ras = re.compile('(?:\d{1,3}\s+\d{1,3}\s+)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
