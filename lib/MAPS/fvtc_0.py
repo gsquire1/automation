@@ -2015,9 +2015,10 @@ def add_monitor_types():
     #### create the object and clear stats
     en = anturlar.Maps()
     ####
-    maps_tools.add_rules_each_monitor_type()
+    maps_tools.add_rules_each_monitor_type(False,True,False)
     
     return()
+
 
 def cleanup_rules():
     """
