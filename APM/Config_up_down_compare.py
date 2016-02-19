@@ -572,6 +572,8 @@ def capture_switch_info(extend_name="", fid=128):
     relay_server_info    = mi.get_relay_server_info()
     credit_recov_info    = mi.credit_recovery()
     dns_info             = mi.dns_config_info()
+    sfpinfo              = si.sfp_info()
+    
     
     
     
@@ -634,6 +636,7 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("Blades                   :  %s  \n" % blades)
     
     ff.write("LICENSE LIST             :  %s  \n" % license_list)
+    ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
     ff.write("="*80)
     ff.write("\n")
     ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
