@@ -777,10 +777,15 @@ def main():
         if not nos:
             while a >= 0:
                 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                cmd = anturlar.fos_cmd("sloterrshow -u -c 1")
-                if "sts_ftb_type1_miss" in cmd:
-                    anturlar.fos_cmd("tracedump -n")
-                    print("Saw type 1 miss, grabbing tracedump and then exit")
+                digit = "0-9"
+                #cmd = anturlar.fos_cmd("sloterrshow -u -c 1")
+                cmd = anturlar.fos_cmd("porterrshow | awk '{for(i=4;i<NF;i++)if($i>0){print;break}}'")
+                #print(cmd)
+                if digit in cmd:
+                    #anturlar.fos_cmd("tracedump -n")
+                    print("We have errors in sloterrshow")
+                    print(cmd)
+                    #Email here
                     sys.exit()
                 else:
                     print("\n\nNothing found yet")

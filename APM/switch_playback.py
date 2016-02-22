@@ -587,7 +587,7 @@ def pwr_cycle(pwr_ip, pp, stage, db=10):
 def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
     
     reg_list = [ b"^=> "]
-    reg_bash = [ b"bash-2.04", b"^=> "]
+    reg_bash = [ b".*?bash-2.04", b".*?=> "]
     #reg_bash = [ b"bash-2.04", b"=> "]
     reg_bash_only = [ b"bash-2.04" ]
     reg_linkup = [ b"link is up"]
@@ -605,75 +605,102 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     if switch_type == '133':  ####  ODIN
         nbt = "tftpboot 0x1000000 net_install26_odin.img\n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_list, 30)
+        #capture = tn.expect(reg_list, 30)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
-        capture = tn.expect(reg_bash_only, 30)
+        #capture = tn.expect(reg_bash_only, 30)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '66' or switch_type == '71' or switch_type == '118' or switch_type == '109'):
         #### 5100  Stinger   tomahawk  tom_too
         nbt = "tftpboot 0x1000000 net_install_v7.2.img\n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_list, 30)
+        #capture = tn.expect(reg_list, 30)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
-        capture = tn.expect(reg_bash_only, 30)
+        #capture = tn.expect(reg_bash_only, 30)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83' or switch_type == '62' or switch_type == '77'):
         ####  DCX zentron  pluto zentron  thor  7800
         nbt = "tftpboot 0x1000000 net_install26_8548.img\n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_list, 30)
+        #capture = tn.expect(reg_list, 30)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
-        capture = tn.expect(reg_bash_only, 30)
+        #capture = tn.expect(reg_bash_only, 30)
+        capture = tn.expect(reg_bash_only)
         
         
     if switch_type == '148':  #### SKYBOLT
         tn.write(b"makesinrec 0x1000000 \n")
-        capture = tn.expect(reg_list,30)
+        #capture = tn.expect(reg_list,30)
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x2000000 skybolt/uImage \n")
-        capture = tn.expect(reg_list,30)
+        #capture = tn.expect(reg_list,30)
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt \n")
-        capture = tn.expect(reg_list,30)
+        #capture = tn.expect(reg_list,30
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb \n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \n")
-        caputure = tn.expect(reg_bash_only,30)
+        #caputure = tn.expect(reg_bash_only,30)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '141' or switch_type == '142'):  #### YODA 
         tn.write(b"makesinrec 0x1000000 \n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x2000000 yoda/uImage\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x3000000 yoda/ramdisk.yoda\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x4000000 yoda/silkworm_yoda.dtb\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\n")
-        caputure = tn.expect(reg_bash_only,30)
+        #caputure = tn.expect(reg_bash_only,30)
+        capture = tn.expect(reg_bash_only)
+        
         
         
     if (switch_type == '162'):  #### WEDGE
         tn.write(b"makesinrec 0x1000000 \n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x2000000 wedge/uImage.netinstall\n")
-        capture = tn.expect(reg_bash,10)
+        #capture = tn.expect(reg_bash,10)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x3000000 wedge/ramdisk_v1.0.img\n")
-        capture = tn.expect(reg_bash,20)
+        #capture = tn.expect(reg_bash,20)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x4000000 wedge/silkworm.dtb.netinstall\n")
-        capture = tn.expect(reg_bash,10)
+        #capture = tn.expect(reg_bash,10)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\n")
-        caputure = tn.expect(reg_bash,60)
+        #caputure = tn.expect(reg_bash,60)
+        capture = tn.expect(reg_bash)
         
     if (switch_type == '166' or switch_type == '165'):  #### Allegiance
         tn.write(b"makesinrec 0x1000000 \n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x2000000 lando/uImage.netinstall\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x3000000 lando/ramdisk_v1.0.img\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0xc00000 lando/silkworm.dtb.netinstall\n")
-        capture = tn.expect(reg_bash,30)
+        #capture = tn.expect(reg_bash,30)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0xc00000\n")
-        caputure = tn.expect(reg_bash,60)
+        #caputure = tn.expect(reg_bash,60)
+        capture = tn.expect(reg_bash)
 
 #######################################################################################################################
 #######################################################################################################################
@@ -1894,30 +1921,7 @@ def main():
         #    
         #sys.exit()
         #    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+ 
     
     if pa.file_action != 2:
         d = liabhar.dateTimeStuff()
@@ -2137,7 +2141,7 @@ def main():
 ####  turn each port off then turn each port on (otherwise the delay between did not power cycle the switch)
 ####
 #######################################################################################################################
-    reg_list_bash = [b"bash-2\.04#"]
+    reg_list_bash = [b".*?bash-2\.04#"]
     cons_out = tn.expect(reg_list_bash,900)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
