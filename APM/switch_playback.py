@@ -146,7 +146,7 @@ def info_help_OSError():
 
 
 
-def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
+def connect_console_update_root(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
@@ -173,11 +173,12 @@ def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
     print("tn value is  ", tn)
     tn.set_debuglevel(db)
     
+    #do not print here 
     #print("-------------------------------------------------ready to read lines")
     #############################################################################
     #### login
     ####  start the login procedure 
-    capture = tn.read_until(b".*?login: ")
+    capture = tn.read_until(b"ogin: ")
     print(capture)
     tn.write(usrname.encode('ascii') + b"\r\n")
     #if password:
@@ -329,13 +330,13 @@ def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
 
 
 
-def connect_console(HOST,usrname,password,port,db=0, *args):
+def connect_console(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
     
     var = 1
-    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b".*?login:  ", b"r of users: ", b"admin> "]   #### using b for byte string
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b".*?login: ", b"r of users: ", b"admin> "]   #### using b for byte string
     reg_list_r = [b".*\n", b":root> ", b":admin> "]
     
     password = "pass"
@@ -354,16 +355,17 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     tn = telnetlib.Telnet(HOST,port)
     print("tn value is  ", tn)
-    tn.set_debuglevel(0)
+    tn.set_debuglevel(db)
     
-    
+    print("CONNECTING TO THE CONSOLE-------------------------------------------")
+    print("-------------------------CONNECT CONSOLE FUNCTION-------------------")
     print("-------------------------------------------------ready to read lines")
     tn.write(b"\n")
     #############################################################################
     #### login
     capture = tn.expect(reg_list)
     #capture = tn.read_until(b".*?login: ")
-    #print(capture)
+    print(capture)
     if capture[0] == 4:        
         tn.write(usrname.encode('ascii') + b"\n")
         #if password:
@@ -376,7 +378,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     #############################################################################
     #### login to the switch
-    reg_list = [ b"Enter your option", b".*?login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> ", b"sh-2.04#"]  
+    reg_list = [ b"Enter your option : ", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> ", b"sh-2.04#"]  
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
@@ -467,7 +469,7 @@ def stop_at_cmd_prompt(db=9):
     
     return(capture)
        
-def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
+def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
 
     #liabhar.count_down(10)
     
@@ -590,7 +592,7 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     reg_bash = [ b".*?bash-2.04", b".*?=> "]
     #reg_bash = [ b"bash-2.04", b"=> "]
     reg_bash_only = [ b"bash-2.04" ]
-    reg_linkup = [ b"link is up"]
+    reg_linkup = [ b".*?ink is up"]
     
     #### set tftp command
     
@@ -606,48 +608,48 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         nbt = "tftpboot 0x1000000 net_install26_odin.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash_only)
+        capture = tn.expect(reg_bash)
         
     if (switch_type == '66' or switch_type == '71' or switch_type == '118' or switch_type == '109'):
         #### 5100  Stinger   tomahawk  tom_too
         nbt = "tftpboot 0x1000000 net_install_v7.2.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash_only)
+        capture = tn.expect(reg_bash)
         
     if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83' or switch_type == '62' or switch_type == '77'):
         ####  DCX zentron  pluto zentron  thor  7800
         nbt = "tftpboot 0x1000000 net_install26_8548.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash_only)
+        capture = tn.expect(reg_bash)
         
         
     if switch_type == '148':  #### SKYBOLT
         tn.write(b"makesinrec 0x1000000 \n")
         #capture = tn.expect(reg_list,30)
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x2000000 skybolt/uImage \n")
         #capture = tn.expect(reg_list,30)
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt \n")
         #capture = tn.expect(reg_list,30
-        capture = tn.expect(reg_list)
+        capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb \n")
         #capture = tn.expect(reg_bash,30)
         capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \n")
         #caputure = tn.expect(reg_bash_only,30)
-        capture = tn.expect(reg_bash_only)
+        capture = tn.expect(reg_bash)
         
     if (switch_type == '141' or switch_type == '142'):  #### YODA 
         tn.write(b"makesinrec 0x1000000 \n")
@@ -664,7 +666,7 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000\n")
         #caputure = tn.expect(reg_bash_only,30)
-        capture = tn.expect(reg_bash_only)
+        capture = tn.expect(reg_bash)
         
         
         
@@ -1018,10 +1020,10 @@ def parse_port(port):
     usrname = "port" + usrname
     return usrname
 
-def send_cmd(cmd, db=0):
+def send_cmd(cmd, db=10):
     global tn
     
-    tn.set_debuglevel(9)
+    tn.set_debuglevel(db)
     
     capture = ""
     cmd_look = cmd.encode()
