@@ -33,7 +33,7 @@ def test_anturlar_functions():
     si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
     #a = fcri.__getportlist__("EX-Port")
-    b = fcr.all_ex_ports_with_fid()
+    b = fcri.all_ex_ports_with_edge_fid()
     print("3333333333333333333333333333333")
     print(b)
     sys.exit()
