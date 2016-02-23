@@ -1127,6 +1127,19 @@ class FcrInfo(FabricInfo, SwitchInfo):
         capture_cmd = self.__getportlist__("EX-Port")
         return(capture_cmd)
     
+    def all_ex_ports_with_fid(self):
+        """
+            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
+        """
+        fos_cmd("setcontext %s" % self.base_check()) ###################NEW
+        capture_cmd = self.__getportlist__("EX-Port")
+        print(capture_cmd)
+        sys.exit()
+        for i in capture_cmd:
+            code
+        
+        return(capture_cmd)
+    
     def all_switches_in_bb_ip(self):
         """
             Returns ip addresses of all switches in backbone fabric. Does not get edge switches.

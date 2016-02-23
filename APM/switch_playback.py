@@ -62,8 +62,8 @@ import time
 ####  148  Skybolt
 ####
 ####  162.0  Wedge
-####
-####
+####  165   X6-4 (Venator)
+####  166   X6-8 (Allegience)
 ###############################################################################
 
 
@@ -152,7 +152,7 @@ def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
     
     
     var = 1
-    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b".*?login: ", b"r of users: "]   #### using b for byte string
     reg_list_r = [b".*\n", b":root> "]
     
     password = "pass"
@@ -177,7 +177,7 @@ def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
     #############################################################################
     #### login
     ####  start the login procedure 
-    capture = tn.read_until(b"login: ")
+    capture = tn.read_until(b".*?login: ")
     print(capture)
     tn.write(usrname.encode('ascii') + b"\r\n")
     #if password:
@@ -190,7 +190,7 @@ def connect_console_update_root(HOST,usrname,password,port,db=0, *args):
     #############################################################################
     #### login to the console
     ####
-    reg_list = [ b"Enter your option : ", b"login: ", b"assword: ", b"root> ", b"users: ", b"ogin incorrect", b"=>" , b"admin>", b"proceed.", b"Authentication failure" ]  
+    reg_list = [ b"Enter your option : ", b".*?login: ", b"assword: ", b"root> ", b"users: ", b"ogin incorrect", b"=>" , b"admin>", b"proceed.", b"Authentication failure" ]  
     
     capture = ""
     capture = tn.expect(reg_list)
@@ -335,7 +335,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     
     var = 1
-    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: ", b"admin> "]   #### using b for byte string
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b".*?login:  ", b"r of users: ", b"admin> "]   #### using b for byte string
     reg_list_r = [b".*\n", b":root> ", b":admin> "]
     
     password = "pass"
@@ -362,7 +362,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     #############################################################################
     #### login
     capture = tn.expect(reg_list)
-    #capture = tn.read_until(b"login: ")
+    #capture = tn.read_until(b".*?login: ")
     #print(capture)
     if capture[0] == 4:        
         tn.write(usrname.encode('ascii') + b"\n")
@@ -376,7 +376,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     
     #############################################################################
     #### login to the switch
-    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> ", b"sh-2.04#"]  
+    reg_list = [ b"Enter your option", b".*?login: ", b"assword: ", b"root> ", b"users: ", b"=>" , b"admin> ", b"sh-2.04#"]  
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
@@ -1207,8 +1207,8 @@ def sw_set_pwd_timeout(pswrd, tn):
     """
      
     
-    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
-    reg_login = [ b"login:"]
+    reg_list = [ b"Enter your option", b".*?login: ", b"Password: ", b"root> ", b"users: " ]
+    reg_login = [ b".*?login: "]
     reg_assword = [ b"assword: ", b"root> "]
     reg_change_pass = [ b"key to proceed.", b"incorrect" ]
     reg_complete   = [ b"zation completed", b"root> "]
@@ -1478,9 +1478,6 @@ def enter_file_ext():
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################   
-
-#def find_gateway(switch_ip)
-#    if switch
     
     
 def main():
@@ -1991,7 +1988,7 @@ def main():
     
     
             print("\n"*20)
-            print("SWITHC IP            : %s   " % my_ip)
+            print("SWITCH IP            : %s   " % my_ip)
             print("CP IP List           : %s   " % my_cp_ip_list)
             print("SWITCH NAME          : %s   " % sw_name)
             print("CHASSIS NAME         : %s   " % sw_chass_name)
