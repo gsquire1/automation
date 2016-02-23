@@ -1127,18 +1127,25 @@ class FcrInfo(FabricInfo, SwitchInfo):
         capture_cmd = self.__getportlist__("EX-Port")
         return(capture_cmd)
     
-    def all_ex_ports_with_fid(self):
+    def all_ex_ports_with_edge_fid(self):
         """
             Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
         """
         fos_cmd("setcontext %s" % self.base_check()) ###################NEW
         capture_cmd = self.__getportlist__("EX-Port")
         print(capture_cmd)
-        sys.exit()
+        length = len(capture_cmd)
+        print(length)
+        ex = []
         for i in capture_cmd:
-            code
-        
-        return(capture_cmd)
+            slot = i[0]
+            port = i[1]
+            a = fos_cmd("portcfgexport %s/%s" % (slot, port))
+            fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
+            fid = int(fid[0])
+            ex_list = [slot, port, fid]
+            ex.append(ex_list)
+        return(ex)
     
     def all_switches_in_bb_ip(self):
         """

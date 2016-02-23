@@ -1722,7 +1722,7 @@ def get_info_from_the_switch(extend_name="", fid=128):
     vf_enabled           = si.vf_enabled()
     sw_type              = si.switch_type()
     base_sw              = si.base_check()
-    ex_ports             = fcr.all_ex_ports()
+    ex_ports             = fcr.all_ex_ports_with_edge_fid()
     fcr_state            = si.fcr_enabled()
     ports_and_ls         = si.all_ports_fc_only()
     psw_reset_value      = "YES"
