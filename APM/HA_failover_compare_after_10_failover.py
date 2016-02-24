@@ -728,7 +728,9 @@ def main():
 
     ###################################################################################################################
     #### path to the first file to compare
-    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
+    #switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
+    
+    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
     
     liabhar.JustSleep(10)
     
@@ -758,7 +760,7 @@ def main():
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
-    tn = cofra.ha_failover(10)
+    tn = cofra.ha_failover(100)
     
     liabhar.count_down(120)
     
@@ -772,16 +774,14 @@ def main():
     ss = anturlar.SwitchInfo()
     slot_list = ss.blades(True)
     #### skip if switch is a pizza box
-    if "not a d" not in slot_list:
-         pc_result = slot_pwr_cycle(slot_list)
-    else:
-        print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
-     
+    #if "not a d" not in slot_list:
+    #     pc_result = slot_pwr_cycle(slot_list)
+    #else:
+    #    print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
+    # 
     ####
     #### 
     #### other interrptioons
-    
-    
     ####
     ####
     ####
@@ -816,7 +816,7 @@ def main():
         switch_info = capture_switch_info("compare", fid_to_compare)
     ###################################################################################################################
     #### path to the second file to compare
-        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % pa.ipaddr
+        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
         
         liabhar.cls()
         #### compare the two files
