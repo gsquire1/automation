@@ -170,19 +170,20 @@ def connect_console_update_root(HOST,usrname,password,port,db=10, *args):
     print(port)
     
     tn = telnetlib.Telnet(HOST,port)
-    print("tn value is  ", tn)
     tn.set_debuglevel(db)
+    print("tn value is  ", tn)
+    #tn.set_debuglevel(db)
     
     #do not print here 
     #print("-------------------------------------------------ready to read lines")
     #############################################################################
     #### login
     ####  start the login procedure 
-    capture = tn.read_until(b"ogin: ")
+    capture = tn.read_until(reg_list)
     print(capture)
     tn.write(usrname.encode('ascii') + b"\r\n")
     #if password:
-    capture = tn.read_until(b"assword: ")
+    capture = tn.read_until(b".*?assword: ")
     print(capture)
     tn.write(password.encode('ascii') + b"\r\n")
         
@@ -2138,7 +2139,7 @@ def main():
 #### this step is the same for director or pizza box
 ####
 ####  turn each port off then turn each port on (otherwise the delay between did not power cycle the switch)
-####
+####bash-2.04#
 #######################################################################################################################
     reg_list_bash = [b".*?bash-2\.04#"]
     cons_out = tn.expect(reg_list_bash,900)

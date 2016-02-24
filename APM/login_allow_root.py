@@ -118,15 +118,30 @@ def parse_args(args):
 
     return parser.parse_args()
 
-def connect_console(HOST,usrname,password,port,db=0, *args):
+def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
     
     var = 1
-    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
-    reg_list_r = [b".*\n", b":root> "]
-    
+    #reg_list = [b"aaaaa: ",\
+    #            b"Login incorrect", \
+    #            b"Enter your option : ", \
+    #            b"root> ", \
+    #            b".*?login: ",\
+    #            b"r of users: "]   #### using b for byte string
+    reg_list = [ b"Enter your option : ",\
+                b"login: ", \
+                b"assword: ", \
+                b"root> ", \
+                b".*?users: ", \
+                b"ogin incorrect", \
+                b"=>" ,\
+                b"admin>", \
+                b"proceed.", \
+                b"Authentication failure" ]
+    #reg_list_r = [b".*\n", b":root> "]
+
     password = "pass"
     capture = ""
     option = 1
@@ -149,45 +164,56 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     #############################################################################
     #### login
     ####  start the login procedure 
-    capture = tn.read_until(b"login: ")
+    capture = tn.expect(reg_list) 
     print(capture)
-    tn.write(usrname.encode('ascii') + b"\r\n")
-    #if password:
-    capture = tn.read_until(b"assword: ")
-    print(capture)
-    tn.write(password.encode('ascii') + b"\r\n")
-        
+    print(capture[0])
+    print("*"*10)
+    #sys.exit()
+    if capture[0] == 0:
+        pass
+    else:
+        print(capture)
+        tn.write(usrname.encode('ascii') + b"\r\n")
+        capture = tn.expect(reg_list)
+        tn.write(password.encode('ascii') + b"\r\n")
+        capture = tn.expect(reg_list)
+        print(capture)
     print("\n\n\n\n\n\n\n\n")
-    
+
     #############################################################################
     #### login to the console
     ####
-    reg_list = [ b"Enter your option : ", b"login: ", b"assword: ", b"root> ", b"users: ", b"ogin incorrect", b"=>" , b"admin>", b"proceed.", b"Authentication failure" ]  
-    
-    capture = ""
+    #reg_list = [ b"Enter your option : ",\
+    #            b"login: ", \
+    #            b".*?assword: ", \
+    #            b"root> ", \
+    #            b".*?users: ", \
+    #            b"ogin incorrect", \
+    #            b"=>" ,\
+    #            b"admin>", \
+    #            b"proceed.", \
+    #            b"Authentication failure" ]
+    print("D"*10)
+    #capture = ""
+    #capture = tn.expect(reg_list)
+    print(capture)
+    print(capture[0])
+    print()
+    #sys.exit()
+    ###################################################################################################################
+    ####
+    ####  this sends number 1 when there are more than one user on the console
+    ####
+    ###################################################################################################################
+
+    if capture[0] == 0:
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        #print("\n"*11)
+        tn.write(b"\n")
+        print("END CAPTURE PRINT OUT !!!!!!!!!!!!!!!!!!!!! ")
     capture = tn.expect(reg_list)
     print(capture)
-     
-     
-    ###################################################################################################################
-    ####
-    ####  this sends number 1 when there are more than on user on the console
-    ####
-    ###################################################################################################################
-    if capture[0] == 0:
-        tn.write(struct.pack('!b', 49))   #### use the struct to send a interger
-        capture = tn.expect(reg_list)
-        if capture[0] == 0:
-            #tn.write(struct.pack('b', 49))   #### use the struct to send a interger
-            pass
-        
-        capture = tn.expect(reg_list)
-        print("\n"*11)
-        print(capture)
-        print(capture[0])
-        tn.write(b"\n")
-        capture = tn.expect(reg_list)
-    
+    #sys.exit()
     ###################################################################################################################
     ####
     ####  find login or the user that is logged in. 
@@ -195,22 +221,19 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     ###################################################################################################################
     if capture[0] == 4:
         capture = tn.expect(reg_list)
+        
     if capture[0] == 2:          #### if Password is found we did not enter the user name yet.
         tn.write(b"\n")          ####  so send a \n so we can get the login prompt
         capture = tn.expect(reg_list)
 
-
     if capture[0] == 3:           ##### if root is logged in should be able to continue from here
         print("FOUND ROOT : ")
-        
-        
-        
+             
     if capture[0] == 7:           #### if admin is found log out and see if passwords are changed and root is enabled
         print("FOUND ADMIN : ")   #### 
         tn.write(b"exit\n")
         capture = tn.expect(reg_list)
-       
-    
+          
     if capture[0] == 1:            ####  found login login as root if this is successful go on
         print("FOUND LOGIN : ")    ####   if root is disable loggin as admin and change the root permissions
         tn.write(b"root\n")
@@ -871,7 +894,8 @@ def main():
     tn_list = []
     print("\n\nCONNECT TO THE CONSOLE NOW\n\n")
     #if sw_director_or_pizza:
-    tn_cp0 = connect_console(console_ip, user_name, usr_pass, console_port, 10)
+    tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 10)
+    #print("*"*20)
     tn_list.append(tn_cp0)
     
     print("\n"*20)
@@ -884,7 +908,7 @@ def main():
     
     if console_ip_bkup != "0":
         print("\t\tONLY FOR DIRECTORS OR TWO CONSOLES ")
-        tn_cp1 = connect_console(console_ip_bkup, user_name, usr_pass, console_port_bkup, 10)
+        tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name, usr_pass, console_port_bkup, 10)
         tn_list.append(tn_cp1)
     
         print("\n"*20)
