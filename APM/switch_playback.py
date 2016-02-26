@@ -1823,6 +1823,10 @@ def main():
         if not os.path.isfile(complete_name):  #### this should be checked in parser
             cant_find_file_message(complete_name,pa.filename)
         
+        connect_console_enable_root(console_ip,user_name,usr_pass,console_port,10)
+        
+        if console_ip_bkup != "":
+            connect_console_enable_root(console_ip_bkup,user_name,usr_pass,console_port_bkup,10)
         
         load_config(ipaddr_switch,user_name, usr_pass, pa.filename)
         
@@ -1896,6 +1900,12 @@ def main():
         #### see note at the end of this line                                               ####   found
         if not os.path.isfile(complete_name):  #### this should be checked in parser
             cant_find_file_message(complete_name,pa.filename)
+            
+        connect_console_enable_root(console_ip,user_name,usr_pass,console_port,10)
+           
+        if console_ip_bkup != "":
+            connect_console_enable_root(console_ip_bkup,user_name,usr_pass,console_port_bkup,10)
+         
         load_config(ipaddr_switch,user_name, usr_pass, pa.filename)
         
         sys.exit()
