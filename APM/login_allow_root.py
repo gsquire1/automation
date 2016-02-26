@@ -122,25 +122,18 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
-    
     var = 1
-    #reg_list = [b"aaaaa: ",\
-    #            b"Login incorrect", \
-    #            b"Enter your option : ", \
-    #            b"root> ", \
-    #            b".*?login: ",\
-    #            b"r of users: "]   #### using b for byte string
-    reg_list = [ b"Enter your option : ",\
+    reg_list = [ b"Enter your option : ", \
                 b"login: ", \
                 b"assword: ", \
                 b"root> ", \
                 b".*?users: ", \
                 b"ogin incorrect", \
-                b"=>" ,\
+                b"=>" , \
                 b"admin>", \
                 b"proceed.", \
-                b"Authentication failure" ]
-    #reg_list_r = [b".*\n", b":root> "]
+                b"Authentication failure" , \
+                b"Console Server Management" ]
 
     password = "pass"
     capture = ""
@@ -155,51 +148,77 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     print(usrname)
     print(password)
     print(port)
-    
+    ###########################################################################
+    ####
+    #### connect to the console via telnet
+    ####   this is connection to console before login 
+    ####
     tn = telnetlib.Telnet(HOST,port)
     print("tn value is  ", tn)
     tn.set_debuglevel(db)
-    
-    #print("-------------------------------------------------ready to read lines")
+    print("@"*80)
+    print("CONSOLE==="*8)
+    print("CONNECTED VIA TELNET TO THE CONSOLE ")
+    print("NEXT STEP IS TO LOGIN TO THE CONSOLE")
+    print("\n"*4)
     #############################################################################
-    #### login
-    ####  start the login procedure 
-    capture = tn.expect(reg_list) 
+    #### login console  
+    ####  start the login procedure
+    ####
+    #############################################################################
+    ####
+    #### some consoles would not need to login steps so if the capture after the
+    ####    telnet login are the words 'Enter your login: '  or reglist 0
+    ####     if this is found we can move to the next step if not then login
+    ####      to the console
+    ####
+    ####   steps for both types of consoles
+    ####    1. console 1 displays a message "Welcome to Console Server Managment Server .....port SXXX
+    ####       - look for this message
+    ####          - login to the console
+    ####
+    ####    2. check for timeout of so many seconds
+    ####       - if timeout send a \n and look for login
+    ####
+    ####    3. should be at switch login 
+    ####
+    ####
+    
+  
+    capture = tn.expect(reg_list, 20)
+    if capture[0] == 10:
+        #######################################################################
+        ####
+        #### send the username and password for the console login
+        ####
+        ####
+        capture = tn.expect(reg_list, 30)
+        print("@"*80)
+        print(capture)
+        print("@"*80)
+        print("STEP TWO OF LOGIN TO THE CONSOLE ")
+        print("CONSOLE==LOGIN======"*4)
+    
+        tn.write(usrname.encode('ascii') + b"\r\n")
+        capture = tn.expect(reg_list)
+        tn.write(password.encode('ascii') + b"\r\n\n")
+                
+        capture = tn.expect(reg_list)
+        
+        print(capture)
+    else:
+        tn.write(b"\n")
+    print("1___"*20)
     print(capture)
     print(capture[0])
     print("*"*10)
-    #sys.exit()
-    if capture[0] == 0:
-        pass
-    else:
-        print(capture)
-        tn.write(usrname.encode('ascii') + b"\r\n")
-        capture = tn.expect(reg_list)
-        tn.write(password.encode('ascii') + b"\r\n")
-        capture = tn.expect(reg_list)
-        print(capture)
-    print("\n\n\n\n\n\n\n\n")
-
-    #############################################################################
-    #### login to the console
-    ####
-    #reg_list = [ b"Enter your option : ",\
-    #            b"login: ", \
-    #            b".*?assword: ", \
-    #            b"root> ", \
-    #            b".*?users: ", \
-    #            b"ogin incorrect", \
-    #            b"=>" ,\
-    #            b"admin>", \
-    #            b"proceed.", \
-    #            b"Authentication failure" ]
-    print("D"*10)
-    #capture = ""
-    #capture = tn.expect(reg_list)
+    tn.write(b"\n")
+    capture = tn.expect(reg_list, 30)
+    print("2___"*20)
     print(capture)
     print(capture[0])
-    print()
-    #sys.exit()
+    print("*"*10)
+
     ###################################################################################################################
     ####
     ####  this sends number 1 when there are more than one user on the console
@@ -209,20 +228,41 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     if capture[0] == 0:
         tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
         #print("\n"*11)
-        tn.write(b"\n")
+        #tn.write(b"\n")
+        capture = tn.expect(reg_list)
+        print(capture)
         print("END CAPTURE PRINT OUT !!!!!!!!!!!!!!!!!!!!! ")
+    else:
+        tn.write(b"\n")
+    
+    print("3___"*20)
     capture = tn.expect(reg_list)
     print(capture)
-    #sys.exit()
     ###################################################################################################################
     ####
     ####  find login or the user that is logged in. 
     ####
     ###################################################################################################################
-    if capture[0] == 4:
+    print("4___"*20)
+    
+    if capture[0] == 0:
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        #print("\n"*11)
+        #tn.write(b"\n")
         capture = tn.expect(reg_list)
+        print(capture)
+    else:
+        tn.write(b"\n")
+        capture = tn.expect(reg_list)
+        print(capture)
+    
+    if capture[0] == 4:          ####  found the users: after starting a regular session
+        print("FOUND USER ")
+        tn.write(b"\n")
+        capture = tn.expect(reg_list)  ####  nothing to do execpt wait for the login or user prompt
         
-    if capture[0] == 2:          #### if Password is found we did not enter the user name yet.
+    if capture[0] == 2:#### if Password is found we did not enter the user name yet.
+        print("FOUND PASSWORD  ")
         tn.write(b"\n")          ####  so send a \n so we can get the login prompt
         capture = tn.expect(reg_list)
 
@@ -265,20 +305,15 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
                         capture = tn.expect(reg_list)
                         tn.write(b"anything\n")         #### old password for admin 
                         capture = tn.expect(reg_list)
-                                           
-                                          
-                                           
+                                                        
                         print("&"*88)
                         print("&"*88)
                         print("&"*88)
-                        #tn.write(b"\n")
-                        #capture = tn.expect(reg_list)
+                     
                         tn.write(b"password\n")
                         capture = tn.expect(reg_list)
                         tn.write(b"password\n")
                         capture = tn.expect(reg_list)
-                        
-                        
                       
                         tn.write(b"userconfig --change root -e yes \n")
                         capture = tn.expect(reg_list)
@@ -301,15 +336,11 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
                         tn.write(b"password\n")
                         capture = tn.expect(reg_list)
                         
-    
     print("\n"*8)
     print("@"*30)
     print("@"*30)
     print("@"*30)
     print(capture)
-    
-    tn.write(b"fabricshow\n")
-    capture = tn.expect(reg_list)
     tn.write(b"timeout 0\n")
     capture = tn.expect(reg_list)
     print("\n"*10)
@@ -317,7 +348,6 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     print("\n"*10)
     liabhar.JustSleep(10)
 
-    
     return(tn)
 
 def stop_at_cmd_prompt(db=0):
@@ -916,23 +946,7 @@ def main():
         print("\n"*20)
     
     print(ipaddr_switch)
-    
-    cc = cofra.SwitchUpdate()
-    #cons_out = cc.playback_licenses()
-    #cons_out  = cc.playback_ls()
-
-    
-    #cons_out = cc.playback_switch_names()
-    
-    #cons_out = cc.playback_switch_domains()
-    #cons_out = cc.playback_add_ports()
-    cons_out = cc.playback_timeout()
-    #tn       = cc.reboot_reconnect()
-    #cons_out = anturlar.fos_cmd("passwddefault")
-    #cons_out = anturlar.fos_cmd("logout")
-    
-    liabhar.JustSleep(30)
-    #cons_out = cc.power_cycle()
+  
     liabhar.JustSleep(10)
     #print("reconnect via telnet")
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")

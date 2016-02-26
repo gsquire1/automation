@@ -144,9 +144,240 @@ def info_help_OSError():
     print("\n"*5)
     sys.exit()
 
+def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
+    
+    global tn
+    
+    var = 1
+    reg_list = [ b"Enter your option : ", \
+                b"login: ", \
+                b"assword: ", \
+                b"root> ", \
+                b".*?users: ", \
+                b"ogin incorrect", \
+                b"=>" , \
+                b"admin>", \
+                b"proceed.", \
+                b"Authentication failure" , \
+                b"Console Server Management" ]
+
+    password = "pass"
+    capture = ""
+    option = 1
+    #############################################################################
+    #### parse the user name for console login
+    ####
+    port = str(port)
+    usrname = parse_port(port)
+    print("connecting via Telnet to  " + HOST + " on port " + port )
+    print(HOST)
+    print(usrname)
+    print(password)
+    print(port)
+    ###########################################################################
+    ####
+    #### connect to the console via telnet
+    ####   this is connection to console before login 
+    ####
+    tn = telnetlib.Telnet(HOST,port)
+    print("tn value is  ", tn)
+    tn.set_debuglevel(db)
+    print("@"*80)
+    print("CONSOLE==="*8)
+    print("CONNECTED VIA TELNET TO THE CONSOLE ")
+    print("NEXT STEP IS TO LOGIN TO THE CONSOLE")
+    print("\n"*4)
+    #############################################################################
+    #### login console  
+    ####  start the login procedure
+    ####
+    #############################################################################
+    ####
+    #### some consoles would not need to login steps so if the capture after the
+    ####    telnet login are the words 'Enter your login: '  or reglist 0
+    ####     if this is found we can move to the next step if not then login
+    ####      to the console
+    ####
+    ####   steps for both types of consoles
+    ####    1. console 1 displays a message "Welcome to Console Server Managment Server .....port SXXX
+    ####       - look for this message
+    ####          - login to the console
+    ####
+    ####    2. check for timeout of so many seconds
+    ####       - if timeout send a \n and look for login
+    ####
+    ####    3. should be at switch login 
+    ####
+    ####
+    
+  
+    capture = tn.expect(reg_list, 20)
+    if capture[0] == 10:
+        #######################################################################
+        ####
+        #### send the username and password for the console login
+        ####
+        ####
+        capture = tn.expect(reg_list, 30)
+        print("@"*80)
+        print(capture)
+        print("@"*80)
+        print("STEP TWO OF LOGIN TO THE CONSOLE ")
+        print("CONSOLE==LOGIN======"*4)
+    
+        tn.write(usrname.encode('ascii') + b"\r\n")
+        capture = tn.expect(reg_list)
+        tn.write(password.encode('ascii') + b"\r\n\n")
+                
+        capture = tn.expect(reg_list)
+        
+        print(capture)
+    else:
+        tn.write(b"\n")
+    print("1___"*20)
+    print(capture)
+    print(capture[0])
+    print("*"*10)
+    tn.write(b"\n")
+    capture = tn.expect(reg_list, 30)
+    print("2___"*20)
+    print(capture)
+    print(capture[0])
+    print("*"*10)
+
+    ###################################################################################################################
+    ####
+    ####  this sends number 1 when there are more than one user on the console
+    ####
+    ###################################################################################################################
+
+    if capture[0] == 0:
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        #print("\n"*11)
+        #tn.write(b"\n")
+        capture = tn.expect(reg_list)
+        print(capture)
+        print("END CAPTURE PRINT OUT !!!!!!!!!!!!!!!!!!!!! ")
+    else:
+        tn.write(b"\n")
+    
+    print("3___"*20)
+    capture = tn.expect(reg_list)
+    print(capture)
+    ###################################################################################################################
+    ####
+    ####  find login or the user that is logged in. 
+    ####
+    ###################################################################################################################
+    print("4___"*20)
+    
+    if capture[0] == 0:
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        #print("\n"*11)
+        #tn.write(b"\n")
+        capture = tn.expect(reg_list)
+        print(capture)
+    else:
+        tn.write(b"\n")
+        capture = tn.expect(reg_list)
+        print(capture)
+    
+    if capture[0] == 4:          ####  found the users: after starting a regular session
+        print("FOUND USER ")
+        tn.write(b"\n")
+        capture = tn.expect(reg_list)  ####  nothing to do execpt wait for the login or user prompt
+        
+    if capture[0] == 2:#### if Password is found we did not enter the user name yet.
+        print("FOUND PASSWORD  ")
+        tn.write(b"\n")          ####  so send a \n so we can get the login prompt
+        capture = tn.expect(reg_list)
+
+    if capture[0] == 3:           ##### if root is logged in should be able to continue from here
+        print("FOUND ROOT : ")
+             
+    if capture[0] == 7:           #### if admin is found log out and see if passwords are changed and root is enabled
+        print("FOUND ADMIN : ")   #### 
+        tn.write(b"exit\n")
+        capture = tn.expect(reg_list)
+          
+    if capture[0] == 1:            ####  found login login as root if this is successful go on
+        print("FOUND LOGIN : ")    ####   if root is disable loggin as admin and change the root permissions
+        tn.write(b"root\n")
+        capture = tn.expect(reg_list)
+        if capture[0] == 2:              ####  is password
+            print("FIND 2  "*10 )
+            tn.write(b"password\n")
+            capture = tn.expect(reg_list)
+            if capture[0] == 3:          ####  see the root prompt means root is configured and we can get out
+                print("@"*55)
+                #break
+                    
+            if capture[0] == 1:              #### is the login incorrect
+                print("FIND 5  "*10 )
+                tn.write(b"admin\n")
+                capture = tn.expect(reg_list)
+                if capture[0] == 2:              ####  is password
+                    print("FIND 2 after 5  "* 8 )
+                    tn.write(b"password\n")
+                    capture = tn.expect(reg_list)
+                    
+                    if capture[0] == 8:          #### if the user is asked to change password
+                        print("FIND  8  "* 10 )
+                        tn.write(b"\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")         #### old password for admin 
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")         #### new password for admin 
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")         #### new password for admin 
+                        capture = tn.expect(reg_list)
+                                                        
+                        print("&"*88)
+                        print("&"*88)
+                        print("&"*88)
+                     
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                      
+                        tn.write(b"userconfig --change root -e yes \n")
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"echo Y | rootaccess --set all \n")
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"exit\n")
+                        capture = tn.expect(reg_list)
+                        capture = tn.expect(reg_list)
+                        
+                        tn.write(b"root\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"fibranne\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        tn.write(b"password\n")
+                        capture = tn.expect(reg_list)
+                        
+    print("\n"*8)
+    print("@"*30)
+    print("@"*30)
+    print("@"*30)
+    print(capture)
+    tn.write(b"timeout 0\n")
+    capture = tn.expect(reg_list)
+    print("\n"*10)
+    print(capture)
+    print("\n"*10)
+    liabhar.JustSleep(10)
+
+    return(tn)
 
 
-def connect_console_update_root(HOST,usrname,password,port,db=10, *args):
+def connect_console_update_root_old(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
@@ -990,11 +1221,11 @@ def do_net_install(sw_info_filename):
     tn_list = []
     print("\n\nCONNECT TO THE CONSOLE NOW\n\n")
     #if sw_director_or_pizza:
-    tn_cp0 = connect_console_update_root(console_ip, user_name, usr_pass, console_port, 0)
+    tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
     tn_list.append(tn_cp0)
     
     if sw_director_or_pizza:
-        tn_cp1 = connect_console_update_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
+        tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
         tn_list.append(tn_cp1)
     
     for tn in tn_list:
@@ -1356,6 +1587,7 @@ def load_config(ipaddr_switch, user_name,usr_psswd, filename):
        read from config files and configure the switch
     
     """
+    
     try:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
         
@@ -1590,6 +1822,8 @@ def main():
         #### see note at the end of this line                                               ####   found
         if not os.path.isfile(complete_name):  #### this should be checked in parser
             cant_find_file_message(complete_name,pa.filename)
+        
+        
         load_config(ipaddr_switch,user_name, usr_pass, pa.filename)
         
         sys.exit()
@@ -1631,6 +1865,12 @@ def main():
     
         if not os.path.isfile(complete_name):  #### this should be checked in parser
             cant_find_file_message(complete_name,pa.filename)
+        
+        connect_console_enable_root(console_ip,user_name,usr_pass,console_port,10)
+        
+        if console_ip_bkup != "":
+            connect_console_enable_root(console_ip_bkup,user_name,usr_pass,console_port_bkup,10)
+        
         load_config(ipaddr_switch,user_name, usr_pass, pa.filename)
     
         sys.exit()    
@@ -2068,9 +2308,9 @@ def main():
 ####
     tn_list = []
     if sw_director_or_pizza:
-        tn_cp0 = connect_console(console_ip, user_name, usr_pass, console_port, 0)
+        tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
         
-        tn_cp1 = connect_console(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
+        tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
         #tn_list = []
         tn_list.append(tn_cp0)
         tn_list.append(tn_cp1)
@@ -2109,7 +2349,7 @@ def main():
     #### im a pizza box
     ###########################################################################
          
-        tn = connect_console(console_ip, user_name, usr_pass, console_port, 0)
+        tn = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
         tn_list.append(tn)
        
      
