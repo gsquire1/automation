@@ -667,6 +667,8 @@ def fcr_state_persist_disabled():
 
     sys.exit(0)#######################
     
+
+    
 def firmwaredownload(frmdwn, frmup):
     """
         uses cofra firmwaredownload to do testing for update to
