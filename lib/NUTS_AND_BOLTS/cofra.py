@@ -311,7 +311,7 @@ class DoFirmwaredownloadChoice():
             print("END OF SEND Y \n\n\n\n\n\n")
             anturlar.close_tel()
             
-            liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+            liabhar.email_sender_html("smckie@brocade.com,gsquire@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
             
             liabhar.count_down(1800) 
             return(capture_cmd)
