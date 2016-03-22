@@ -313,11 +313,10 @@ class DoFirmwaredownloadChoice():
             print("END OF SEND Y \n\n\n\n\n\n")
             anturlar.close_tel()
             
-<<<<<<< HEAD
-            liabhar.email_sender_html("smckie@brocade.com,gsquire@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
-=======
+
+            ####liabhar.email_sender_html("smckie@brocade.com,gsquire@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+
             liabhar.email_sender_html(email, email, "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
->>>>>>> a082dd6bf86cfbb9c7e5d61dbb972a3030bff176
             
             liabhar.count_down(1800) 
             return(capture_cmd)
@@ -409,8 +408,8 @@ class DoFirmwaredownloadChoice():
             message_check = "failed"
         
         mmsg = "%s "% (capture_own_regex)
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
+        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
         
         if "failed" in message_check:
             print("\n\ndo you want to stop the test ?")
@@ -438,8 +437,8 @@ class DoFirmwaredownloadChoice():
         capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
         #anturlar.close_tel()
         mmsg = "%s "% (capture_own_regex)
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
+        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
         print("exit now")
         sys.exit()
         
