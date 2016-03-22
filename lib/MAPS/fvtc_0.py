@@ -1953,7 +1953,7 @@ def mem_monitor_test():
 
  
  
-def firmwaredownload(frmdwn, frmup):
+def firmwaredownload(frmdwn, frmup, email):
     """
         uses cofra firmwaredownload to do testing for update to
         newest code
@@ -1975,7 +1975,7 @@ def firmwaredownload(frmdwn, frmup):
     while True:
     #f = cofra.doFirmwareDownload(frmdwn)
         capture_cmd = anturlar.fos_cmd("version")
-        f = cofra.DoFirmwaredownloadChoice(frmdwn,frmup)
+        f = cofra.DoFirmwaredownloadChoice(frmdwn,frmup, email)
         
         #
         #print("value of f is :  ")
@@ -1991,7 +1991,7 @@ def firmwaredownload(frmdwn, frmup):
         en = anturlar.SwitchInfo()
         capture_cmd = anturlar.fos_cmd("version")
         
-        f = cofra.DoFirmwaredownloadChoice(frmdwn, frmup)
+        f = cofra.DoFirmwaredownloadChoice(frmdwn, frmup, email)
     
         anturlar.connect_tel_noparse(myip, 'root', 'password')
         en = anturlar.SwitchInfo()

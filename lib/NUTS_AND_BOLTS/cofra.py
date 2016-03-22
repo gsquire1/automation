@@ -221,9 +221,10 @@ class DoFirmwaredownloadChoice():
         is already on the switch
         
     """
-    def __init__(self, firmdown, firmup):
+    def __init__(self, firmdown, firmup, email):
         self.firmdown = firmdown
         self.firmup = firmup
+        self.email = email
         #ras = re.compile('([\.a-z0-9]+)(?:_)')
         ras = re.compile('([\.a-z0-9]{6})')
         ras = ras.search(firmdown)
@@ -285,6 +286,7 @@ class DoFirmwaredownloadChoice():
           
     def start(self):
         ras = self.check_version()
+        email = self.email
         download_success = False
         print("\n\nFIRMUP IS %s\n"%(self.firmup))
         print("RAS IS     %s\n"%(ras))
@@ -311,7 +313,7 @@ class DoFirmwaredownloadChoice():
             print("END OF SEND Y \n\n\n\n\n\n")
             anturlar.close_tel()
             
-            liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+            liabhar.email_sender_html(email, email, "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
             
             liabhar.count_down(1800) 
             return(capture_cmd)
