@@ -707,7 +707,9 @@ def main():
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
     steps_to_run      = pa.steps
- 
+    if ipaddr_switch != pa.ipaddr:
+        pa.ipaddr = ipaddr_switch
+        
     fid_to_compare    = 128
     
     ###################################################################################################################

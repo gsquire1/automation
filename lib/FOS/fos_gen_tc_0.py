@@ -332,7 +332,7 @@ def check_version():
     
     
     ras = re.compile('Fabric OS:\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-    ras = re.compile('Fabric\s+OS:\s+([\.\\s_a-zA-Z0-9]{6,24})(?:\\r\\n)')
+    ras = re.compile('[Fabric OS|FOS AMPOS]:\s+([\.\\s_a-zA-Z0-9]{6,24})(?:\\r\\n)')
     
     
     #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')

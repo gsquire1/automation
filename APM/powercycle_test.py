@@ -116,7 +116,103 @@ def parse_args(args):
 
     return parser.parse_args()
 
+
+
 def connect_console(HOST,usrname,password,port,db=0, *args):
+    
+    global tn
+    
+    
+    var = 1
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
+    reg_list_r = [b".*\n", b":root> "]
+    
+    password = "pass"
+    capture = ""
+    option = 1
+    #############################################################################
+    #### parse the user name for console login
+    ####
+    port = str(port)
+    usrname = parse_port(port)
+    print("connecting via Telnet to  " + HOST + " on port " + port )
+    print(HOST)
+    print(usrname)
+    print(password)
+    print(port)
+    
+    tn = telnetlib.Telnet(HOST,port)
+    print("tn value is  ", tn)
+    tn.set_debuglevel(db)
+    
+    
+    print("-------------------------------------------------ready to read lines")
+    #############################################################################
+    #### login 
+    capture = tn.read_until(b"login: ")
+    print(capture)
+    tn.write(usrname.encode('ascii') + b"\r\n")
+    #if password:
+    capture = tn.read_until(b"assword: ")
+    print(capture)
+    tn.write(password.encode('ascii') + b"\r\n")
+        
+    print("\n\n\n\n\n\n\n\n")
+    
+    #############################################################################
+    #### login to the switch
+    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" ]  
+    while var <= 4:
+        #print("start of the loop var is equal to ")
+        capture = ""
+        capture = tn.expect(reg_list)
+        print(capture)
+        
+        if capture[0] == 0:
+            tn.write(b"1")
+                    
+        if capture[0] == 1:
+            tn.write(b"root\r\n")
+                
+        if capture[0] == 2:
+            tn.write(b"assword\r\n")
+                    
+        if capture[0] == 3:
+            print(capture)
+            print("this found root")
+            break
+        
+        if capture[0] == 4:
+            print(capture)
+            print("\n\n\n\n\n\nFOUND USERS: \n\n")
+            tn.write(b"\r\n")
+            #capture = tn.expect(reg_list)
+            #break
+        if capture[0] == 5:
+            print(capture)
+            var += 4
+            break
+        
+        var += 1
+      
+    capture = tn.expect(reg_list, 20)
+    if capture[0] == 1 :
+        tn.write(b"root\r\n")
+        capture = tn.expect(reg_list, 20)
+        tn.write(b"password\r\n")
+        capture = tn.expect(reg_list, 20)
+        
+
+    capture = tn.expect(reg_list, 20)
+    
+    return(tn)
+
+
+
+
+
+
+def connect_console_old(HOST,usrname,password,port,db=0, *args):
     
     global tn
     
@@ -468,7 +564,7 @@ def console_info(chassis_name):
     """
     
     """
-    
+    #sw_set_pwd_timeout
     switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
     switchmatrix = 'ini/SwitchMatrix.csv'
     try:
@@ -593,59 +689,59 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
-def sw_set_pwd_timeout(pswrd, tn):
-    """
-        
-        set the password for the root, factory, admin user accounts
-        
-    """
-     
-    
-    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
-    reg_login = [ b"login:"]
-    reg_assword = [ b"assword: ", b"root> "]
-    reg_change_pass = [ b"key to proceed", b"incorrect" ]
-    reg_complete   = [ b"zation completed"]
-    reg_linertn    = [ b"\\r\\n" ]
-    
-    print("\n\nlooking for completed task\n\n")
-    capture = tn.expect(reg_complete, 10)
-    tn.write(b"\r\n")
-    print("\n\nwrite to tn a newline \n\n")
-    print("\n\nlooking for login and send root\n\n")
-        #capture = tn.expect(reg_linertn)
-    capture = tn.expect(reg_login, 60)
-    
-    tn.write(b"root\r\n")
-    capture = tn.expect(reg_assword, 20)
-    print("\n\nlooking for password and send fibranne\n\n")
-    tn.write(b"fibranne\r\n")
-    capture = tn.expect(reg_change_pass, 20)
-    tn.write(b"\r\n")
-    capture = tn.expect(reg_linertn)
-
-    
-    while True:    
-        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
-        #### if root is found break out
-        print("CAPTURE is  ")
-        print(capture)
-        
-        if capture[0] == 1:
-            print(capture)
-            print("this found root")
-            break
-        tn.write(b"password\r\n")
-  
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"root\r\n")
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"password\r\n")
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"timeout 0 \r\n")
-    capture = tn.expect(reg_list, 20)
-    
-    return(True)
+#def sw_set_pwd_timeout(pswrd, tn):
+#    """
+#        
+#        set the password for the root, factory, admin user accounts
+#        
+#    """
+#     
+#    
+#    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
+#    reg_login = [ b"login:"]
+#    reg_assword = [ b"assword: ", b"root> "]
+#    reg_change_pass = [ b"key to proceed", b"incorrect" ]
+#    reg_complete   = [ b"zation completed"]
+#    reg_linertn    = [ b"\\r\\n" ]
+#    
+#    print("\n\nlooking for completed task\n\n")
+#    capture = tn.expect(reg_complete, 10)
+#    tn.write(b"\r\n")
+#    print("\n\nwrite to tn a newline \n\n")
+#    print("\n\nlooking for login and send root\n\n")
+#        #capture = tn.expect(reg_linertn)
+#    capture = tn.expect(reg_login, 60)
+#    
+#    tn.write(b"root\r\n")
+#    capture = tn.expect(reg_assword, 20)
+#    print("\n\nlooking for password and send fibranne\n\n")
+#    tn.write(b"fibranne\r\n")
+#    capture = tn.expect(reg_change_pass, 20)
+#    tn.write(b"\r\n")
+#    capture = tn.expect(reg_linertn)
+#
+#    
+#    while True:    
+#        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
+#        #### if root is found break out
+#        print("CAPTURE is  ")
+#        print(capture)
+#        
+#        if capture[0] == 1:
+#            print(capture)
+#            print("this found root")
+#            break
+#        tn.write(b"password\r\n")
+#  
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"root\r\n")
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"password\r\n")
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"timeout 0 \r\n")
+#    capture = tn.expect(reg_list, 20)
+#    
+#    return(True)
    
 def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
     """
@@ -746,6 +842,7 @@ def main():
     user_name         = usr_pass[0]
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
+
 
 ###################################################################################################################
 ###################################################################################################################
@@ -973,6 +1070,7 @@ def main():
 ####
 ####
 #######################################################################################################################
+    connect_console(console_ip,user_name,usr_psswd,console_port)
 
     print("\r\n"*6)
     print("@"*40)
@@ -995,24 +1093,9 @@ def main():
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
     except:
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    cons_out = sw_set_pwd_timeout(usr_psswd, tn)
+    #cons_out = sw_set_pwd_timeout(usr_psswd, tn)
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    
-    print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
-    print(my_ip)
-    
-    cc = cofra.SwitchUpdate()
-    
-    cons_out = cc.playback_licenses()
-    cons_out = cc.playback_ls()
-    cons_out = cc.playback_switch_names()
-    cons_out = cc.playback_switch_domains()
-    cons_out = cc.playback_add_ports()
-    tn       = cc.reboot_reconnect()
-    cons_out = anturlar.fos_cmd("switchshow")
-    print(cons_out)
-    cons_out = anturlar.fos_cmd("timeout 0")
-    print(cons_out)
+ 
      
     anturlar.close_tel()
     #tn.write(b"exit\n")

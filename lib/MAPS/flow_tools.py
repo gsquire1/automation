@@ -214,6 +214,7 @@ def check_gen_all_stats():
   sw_ip = sw_info.ipaddress()
   
   fv = anturlar.FlowV()
+  fv.toggle_all()       #### default is to turn all ports to SIM ports 
   fv.genAll("on")
   
   f = "%s%s%s"%("logs/Gen_all_stats_test_case_file",sw_ip,".txt")

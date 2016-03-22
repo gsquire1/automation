@@ -2027,6 +2027,9 @@ class FlowV(SwitchInfo):
             state = "-disable"
             
         portlist =  self.all_ports()
+        print(portlist)
+         
+        
         if self.am_i_director:
             for i in portlist:
                 slot = i[0]
@@ -2035,15 +2038,18 @@ class FlowV(SwitchInfo):
                 #cmd = fos_cmd("portcfgshow %a/%a" % (slot, port))
                 #ex = pattern.search(cmd)
                 #if ex:
-                fos_cmd("flow --control -simport "+slot+"/"+port+" %s"%(state))
-              
+                fos_cmd("flow --control -simport %s/%s %s" %(slot, port, state))
+                #fos_cmd("flow --control -simport "+slot+"/"+port+" %s"%(state))
+                
+                
         else: 
             for i in portlist:
                 #pattern = re.compile(r'(?:\Sim\sPort\s+)(?P<state> ON)')
                 #cmd = fos_cmd("portcfgshow %a" % i)
                 #ex = pattern.search(cmd)
                 #if ex:
-                fos_cmd("flow --control -simport "+i+" %s"%(state))
+                fos_cmd("flow --control -simport %s %s " %(i, state))
+                #fos_cmd("flow --control -simport "+i+" %s"%(state))
               
         return(portlist)
 

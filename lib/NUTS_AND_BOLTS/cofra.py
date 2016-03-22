@@ -310,6 +310,9 @@ class DoFirmwaredownloadChoice():
             #print(capture_cmd)
             print("END OF SEND Y \n\n\n\n\n\n")
             anturlar.close_tel()
+            
+            liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+            
             liabhar.count_down(1800) 
             return(capture_cmd)
         
@@ -399,19 +402,41 @@ class DoFirmwaredownloadChoice():
         if "Brocade FC16-64 blades" in capture_own_regex:
             message_check = "failed"
         
-        
+        mmsg = "%s "% (capture_own_regex)
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
         
         if "failed" in message_check:
             print("\n\ndo you want to stop the test ?")
             print(message_check)
+            print("STOP"*20)
+            print("STOP"*20)
             sys.exit()
             #return(message_check)
+        if "failed" in capture_own_regex:
+            print("\n\ndo you want to stop the test ?")
+            print(capture_own_regex)
+            print("\n"*4)
+            print("STOP"*20)
+            print("STOP"*20)
+            sys.exit()
+            #return(message_check)
+        print("\n"*4)
+        print("FAIL____"*10)
+        print(message_check)
+        print("FAIL____"*10)
+        print(capture_own_regex)
+        print("FAIL____"*10)
         
         liabhar.count_down(20)
         capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
         #anturlar.close_tel()
-        
+        mmsg = "%s "% (capture_own_regex)
         liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
+        print("exit now")
+        sys.exit()
+        
         liabhar.count_down(1800) 
         return(capture_cmd)
 ###############################################################################
