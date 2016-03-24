@@ -217,10 +217,11 @@ class DoSupportsave():
 
 class DoFirmwaredownloadChoice():
     """
-        do a firmware download to 7.4.x or 7.3.1 builds depending on what
-        is already on the switch
+        do a firmware download to one of the builds in the ini file
+        depending on what is already on the switch
         
     """
+    
     def __init__(self, firmdown, firmup, email):
         self.firmdown = firmdown
         self.firmup = firmup
@@ -284,12 +285,49 @@ class DoFirmwaredownloadChoice():
   
         return(f)
           
+    def eml_mssg(self):
+        """
+        """
+        ss = anturlar.SwitchInfo()
+        my_ip    = ss.ipaddress()
+        my_name  = ss.chassisname()
+        my_name  = str(my_name[0])
+        
+        msg_html = """\
+        <p>
+        Firmwaredownload has Started      
+        ================================================================
+        Switch IP Address                   :      replace_ip  
+        Switch Name                         :      replace_name 
+        Firmware Version downloading        :      replace_firm_up 
+        Firmware Version Next               :      replace_firm_next 
+       </p>
+        
+        """
+        
+        msg_html = msg_html.replace("replace_ip", my_ip)
+        msg_html = msg_html.replace("replace_name", my_name)
+        msg_html = msg_html.replace("replace_firm_up", self.firmdown)
+        msg_html = msg_html.replace("replace_firm_next", self.firmup)
+        
+        
+        return(msg_html)
+        
+        
+        
     def start(self):
         ras = self.check_version()
         email = self.email
         download_success = False
         print("\n\nFIRMUP IS %s\n"%(self.firmup))
         print("RAS IS     %s\n"%(ras))
+        
+        #ss = anturlar.SwitchInfo()
+        #my_ip    = ss.ipaddress()
+        #my_name  = ss.chassisname()
+        mmsg = self.eml_mssg()
+        #mmsg = "Firmwaredownload has started on \n%s  \n%s  \n\n\n" % (my_ip, my_name)
+        
         if ras != self.firmup:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
             firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
@@ -315,8 +353,8 @@ class DoFirmwaredownloadChoice():
             
 
             ####liabhar.email_sender_html("smckie@brocade.com,gsquire@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
-
-            liabhar.email_sender_html(email, email, "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+            
+            liabhar.email_sender_html(email, email, "Started Firmware Download ", mmsg)        
             
             liabhar.count_down(1800) 
             return(capture_cmd)
@@ -408,8 +446,9 @@ class DoFirmwaredownloadChoice():
             message_check = "failed"
         
         mmsg = "%s "% (capture_own_regex)
-        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
-        liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", " %s "%(mmsg))
+        #liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html(email, "smckie@brocade.com", "Firmware Download Failed ", " %s  %s <br><br> \
+                                  Console capture at time of Failure   <br><hr> %s "%(self.firmup, self.firmdown, mmsg))
         
         if "failed" in message_check:
             print("\n\ndo you want to stop the test ?")

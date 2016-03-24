@@ -291,15 +291,12 @@ def email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" ):
     <html>
       <head></head>
       <body>
-        <p>Hi!<br>
-           How are you?<br>
-           Here is the <a href="http://www.python.org">link</a> you wanted.
+        <p>Message:
+           <pre>  replace_me </pre>
            <br>
-           
-           Message:<br>
-           replace_me
-           
-           
+           <br>
+           </p><hr>
+        <p>  Link to python  <a href="http://www.python.org">link</a>   
         </p>
       </body>
     </html>

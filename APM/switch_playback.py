@@ -821,7 +821,7 @@ def pwr_cycle(pwr_ip, pp, stage, db=10):
 def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
     
     reg_list = [ b"^=> "]
-    reg_bash = [ b".*?bash-2.04", b".*?=> "]
+    reg_bash = [ b".*?bash-2.04#", b".*?=> ", b"bash-2.04#"]
     #reg_bash = [ b"bash-2.04", b"=> "]
     reg_bash_only = [ b"bash-2.04" ]
     reg_linkup = [ b".*?ink is up"]
