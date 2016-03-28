@@ -970,7 +970,9 @@ class SwitchInfo:
             capture_cmd = fos_cmd("switchshow")
             ras = re.compile('switchState:\s+(\w{6,7})') 
             ras = ras.findall(capture_cmd)
-            print('TRYING TRY STATEMENT IN switch_state')
+            #print(ras)
+            #print('TRYING TRY STATEMENT IN switch_state')
+            #sys.exit()
             try:
                 ss = str(ras[0])
                 return(ss)
