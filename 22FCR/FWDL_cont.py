@@ -84,7 +84,9 @@ def parse_args(args):
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
     parser.add_argument('ip', help="IP address of target switch")   
-    parser.add_argument('firmware', help='firmware verison 8.1.0_bldxx')
+    #parser.add_argument('firmware', help='firmware verison 8.1.0_bldxx')
+    parser.add_argument('frmup', help='firmware to go to 8.1.0_bldxx')
+    parser.add_argument('frmdwn', help='firmware to come from 8.1.0_bldxx')
     parser.add_argument('-t', '--time', type=int, default=None, help="Time between interations in seconds")
     parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")    
     #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
@@ -93,7 +95,7 @@ def parse_args(args):
     #parser.add_argument('-ip', '--ipaddr', type=list, help="IP address of target switch")
     parser.add_argument('-fcr', '--fcrwide', action="store_true", help="Execute fabric wide incluiding edge switches")
     #parser.add_argument('-to', '--tofirmvrsn', type=str, default=None, help="firmware Revision to go to")
-    parser.add_argument('-to', '--tofirmvrsn', action="store_true", help="firmware Revision to go to")
+    #parser.add_argument('-to', '--tofirmvrsn', action="store_true", help="firmware Revision to go to")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -124,217 +126,61 @@ def parse_args(args):
 
     return parser.parse_args()
 
-class doFirmwareDownload():
+def firmwaredownload(frmdwn, frmup, email):
     """
-        do a firmware download to 7.3.0 build of  firmware
-        then close the telnet connection and
-        wait 1200 seconds before closing ending the function
-        Return could be
-                1. a message that firmware version are the same
-                2. server is inaccessible
-                3. the user prompt after firmware download is started
+        uses cofra firmwaredownload to do testing for update to
+        newest code
+        
+        the test will load first firmware and return to the other on a second
+        download command
     """
-    def __init__(self, firmvrsn, firmdown, firmup ):
-        self.firmdown = firmdown
-        self.firmup = firmup
-        self.firmvrsn = firmvrsn
-        self.start()
     
-    def check_status(self):
-        capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
-        if "firmware versions" in capture_cmd:
-            return(True)
-        else:
-            liabhar.count_down(30)
-            self.check_status()
-            
-    def check_version(self):
+    capture_cmd = anturlar.fos_cmd("ipaddrshow")
+    #match = re.search('(?P<ipaddress>[\s+\S+]+:([\d\.]){7,15}(?=\\r\\n))', capture_cmd)
+    match = re.search('(?P<pre>([\s+\w+]+):\s?(?P<ip>[0-9\.]{1,15}))', capture_cmd)
+    if match:
+        myip = (match.group('ip'))
+        #return(myip)
+    else:
+        print("\n\n NO IP FOUND \n\n")
+        #return (0)
+    
+    while True:
+    #f = cofra.doFirmwareDownload(frmdwn)
+        #capture_cmd = anturlar.fos_cmd("version")
+        #f = cofra.DoFirmwaredownloadChoice(frmdwn,frmup, email)
+        #print("value of f is :  ")
+        #print(f)
+        #
+        #if "failed" in f:
+        #    sys.exit()
+        
          
-        capture_cmd = anturlar.fos_cmd("firmwareshow") 
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = ras.search(capture_cmd)
-        ras_dir = ras_dir.search(capture_cmd)
-        f=""
-        try:
-            if ras.group(0) != "none":
-                f= ras.group(1)
-        except:
-            pass
-        try:
-            if ras_dir(0) != "none":
-                f=ras_dir.group(1)
-        except:
-            pass
+        #liabhar.count_down(600)
         
-        return(f)
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        #en = anturlar.SwitchInfo()
+        capture_cmd = anturlar.fos_cmd("version")
+        
+        f = DoFirmwaredownloadChoice(frmdwn, frmup, email)
+        #liabhar.count_down(600)    
+        anturlar.connect_tel_noparse(myip, 'root', 'password')
+        #en = anturlar.SwitchInfo( )
+        print ("++++++++++++++++++++ OUT OF firmwaredownload +++++++++++++++++++++++++++")
 
-    #def start(self):
-    #    ras = self.check_version()
-    #    #print("FIRMUP IS %s\n"%(self.firmup))
-    #    #print("RAS IS     %s\n"%(ras))
-    #    if ras != self.firmvrsn:
-    #        #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
-    #        firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
-    #    else:
-    #        return "fail to perform Firmwaredownload since versions were the same"
-    #        #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-    #    reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
-    #    capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
-    #    if "the same firmware" in capture_own_regex:
-    #        return(capture_own_regex)
-    #    if "server is inaccessible" in capture_own_regex:
-    #        return(capture_own_regex)
-    #    
-    #    capture_cmd = anturlar.fos_cmd("Y")
-    #    anturlar.close_tel()
-    #    liabhar.email_sender_html("smckie@brocade.com", "gsquire@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
-    #    liabhar.count_down(360) 
-    #    return(capture_cmd)
-    
-    def start(self):
-        ras = self.check_version()
-        download_success = False
-        print("\n\nFIRMUP IS %s\n"%(self.firmup))
-        print("RAS IS     %s\n"%(ras))
-        if ras != self.firmup:
-            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
-        else:
-            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
-            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmdown_folder, self.firmdown)
-        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
-                       b'with new firmware', b'Firmware has been downloaded']
-        
-        #capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
-        print("\n\nstart firmwaredownload")
-        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list, 9)
-        
-        if "Y]:" in capture_own_regex:
-            
-            print("\n\n\nsending yes \n\n\n\n")
-            capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list, 9)
-            download_success = True
-            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-            #print(capture_cmd)
-            print("END OF SEND Y \n\n\n\n\n\n")
-            anturlar.close_tel()
-            liabhar.count_down(1800) 
-            return(capture_cmd)
-        
-        #### does  capture_cmd include ha rebooting ???
-        #if "HA Rebooting" in capture_cmd:
-        #    print("\n\n\n")
-        #    return(capture_cmd)
-        #
-        #if "with new firmware" in capture_cmd:
-        #    return(capture_cmd)
-        #
-        #if "Firmware has been downloaded" in capture_cmd:
-        #    return(capture_cmd)
-
-        #######################################################################   
-        #######################################################################
-        ####
-        #### port decommission  -- need to delete decom action in all FIDS
-        ####         -- mapsconfig --actions raslog,email
-        #### FPI monitor        -- need to disable FPI monitor in all FIDS
-        ####         -- mapsconfig --disableFPImon
-        #### discard frame logging --
-        ####         -- framelog --disable -type du  and -type unroute
-        #### SIM ports configured --
-        ####         -- flow --control -simport [port] -disable 
-        ####
-        
-        ####
-        ####  if "root>" in capture_cmd_regex:
-        ####
-        capture_cmd = anturlar.fos_cmd("lscfg --show", 9)
-        ras = re.compile('(\d{1,3})(?=\()')  
-        ls_all = ras.findall(capture_cmd)
-        
-        message_check = ""
-        if "the same firmware" in capture_own_regex:
-            message_check = "Firmwaredownload failed"
-        if "server is inaccessible" in capture_own_regex:
-            message_check = "Firmwaredownload failed"
-        
-        if "Downgrade is not allowed" in capture_own_regex:
-            pass
-            #message_check = "failed"
-        if "Firmwaredownload is already running" in capture_own_regex:
-            pass
-        if "Sanity check failed because system is non-redundant" in capture_own_regex:
-            pass
-        
-        
-        if "port decommission" in capture_own_regex:
-            for l in ls_all:
-                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
-                capture_cmd = anturlar.fos_cmd("mapsconfig --actions raslog,email")
-        
-        if "FPI Monitor" in capture_own_regex:
-            for l in ls_all:
-                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
-                capture_cmd = anturlar.fos_cmd("mapsconfig --disableFPImon")
-            
-        if "discard frame logging" in capture_own_regex:
-            for l in ls_all:
-                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
-                capture_cmd = anturlar.fos_cmd("framelog --disable -type du")
-                capture_cmd = anturlar.fos_cmd("framelog --disable -type unroute")
-             
-        if "SIM ports configured" in capture_own_regex:
-            en = anturlar.SwitchInfo()
-            #port_list = en.sim_ports()
-            
-            for l in ls_all:
-                anturlar.fos_cmd("setcontext %s " % l)
-                port_list = en.sim_ports()
-                anturlar.fos_cmd("flow --control -portIdMode slotport")
-                print("port list is \n")
-                print(port_list)
-                
-                for p in port_list:
-                    capture_cmd = anturlar.fos_cmd("flow --control -simport %s/%s -disable" % (p[0],p[1]) )
-            
-                anturlar.fos_cmd("flow --control -portIdMode index")
-            #capture_cmd = anturlar.fos_cmd_regex("N", reg_ex_list)
-            #message_check = "Firmwaredownload failed"
-        
-        ##if "SIM ports configured" in capture_own_regex:
-        ##    message_check = "Firmwaredownload failed"
-        
-        if "Brocade FC16-64 blades" in capture_own_regex:
-            message_check = "failed"
-        
-        
-        
-        if "failed" in message_check:
-            print("\n\ndo you want to stop the test ?")
-            print(message_check)
-            sys.exit()
-            #return(message_check)
-        
-        liabhar.count_down(20)
-        capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
-        #anturlar.close_tel()
-        
-        liabhar.email_sender_html("gsquire@brocade.com", "gsquire@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
-        liabhar.count_down(1800) 
-        return(capture_cmd)
-###############################################################################
+    return(0)
 
 class DoFirmwaredownloadChoice():
     """
-        do a firmware download to 7.4.x or 7.3.1 builds depending on what
-        is already on the switch
+        do a firmware download to one of the builds in the ini file
+        depending on what is already on the switch
         
     """
-    def __init__(self, firmdown, firmup):
+    
+    def __init__(self, firmdown, firmup, email):
         self.firmdown = firmdown
         self.firmup = firmup
+        self.email = email
         #ras = re.compile('([\.a-z0-9]+)(?:_)')
         ras = re.compile('([\.a-z0-9]{6})')
         ras = ras.search(firmdown)
@@ -376,6 +222,7 @@ class DoFirmwaredownloadChoice():
         
         f=""
         capture_cmd = anturlar.fos_cmd("hashow")
+        print(capture_cmd)
         if "hashow: Not supported" in capture_cmd:
             f = ras.group(1)
         else:
@@ -393,11 +240,49 @@ class DoFirmwaredownloadChoice():
   
         return(f)
           
+    def eml_mssg(self):
+        """
+        """
+        ss = anturlar.SwitchInfo()
+        my_ip    = ss.ipaddress()
+        my_name  = ss.chassisname()
+        my_name  = str(my_name[0])
+        
+        msg_html = """\
+        <p>
+        Firmwaredownload has Started      
+        ================================================================
+        Switch IP Address                   :      replace_ip  
+        Switch Name                         :      replace_name 
+        Firmware Version downloading        :      replace_firm_up 
+        Firmware Version Next               :      replace_firm_next 
+       </p>
+        
+        """
+        
+        msg_html = msg_html.replace("replace_ip", my_ip)
+        msg_html = msg_html.replace("replace_name", my_name)
+        msg_html = msg_html.replace("replace_firm_up", self.firmdown)
+        msg_html = msg_html.replace("replace_firm_next", self.firmup)
+        
+        
+        return(msg_html)
+        
+        
+        
     def start(self):
         ras = self.check_version()
+        email = self.email
         download_success = False
         print("\n\nFIRMUP IS %s\n"%(self.firmup))
         print("RAS IS     %s\n"%(ras))
+        
+        #ss = anturlar.SwitchInfo()
+        #my_ip    = ss.ipaddress()
+        #my_name  = ss.chassisname()
+        mmsg = self.eml_mssg()
+        #mmsg = "Firmwaredownload has started on \n%s  \n%s  \n\n\n" % (my_ip, my_name)
+        
         if ras != self.firmup:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
             firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
@@ -420,7 +305,14 @@ class DoFirmwaredownloadChoice():
             #print(capture_cmd)
             print("END OF SEND Y \n\n\n\n\n\n")
             anturlar.close_tel()
-            liabhar.count_down(1800) 
+            
+
+            ####liabhar.email_sender_html("smckie@brocade.com,gsquire@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s  to  %s"%(self.firmdown, self.firmup))        
+            
+            liabhar.email_sender_html(email, email, "Started Firmware Download ", mmsg)        
+            
+            #liabhar.count_down(1800)
+            liabhar.count_down(700)
             return(capture_cmd)
         
         #### does  capture_cmd include ha rebooting ???
@@ -509,22 +401,448 @@ class DoFirmwaredownloadChoice():
         if "Brocade FC16-64 blades" in capture_own_regex:
             message_check = "failed"
         
-        
+        mmsg = "%s "% (capture_own_regex)
+        #liabhar.email_sender_html(email, "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html(email, email, "Firmware Download Failed ", " %s  %s <br><br> \
+                                  Console capture at time of Failure   <br><hr> %s "%(self.firmup, self.firmdown, mmsg))
         
         if "failed" in message_check:
             print("\n\ndo you want to stop the test ?")
             print(message_check)
+            print("STOP"*20)
+            print("STOP"*20)
             sys.exit()
             #return(message_check)
+        if "failed" in capture_own_regex:
+            print("\n\ndo you want to stop the test ?")
+            print(capture_own_regex)
+            print("\n"*4)
+            print("STOP"*20)
+            print("STOP"*20)
+            sys.exit()
+            #return(message_check)
+        print("\n"*4)
+        print("FAIL____"*10)
+        print(message_check)
+        print("FAIL____"*10)
+        print(capture_own_regex)
+        print("FAIL____"*10)
         
         liabhar.count_down(20)
         capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
         #anturlar.close_tel()
+        mmsg = "%s "% (capture_own_regex)
+        liabhar.email_sender_html(email, email, "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+        liabhar.email_sender_html(email, email, "Started Firmware Download ", " %s "%(mmsg))
+        print("exit now")
+        sys.exit()
         
-        liabhar.email_sender_html("smckie@brocade.com", "smckie@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
         liabhar.count_down(1800) 
         return(capture_cmd)
 ###############################################################################
+
+#class doFirmwareDownload():
+#    """
+#        do a firmware download to 7.3.0 build of  firmware
+#        then close the telnet connection and
+#        wait 1200 seconds before closing ending the function
+#        Return could be
+#                1. a message that firmware version are the same
+#                2. server is inaccessible
+#                3. the user prompt after firmware download is started
+#    """
+#    def __init__(self, firmvrsn, firmdown, firmup ):
+#        self.firmdown = firmdown
+#        self.firmup = firmup
+#        self.firmvrsn = firmvrsn
+#        self.start()
+#    
+#    def check_status(self):
+#        capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
+#        if "firmware versions" in capture_cmd:
+#            return(True)
+#        else:
+#            liabhar.count_down(30)
+#            self.check_status()
+#            
+#    def check_version(self):
+#         
+#        capture_cmd = anturlar.fos_cmd("firmwareshow") 
+#        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+#        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+#        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+\\r\\n\s+([\._a-z0-9]{6,18})')
+#        ras = ras.search(capture_cmd)
+#        ras_dir = ras_dir.search(capture_cmd)
+#        f=""
+#        try:
+#            if ras.group(0) != "none":
+#                f= ras.group(1)
+#        except:
+#            pass
+#        try:
+#            if ras_dir(0) != "none":
+#                f=ras_dir.group(1)
+#        except:
+#            pass
+#        
+#        return(f)
+#
+#    #def start(self):
+#    #    ras = self.check_version()
+#    #    #print("FIRMUP IS %s\n"%(self.firmup))
+#    #    #print("RAS IS     %s\n"%(ras))
+#    #    if ras != self.firmvrsn:
+#    #        #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
+#    #        firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.4.0/%s,fwdlacct"%(self.firmvrsn)
+#    #    else:
+#    #        return "fail to perform Firmwaredownload since versions were the same"
+#    #        #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+#    #    reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.']
+#    #    capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+#    #    if "the same firmware" in capture_own_regex:
+#    #        return(capture_own_regex)
+#    #    if "server is inaccessible" in capture_own_regex:
+#    #        return(capture_own_regex)
+#    #    
+#    #    capture_cmd = anturlar.fos_cmd("Y")
+#    #    anturlar.close_tel()
+#    #    liabhar.email_sender_html("smckie@brocade.com", "gsquire@brocade.com", "Started Firmware Download ", "%s"%(self.firmvrsn))
+#    #    liabhar.count_down(360) 
+#    #    return(capture_cmd)
+#    
+#    def start(self):
+#        ras = self.check_version()
+#        download_success = False
+#        print("\n\nFIRMUP IS %s\n"%(self.firmup))
+#        print("RAS IS     %s\n"%(ras))
+#        if ras != self.firmup:
+#            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
+#            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
+#        else:
+#            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+#            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmdown_folder, self.firmdown)
+#        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
+#                       b'with new firmware', b'Firmware has been downloaded']
+#        
+#        #capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+#        print("\n\nstart firmwaredownload")
+#        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list, 9)
+#        
+#        if "Y]:" in capture_own_regex:
+#            
+#            print("\n\n\nsending yes \n\n\n\n")
+#            capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list, 9)
+#            download_success = True
+#            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+#            #print(capture_cmd)
+#            print("END OF SEND Y \n\n\n\n\n\n")
+#            anturlar.close_tel()
+#            liabhar.count_down(1800) 
+#            return(capture_cmd)
+#        
+#        #### does  capture_cmd include ha rebooting ???
+#        #if "HA Rebooting" in capture_cmd:
+#        #    print("\n\n\n")
+#        #    return(capture_cmd)
+#        #
+#        #if "with new firmware" in capture_cmd:
+#        #    return(capture_cmd)
+#        #
+#        #if "Firmware has been downloaded" in capture_cmd:
+#        #    return(capture_cmd)
+#
+#        #######################################################################   
+#        #######################################################################
+#        ####
+#        #### port decommission  -- need to delete decom action in all FIDS
+#        ####         -- mapsconfig --actions raslog,email
+#        #### FPI monitor        -- need to disable FPI monitor in all FIDS
+#        ####         -- mapsconfig --disableFPImon
+#        #### discard frame logging --
+#        ####         -- framelog --disable -type du  and -type unroute
+#        #### SIM ports configured --
+#        ####         -- flow --control -simport [port] -disable 
+#        ####
+#        
+#        ####
+#        ####  if "root>" in capture_cmd_regex:
+#        ####
+#        capture_cmd = anturlar.fos_cmd("lscfg --show", 9)
+#        ras = re.compile('(\d{1,3})(?=\()')  
+#        ls_all = ras.findall(capture_cmd)
+#        
+#        message_check = ""
+#        if "the same firmware" in capture_own_regex:
+#            message_check = "Firmwaredownload failed"
+#        if "server is inaccessible" in capture_own_regex:
+#            message_check = "Firmwaredownload failed"
+#        
+#        if "Downgrade is not allowed" in capture_own_regex:
+#            pass
+#            #message_check = "failed"
+#        if "Firmwaredownload is already running" in capture_own_regex:
+#            pass
+#        if "Sanity check failed because system is non-redundant" in capture_own_regex:
+#            pass
+#        
+#        
+#        if "port decommission" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("mapsconfig --actions raslog,email")
+#        
+#        if "FPI Monitor" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("mapsconfig --disableFPImon")
+#            
+#        if "discard frame logging" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("framelog --disable -type du")
+#                capture_cmd = anturlar.fos_cmd("framelog --disable -type unroute")
+#             
+#        if "SIM ports configured" in capture_own_regex:
+#            en = anturlar.SwitchInfo()
+#            #port_list = en.sim_ports()
+#            
+#            for l in ls_all:
+#                anturlar.fos_cmd("setcontext %s " % l)
+#                port_list = en.sim_ports()
+#                anturlar.fos_cmd("flow --control -portIdMode slotport")
+#                print("port list is \n")
+#                print(port_list)
+#                
+#                for p in port_list:
+#                    capture_cmd = anturlar.fos_cmd("flow --control -simport %s/%s -disable" % (p[0],p[1]) )
+#            
+#                anturlar.fos_cmd("flow --control -portIdMode index")
+#            #capture_cmd = anturlar.fos_cmd_regex("N", reg_ex_list)
+#            #message_check = "Firmwaredownload failed"
+#        
+#        ##if "SIM ports configured" in capture_own_regex:
+#        ##    message_check = "Firmwaredownload failed"
+#        
+#        if "Brocade FC16-64 blades" in capture_own_regex:
+#            message_check = "failed"
+#        
+#        
+#        
+#        if "failed" in message_check:
+#            print("\n\ndo you want to stop the test ?")
+#            print(message_check)
+#            sys.exit()
+#            #return(message_check)
+#        
+#        liabhar.count_down(20)
+#        capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
+#        #anturlar.close_tel()
+#        
+#        liabhar.email_sender_html("gsquire@brocade.com", "gsquire@brocade.com", "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+#        liabhar.count_down(1800) 
+#        return(capture_cmd)
+################################################################################
+#
+#class DoFirmwaredownloadChoice():
+#    """
+#        do a firmware download to 7.4.x or 7.3.1 builds depending on what
+#        is already on the switch
+#        
+#    """
+#    def __init__(self, firmdown, firmup, email):
+#        self.firmdown = firmdown
+#        self.firmup = firmup
+#        #ras = re.compile('([\.a-z0-9]+)(?:_)')
+#        ras = re.compile('([\.a-z0-9]{6})')
+#        ras = ras.search(firmdown)
+#        frm_no_bld_down = ras.group(1)
+#        
+#        #ras_up = re.compile('([\.a-z0-9]+)(?:_)')
+#        ras_up = re.compile('([\.a-z0-9]{6})')
+#        ras_up = ras_up.search(firmup)
+#        frm_no_bld_up   = ras_up.group(1)
+#        
+#        if 'amp' in firmdown:
+#            frm_no_bld_down = frm_no_bld_down + '_amp'
+#        self.firmdown_folder = frm_no_bld_down   
+#        if 'amp' in firmup:
+#            frm_no_bld_up = frm_no_bld_up + '_amp'
+#        self.firmup_folder = frm_no_bld_up
+#        
+#        #self.check_version()
+#        
+#        self.start()
+#        
+#    
+#    def check_status(self):
+#        capture_cmd = anturlar.fos_cmd("firmwaredownloadstatus")
+#        if "firmware versions" in capture_cmd:
+#            return(True)
+#        else:
+#            liabhar.count_down(30)
+#            self.check_status()
+#               
+#    def check_version(self):
+#         
+#        capture_cmd = anturlar.fos_cmd("firmwareshow") 
+#        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+#        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+#        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+[\\r\\n]*\s+([\._a-z0-9]{6,18})')
+#        ras = ras.search(capture_cmd)
+#        ras_dir = ras_dir.search(capture_cmd)
+#        
+#        f=""
+#        capture_cmd = anturlar.fos_cmd("hashow")
+#        if "hashow: Not supported" in capture_cmd:
+#            f = ras.group(1)
+#        else:
+#            f = ras_dir.group(1)
+#        
+#        
+#        #print("switch RAS is :  %s  " % ras.group(1))
+#        #print("director RAS is  : %s " % ras_dir.group(1))
+#        
+#        #try:
+#        #    if ras_dir(0) != "none":
+#        #        f=ras_dir.group(1)
+#        #except:
+#        #    pass
+#  
+#        return(f)
+#          
+#    def start(self):
+#        ras = self.check_version()
+#        download_success = False
+#        print("\n\nFIRMUP IS %s\n"%(self.firmup))
+#        print("RAS IS     %s\n"%(ras))
+#        if ras != self.firmup:
+#            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
+#            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
+#        else:
+#            #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
+#            firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmdown_folder, self.firmdown)
+#        reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
+#                       b'with new firmware', b'Firmware has been downloaded']
+#        
+#        #capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
+#        print("\n\nstart firmwaredownload")
+#        capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list, 9)
+#        
+#        if "Y]:" in capture_own_regex:
+#            
+#            print("\n\n\nsending yes \n\n\n\n")
+#            capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list, 9)
+#            download_success = True
+#            print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+#            #print(capture_cmd)
+#            print("END OF SEND Y \n\n\n\n\n\n")
+#            anturlar.close_tel()
+#            #liabhar.count_down(1800)
+#            liabhar.count_down(700)
+#            return(capture_cmd)
+#        
+#        #### does  capture_cmd include ha rebooting ???
+#        #if "HA Rebooting" in capture_cmd:
+#        #    print("\n\n\n")
+#        #    return(capture_cmd)
+#        #
+#        #if "with new firmware" in capture_cmd:
+#        #    return(capture_cmd)
+#        #
+#        #if "Firmware has been downloaded" in capture_cmd:
+#        #    return(capture_cmd)
+#
+#        #######################################################################   
+#        #######################################################################
+#        ####
+#        #### port decommission  -- need to delete decom action in all FIDS
+#        ####         -- mapsconfig --actions raslog,email
+#        #### FPI monitor        -- need to disable FPI monitor in all FIDS
+#        ####         -- mapsconfig --disableFPImon
+#        #### discard frame logging --
+#        ####         -- framelog --disable -type du  and -type unroute
+#        #### SIM ports configured --
+#        ####         -- flow --control -simport [port] -disable 
+#        ####
+#        
+#        ####
+#        ####  if "root>" in capture_cmd_regex:
+#        ####
+#        capture_cmd = anturlar.fos_cmd("lscfg --show", 9)
+#        ras = re.compile('(\d{1,3})(?=\()')  
+#        ls_all = ras.findall(capture_cmd)
+#        
+#        message_check = ""
+#        if "the same firmware" in capture_own_regex:
+#            message_check = "Firmwaredownload failed"
+#        if "server is inaccessible" in capture_own_regex:
+#            message_check = "Firmwaredownload failed"
+#        
+#        if "Downgrade is not allowed" in capture_own_regex:
+#            pass
+#            #message_check = "failed"
+#        if "Firmwaredownload is already running" in capture_own_regex:
+#            pass
+#        if "Sanity check failed because system is non-redundant" in capture_own_regex:
+#            pass
+#        
+#        
+#        if "port decommission" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("mapsconfig --actions raslog,email")
+#        
+#        if "FPI Monitor" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("mapsconfig --disableFPImon")
+#            
+#        if "discard frame logging" in capture_own_regex:
+#            for l in ls_all:
+#                capture_cmd = anturlar.fos_cmd("setcontext %s " % l)
+#                capture_cmd = anturlar.fos_cmd("framelog --disable -type du")
+#                capture_cmd = anturlar.fos_cmd("framelog --disable -type unroute")
+#             
+#        if "SIM ports configured" in capture_own_regex:
+#            en = anturlar.SwitchInfo()
+#            #port_list = en.sim_ports()
+#            
+#            for l in ls_all:
+#                anturlar.fos_cmd("setcontext %s " % l)
+#                port_list = en.sim_ports()
+#                anturlar.fos_cmd("flow --control -portIdMode slotport")
+#                print("port list is \n")
+#                print(port_list)
+#                
+#                for p in port_list:
+#                    capture_cmd = anturlar.fos_cmd("flow --control -simport %s/%s -disable" % (p[0],p[1]) )
+#            
+#                anturlar.fos_cmd("flow --control -portIdMode index")
+#            #capture_cmd = anturlar.fos_cmd_regex("N", reg_ex_list)
+#            #message_check = "Firmwaredownload failed"
+#        
+#        ##if "SIM ports configured" in capture_own_regex:
+#        ##    message_check = "Firmwaredownload failed"
+#        
+#        if "Brocade FC16-64 blades" in capture_own_regex:
+#            message_check = "failed"
+#        
+#        
+#        
+#        if "failed" in message_check:
+#            print("\n\ndo you want to stop the test ?")
+#            print(message_check)
+#            sys.exit()
+#            #return(message_check)
+#        
+#        liabhar.count_down(20)
+#        capture_cmd = anturlar.fos_cmd_regex("Y", reg_ex_list)
+#        #anturlar.close_tel()
+#        
+#        liabhar.email_sender_html(email, email, "Started Firmware Download ", "%s %s"%(self.firmdown, self.firmup))
+#        liabhar.count_down(1800) 
+#        return(capture_cmd)
+################################################################################
 
 def connect_console(HOST,usrname,password,port, *args):
     
@@ -1134,6 +1452,8 @@ def main():
     #print(pa.verbose)
     #print(pa.firmware)
     #print("@"*40)
+    #print(pa.frmup)
+    #print(pa.frmdwn)
     #sys.exit()
 
    
@@ -1153,6 +1473,8 @@ def main():
     usr_pass            = get_user_and_pass(pa.chassis_name)
     user_name           = usr_pass[0]
     usr_psswd           = usr_pass[1]
+    frmup               = pa.frmup
+    frmdwn              = pa.frmdwn
     
     tn = anturlar.connect_tel_noparse(pa.ip,user_name,usr_psswd)
     fi = anturlar.FabricInfo()
@@ -1169,17 +1491,18 @@ def main():
         ipaddr_switch   = fcr.fcr_fab_wide_ip()     
     else:
         ipaddr_switch       = [pa.ip]
-        
-    #fwdl = cofra.DoFirmwaredownloadChoice('v7.4.0','v7.4.0a_rc1_bld10')
-    if pa.tofirmvrsn == False:
-        print("none")
-    else:
-        pass
-    #sys.exit()
-    fwdl = doFirmwareDownload(pa.firmware)
-    a = fwdl.start()
+    
+    fwdl = firmwaredownload(frmdwn, frmup,"gsquire@brocade.com")    
+    ##fwdl = cofra.DoFirmwaredownloadChoice('v7.4.0','v7.4.0a_rc1_bld10')
+    #if pa.tofirmvrsn == False:
+    #    print("none")
+    #else:
+    #    pass
+    ##sys.exit()
+    #fwdl = doFirmwareDownload(pa.firmware)
+    #a = fwdl.start()
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    print(a)
+    #print(a)
     #print(c)
     anturlar.close_tel()
     sys.exit()

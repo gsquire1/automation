@@ -276,6 +276,50 @@ def csv_functions_ip():
         print('\n\nFile Not Found (Line 158 in fcr_tools.py)')
         return(False)
     
+def ha_failover( times=1):
+    """
+        do HA failover on directors
+        do hareboot on pizza box
+    """
+    #### steps
+    ####  1. Determine Pizza box or Director
+    ####  2. save username and password
+    ####  3. HA Failover or HA reboot
+    ####  4. wait some time
+    ####  5. reconnect
+
+    sw_info = anturlar.SwitchInfo()
+    ip_addr = sw_info.ipaddress()
+    chassis = sw_info.am_i_director
+
+    while times > 0:
+        print("\n\n\n")
+        print("@"*60)
+        print("HA Failovers remaining -- %s " % times)
+        print("@"*60)
+        times -= 1
+        liabhar.count_down(10)
+        if chassis:
+            capture = anturlar.fos_cmd("echo Y | hafailover")    
+        else:
+            capture = anturlar.fos_cmd("hareboot")
+        liabhar.count_down(300)
+        tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
+        switch_sync = sw_info.synchronized()
+        print("\n\n")
+        print("@"*60)
+        print("VALUE OF switch_sync is   --   %s   " % switch_sync)
+        print("@"*60)
+        while  switch_sync is False:
+            liabhar.count_down(120)
+            switch_sync = sw_info.synchronized()
+            print("\n\n")
+            print("@"*60)
+            print("The VALUE OF switch_sync is   --   %s   " % switch_sync)
+            print("@"*60)
+    
+    return(tn)
+    
 def file_diff(a,b,c=""):
     """
     Compare two files for differences, print to console and put in a file in logs directory
@@ -773,6 +817,9 @@ def switch_command_loop(iterations):
     
 def timeserversetup():
     cmd = anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    print(cmd)
+    ha_failover()
+    cmd = anturlar.fos_cmd("date")
     print(cmd)
     return (cmd)
 
