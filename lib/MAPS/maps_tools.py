@@ -263,7 +263,7 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                                         "SEC_FCS","SEC_SCC","SEC_AUTH_FAIL","SEC_TELNET","SEC_TS", \
                                         "DID_CHG","FLOGI","FAB_CFG","EPORT_DOWN","FAB_SEG","ZONE_CHG", \
                                         
-                                        "RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "ZONED_DEV_RATIO", "OVER_SUB_RATIO"]
+                                        "RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "IT_FLOW", "OVER_SUB_RATIO"]
     
     monitor_list_with_no_timebase =  [ "PWR_HRS", " RXP", "VOLTAGE", "CURRENT", "TXP", "SFP_TEMP", "VTAP_IOPS", "BE_LATENCY_IMPACT", \
                                        "DAYS_TO_EXPIRE", "IP_JITTER", "IP_RTT", "JITTER", "RTT", "BLADE_STATE", "DEV_LATENCY_IMPACT", \
@@ -295,7 +295,7 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
 
     circuit_group_list = [ "ALL_CIRCUITS", "ALL_CIRCUIT_F_QOS", "ALL_CIRCUIT_HIGH_QOS", "ALL_CIRCUIT_MED_QOS", "ALL_CIRCUIT_LOW_QOS" ]
 
-    tunnel_group_list  = [ "ALL_cleanup_all_rulesTUNNELS", "ALL_TUNNEL_F_QOS", "ALL_TUNNEL_HIGH_QOS", "ALL_TUNNEL_MED_QOS", "ALL_TUNNEL_LOW_QOS" ]
+    tunnel_group_list  = [ "ALL_TUNNELS", "ALL_TUNNEL_F_QOS", "ALL_TUNNEL_HIGH_QOS", "ALL_TUNNEL_MED_QOS", "ALL_TUNNEL_LOW_QOS" ]
     
     ip_logical_group_list = [ "ALL_TUNNEL_IP_HIGH_QOS", "ALL_TUNNEL_IP_MED_QOS", "ALL_TUNNEL_IP_LOW_QOS", \
                              "ALL_CIRCUIT_IP_HIGH_QOS", "ALL_CIRCUIT_IP_MED_QOS", "ALL_CIRCUIT_IP_LOW_QOS" ]
@@ -317,10 +317,11 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
     quarantined_group_list   = [ "ALL_QUARANTINED_PORTS" ]
     asic_group_list          = [ "ALL_ASICS" ]
     certs_group_list         = [ "ALL_CERTS" ]
+    local_pid_list           = [ "ALL_LOCAL_PIDS" ]
     
     all_other_groups_list   =  temp_sensor_group_list + fan_group_list + power_supply_group_list + wwn_group_list \
                         + blade_group_list + flash_group_list + switch_group_list + chassis_group_list + d_group_list \
-                        + be_ports_group_list + quarantined_group_list + asic_group_list + certs_group_list
+                        + be_ports_group_list + quarantined_group_list + asic_group_list + certs_group_list + local_pid_list
     
     monitor_list_combined  =  monitor_list_for_ios + monitor_list_for_traffic_perf + monitor_list_for_monitor_type + monitor_list_with_no_timebase
     monitor_list_quick_sfp =  monitor_list_with_no_timebase
