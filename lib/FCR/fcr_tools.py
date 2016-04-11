@@ -14,6 +14,9 @@ import liabhar
 import cofra
 import switch_playback
 import sys, os, csv, re, filecmp, difflib
+import configparser
+import json
+import ast
 
 """
 Naming conventions --
@@ -38,19 +41,20 @@ def test_anturlar_functions():
     print(b)
     sys.exit()
     
-def playback_add_ports():
+def playback_add_ports_ex_ports():
 #def playback_add_ports(self):
     """
     
     """
     
-    reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
-    reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
+    #reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
+    #reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
     #switch_ip = self.si.ipaddress()
 
     #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
     #f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
-    f = ("logs/Switch_Info_10.38.134.65_2015_11_11_13_40_19_875006_65_VF_Wedge.txt")
+    #f = ("logs/Switch_Info_10.38.134.40_2016_04_07_09_51_13_980222_for_playback.txt")
+    f = ("logs/Switch_Info_10.38.134.10_NON_VF_for_playback.txt")
     try:
         with open(f, 'r') as file:
             a = file.read()
@@ -58,14 +62,29 @@ def playback_add_ports():
     except IOError:
         print("\n\nThere was a problem opening the file:" , f)
         sys.exit()
-    ras = re.findall('EX_PORTS\s+:\s+\{(.+)(?:})', a)
-    print(ras)
+    ports = re.findall('EX_PORTS\s+:\s+\{(.+)(?:})', a)
+    base = re.findall('BASE SWITCH\s+:\s+(\d{1,3})', a)
+    base_fid = (str(base[0]))
+    print (base_fid)
+    print("###########################")
+    #ports = str(ports)
+    a = str(ports)
+    ports = a.split(":")
+    ex_ports = (ports[1])
+    print(ex_ports)
+    if ex_ports.endswith(']"]'):
+        ex_ports = ex_ports[:-3]
+        ex_ports = ex_ports[2:]
+    ex_ports_with_fid = ast.literal_eval(ex_ports)
+    for i in ex_ports_with_fid:
+        print(i)
+        slot = i[0]
+        port = i[1]
+        fid = i[2]
+        print("slot = %s, port = %s, fid = %s" % (slot, port, fid))
     sys.exit()
-    sn = ras[0]
-    sn = sn.split("'")
-    print("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-    print(sn)
-    sys.exit()
+
+
     for i in range(2,len(sn),2):
         
         fid_for_ports = sn[i-1]
@@ -158,8 +177,6 @@ def user_start():
     print("OUT OF LOOP")
     sys.exit()
 
-
-    
 def csv_functions_ip():
     user_start()
     sys.exit()
@@ -343,12 +360,10 @@ def file_diff(a,b,c=""):
             differ.write(line)    
     sys.exit()
        
-
 def portcfgfillword():
     fcr = anturlar.FcrInfo()
     portcfg = fcr.portcfgfillword(3)
-    
-    
+      
 def bb_fabric_switch_status():
     """
         OBSOLETE##############
@@ -467,7 +482,6 @@ def configdl(clear = 0):
     configdown_cmd = ("configdownload -all -p ftp 10.38.35.131,ftp1,/configs/%s.txt,ftp2") % (sw_ip)
     cons_out = anturlar.fos_cmd (configdown_cmd)
     
-
 def fab_wide_proxy_device_numbers():
     """
     Retrieve number of proxy device on all backbone switches in fabric. Drop those numbers
@@ -505,9 +519,6 @@ def fab_wide_proxy_device_numbers():
     print('='*20 + '\n\n')
     return(switch_list_with_proxy_dev)
 
-
-    
-
 def switch_status():
     """
         Retrieve FCR fabric and return info. Variable #'s:
@@ -534,21 +545,13 @@ def switch_status():
     switch_info = { 'switch_name' : initial_checks[0],'ipaddr' : initial_checks[1], 'chassis' : initial_checks[2],'vf_enabled' : initial_checks[3], 'fcr_enabled' : initial_checks[4], 'base' : initial_checks[5]}
     return (switch_info)
 
-#def ex_deconfig(): 
-#    fcri = anturlar.FcrInfo()
-#    test = fcri.ex_deconfig()
-#    print('\n\nAll EX_ports found are now deconfigured.')
-
 def ex_port_list():
     """
     Grabs only ONLINE EX-Ports. Parses "switchshow" for EX-Ports.
     """
     si = anturlar.SwitchInfo()
     ex_list = si.ex_ports()
-    #print('*************')
-    #print(ex_list)
-    
-   
+       
 def ex_deconfig():
     """
     Find all EX-Ports AND VEX-Ports on either director or pizzabox and deconfigure.
@@ -711,8 +714,6 @@ def fcr_state_persist_disabled():
 
     sys.exit(0)#######################
     
-
-    
 def firmwaredownload(frmdwn, frmup):
     """
         uses cofra firmwaredownload to do testing for update to
@@ -826,7 +827,35 @@ def timeserversetup():
 def autoftpsetup():
     cmd = anturlar.fos_cmd(supportftp -S)
     print(cmd)
-        
+
+def all_ex_ports_with_edge_fid():
+    """
+        Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
+    """
+    si =anturlar.SwitchInfo()
+    anturlar.fos_cmd("setcontext %s" % si.base_check()) ###################NEW
+    capture_cmd = si.__getportlist__("EX-Port")
+    print(capture_cmd)
+    length = len(capture_cmd)
+    print(length)
+    ex = []
+    for i in capture_cmd:
+        slot = i[0]
+        port = i[1]
+        a = anturlar.fos_cmd("portcfgexport %s/%s" % (slot, port))
+        fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
+        fid = int(fid[0])
+        ex_list = [slot, port, fid]
+        ex.append(ex_list)
+    print("YYYYYYYYYYYYYYYYYY")
+    print(ex)
+    print("ZZZZZZZZZZZZZZZZZZ")
+    print(ex[1])
+    sys.exit()
+    return(ex)
+
+
+
     
     
 
