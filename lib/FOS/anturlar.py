@@ -282,6 +282,7 @@ class SwitchInfo:
             ras = re.compile('\s?([0-9]{1,4})\s+(\d+)\s+([-0-9abcdef]{6})\s+([-id]{2})\s+([-UNG123486]{2,4})\s+([_\w]{5,9})\s+([FCVE]+)\s*([->\w]{6,14})([()-:\"_=\w\s\d]*?(?=\\n))')
         ras = ras.findall(capture_cmd)
         self.online_ports = ras
+        return(ras)
         
     def __sw_basic_info__(self):
         """
@@ -1133,21 +1134,38 @@ class FcrInfo(FabricInfo, SwitchInfo):
         """
             Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
         """
-        fos_cmd("setcontext %s" % self.base_check()) ###################NEW
-        capture_cmd = self.__getportlist__("EX-Port")
-        print(capture_cmd)
-        length = len(capture_cmd)
-        print(length)
-        ex = []
-        for i in capture_cmd:
-            slot = i[0]
-            port = i[1]
-            a = fos_cmd("portcfgexport %s/%s" % (slot, port))
-            fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
-            fid = int(fid[0])
-            ex_list = [slot, port, fid]
-            ex.append(ex_list)
-        return(ex)
+        if self.am_i_director:
+            fos_cmd("setcontext %s" % self.base_check()) ###################NEW
+            capture_cmd = self.__getportlist__("EX-Port")
+            print(capture_cmd)
+            length = len(capture_cmd)
+            print(length)
+            ex = []
+            for i in capture_cmd:
+                slot = i[0]
+                port = i[1]
+                a = fos_cmd("portcfgexport %s/%s" % (slot, port))
+                fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
+                fid = int(fid[0])
+                ex_list = [slot, port, fid]
+                ex.append(ex_list)
+            return(ex)
+        else:
+            fos_cmd("setcontext %s" % self.base_check()) ###################NEW
+            capture_cmd = self.__getportlist__("EX-Port")
+            print(capture_cmd)
+            #sys.exit()
+            length = len(capture_cmd)
+            print(length)
+            ex = []
+            for i in capture_cmd:
+                a = fos_cmd("portcfgexport %s" % (i[1]))
+                fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
+                print(fid)
+                fid = int(fid[0])
+                ex_list = [i[1], fid]
+                ex.append(ex_list)
+            return(ex)
     
     def all_switches_in_bb_ip(self):
         """

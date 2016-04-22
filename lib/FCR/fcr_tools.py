@@ -30,12 +30,25 @@ GLOBAL_CONSTANT_NAME            ClassName
                                 
 """
 
+def test_cofra_functions():
+    su = cofra.SwitchUpdate()
+    #a = fcri.__getportlist__("EX-Port")
+    #b = fcri.all_ex_ports_with_edge_fid()
+    print("1111111111111111111111111111111")
+    #b = su.playback_add_ports()
+    b = su.playback_add_ports_ex("root", "password")
+    print("3333333333333333333333333333333")
+    print(b)
+    sys.exit()
+    
 def test_anturlar_functions():
     #a = ex_port_list()
     fcri = anturlar.FcrInfo()
-    si = anturlar.SwitchInfo()
+    #si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
     #a = fcri.__getportlist__("EX-Port")
+    #b = fcri.all_ex_ports_with_edge_fid()
+    print("1111111111111111111111111111111")
     b = fcri.all_ex_ports_with_edge_fid()
     print("3333333333333333333333333333333")
     print(b)
