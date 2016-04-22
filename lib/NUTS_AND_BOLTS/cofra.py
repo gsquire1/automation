@@ -786,6 +786,7 @@ class SwitchUpdate():
             fid_ports = fid_ports.split(",")
             print("@"*30)
             print(fid_ports)
+            print(len(fid_ports))
             print("$"*44)
             for s in range(0,len(fid_ports),2):
                 try:
@@ -805,7 +806,70 @@ class SwitchUpdate():
                     print("No ports in this FID")
                     
         return(True)
-    
+
+    def playback_add_ports_ex(self):
+        reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
+        reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"N\]: "]
+        ### Default
+        f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
+        ## Below used for testing this function
+        #f = "logs/Switch_Info_10.38.134.53_2016_04_19_14_05_30_512085_for_playback.txt"
+        #f = "logs/Test/Switch_Info_10.38.134.53_VF_EX_for_playback.txt"
+        #f = "logs/Switch_Info_10.38.134.10_2016_04_21_14_29_58_834247_for_playback.txt"
+        try:
+            with open(f, 'r') as file:
+                a = file.read()
+        except IOError:
+            print("\n\nThere was a problem opening the file:" , f)
+            sys.exit()
+        try:
+            ras_vf_enabled = re.findall('VF SETTING\s+:\s+([TrueFals0-9]+)', a)
+            ports = re.findall('EX_PORTS\s+:\s+\{(.+)(?:})', a)
+            base = re.findall('BASE SWITCH\s+:\s+(\d{1,3})', a)
+            enabled = re.findall('FCR ENABLED\s+:\s+([TrueFals0-9]+)', a)
+            a = str(ports[0])
+            b = a.split(":")
+            print(b[0])
+            print(b[1])
+            ls_base = b[0]
+            pt = b[1]
+            portdict = {ls_base:pt}
+            ex_ports = portdict[ls_base]
+            if ex_ports == (" []" or False):
+                print("@"*30)
+                print("NO EX_Ports Found")
+                print("@"*30)
+                return(0)
+            cons_out = anturlar.fos_cmd("fosconfig --enable fcr")
+            cons_out = anturlar.fos_cmd("diagdisablepost")
+            if ras_vf_enabled[0] == "False":
+                reboot = self.vf_config(True)
+                liabhar.count_down(120)
+            tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
+            ex_ports = ex_ports.lstrip()
+            ex_ports_with_fid = ast.literal_eval(ex_ports)
+            if self.direct:
+                cons_out = anturlar.fos_cmd ("setcontext %s" % ls_base)
+                for i in ex_ports_with_fid:
+                    slot = i[0]
+                    port = i[1]
+                    ex_fid = i[2]
+                    cons_out = anturlar.fos_cmd("portdisable %s/%s" % (slot, port), 0)
+                    cons_out = anturlar.fos_cmd("portcfgexport %s/%s -a 1 -f %s" % (slot, port, ex_fid), 0)
+                    cons_out = anturlar.fos_cmd("portenable %s/%s" % (slot, port), 0)
+            else:
+                cons_out = anturlar.fos_cmd ("setcontext %s" % ls_base)
+                for i in ex_ports_with_fid:    
+                    port = i[0]
+                    ex_fid = i[1]
+                    cons_out = anturlar.fos_cmd("portdisable %s" % port, 0)
+                    cons_out = anturlar.fos_cmd("portcfgexport %s -a 1 -f %s" % (port, ex_fid), 0)
+                    cons_out = anturlar.fos_cmd("portenable %s" % port, 0)
+        except:
+                print("You have problems in cofra.playback_add_ports_ex")
+                return(False)
+        return(True)
+   
     def playback_timeout(self, seconds=0 ):
         anturlar.fos_cmd("timeout %s " % seconds)
     
@@ -967,7 +1031,12 @@ class SwitchUpdate():
         #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
         return(tn)
 
-        
+    def vf_config(self, disabled = False):
+        reg_ex_yes_no = [b"N]: ", b"Rebooting!"]
+        anturlar.fos_cmd_regex("fosconfig --disable vf", reg_ex_yes_no, 9)
+        anturlar.fos_cmd_regex("Y", reg_ex_yes_no, 9)
+        #anturlar.fos_cmd("Y", 9)
+        return(True)
     
 ###############################################################################
 def bladeportmap_Info(blade = 0):
