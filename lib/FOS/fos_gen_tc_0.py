@@ -223,7 +223,7 @@ def fabric_switch_config_show():
     
     fabric_data = []
     for ip in fab_ip_list:
-        tnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+        tnn = anturlar.connect_tel_noparse(ip, 'root', 'anything')
         
         m_info          = anturlar.Maps()
         f_info          = anturlar.FlowV()
@@ -283,7 +283,7 @@ def fabric_switch_config_show():
     #ff.write("\n"*5)
         
     for ip in fab_ip_list:
-        tnnn = anturlar.connect_tel_noparse(ip, 'root', 'password')
+        tnnn = anturlar.connect_tel_noparse(ip, 'root', 'anything')
         firmware_ver = check_version()
         m_info          = anturlar.Maps()
         chass_name      = m_info.chassisname()
