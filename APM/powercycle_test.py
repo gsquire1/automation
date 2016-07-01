@@ -1,4 +1,4 @@
-#!/opt/python3/bin/python3
+#!/usr/bin/env python3
 
 
 ###############################################################################
@@ -58,6 +58,28 @@ import time
 ####  142  Yoda pluto
 ####  148  Skybolt
 ####
+###############################################################################
+
+
+def user_start():
+    go = False
+    start = 'n'
+    while not go : 
+              
+        is_valid = 0
+        while not is_valid:
+            try:
+                start = str(input("\n\n\n\nSTART THE Power Cycle TEST ?  [y/n] : "))
+                is_valid = 1 
+            except:
+                print("\n\nthere was an error with the input")
+                sys.exit()
+                
+        if start == 'y':
+            go = True
+        else:
+            sys.exit()
+    return()
 ###############################################################################
 
 
@@ -689,59 +711,6 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
-#def sw_set_pwd_timeout(pswrd, tn):
-#    """
-#        
-#        set the password for the root, factory, admin user accounts
-#        
-#    """
-#     
-#    
-#    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
-#    reg_login = [ b"login:"]
-#    reg_assword = [ b"assword: ", b"root> "]
-#    reg_change_pass = [ b"key to proceed", b"incorrect" ]
-#    reg_complete   = [ b"zation completed"]
-#    reg_linertn    = [ b"\\r\\n" ]
-#    
-#    print("\n\nlooking for completed task\n\n")
-#    capture = tn.expect(reg_complete, 10)
-#    tn.write(b"\r\n")
-#    print("\n\nwrite to tn a newline \n\n")
-#    print("\n\nlooking for login and send root\n\n")
-#        #capture = tn.expect(reg_linertn)
-#    capture = tn.expect(reg_login, 60)
-#    
-#    tn.write(b"root\r\n")
-#    capture = tn.expect(reg_assword, 20)
-#    print("\n\nlooking for password and send fibranne\n\n")
-#    tn.write(b"fibranne\r\n")
-#    capture = tn.expect(reg_change_pass, 20)
-#    tn.write(b"\r\n")
-#    capture = tn.expect(reg_linertn)
-#
-#    
-#    while True:    
-#        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
-#        #### if root is found break out
-#        print("CAPTURE is  ")
-#        print(capture)
-#        
-#        if capture[0] == 1:
-#            print(capture)
-#            print("this found root")
-#            break
-#        tn.write(b"password\r\n")
-#  
-#    capture = tn.expect(reg_list, 20)
-#    tn.write(b"root\r\n")
-#    capture = tn.expect(reg_list, 20)
-#    tn.write(b"password\r\n")
-#    capture = tn.expect(reg_list, 20)
-#    tn.write(b"timeout 0 \r\n")
-#    capture = tn.expect(reg_list, 20)
-#    
-#    return(True)
    
 def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
     """
@@ -843,6 +812,8 @@ def main():
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
 
+
+    user_start()
 
 ###################################################################################################################
 ###################################################################################################################
@@ -969,14 +940,14 @@ def main():
 ####
         cnt = 1
     
-        if not pa.cmdprompt:
-            for tn in tn_list:
-                cons_out = stop_at_cmd_prompt(0)
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                print(cons_out)
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            
+        #if not pa.cmdprompt:
+        #    for tn in tn_list:
+        #        cons_out = stop_at_cmd_prompt(0)
+        #        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #        print(cons_out)
+        #        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        #    
             #for tn in tn_list:
                 #cons_out = env_variables(sw_type, 0)
                 #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")

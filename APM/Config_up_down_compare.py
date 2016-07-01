@@ -583,6 +583,7 @@ def capture_switch_info(extend_name="", fid=128):
         dns_info             = mi.dns_config_info()
         sfpinfo              = si.sfp_info()
         
+        cfgshow_output       = anturlar.fos_cmd("configshow")
         
         slot_info            = anturlar.fos_cmd("slotshow -m") 
         
@@ -663,6 +664,7 @@ def capture_switch_info(extend_name="", fid=128):
         ff.write("="*80)
         ff.write("\n")
         ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
+        ff.write("CONFIG SHOW OUTPUT       :  %s  \n" % cfgshow_output)
         ff.write("\n"*2)
         ff.close()
         

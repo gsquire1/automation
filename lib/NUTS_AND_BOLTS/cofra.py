@@ -1073,6 +1073,7 @@ def clear_stats():
     switch_info = anturlar.fos_cmd("slotstatsclear")
     switch_info = anturlar.fos_cmd("fabstatsclear")
     switch_info = anturlar.fos_cmd("history -c")
+    return(True)
 ###############################################################################
    
 def PortStats(counter="all", port_list = "all"):

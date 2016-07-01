@@ -531,7 +531,7 @@ class SwitchInfo:
         else:
             return(0)
     
-    def blades(self, L=False):
+    def blades(self, L=False, C=False):
         """
             return the list of SW blades in the switch
             includes SW BLADES and AP BLADES
@@ -545,6 +545,10 @@ class SwitchInfo:
             capture_cmd = fos_cmd("slotshow -m")
             if L:
                 ras = re.compile('(\d+)\s+[SWAP]')
+            elif C:
+                #ras = re.compile('(\d+)\s+(CORE BLADE)\s+(\d+)\s+([-CRFCOSEX1032468]+)\s+(\w+)')
+                print("&"*80)
+                ras = re.compile('(\d+)\s+[CO]{2}')
             else:
                 ras = re.compile('(\d+)\s+(SW BLADE|AP BLADE|CP BLADE|CORE BLADE)\s+(\d+)\s+([-FCOSEX1032468]+)\s+(\w+)')
             

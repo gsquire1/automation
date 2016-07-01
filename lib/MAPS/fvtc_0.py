@@ -1625,19 +1625,28 @@ def tc_01_01_06_07():
     ####
     #### create the object and clear stats
     en = anturlar.Maps()
+    statsclearcomplete = cofra.clear_stats()
+    
+    
     slot_list = en.blades(True)
     if "not a" in slot_list:
         slot_list = [0]
     print("slot list   %s " % slot_list )
+    
+    
+    slot_core_list = en.blades(False,True)
+    print("core blades    % s  " % slot_core_list)
+    
+    
     ####
     #fabmems = anturlar.fabric_members()
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-    cmdrtn = anturlar.fos_cmd("mapspolicy --enable Nervio_test_1")
+    #cmdrtn = anturlar.fos_cmd("mapspolicy --enable Nervio_test_1")
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
     #### add the slot numbers here
     slot_numb = int(slot_list[0])
-    
+     
     bld_map = cofra.bladeportmap_Info(slot_numb)
     print("\n\n\nBLADEPORTMAP INFO \n")
     
@@ -1654,8 +1663,25 @@ def tc_01_01_06_07():
     ###########################################################################
     cont = 0
     
+    
+    slotpicklist = []
+    
     while cont <= 100000:
         cont +=1
+        
+        slot_list_len = (len(slot_list))
+        ####pick a FC blade
+        print("SLOT LIST           %s  " % slot_list)
+        print("LENGTH of SLOT LIST  %s " % slot_list_len)
+        slot_to_add_err = ((liabhar.random_number_int(float(len(slot_list))))) -1
+        print("random slot number  %s  " % slot_to_add_err)
+        
+        slot_numb_holder = int(slot_list[slot_to_add_err])
+        print("slot number is      %s  " % slot_numb_holder)
+        slotpicklist.append(slot_numb_holder)
+        
+        print("the list of slots  is  %s  " % slotpicklist)
+        liabhar.JustSleep(10)
         
         ####  pick a port randomly 
         port_to_add_err = ((liabhar.random_number_int(float(len(in_sync_ports))))) - 1
@@ -1755,6 +1781,7 @@ def tc_01_01_06_07():
     
         cmdrtn = anturlar.fos_cmd("mapsdb --show all")
         liabhar.JustSleep(10)
+        
     return(0)
 ###############################################################################        
    
