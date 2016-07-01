@@ -426,6 +426,12 @@ class SwitchInfo:
         if not ras_result:
             ras_result = "no port found"
         return(port_list)
+
+    def ae_ports(self):
+        """
+           Return a list of the AMP AE-ports in the current FID
+        """
+        return(self.__getportlist__("AE-Port"))
     
     def allow_xisl(self):
         """

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 ###############################################################################
 #### Home location is
 ####
@@ -8,15 +7,17 @@
 FCR TOOLS - different functions to get information from switches and/or fabrics in regards to FCR configuration
 
 """
-
+from multiprocessing import Process,Queue
 import anturlar
 import liabhar
 import cofra
 import switch_playback
-import sys, os, csv, re, filecmp, difflib
-import configparser
-import json
+import sys, os, csv, re, filecmp, difflib, readline
+from configparser import SafeConfigParser
 import ast
+import readline
+
+
 
 """
 Naming conventions --
@@ -37,7 +38,7 @@ def test_cofra_functions():
     print("1111111111111111111111111111111")
     #b = su.playback_add_ports()
     b = su.playback_add_ports_ex("root", "password")
-    print("3333333333333333333333333333333")
+    print("2222222222222222222222222222222")
     print(b)
     sys.exit()
     
@@ -50,157 +51,41 @@ def test_anturlar_functions():
     #b = fcri.all_ex_ports_with_edge_fid()
     print("1111111111111111111111111111111")
     b = fcri.all_ex_ports_with_edge_fid()
-    print("3333333333333333333333333333333")
+    print("2222222222222222222222222222222")
     print(b)
     sys.exit()
     
-def playback_add_ports_ex_ports():
-#def playback_add_ports(self):
-    """
-    
-    """
-    
-    #reg_ex_yes_no_root = [b"no\]\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+", b"root> "]
-    #reg_ex_yes_no = [b"n\]\?:\\s+", b":\s+[\[ofn\]]+", b"[0-9]+\]\\s+"]
-    #switch_ip = self.si.ipaddress()
-
-    #f = ("%s%s%s"%("logs/Switch_Info_for_playback_",self.switch_ip,".bak.txt"))
-    #f = "%s%s%s"%("logs/Switch_Info_",self.switch_ip,"_%s.txt" % self.extend_name)
-    #f = ("logs/Switch_Info_10.38.134.40_2016_04_07_09_51_13_980222_for_playback.txt")
-    f = ("logs/Switch_Info_10.38.134.10_NON_VF_for_playback.txt")
-    try:
-        with open(f, 'r') as file:
-            a = file.read()
-            print(a)
-    except IOError:
-        print("\n\nThere was a problem opening the file:" , f)
-        sys.exit()
-    ports = re.findall('EX_PORTS\s+:\s+\{(.+)(?:})', a)
-    base = re.findall('BASE SWITCH\s+:\s+(\d{1,3})', a)
-    base_fid = (str(base[0]))
-    print (base_fid)
-    print("###########################")
-    #ports = str(ports)
-    a = str(ports)
-    ports = a.split(":")
-    ex_ports = (ports[1])
-    print(ex_ports)
-    if ex_ports.endswith(']"]'):
-        ex_ports = ex_ports[:-3]
-        ex_ports = ex_ports[2:]
-    ex_ports_with_fid = ast.literal_eval(ex_ports)
-    for i in ex_ports_with_fid:
-        print(i)
-        slot = i[0]
-        port = i[1]
-        fid = i[2]
-        print("slot = %s, port = %s, fid = %s" % (slot, port, fid))
-    sys.exit()
-
-
-    for i in range(2,len(sn),2):
-        
-        fid_for_ports = sn[i-1]
-        fid_ports = sn[i]
-        
-        fid_ports = fid_ports.replace(": [","")
-        fid_ports = fid_ports.replace("[","")
-        fid_ports = fid_ports.replace("]],","")
-        fid_ports = fid_ports.replace(" ","")
-        fid_ports = fid_ports.replace("]","")
-        fid_ports = fid_ports.split(",")
-        print("@"*30)
-        print(fid_ports)
-        print("$"*44)
-        for s in range(0,len(fid_ports),2):
-            try:
-                slot = fid_ports[s]
-                port = fid_ports[s+1]
-                #print("SLOT PORT_____%s_____%s___ " % (slot,port))
-                #### add pizza box vs director
-                #am_director = si.director()
-                if self.direct:
-                    cons_out = anturlar.fos_cmd_regex("lscfg --config %s -slot %s -port %s" % (fid_for_ports, slot,port) , reg_ex_yes_no, 0)
-                    cons_out = anturlar.fos_cmd("y",0)
-                else:
-                    cons_out = anturlar.fos_cmd_regex("lscfg --config %s -port %s" % (fid_for_ports, port) , reg_ex_yes_no, 0)
-                    cons_out = anturlar.fos_cmd("y",0)
-             
-            except IndexError:
-                print("No ports in this FID")
-                
-    return(True)
-    
-def enter_file_ext():
+def user_start():
     go = False
     start = 'n'
-    ###################################################################################################################
-    ####
-    ####  enter a file extension for the replay file instead of the default
-    ####  otherwise use the defualt
-    ####  stop if the user pushes esc 
-    ####
-    ###################################################################################################################
-    
-    
-    
-#######################################################################################################################
-####
-####  standard way to handle user input
-####    - while loop looking for a valid 'go' variable
-####       - while loop waiting for a string input
-####       - if start variable is y set go to true and exit the procedure
-####
-#######################################################################################################################
-    while not go : 
-              
-        is_valid = 0
+    while not go :       
+        is_valid = False
         while not is_valid:
             try:
-                start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/no] : "))
-                is_valid = 1 
-            except:
+                start = str(input("\n\n\n\nSTART THE TEST ?  [y/n] : "))
+                print("GGGGGG")
+                is_valid = True 
+            except EOFError:
                 print("\n\nthere was an error with the input")
-                sys.exit()        
-        if start == 'y' :
+                sys.exit()
+                
+        if start == 'y':
             go = True
         else:
-            print("START VALUE is  %s" % start)
-            if start == 'no':
-                sys.exit()
-            else:
-                start = 'n'
+            sys.exit()
+            
 
-def user_start():
-    temperature = 115  
-    while temperature > 112: # first while loop code
-        print(temperature)
-        temperature = temperature - 1
-    print('The tea is cool enough.')
-    start = 'n'
-    go = False
-    while go == False : ##Not False
-        print("go is equal to FALSE")
-        try:
-            start = str(input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
-            print(start)
-        except:
-            print("SOMETHING WRONG WITH INPUT")
-        go = True
-    print("OUT OF LOOP")
-    sys.exit()
 
 def csv_functions_ip():
-    user_start()
+    person = input('Enter your name: ')
+    print('Hello', person)
     sys.exit()
-    start = (input("\n\n\n\nCONTINUE WITH RESTORING THE SWITCH  [y/n] : "))
+    # start = input('CONTINUE WITH RESTORING THE SWITCH  [y/n] : ')
+    start = user_start()
     print(start)
     sys.exit()
     test_file = '/home/RunFromHere/ini/TBC_SwitchMatrix.csv'
     ips = []
-    #name = str(input("What's your name?  "))
-    #print(name)
-    #sys.exit()
     try:
         with open(test_file) as switch_matrix:
             my_dict = csv.DictReader(switch_matrix)
@@ -235,28 +120,13 @@ def csv_functions_ip():
                     console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
                     cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
                     cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
-
-                else:
-                    pass
-                #if (console_2) #############CP IPS NEED TO GO IN THIS LOOP
-                #print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-                #print(cp0_ip)
-                #print(cp1_ip)
-                #cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
-                #cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
-
-##############################################################
                 print (chassis_name)
                 print (ip)
                 print(console_1)
                 if (console_2):
                     print (console_2)
-                    #print (console_2_port)
                     print(cp0ip)
                     print(cp1ip)
-                #print(console_2)
-                #print(cp0ip)
-                #print(cp1ip)
             print("THEEND")
             sys.exit()
             if console_2 != '':
@@ -265,42 +135,6 @@ def csv_functions_ip():
                     print("PPPPPPPPPPP")
                     print(console_2)
                     print(console_2_port)
-            else:
-                    #print("MUST BE A PIZZA BOX")
-                    pass
-            
-            #value = None
-            #keys = my_dict.keys()
-            #print (keys)
-            #keys_sorted = keys.sorted()
-            #print (keys_sorted)
-            #for row in my_dict:
-                #print
-                #if row in reader:
-                #    value = reader[key]
-                #    print("PPPPPPPPPPPPPPPPPPPPP")
-                #    print(value)
-                #chassisname = (row['Chassisname'])
-                #print(chassisname)
-                #if chassisname in row:
-                #    print("True")
-                #    #chassisname = (row['Chassisname'])
-                #    #print(chassisname)
-                #else:
-                #    print("NOT THERE")
-                #sys.exit()
-                #
-                #if ip:
-                #    if ip not in ips:
-                #        ips.append(ip)
-            #print("\n\n%s" % ips)
-            #print("\n\n%s" % row)
-            #return(ips)
-            #for ip in ips:
-                #get_info_from_the_switch(ip)
-            #return(ips)
-            return()
-
 
     except FileNotFoundError:
         print('\n\nFile Not Found (Line 158 in fcr_tools.py)')
@@ -350,12 +184,18 @@ def ha_failover( times=1):
     
     return(tn)
     
-def file_diff(a,b,c=""):
+def file_diff(a,b,extend_name=""):
     """
-    Compare two files for differences, print to console and put in a file in logs directory
+    Compare two files for differences, print only differences to console and
+    put in a file in logs directory.
     """
 
-    difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    #a = "/home/RunFromHere/logs/10.38.36.67.txt"
+    #b = "/home/RunFromHere/logs/10.38.36.167.txt"
+    #difference = ("/home/RunFromHere/logs/difference_%s.txt" % c)
+    difference = ("logs/difference_%s.txt" % extend_name)
+    #filecmp = difflib.Differ()
+    
     z = filecmp.cmp(a,b)
     if z == True:
         print("\n\nThe files are the same")
@@ -371,29 +211,11 @@ def file_diff(a,b,c=""):
     with open (difference, 'w') as differ:
         for line in difflib.context_diff(c,d, fromfile=(a), tofile=(b), n=0):
             differ.write(line)    
-    sys.exit()
+    return(False) ## false would mean that there are differences 
        
 def portcfgfillword():
     fcr = anturlar.FcrInfo()
     portcfg = fcr.portcfgfillword(3)
-      
-def bb_fabric_switch_status():
-    """
-        OBSOLETE##############
-        For all switches found in backbone fabric, returns a dictionary data structure for switch
-        status for switch states:
-        fcr_enabled (T or F); ip address; switch_name; vf_enabled (T or F); base (return base FID
-        if T or False if not configured).
-    """
-    si = anturlar.FcrInfo()
-    ips = si.all_switches_in_bb_ip()
-    switch_dict = {}
-    for i in ips:
-        anturlar.connect_tel_noparse(i,'root','password')
-        a = switch_status()
-        switch_dict = switch_dict + a
-        print(switch_dict)
-    return(switch_dict)
 
 def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     """
@@ -867,10 +689,34 @@ def all_ex_ports_with_edge_fid():
     sys.exit()
     return(ex)
 
+def def_zone_reset(fid1, fid2):
+    si = anturlar.SwitchInfo()
+    sleep = liabhar.count_down(3)
+    g = [fid1, fid2]
+    for i in g:
+        anturlar.fos_cmd("setcontext %s" % i)
+        a = str(si.ae_ports())
+        b = a.strip('[')
+        b = b.strip(']')
+        b = b.split(',')
+        index = (b[0])
+        port = (b[1])
+        reg_ex = [b"no] "]  ### Needs to be square brackets to send as a list
+        z = anturlar.fos_cmd_regex("defzone --allaccess", reg_ex, 9) #### use regex because return is something other than "root:"
+        anturlar.fos_cmd("yes")
+        sleep
+        y = anturlar.fos_cmd_regex("cfgsave", reg_ex, 9)
+        anturlar.fos_cmd("yes")
+        sleep
+        for i in port:
+            anturlar.fos_cmd(" portdisable %s" % port)
+            sleep
+            anturlar.fos_cmd(" portenable %s" % port)
+        sleep
+        anturlar.fos_cmd("switchshow")
+    sys.exit()
 
-
+        
     
     
 
-
-    
