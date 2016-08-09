@@ -741,6 +741,9 @@ def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
                               # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
+    if swtype == '162':
+        ethact = "FM1@DTSEC2"
+    
     if swtype == '148':   #### HANDLE SKYBOLT and ethact here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
