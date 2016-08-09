@@ -741,13 +741,13 @@ def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
                               # So if server changes or multiple servers etc.
     ethact    = "ENET0"
     
-    if swtype == '162':
+    if swtype == '162' or swtype =="170":
         ethact = "FM1@DTSEC2"
     
     if swtype == '148':   #### HANDLE SKYBOLT and ethact here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
-    if swtype == '162' or swtype == '166' or swtype == '165':   #### HANDLE WEDGE and Allegiance bootargs here
+    if swtype == '162' or swtype == '166' or swtype == '165' or swtype == '170':   #### HANDLE WEDGE and Allegiance bootargs here and CHEWBACCA
         bootargs  = "root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
     if swtype == '166' or swtype == '165': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
@@ -838,6 +838,27 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     if 'amp' in frm_version:
         frm_no_bld = frm_no_bld + '_amp'
     
+    
+    if switch_type == '170':  ####  CHEWBACCA
+        nbt = "makesinrec 0x1000000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash)
+        ####
+        nbt = "tftpboot 0x2000000 chewbacca/uImage \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash)
+        ####
+        nbt = "tftpboot 0x3000000 chewbacca/ramdisk_v1.0.img \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash)
+        ####
+        nbt = "tftpboot 0xc00000 chewbacca/silkworm.dtb \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash)
+        ####
+        nbt = "bootm 0x2000000 0x3000000 0xc00000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash)
     
     if switch_type == '133':  ####  ODIN
         nbt = "tftpboot 0x1000000 net_install26_odin.img\n"
