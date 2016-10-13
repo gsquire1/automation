@@ -698,7 +698,6 @@ def def_zone_reset(fid1, fid2):
         a = str(si.ae_ports())
         b = a.strip('[')
         b = b.strip(']')
-        b = b.split(',')
         index = (b[0])
         port = (b[1])
         reg_ex = [b"no] "]  ### Needs to be square brackets to send as a list
@@ -715,6 +714,25 @@ def def_zone_reset(fid1, fid2):
         sleep
         anturlar.fos_cmd("switchshow")
     sys.exit()
+    
+def create_ls(number_of_ls):
+    si = anturlar.SwitchInfo()
+    sleep = liabhar.count_down(10)
+    a = number_of_ls
+    print(a)
+    print("9999999999999999999999999999999999999999999")
+    reg_ex = [b"no] "]
+    for i in a:
+        print(i)
+        print(type(i))
+        sys.exit()
+        z = anturlar.fos_cmd_regex("lscfg --create %s" % i, reg_ex, 9) #### use regex because return is something other than "root:"
+        anturlar.fos_cmd("yes")
+        anturlar.fos_cmd("lscfg --show")
+        sleep
+    print("done")
+        
+    
 
         
     
