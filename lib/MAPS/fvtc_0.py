@@ -1610,8 +1610,9 @@ def tc_01_01_06_07():
     """
     ###########################################################################
     ####  todo -
-    ####    1.   ??
+    ####    1.   check for pizza box or chassis now it fails for pizza line 1703??
     ####    2.  add the slot numbers - right now it is the default 0
+    ####   
     ###
     ###########################################################################
     ####
@@ -1649,7 +1650,9 @@ def tc_01_01_06_07():
      
     bld_map = cofra.bladeportmap_Info(slot_numb)
     print("\n\n\nBLADEPORTMAP INFO \n")
-    
+    print(bld_map)
+    print("@"*80)
+    print("#"*80)
     #### create a list of only in_sync ports
     #count_in_synce = 0
     in_sync_ports = []
@@ -1693,7 +1696,11 @@ def tc_01_01_06_07():
         pck_rndm_err = ((liabhar.random_number_int(multiplier))) - 1
         #### from the list of in_sync ports get the port that cooresponds
         #### to the number    i = in_sync_port[port_to_add_err]
-        i = in_sync_ports[port_to_add_err]
+        try:
+            i = in_sync_ports[port_to_add_err]
+        except IndexError:
+            i = 0
+            
         chip_numb = i[8]
         chip_id = i[11]
         chip_port = i[4]
@@ -1896,6 +1903,118 @@ def tc_02_01_01_01():
 ###############################################################################   
     
  
+ 
+def tc_07_01_06_01():
+    """
+        Test Case   25.07.01_06_01_supportsave_test
+        Title:
+        Feature:    MAPS
+        Objective:  Verify during and after a supportsave there is no reporting
+                    of CPU usage. also other monitoring issues.
+                    
+    """
+    ###########################################################################
+    ####  todo -
+    ####    1.   supportsave
+    ####    2.   check cpu usage
+    ####
+    ###########################################################################
+    ####
+    #### Steps:
+    ####    1. supportsave
+    ####    2. check cpu usage for the value
+    ####    3. errdumpall look for MAPS messages
+    ####    
+    ####
+    ###########################################################################
+    #### start testing
+    ####
+    #### create the object and clear stats
+    print("get the maps info \n")
+    en = anturlar.Maps()
+    print("\n\nComplete with MAPS info")
+    ####
+    
+    fab_stuff = anturlar.FabricInfo(en.currentFID())
+    fabmems = fab_stuff.fabric_members()
+    myzone = fab_stuff.zone_info()
+    eports = en.e_ports()
+   
+    cpu_start   = en.cpu_usage()
+    mem_start   = en.mem_usage()
+    temp_start  = en.temp_status()
+    
+    print("@"*80)
+    print("@"*80)
+    print("CPU USAGE  = %s " % cpu_start)
+    print("MEM USAGE  = %s " % mem_start)
+    print("TEMP START = %s " % temp_start)
+    print("@"*80)
+    print("@"*80)
+    
+    
+    x = 0
+    while x <= 100:
+    
+        f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','supportsave/test_case_07_01_06_01')
+        print("\nSupportsave Complete\n")
+        liabhar.JustSleep(60)
+        cpu_now   = en.cpu_usage()
+        mem_now   = en.mem_usage()
+        temp_now  = en.temp_status()
+        x += 1
+        
+    print("@"*80)
+    print("@"*80)
+    print("CPU USAGE  = %s " % cpu_start)
+    print("MEM USAGE  = %s " % mem_start)
+    print("TEMP START = %s " % temp_start)
+    print("#"*80)
+    print("CPU USAGE  = %s " % cpu_now)
+    print("MEM USAGE  = %s " % mem_now)
+    print("TEMP START = %s " % temp_now)
+    
+    some_cpu_ras = anturlar.fos_cmd("errdumpall | grep CPU")
+    some_mem_ras = anturlar.fos_cmd("errdumpall | grep MEMORY")
+        
+    print("@"*80)
+    print("@"*80)
+    print("#"*80)
+    print(some_cpu_ras)
+    print(some_mem_ras)
+    
+    
+    
+    x = 5555
+    while x <= 3600:
+        
+        anturlar.fos_cmd("date") 
+        anturlar.fos_cmd("mapsdb --show")
+        cmdrtn = anturlar.fos_cmd("sleep 5")
+        
+        for p in eports:
+            x += 1
+            cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+            #cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            #cmdrtn = anturlar.fos_cmd("sleep 10")
+        
+        for p in eports:
+            cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+    
+    
+        for p in eports:
+            x += 1
+            cmdrtn = anturlar.fos_cmd("portdisable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+            cmdrtn = anturlar.fos_cmd("portenable %s " % p[0])
+            cmdrtn = anturlar.fos_cmd("sleep 10")
+    
+    
+    
+    return()
+###############################################################################  
    
     
 def tc_01_01_template():
