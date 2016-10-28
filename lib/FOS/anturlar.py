@@ -1054,7 +1054,13 @@ class SwitchInfo:
         capture_cmd = fos_cmd("switchshow")
         ras = re.compile('switchType:\s+(\d{1,3})')
         ras = ras.findall(capture_cmd)
-        sn = str(ras[0])
+        try:
+            sn = str(ras[0])
+        except IndexError:
+            
+            sysexit()
+        
+        
         return(sn)
     
     
@@ -1886,6 +1892,10 @@ class Maps(SwitchInfo):
         """
            calculate the cpu usage from the data
            in /proc/stat
+           the numbers are captured in /proc/stat
+           wait 2 minutes and capture the numbers again
+           make the calculation
+           
         """
         #### equation for cpu usage
         #### cat /proc/stat - in the line containing cpu, the 4th number 

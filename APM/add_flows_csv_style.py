@@ -58,43 +58,10 @@ import time
 ####  142  Yoda pluto
 ####  148  Skybolt
 ####
-####  166  Allegiance
-####  165  Venator
-####
-####  162  Wedge
-####  170  Chewbacca
-####
-####
 ###############################################################################
-
-
-def user_start():
-    go = False
-    start = 'n'
-    while not go : 
-              
-        is_valid = 0
-        while not is_valid:
-            try:
-                print("This test can run 3 steps  ")
-                print("   1. capture the switch info and write to file")
-                print("   2. configdownload, capture the switch info and perform diff on orig file")
-                print("   3. do all steps ")
-                print("   4. exit")
-                
-                start = int(input("\n\n\n\nEnter your choice 1-4   "))
-                
-                is_valid = 1 
-            except:
-                print("\n\nthere was an error with the input\n\n")
-                sys.exit()
-                
-        if start > 0 and start <=3:
-            go = True
-            return(start)
-        else:
-            sys.exit()
-
+###############################################################################
+####
+#### to power cycle   
 
 def parent_parser():
     
@@ -118,9 +85,10 @@ def parse_args(args):
     #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
-    parser.add_argument('-cp',  '--cmdprompt', help="switch is already at command prompt")
-    parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
-    parser.add_argument('-r',   '--steps', type=int, help="Steps that will be executed")
+    #parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
+    parser.add_argument('-file', '--flowMatrixFile', type=str, help="The csv file with the list of Flow settings")
+    #parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
+    #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
     #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -136,13 +104,17 @@ def parse_args(args):
         print("Chassis Name or IP address is required")
         sys.exit()
         
-    if args.cmdprompt and not args.switchtype:
-        print("To start at the command prompt the switch type is needed.")
+    if not args.flowMatrixFile:
+        print("\n\nThe Flow Matrix CSV File is required\n\n")
         sys.exit()
         
-    if not args.cmdprompt and args.switchtype:
-        print('To start at the command prompt both switch type and command prompt is requried')
-        sys.exit()
+    #if args.cmdprompt and not args.switchtype:
+    #    print("To start at the command prompt the switch type is needed.")
+    #    sys.exit()
+        
+    #if not args.cmdprompt and args.switchtype:
+    #    print('To start at the command prompt both switch type and command prompt is requried')
+    #    sys.exit()
     #print("Connecting to IP :  " + args.ip)
     #print("user             :  " + args.user)
     #verbose    = args.verbose
@@ -266,6 +238,62 @@ def stop_at_cmd_prompt(db=0):
     
     return()
        
+def env_variables(swtype, db=0):
+    
+    liabhar.JustSleep(60)
+    
+    tn.set_debuglevel(db)
+    tn.write(b"printenv\r\n")
+    reg_list = [b"=>"]
+    capture = tn.expect(reg_list, 300)
+    
+    gateway   = "10.38.32.1"
+    netmask   = "255.255.240.0"
+    bootargs  = "ip=off"
+    ethrotate = "no"
+    server_ip = "10.38.2.40"
+    ethact    = "ENET0"
+    
+    if swtype == 148:
+        print("SKYBOLT")
+        ethact = "FM1@DTSEC2"
+    #if (swtype == 141 or swtype == 142):
+    #    print("YODA")
+    #    ethact = "FM2@DTSEC4"
+        
+    a = ("setenv ethact %s \r\n" % ethact)
+    tn.write(a.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    
+    g = ("setenv gateway %s \r\n" % gateway)
+    tn.write(g.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    n = ("setenv netmask %s\r\n"%netmask)
+    tn.write(n.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    b = ("setenv bootargs %s\r\n"%bootargs)
+    tn.write(b.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    e = ("setenv ethrotate %s\r\n"%ethrotate)
+    tn.write(e.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    s = ("setenv serverip %s\r\n"%server_ip)
+    tn.write(s.encode('ascii'))
+    capture = tn.expect(reg_list, 300)
+    
+    tn.write(b"saveenv\r\n")
+    capture = tn.expect(reg_list, 300)
+    tn.write(b"printenv\r\n")    
+    capture = tn.expect(reg_list, 300)
+    
+    liabhar.JustSleep(60)
+    
+    p = ("ping %s  \r\n" % gateway)
+    tn.write(p.encode('ascii'))
+    tn.write(b"\r\n")
+    capture = tn.expect(reg_list, 300)
+    
+    return(capture)
 
 def pwr_cycle(pwr_ip, pp, stage, db=0):
     
@@ -285,7 +313,91 @@ def pwr_cycle(pwr_ip, pp, stage, db=0):
     
     return(0) 
     
+def load_kernel(switch_type, sw_ip, frm_version):
+    
+    reg_list = [ b"=>"]
+    reg_bash = [ b"bash-2.04", b"=>"]
+    reg_linkup = [ b"link is up"]
+    
+    #### set tftp command
+    
+    ras = re.compile('([\.a-z0-9]+)(?:_)?')
+    ras = ras.search(frm_version)
+    frm_no_bld = ras.group(1)
+    if 'amp' in frm_version:
+        frm_no_bld = frm_no_bld + '_amp'
+    
+    
+    if switch_type == '133':  ####  ODIN
+        nbt = "tftpboot 0x1000000 net_install26_odin.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+    if (switch_type == '66' or switch_type == '71' or switch_type == '118' or switch_type == '109'):
+        #### 5100  Stinger   tomahawk  tom_too
+        nbt = "tftpboot 0x1000000 net_install_v7.2.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+    if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83'):
+        ####  DCX zentron  pluto zentron  thor  7800
+        nbt = "tftpboot 0x1000000 net_install26_8548.img\r\n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list, 300)
+        tn.write(b"bootm 0x1000000\r\n")
+        capture = tn.expect(reg_bash, 300)
+        
+        
+    if switch_type == '148':  #### SKYBOLT
+        tn.write(b"makesinrec 0x1000000 \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x2000000  skybolt/uImage\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
+        caputure = tn.expect(reg_bash,300)
+        
+    if (switch_type == '141' or switch_type == '142'):  #### YODA 
+        tn.write(b"makesinrec 0x1000000 \r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x2000000 yoda/uImage\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x3000000 yoda/ramdisk.yoda\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"tftpboot 0x4000000 yoda/silkworm_yoda.dtb\r\n")
+        capture = tn.expect(reg_bash,300)
+        tn.write(b"bootm 0x2000000 0x3000000 0x4000000\r\n")
+        caputure = tn.expect(reg_bash,300)
+        
+        
+    tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\r\n")
+    capture = tn.expect(reg_bash, 300)
+    i = "ifconfig eth0 %s netmask 255.255.240.0\r\n" % sw_ip 
+    tn.write(i.encode('ascii'))
+    capture = tn.expect(reg_bash, 300)
+    tn.write(b"route add default gw 10.38.32.1\r\n")
+    capture = tn.expect(reg_linkup,10)
+    #tn.write(b"\r\n")
+    capture = tn.expect(reg_bash, 10)
+    m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\r\n"
+    tn.write(m.encode('ascii'))
+    capture = tn.expect(reg_bash, 30)
+    ### firmwarepath
+    firmpath = "cd /load/SQA/fos/%s/%s\r\n" % (frm_no_bld, frm_version)
+    tn.write(firmpath.encode('ascii'))
+    capture = tn.expect(reg_bash,600)
+    #### need to capture when this hangs anc was not able to connect to the server  
+    tn.write(b"./install release\r\n")
+    capture = tn.expect(reg_bash,600)
 
+    return(0)
 
 def parse_port(port):
     print("port number " , port )
@@ -388,6 +500,73 @@ def console_info(chassis_name):
             
     return(a)
 
+
+
+def create_flow(chassis_name,flowMatrixFile):
+    """
+    
+    """
+        
+    flowmatrix = "ini/%s" % flowMatrixFile
+    
+    
+    switchmatrix = 'ini/SwitchMatrix.csv'
+    
+    
+    
+    try:
+        csv_file = csv.DictReader(open(flowmatrix, 'r'), delimiter=',', quotechar='"')
+    except OSError:
+        print("\n\nCannot find the file FlowMatrix.csv\n\n")
+        print(flowmatrix)
+        sys.exit()
+        return(False)
+    
+    cons_out = anturlar.fos_cmd("fosexec --fid all -cmd 'flow --deact all'")
+    reg_list = [b"no] "]
+    #cons_out = anturlar.fos_cmd_regex("flow --delete all",reg_list )
+    #print(type(cons_out))
+    #if "yes, y, no, n" in cons_out:
+    #    cons_out = anturlar.fos_cmd("yes")
+    
+    FID_change = 0
+    
+    for line in csv_file:
+        chassname   = (line['Chassisname'])
+        FID         = (line['FID'])
+        FlowName    = (line['FlowName'])
+        fea         = (line['Feature'])
+        srcdev      = (line['srcdev'])
+        dstdev      = (line['dstdev'])
+        ingrport    = (line['ingrport'])
+        
+        egrport     = (line['egrport'])
+        bidir       = (line['bidir'])
+        lun         = (line['Lun'])
+        ftype       = (line['FrameType'])
+        sfid        = (line['SFID'])
+        dfid        = (line['DFID'])
+        seid        = (line['SEID'])
+        mirrorport  = (line['MirPort'])
+        noact       = (line['noact'])
+    
+               
+        if FID_change == FID:
+            pass
+        else:
+            cons_out = anturlar.fos_cmd("setcontext %s " % FID)
+            FID_change = FID
+        
+        print(chassname,FID,FlowName,srcdev,dstdev,ingrport,egrport,bidir,lun,ftype,sfid,dfid,seid,mirrorport,noact)
+    
+        cons_out = anturlar.fos_cmd("flow --create %s -fea %s -srcdev %s -dstdev %s -ingrport %s " % (FlowName,fea,srcdev,dstdev,ingrport))
+    
+    
+    liabhar.JustSleep(10)
+    cons_out = anturlar.fos_cmd("flow --show")    
+    
+    return()
+
 def pwr_pole_info(chassis_name):
     """
     
@@ -466,7 +645,11 @@ def power_cycle(power_pole_info):
             print(power_pole_info[0])
             print(power_pole_info)
             liabhar.JustSleep(30)
-     
+    
+    
+    
+    
+    
     
 def get_user_and_pass(chassis_name):
     """
@@ -510,175 +693,109 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
- 
-def slot_pwr_cycle(slot_list):
-    """
+def sw_set_pwd_timeout(pswrd,tn):
+   
+    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
+    reg_login = [ b"login:"]
+    reg_assword = [ b"assword: ", b"root> "]
+    reg_change_pass = [ b"key to proceed", b"incorrect" ]
+    reg_complete   = [ b"zation completed"]
+    reg_linertn    = [ b"\\r\\n" ]
     
-    """
+    print("\n\nlooking for completed task\n\n")
+    capture = tn.expect(reg_complete, 10)
+    tn.write(b"\r\n")
+    print("\n\nwrite to tn a newline \n\n")
+    print("\n\nlooking for login and send root\n\n")
+        #capture = tn.expect(reg_linertn)
+    capture = tn.expect(reg_login, 60)
     
+    tn.write(b"root\r\n")
+    capture = tn.expect(reg_assword, 20)
+    print("\n\nlooking for password and send fibranne\n\n")
+    tn.write(b"fibranne\r\n")
+    capture = tn.expect(reg_change_pass, 20)
+    tn.write(b"\r\n")
+    capture = tn.expect(reg_linertn)
+
     
-    for s in slot_list:
-    
-        capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
+    while True:    
+        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
+        #### if root is found break out
+        print("CAPTURE is  ")
+        print(capture)
         
-        liabhar.JustSleep(30)
-        
-    for s in slot_list:
-        capture_cmd = anturlar.fos_cmd("slotpoweron %s " % s)
-        liabhar.JustSleep(60)
-    liabhar.JustSleep(300)
+        if capture[0] == 1:
+            print(capture)
+            print("this found root")
+            break
+        tn.write(b"password\r\n")
+  
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"root\r\n")
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"password\r\n")
+    capture = tn.expect(reg_list, 20)
+    tn.write(b"timeout 0 \r\n")
+    capture = tn.expect(reg_list, 20)
+    
     return(True)
-    
     
 
-def capture_switch_info(extend_name="", fid=128):
+
+ 
+ 
+ 
+   
+def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
+    """
+        open the log file for reading and add the following
+        1. license
+        2. create fids and base switch is previously set
+        3. put ports into the FIDS
+        4. update domains
+        5. update switch name
+        6. enable fcr
+        7.
     """
     
+    ff = ""
+    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+    print(f)
     
-    """
+    try:
+        with open(f, 'r') as file:
+            ff = file.read()
+    except IOError:
+        print("\n\nThere was a problem opening the file" , f)
+        sys.exit()
+        
+    print("look for the info\r\n")
+    print(ff)
+    ras_license     = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', ff)
     
-    si = anturlar.SwitchInfo()
-    mi = anturlar.Maps()
-    fi = anturlar.FlowV()
-    fcr = anturlar.FcrInfo()
+    print(ras_license)
+    ras_ls_list     = re.findall('LS LIST\s+:\s+\[(.+)\]', ff)
+    ras_base        = re.findall('BASE SWITCH\s+:\s+\[(.+)\]', ff)
+    ras_switchname  = re.findall('SWITCH NAME\s+:\s+\[(.+)\]', ff)
+    ras_vf          = re.findall('VF SETTING\s+:\s+\[(.+)\]', ff)
+    ras_fcr         = re.findall('FCR ENABLED\s+:\s+\[(.+)\]', ff)
+    ras_xisl        = re.findall('ALLOW XISL\s+:\s+\[(.+)\]', ff)
+    ras_ports       = re.findall('Ports\s+:\s+\[(.+)\]', ff)
     
-    ls_list              = si.ls()
-    print("@"*80)
-    print("LS LIST    %s " % ls_list)
+    ll = ras_license[0]
+    ll.replace("'","")        #### remove the comma with string command  
+    lic_list = ll.split(",")  #### change the data from string to list
+
+    all_list = []
+    all_list += [lic_list]
+    all_list += [ras_ls_list]
+    all_list += [ras_base]
+    all_list += [ras_switchname]
+        
     
-    for ls in ls_list:
-        cons_out             = anturlar.fos_cmd("setcontext %s " % ls) 
-    
-        vdx                  = si.nos_check()
-        switch_ip            = si.ipaddress()
-        switch_cp_ips        = si.cp_ipaddrs_get()
-        license_list         = si.getLicense()
-        ls_list              = si.ls()
-        first_ls             = si.ls_now()
-        switch_id            = si.switch_id()
-        fid_now              = si.currentFID()
-        try:
-            theswitch_name   = si.switch_name()
-        except IndexError:
-            theswitch_name   = "unknown"
-            pass
-        chassis_name         = si.chassisname()
-        director_pizza       = si.director()
-        vf_enabled           = si.vf_enabled()
-        sw_type              = si.switch_type()
-        base_sw              = si.base_check()
-        sim_ports            = si.sim_ports()
-        ex_ports             = fcr.all_ex_ports()
-        e_ports              = si.e_ports()
-        f_ports              = si.f_ports()
-        fcr_state            = si.fcr_enabled()
-        ports_and_ls         = si.all_ports_fc_only()
-        psw_reset_value      = "YES"
-        xisl_st_per_ls       = si.allow_xisl()
-        maps_policy_sum      = mi.get_policies()
-        maps_non_dflt_policy = mi.get_nondflt_policies()
-        
-        flow_per_ls          = fi.flow_names()
-        blades               = si.blades()
-        deflt_switch         = si.default_switch()
-        #sfp_info             = si.sfp_info()
-        maps_email_cfg       = mi.get_email_cfg()
-        maps_actions         = mi.get_actions()
-        logical_groups       = mi.logicalgroup_count()
-        relay_server_info    = mi.get_relay_server_info()
-        credit_recov_info    = mi.credit_recovery()
-        dns_info             = mi.dns_config_info()
-        sfpinfo              = si.sfp_info()
-        
-        cfgshow_output       = anturlar.fos_cmd("configshow")
-        
-        slot_info            = anturlar.fos_cmd("slotshow -m") 
-        
-        
-            
-        ###################################################################################################################
-        ###################################################################################################################
-        ####
-        #### print the variables for review
-        ####
-        ###################################################################################################################
-        ###################################################################################################################
-        
-        print("\n\n\n")
-        print("SWITCH IP         :  %s  " % switch_ip)
-        print("SWITCH NAME       :  %s  " % theswitch_name)
-        #print("SWITCH DOMAIN     :  %s  " % domain_list)
-        print("LS LIST           :  %s  " % ls_list)
-        print("DEFAULT SWITCH    :  %s  " % deflt_switch)
-        print("BASE SWITCH       :  %s  " % base_sw)
-        print("EX_PORTS          :  %s  " % ex_ports)######################NEW
-        print("VF SETTING        :  %s  " % vf_enabled)
-        print("SWITCH TYPE       :  %s  " % sw_type)
-        print("TIMEOUT VALUE     :  0   " )
-        print("RESET PASSWORD    :  %s " % psw_reset_value)
-        print("FCR ENABLED       :  %s " % fcr_state)
-        print("BLADES            :  %s " % blades)
-        print("LICENSE LIST      :  %s  " % license_list)
-        
-    #######################################################################################################################
-    #######################################################################################################################
-    #######################################################################################################################
-    ####
-    ####  Write to the file
-    ####
-    #######################################################################################################################
-    #######################################################################################################################
-    #######################################################################################################################
-        
-        f = "%s%s%s"%("logs/Switch_Info_cudc",switch_ip,"_%s.txt" % extend_name)
-        header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
-                               "","", "==============================\n")  
-        #ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
-        ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-        ff.write(header)
-        ###################################################################################################################
-        ff.write("SWITCH IP                :  %s  \n" % switch_ip)
-        ff.write("LS LIST                  :  %s  \n" % ls_list)
-        ff.write("DEFAULT SWITCH           :  %s  \n" % deflt_switch)
-        ff.write("BASE SWITCH              :  %s  \n" % base_sw)
-        ff.write("EX_PORTS                 :  %s  \n" % ex_ports)
-        ff.write("SWITCH NAME              :  %s  \n" % theswitch_name)
-        ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
-        ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)
-        ff.write("VF SETTING               :  %s  \n" % vf_enabled)
-        ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
-        ff.write("TIMEOUT VALUE            :  0   \n" )
-        ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
-        ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
-        ff.write("Ports                    :  %s  \n" % ports_and_ls)
-        ff.write("E PORTS                  :  %s  \n" % e_ports)
-        ff.write("F PORTS                  :  %s  \n" % f_ports)
-        ff.write("SIM PORTS                :  %s  \n" % sim_ports)
-        ff.write("Blades                   :  %s  \n" % blades)
-        ff.write("SLOT SHOW INFO           :  %s  \n" % slot_info)
-        ff.write("LICENSE LIST             :  %s  \n" % license_list)
-        ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
-        ff.write("="*80)
-        ff.write("\n")
-        ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
-        ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
-        ff.write("EMAIL CFG                :  %s  \n" % maps_email_cfg)
-        ff.write("MAPS ACTIONS             :  %s  \n" % maps_actions)
-        ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
-        ff.write("RELAY SERVER HOST IP     :  %s  \n" % relay_server_info)
-        ff.write("CREDIT RECOVERY INFO     :  %s  \n" % credit_recov_info)
-        ff.write("DNS CONFIG INFO          :  %s  \n" % dns_info)
-        ff.write("="*80)
-        ff.write("\n")
-        ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
-        ff.write("CONFIG SHOW OUTPUT       :  %s  \n" % cfgshow_output)
-        ff.write("\n"*2)
-        ff.close()
-        
-        #cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
-    
-    
-    return(True)
+    return(all_list)
+
     
 #######################################################################################################################
 #######################################################################################################################
@@ -689,7 +806,8 @@ def capture_switch_info(extend_name="", fid=128):
     
 def main():
 
-    global tn   #### varable for telnet session
+    global tn
+    
 #######################################################################################################################
 ####
 #### 
@@ -702,7 +820,7 @@ def main():
     print(pa.quiet)
     print(pa.verbose)
     #print(pa.firmware)
-    print(pa.cmdprompt)
+    #print(pa.cmdprompt)
     print("@"*40)
     
 ###################################################################################################################
@@ -728,152 +846,47 @@ def main():
     user_name         = usr_pass[0]
     usr_psswd         = usr_pass[1]
     ipaddr_switch     = get_ip_from_file(pa.chassis_name)
-    steps_to_run      = pa.steps
-    if ipaddr_switch != pa.ipaddr:
-        pa.ipaddr = ipaddr_switch
-        
-    fid_to_compare    = 31
-    
-    ###################################################################################################################
-    #### if the user does not enter a value for which steps to run prompt for user input value
-    ####
-    if not steps_to_run:
-        #pa.start = user_start()
-        steps_to_run = pa.start = user_start()
-        
+ 
+ 
+
     tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
-    if steps_to_run == 1 or steps_to_run == 3:
-
-        switch_info = capture_switch_info("compare_orig", fid_to_compare)
-        
-    ###################################################################################################################
-    #### path to the first file to compare
-    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
     
     liabhar.JustSleep(10)
+    #cons_out = cc.power_cycle()
+       
+    cons_out = anturlar.fos_cmd("switchshow")
+    print(cons_out)
     
-    ###################################################################################################################
-    #### this is how to reconnect with telnet
-    #print("reconnect via telnet")
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
+    
+    rt = create_flow(pa.chassis_name,pa.flowMatrixFile)
+    
+    print("\n\ncreated flows now waiting for while to reboot\n\n")
+    
+    liabhar.JustSleep(120)
+    
+    p_info = pwr_pole_info(pa.chassis_name)
+    p_turn = power_cycle(p_info)
+    
+    liabhar.JustSleep(120)
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    
 
-    ###################################################################################################################
-    ###################################################################################################################
-    ###################################################################################################################
-    ####
-    #### do configupload  or other test steps here
-    ####  make other changes here before configupload or other commands 
-    ####
-    ###################################################################################################################
-    ####
-    ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
-    ####
-    pp = cofra.SwitchUpdate()
-    #tn = pp.reboot_reconnect()
-    
-    #liabhar.count_down(60)
-    ###################################################################################################################
-    ####
-    #### hafailover or hareboot on pizza box
-    ####  call the failover function from cofra and send the number of failovers
-    ####
-    tn = cofra.ha_failover(10)
-    
-    liabhar.count_down(120)
+    cons_out = anturlar.fos_cmd("flow --show all")
+    print("\n"*30)
+    print(cons_out)
     
     
     
-    ###################################################################################################################
-    ####
-    #### power cycle slots
-    ####
-    
-    #ss = anturlar.SwitchInfo()
-    #slot_list = ss.blades(True)
-    ##### skip if switch is a pizza box
-    #if "not a d" not in slot_list:
-    #     pc_result = slot_pwr_cycle(slot_list)
-    #else:
-    #    print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
-     
-    ####
-    #### 
-    #### other interrptioons
-    
-    
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ###################################################################################################################
-    ###################################################################################################################
-    ###################################################################################################################
-    
-    if steps_to_run == 2 or steps_to_run == 3:
-        liabhar.JustSleep(10)
-        liabhar.count_down(360)
-        #cons_out = anturlar.fos_cmd("setcontext 128")
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        
-        switch_info = capture_switch_info("compare", fid_to_compare)
-    ###################################################################################################################
-    #### path to the second file to compare
-        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % pa.ipaddr
-        
-        liabhar.cls()
-        #### compare the two files
-        print("#"*80)
-        print("#"*80)
-        print("#######")
-        print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @  ")
-        print("#######     @  @    @       @      @   @   @        @     @  ")
-        print("#######     @@@     @@@@     @@@   @   @   @        @     @  ")
-        print("#######     @  @    @           @  @   @   @        @        ")
-        print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
-        print("#"*80)
-        print("#"*80)
-        
-        
-        diff_f  = liabhar.file_diff(switch_data_0,switch_data_1)
-        print("#"*80)
-        print("#"*80)
-        print("#"*80)
-        print("#"*80)
-        print("Result ")
-        print(diff_f)
-    
-     
-    ###################################################################################################################
-    ####  put additional commands here before disconnecting from telnet
-    ####
-    #cons_out = anturlar.fos_cmd("mapsdb --show all")
-    #print(cons_out)
-    #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-    cons_out = anturlar.fos_cmd("mapspolicy --enable Nervio")
     anturlar.close_tel()
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
     print(date_is)
-    print(type(steps_to_run))
-    print(steps_to_run)
+    
+    
+    
+    
+    
     
 if __name__ == '__main__':
     

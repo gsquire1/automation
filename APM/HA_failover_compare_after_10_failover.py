@@ -719,6 +719,24 @@ def main():
         
     tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     
+    ###################################################################################################################
+    ####
+    ####   configure some settings that are not defualt to confirm they remain after disruptions
+    ####
+    cons_out = send_cmd("creditrecovmode --cfg onLrThresh")
+    cons_out = send_cmd("creditrecovmode --cfg onLrThresh -lrtthreshold 7")
+    cons_out = send_cmd("creditrecovmode --fe_crdloss off")
+    cons_out = send_cmd("creditrecovmode --be_crdloss off")
+    cons_out = send_cmd("creditrecovmode --be_losync off")
+    cons_out = send_cmd("creditrecovmode --fault edgeblade")
+    
+    
+    
+    ###################################################################################################################
+    ####
+    ####   capture teh configuration file  if the user selected 1 or 3
+    ####
+    
     if steps_to_run == 1 or steps_to_run == 3:
         
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
@@ -760,7 +778,7 @@ def main():
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
-    tn = cofra.ha_failover(100)
+    tn = cofra.ha_failover(10)
     
     liabhar.count_down(120)
     
