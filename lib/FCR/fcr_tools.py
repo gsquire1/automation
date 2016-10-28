@@ -75,20 +75,101 @@ def user_start():
             sys.exit()
             
 
+def tbc_creator():
+    
+    test_file = '/home/RunFromHere/ini/TBC1_SwitchMatrix.csv'
+    tbc_file = '/home/RunFromHere/ini/Fabric_Services.tbc'
+    all_power_ips = []
+    try:
+        with open(test_file, 'r') as switch_matrix, open(tbc_file, 'r+') as f:
+            my_dict = csv.DictReader(switch_matrix)
+            for row in my_dict:
+                chassisname = (row['Chassisname'])      # Resource_type
+                ip = (row['IP Address'])                # IP
+                password = (row['Password'])            # Password
+                console_1 = (row['Console1 IP'])        # CP_0 Console IP
+                console_1_port = (row['Console1 Port']) # CP_0 Console Port
+                console_2 = (row['Console2 IP'])        # CP_1 Console IP
+                console_2_port = (row['Console2 Port']) # CP_1 Console Port
+                cp0_ip = (row['CP0 IP'])                # CP_0 IP
+                cp1_ip = (row['CP1 IP'])                # CP_1 IP
+                fabric_name = (chassisname)             #Fabric name
+                admin_pwd = ['password']                # Admin Password
+                root_pwd = ['password']                 # Root Password
+                pwr_1 = (row['Power1 IP'])              # Power_1
+                pwr_1_port = (row['Power1 Port'])       # Power_1_Port
+                pwr_2 = (row['Power2 IP'])              # Power_2
+                pwr_2_port = (row['Power2 Port'])       # Power_2_Port
+                pwr_3 = (row['Power3 IP'])              # Power_3
+                pwr_3_port = (row['Power3 Port'])       # Power_3_Port
+                pwr_4 = (row['Power4 IP'])              # Power_3
+                pwr_4_port = (row['Power4 Port'])       # Power_3_Port
+                fos_resources = [chassisname, ip, password, console_1,console_1_port,console_2,console_2_port,cp0_ip, cp1_ip,fabric_name]
+                power_ips = [pwr_1, pwr_2, pwr_3, pwr_4]
+                for i in power_ips:
+                    if i != ''  and i not in all_power_ips:
+                            all_power_ips += [i]
 
-def csv_functions_ip():
+                chassis_name = ("%s_resource_type       fos" % chassisname)
+                ip = "%s_ip                  %s" % (chassisname, ip)
+                console_1 = "%s_cp0_console         %s %s" % (chassisname, console_1, console_1_port)
+                cp0ip = "%s_cp0_ip        %s" % (chassisname, cp0_ip)
+                cp1ip = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
+                if (console_2):
+                    console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
+                    cp0ip = "%s_cp0_ip              %s" % (chassisname, cp0_ip)
+                    cp1ip = "%s_cp0_ip              %s" % (chassisname, cp1_ip)
+                fabric_name = "%s_fabric_name         %s" % (chassisname, chassisname)
+                power_1 = "%s_pwr_1           %s %s" % (chassisname, pwr_1, pwr_1_port)
+                power_ips = pwr_1
+                if(pwr_2):
+                    power_2 = "%s_pwr_2           %s %s" % (chassisname, pwr_2, pwr_2_port)
+                    power_ips = (power_ips , pwr_2)
+                if(pwr_3):
+                    power_3 = "%s_pwr_3           %s %s" % (chassisname, pwr_3, pwr_3_port)
+                    power_ips = (power_ips , pwr_3)
+                if(pwr_4):
+                    power_4 = "%s_pwr_4           %s %s" % (chassisname, pwr_4, pwr_4_port)
+                    power_ips = (power_ips, pwr_4)
+                admin = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
+                f.write(chassis_name+"\n")
+                f.write(ip+"\n")
+                f.write(console_1+"\n")
+                if (console_2):
+                    f.write(console_2+"\n")
+                    f.write(cp0ip+"\n")
+                    f.write(cp1ip+"\n")
+                f.write(fabric_name+"\n")
+                f.write(power_1+"\n")
+                if (pwr_2):
+                    f.write(power_2+"\n")
+                if (pwr_3):
+                    f.write(power_3+"\n")
+                if (pwr_4):
+                    f.write(power_4+"\n")
+                f.write("\n\n\n")
+            for i in all_power_ips:
+                power_1 = "%s_resource_type       power_tower" % i
+                ip = "%s_ip                  %s" % (i, i)
+                login = "%s_login               %s" % (i, "user")
+                pwd = "%s_password            %s" % (i, "pass")
+                f.write(power_1+"\n")
+                f.write(ip+"\n")
+                f.write(login+"\n")
+                f.write(pwd+"\n")
+                f.write("\n\n")
+        print("\n\nALL FINISHED\n\n")
+    except FileNotFoundError:
+        print('\n\nFile(s) Not Found (Line 158 in fcr_tools.py)')
+        return(False)
+    
 
+    
+def csv_functions_ip_new():
     test_file = '/home/RunFromHere/ini/TBC1_SwitchMatrix.csv'
     tbc_file = '/home/RunFromHere/ini/Fabric_Services.tbc'
     ips = []
     all_power_ips = []
-    # try:
-    #     with open(test_file, 'rb') as switch_matrix:
-    #         my_dict = csv.DictReader(switch_matrix)
-    #     #switch_matrix = open(test_file, 'r')
-    # except FileNotFoundError:
-    #     print('\n\nFile Not Found (SwitchMatrix)')
-    #     return(False)
     try:
         with open(test_file, 'rb') as file:
             switch_matrix = file.read()
@@ -97,7 +178,7 @@ def csv_functions_ip():
             #my_dict = csv.DictReader(switch_matrix)
             print(my_dict)
             for row in my_dict:
-                print(row)
+                #print(row)
                 # print("\n")
                 # sys.exit()
                 chassisname = (row['Chassisname'])
@@ -130,35 +211,14 @@ def csv_functions_ip():
                     if i != '':
                         if i not in all_power_ips:
                            all_power_ips += [i]
+                for i in fos_resources:
+                    print(i)
     except IOError:
         print("\n\nThere was a problem opening the file:" , f)
-        #sys.exit() 
-        #sys.exit()
+
         #Start TBC File Write
-    #     for i in fos_resources:
-    #         #print(i)
-    #         chassis_name = ("%s_resource_type       fos" % chassisname)
-    #         ip = "%s_ip                  %s" % (chassisname, ip)
-    #         console_1 = "%s_cp0_console         %s %s" % (chassisname, console_1, console_1_port)
-    #         cp0ip = "%s_cp0_ip        %s" % (chassisname, cp0_ip)
-    #         cp1ip = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
-    #         if (console_2):
-    #             console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
-    #             cp0ip = "%s_cp0_ip              %s" % (chassisname, cp0_ip)
-    #             cp1ip = "%s_cp0_ip              %s" % (chassisname, cp1_ip)
-    #         fabric_name = "%s_fabric_name         %s" % (chassisname, chassisname)
-    #         power_1 = "%s_power1_ip           %s %s" % (chassisname, pwr_1, pwr_1_port)
-    #         power_ips = pwr_1
-    #         if(pwr_2):
-    #             power_2 = "%s_power2_ip           %s %s" % (chassisname, pwr_2, pwr_2_port)
-    #             power_ips = (power_ips , pwr_2)
-    #         if(pwr_3):
-    #             power_3 = "%s_power3_ip           %s %s" % (chassisname, pwr_3, pwr_3_port)
-    #             power_ips = (power_ips , pwr_3)
-    #         if(pwr_4):
-    #             power_4 = "%s_power4_ip           %s %s" % (chassisname, pwr_4, pwr_4_port)
-    #             power_ips = (power_ips, pwr_4)
-    #         admin = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
+
+
     #         #pp = pprint.pformat(indent=4)
     #     f.write(chassis_name+"\n")
     #     f.write(ip+"\n")
@@ -190,7 +250,7 @@ def csv_functions_ip():
 
     #switch_matrix.close()
     #f.close()
-        print("THEEND")   
+        #print("THEEND")   
     
     #     try:
     #     with open(test_file) as switch_matrix:
