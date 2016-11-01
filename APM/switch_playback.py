@@ -1,5 +1,5 @@
 #!/opt/python3/bin/python3
-
+#Graham
 
 ###############################################################################
 ####
@@ -64,6 +64,7 @@ import time
 ####  162.0  Wedge
 ####  165   X6-4 (Venator)
 ####  166   X6-8 (Allegience)
+####  170   Chewbacca
 ###############################################################################
 
 
@@ -593,7 +594,7 @@ def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
         #print("SKYBOLT")
         ethact = "FM1@DTSEC2"
     if swtype == '162' or swtype == '166' or swtype == '165' or swtype == '170' :   #### HANDLE WEDGE and Allegiance bootargs here and CHEWBACCA
-        bootargs  = "root=/dev/sda/\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+        bootargs  = "root=/dev/sda$prt rootfstype=ext4 console=ttyS0,9600 quiet"
         
     if swtype == '166' or swtype == '165': #ethprime is a new env variable and "ethact =" between Allegiance and Wedge are different
         ethact = "FM2@DTSEC4"
@@ -795,13 +796,13 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         tn.write(b"makesinrec 0x1000000 \n")
         #capture = tn.expect(reg_bash,30)
         capture = tn.expect(reg_bash)
-        tn.write(b"tftpboot 0x2000000 lando/uImage.netinstall\n")
+        tn.write(b"tftpboot 0x2000000 rayg/uImage.netinstall\n")
         #capture = tn.expect(reg_bash,30)
         capture = tn.expect(reg_bash)
         tn.write(b"tftpboot 0x3000000 lando/ramdisk_v1.0.img\n")
         #capture = tn.expect(reg_bash,30)
         capture = tn.expect(reg_bash)
-        tn.write(b"tftpboot 0xc00000 lando/silkworm.dtb.netinstall\n")
+        tn.write(b"tftpboot 0xc00000 rayg/silkworm.dtb.netinstall\n")
         #capture = tn.expect(reg_bash,30)
         capture = tn.expect(reg_bash)
         tn.write(b"bootm 0x2000000 0x3000000 0xc00000\n")

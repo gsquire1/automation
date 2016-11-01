@@ -15,7 +15,7 @@ import switch_playback
 import sys, os, csv, re, filecmp, difflib, readline
 from configparser import SafeConfigParser
 import ast
-import readline
+import readline, pprint
 
 
 
@@ -75,23 +75,15 @@ def user_start():
             sys.exit()
             
 
-
-def csv_functions_ip():
-    person = input('Enter your name: ')
-    print('Hello', person)
-    sys.exit()
-    # start = input('CONTINUE WITH RESTORING THE SWITCH  [y/n] : ')
-    start = user_start()
-    print(start)
-    sys.exit()
-    test_file = '/home/RunFromHere/ini/TBC_SwitchMatrix.csv'
-    ips = []
+def tbc_creator():
+    
+    test_file = '/home/RunFromHere/ini/TBC1_SwitchMatrix.csv'
+    tbc_file = '/home/RunFromHere/ini/Fabric_Services.tbc'
+    all_power_ips = []
     try:
-        with open(test_file) as switch_matrix:
+        with open(test_file, 'r') as switch_matrix, open(tbc_file, 'r+') as f:
             my_dict = csv.DictReader(switch_matrix)
             for row in my_dict:
-                #print(row)
-                #sys.exit()
                 chassisname = (row['Chassisname'])      # Resource_type
                 ip = (row['IP Address'])                # IP
                 password = (row['Password'])            # Password
@@ -101,44 +93,77 @@ def csv_functions_ip():
                 console_2_port = (row['Console2 Port']) # CP_1 Console Port
                 cp0_ip = (row['CP0 IP'])                # CP_0 IP
                 cp1_ip = (row['CP1 IP'])                # CP_1 IP
-                fabric_name = ("Need to get user input here")   #Fabric name
+                fabric_name = (chassisname)             #Fabric name
                 admin_pwd = ['password']                # Admin Password
                 root_pwd = ['password']                 # Root Password
                 pwr_1 = (row['Power1 IP'])              # Power_1
                 pwr_1_port = (row['Power1 Port'])       # Power_1_Port
                 pwr_2 = (row['Power2 IP'])              # Power_2
                 pwr_2_port = (row['Power2 Port'])       # Power_2_Port
+                pwr_3 = (row['Power3 IP'])              # Power_3
+                pwr_3_port = (row['Power3 Port'])       # Power_3_Port
+                pwr_4 = (row['Power4 IP'])              # Power_3
+                pwr_4_port = (row['Power4 Port'])       # Power_3_Port
+                fos_resources = [chassisname, ip, password, console_1,console_1_port,console_2,console_2_port,cp0_ip, cp1_ip,fabric_name]
+                power_ips = [pwr_1, pwr_2, pwr_3, pwr_4]
+                for i in power_ips:
+                    if i != ''  and i not in all_power_ips:
+                            all_power_ips += [i]
 
-                print ('\n\n')
-                #sys.exit()
                 chassis_name = ("%s_resource_type       fos" % chassisname)
-                ip = "%s_ip                             %s" % (chassisname, ip)
-                console_1 = "%s_cp0_console             %s %s" % (chassisname, console_1, console_1_port)
-                cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
-                cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
+                ip = "%s_ip                  %s" % (chassisname, ip)
+                console_1 = "%s_cp0_console         %s %s" % (chassisname, console_1, console_1_port)
+                cp0ip = "%s_cp0_ip        %s" % (chassisname, cp0_ip)
+                cp1ip = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
                 if (console_2):
                     console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
-                    cp0ip = "%s_cp0_ip    %s" % (chassisname, cp0_ip)
-                    cp1ip = "%s_cp0_ip    %s" % (chassisname, cp1_ip)
-                print (chassis_name)
-                print (ip)
-                print(console_1)
+                    cp0ip = "%s_cp0_ip              %s" % (chassisname, cp0_ip)
+                    cp1ip = "%s_cp0_ip              %s" % (chassisname, cp1_ip)
+                fabric_name = "%s_fabric_name         %s" % (chassisname, chassisname)
+                power_1 = "%s_pwr_1           %s %s" % (chassisname, pwr_1, pwr_1_port)
+                power_ips = pwr_1
+                if(pwr_2):
+                    power_2 = "%s_pwr_2           %s %s" % (chassisname, pwr_2, pwr_2_port)
+                    power_ips = (power_ips , pwr_2)
+                if(pwr_3):
+                    power_3 = "%s_pwr_3           %s %s" % (chassisname, pwr_3, pwr_3_port)
+                    power_ips = (power_ips , pwr_3)
+                if(pwr_4):
+                    power_4 = "%s_pwr_4           %s %s" % (chassisname, pwr_4, pwr_4_port)
+                    power_ips = (power_ips, pwr_4)
+                admin = "%s_cp0_ip        %s" % (chassisname, cp1_ip)
+                f.write(chassis_name+"\n")
+                f.write(ip+"\n")
+                f.write(console_1+"\n")
                 if (console_2):
-                    print (console_2)
-                    print(cp0ip)
-                    print(cp1ip)
-            print("THEEND")
-            sys.exit()
-            if console_2 != '':
-                    #console_2 = (row['Console2 IP'])
-                    #console_2_port= (row['Console2 Port'])
-                    print("PPPPPPPPPPP")
-                    print(console_2)
-                    print(console_2_port)
-
+                    f.write(console_2+"\n")
+                    f.write(cp0ip+"\n")
+                    f.write(cp1ip+"\n")
+                f.write(fabric_name+"\n")
+                f.write(power_1+"\n")
+                if (pwr_2):
+                    f.write(power_2+"\n")
+                if (pwr_3):
+                    f.write(power_3+"\n")
+                if (pwr_4):
+                    f.write(power_4+"\n")
+                f.write("\n\n\n")
+            for i in all_power_ips:
+                power_1 = "%s_resource_type       power_tower" % i
+                ip = "%s_ip                  %s" % (i, i)
+                login = "%s_login               %s" % (i, "user")
+                pwd = "%s_password            %s" % (i, "pass")
+                f.write(power_1+"\n")
+                f.write(ip+"\n")
+                f.write(login+"\n")
+                f.write(pwd+"\n")
+                f.write("\n\n")
+        print("\n\nALL FINISHED\n\n")
     except FileNotFoundError:
-        print('\n\nFile Not Found (Line 158 in fcr_tools.py)')
+        print('\n\nFile(s) Not Found (Line 158 in fcr_tools.py)')
         return(False)
+    
+
     
 def ha_failover( times=1):
     """
@@ -698,7 +723,6 @@ def def_zone_reset(fid1, fid2):
         a = str(si.ae_ports())
         b = a.strip('[')
         b = b.strip(']')
-        b = b.split(',')
         index = (b[0])
         port = (b[1])
         reg_ex = [b"no] "]  ### Needs to be square brackets to send as a list
@@ -715,6 +739,25 @@ def def_zone_reset(fid1, fid2):
         sleep
         anturlar.fos_cmd("switchshow")
     sys.exit()
+    
+def create_ls(number_of_ls):
+    si = anturlar.SwitchInfo()
+    sleep = liabhar.count_down(10)
+    a = number_of_ls
+    print(a)
+    print("9999999999999999999999999999999999999999999")
+    reg_ex = [b"no] "]
+    for i in a:
+        print(i)
+        print(type(i))
+        sys.exit()
+        z = anturlar.fos_cmd_regex("lscfg --create %s" % i, reg_ex, 9) #### use regex because return is something other than "root:"
+        anturlar.fos_cmd("yes")
+        anturlar.fos_cmd("lscfg --show")
+        sleep
+    print("done")
+        
+    
 
         
     
