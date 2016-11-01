@@ -172,7 +172,7 @@ def tc_01_01_03_01():
     Test Case   25.01.01.03.01
     Title:      MAPS Category Management Default thresholds
     Feature:    MAPS 
-    Confirm MAPS default thresholds are set correctly
+    Objective:  Confirm MAPS default thresholds are set correctly
         
     """
     ###########################################################################
@@ -2022,8 +2022,9 @@ def tc_01_01_template():
         Test Case   25.01.01.template
         Title:
         Feature:    Predfined Group Management
-        Objective:  Verify the predefined groups including only the elements
-        defined for each group 
+        Objective:  Template - discription of the test case and the area that
+                    is being tested in this test case
+        
     """
     ###########################################################################
     ####  todo -
