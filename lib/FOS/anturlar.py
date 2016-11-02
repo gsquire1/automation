@@ -1678,21 +1678,32 @@ class Maps(SwitchInfo):
         
         return(ras)
         
-    
-
     def get_rules(self):
         capture_cmd = fos_cmd("mapsrule --show -all")
-        ras = re.compile('(def[_ ,\/\()-=\.|<>A-Za-z0-9]+)')
+        ras = re.compile('(def[ A-Z0-9nm_]{0,40}(?:|[_A_Z]+\())')
         ras = ras.findall(capture_cmd)
         ras = str(ras)
         ras = ras.replace("'","")
         ras = ras.replace("[","")
         ras = ras.replace("]","")
-        
+        ras = ras.replace(",","")
         ras = ras.replace("|,", "")
         
         return(ras)
-        
+
+    #def get_rules(self):
+    #    capture_cmd = fos_cmd("mapsrule --show -all")
+    #    ras = re.compile('(def[_ ,\/\()-=\.|<>A-Za-z0-9]+)')
+    #    ras = ras.findall(capture_cmd)
+    #    ras = str(ras)
+    #    ras = ras.replace("'","")
+    #    ras = ras.replace("[","")
+    #    ras = ras.replace("]","")
+    #    
+    #    ras = ras.replace("|,", "")
+    #    
+    #    return(ras)
+    #    
 
         
         

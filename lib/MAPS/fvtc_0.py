@@ -273,7 +273,18 @@ def tc_01_01_03_01():
     print("\n\nTEST RESULTS FOR Test Case   25.01.01.03.01 ")
     print(test_result)
     f.write(maps_tools.format_results(test_summary, test_result))
-       
+    
+    #print("#"*80)
+    #print("#"*80)
+    #print("#"*80)
+    #print("#"*80)
+    #
+    #print(df_rules)
+    #
+    #print("#"*80)
+    #print("#"*80)
+    #print("#"*80)
+    
     return(test_result)
 
 
