@@ -178,9 +178,10 @@ def ha_failover( times=1):
     ####  5. reconnect
 
     sw_info = anturlar.SwitchInfo()
+    print(sw_info)
     ip_addr = sw_info.ipaddress()
     chassis = sw_info.am_i_director
-
+    #sys.exit()
     while times > 0:
         print("\n\n\n")
         print("@"*60)
