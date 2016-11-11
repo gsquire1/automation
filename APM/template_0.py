@@ -58,7 +58,12 @@ import time
 ####  142  Yoda pluto
 ####  148  Skybolt
 ####
+####  162.0  Wedge
+####  165   X6-4 (Venator)
+####  166   X6-8 (Allegience)
+####  170   Chewbacca
 ###############################################################################
+
 
 
 def parent_parser():

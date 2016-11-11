@@ -1646,9 +1646,24 @@ def tc_01_01_06_07():
     print("slot list   %s " % slot_list )
     
     
+    slot_list_len = (len(slot_list))
+    
+    slot_list_of_ports = [0 for i in range(12)]
+    
+    #for s in range(slot_list_len):
+    #    
+    #    print(s)
+    #    slot_list_of_ports[s] = []
+    #    print("slot list  %s  "  % slot_list_of_ports[s])        
+    
+    
+    print("slot list length is   %s  " % slot_list_len)
+    print("slot list  0   %s " % slot_list[0])
+    print("slot list  1  %s " % slot_list[1])
+    
+    
     slot_core_list = en.blades(False,True)
     print("core blades    % s  " % slot_core_list)
-    
     
     ####
     #fabmems = anturlar.fabric_members()
@@ -1657,21 +1672,37 @@ def tc_01_01_06_07():
     cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
     #### add the slot numbers here
-    slot_numb = int(slot_list[0])
-     
-    bld_map = cofra.bladeportmap_Info(slot_numb)
-    print("\n\n\nBLADEPORTMAP INFO \n")
-    print(bld_map)
-    print("@"*80)
-    print("#"*80)
-    #### create a list of only in_sync ports
-    #count_in_synce = 0
-    in_sync_ports = []
-    for i in bld_map:
-        if "In_Sync" in (i[12]):
-            
-            in_sync_ports.append(i)
+    for s in range(slot_list_len):
+        slot_numb = int(slot_list[s])
+        
+        bld_map = cofra.bladeportmap_Info(slot_numb)
+        print("\n\n\nBLADEPORTMAP INFO \n")
+        print(bld_map)
+        print("@"*80)
+        print("#"*80)
+        #### create a list of only in_sync ports
+        #count_in_synce = 0
+        in_sync_ports = []
+        
+        for i in bld_map:
+            if "In_Sync" in (i[12]):
+                
+                in_sync_ports.append(i)
+        
+        slot_list_of_ports[s] = in_sync_ports    
     
+    
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    
+    for s in range(slot_list_len):
+        print("\n\n")
+        print("slot list of ports %s  "  % slot_list_of_ports[s])  
+    
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
     
     ###########################################################################
     ###########################################################################
@@ -1683,11 +1714,21 @@ def tc_01_01_06_07():
     while cont <= 100000:
         cont +=1
         
+        
+        print("\n"*20)
+        print("#"*80)
+        print("#"*80)
+        print("#"*80)
+        
         slot_list_len = (len(slot_list))
         ####pick a FC blade
         print("SLOT LIST           %s  " % slot_list)
         print("LENGTH of SLOT LIST  %s " % slot_list_len)
         slot_to_add_err = ((liabhar.random_number_int(float(len(slot_list))))) -1
+        
+        if slot_to_add_err == -1 :
+            slot_to_add_err = 0 
+        
         print("random slot number  %s  " % slot_to_add_err)
         
         slot_numb_holder = int(slot_list[slot_to_add_err])
@@ -1697,20 +1738,61 @@ def tc_01_01_06_07():
         print("the list of slots  is  %s  " % slotpicklist)
         liabhar.JustSleep(10)
         
+        
+        print("#"*80)
+        print("#"*80)
+        print("#"*80)
+    
+        for s in range(slot_list_len):
+            print("\n\n")
+            print("slot list of ports %s  "  % slot_list_of_ports[s])  
+    
+    
+    
+        print("slot to add err value is  ")
+        print(slot_to_add_err)
+        print("slot list of ports value  ")
+        print(slot_list_of_ports[slot_to_add_err])
+        print(len(slot_list_of_ports[slot_to_add_err]))
+        
+        print("#"*80)
+        print("#"*80)
+        print("#"*80)
+        
+        #w = slot_list_of_ports[0]
+        #print(type(w))
+        #print(w)
+        #print((len(w)))
+        #
+        #
+        ####  if the list of ports in the slot is [] then skip
+        
         ####  pick a port randomly 
-        port_to_add_err = ((liabhar.random_number_int(float(len(in_sync_ports))))) - 1
+        #### 
+        #port_to_add_err = ((liabhar.random_number_int(float(len(in_sync_ports))))) - 1
+    
+        port_to_add_err = ((liabhar.random_number_int(float(len(slot_list_of_ports[slot_to_add_err]))))) - 1
         print("\n\nPORT NUMBER TO ADD  %s  \n\n" % port_to_add_err)
-        print("THE LENGTH OF the PORT LIST  %s   \n\n" % len(in_sync_ports))
+        print("THE LENGTH OF the PORT LIST  %s   \n\n" % len(slot_list_of_ports[slot_to_add_err]))
         #### pick and err type randomly
         multiplier = float(12) #### even though we are picking a number that is
         #### an integer the multiplier has to be a float 
         pck_rndm_err = ((liabhar.random_number_int(multiplier))) - 1
         #### from the list of in_sync ports get the port that cooresponds
         #### to the number    i = in_sync_port[port_to_add_err]
+        #try:
+        #    i = in_sync_ports[port_to_add_err]
+        #except IndexError:
+        #    i = 0
+            
         try:
-            i = in_sync_ports[port_to_add_err]
+            i = slot_list_of_ports[slot_to_add_err][port_to_add_err]
+            
         except IndexError:
-            i = 0
+            i = 0   
+            print("could not capture the slot list of ports")
+            sys.exit()
+            
             
         chip_numb = i[8]
         chip_id = i[11]

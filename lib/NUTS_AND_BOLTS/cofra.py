@@ -1162,9 +1162,13 @@ def PortStats(counter="all", port_list = "all"):
         ras_Lli_loss_signal   = ras_Lli_loss_signal.findall(capture_cmd)
         ras_proc_protoc_err   = re.compile('Proc_rqrd:\s+(\d+)\s+Protocol_err:\s+(\d+)')
         ras_proc_protoc_err   = ras_proc_protoc_err.findall(capture_cmd)
-        ras_Suspend_lr_out    = re.compile('Suspended:\s+(\d+)\s+Lr_out:\s+(\d+)')
-        ras_Suspend_lr_out    = ras_Suspend_lr_out.findall(capture_cmd)
-        ras_Overrun_lr_in     = re.compile('Overrun:\s+(\d+)\s+Lr_in:\s+(\d+)')
+        #ras_Suspend_lr_out    = re.compile('Suspended:\s+(\d+)\s+Lr_out:\s+(\d+)')   #### change in 8.0.0 to a different format
+        ras_Suspend_lr_out    = re.compile('Lr_out:\s+(\d+)')                         #### so the Suspend can be removed from 
+        ras_Suspend_lr_out    = ras_Suspend_lr_out.findall(capture_cmd)               #### capture of lr_in and lr_out
+                                                                                      #### this also makes the captures list of one
+        #ras_Overrun_lr_in     = re.compile('Overrun:\s+(\d+)\s+Lr_in:\s+(\d+)')
+        ras_Overrun_lr_in     = re.compile('Lr_in:\s+(\d+)')
+        
         ras_Overrun_lr_in     = ras_Overrun_lr_in.findall(capture_cmd)
         ras_state_change      = re.compile('state transition count:\s+(\d+)')
         ras_state_change      = ras_state_change.findall(capture_cmd)
@@ -1195,6 +1199,13 @@ def PortStats(counter="all", port_list = "all"):
             caputre_porterrshow = anturlar.fos_cmd("porterrshow %s/%s | grep :" % (crnt_slot,crnt_port))
         else:
             caputre_porterrshow = anturlar.fos_cmd("porterrshow %s | grep :" % (crnt_port))
+        
+        ####ALLEGIANCE_______ALLEGIANCE___:FID31:root> porterrshow
+        ####           frames      enc    crc    crc    too    too    bad    enc   disc   link   loss   loss   frjt   fbsy  c3timeout    pcs    uncor
+        ####         tx     rx      in    err    g_eof  shrt   long   eof     out   c3    fail    sync   sig                  tx    rx     err    err
+        ####  32:    0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0   
+        ####  33:    0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0      0   
+        
         
         ras_porterrshow = re.compile('\s*\d+:\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)\s+([\.\dkgmt]+)')
         ras_porterrshow = ras_porterrshow.findall(caputre_porterrshow)
@@ -1229,11 +1240,13 @@ def PortStats(counter="all", port_list = "all"):
                 counter_list_capture.append(proto_count)           
                 
             elif i in "lrout":
-                lr_out_count.append(ras_Suspend_lr_out[0][1])
-                counter_list_capture.append(lr_out_count)
-                
+                #lr_out_count.append(ras_Suspend_lr_out[0][1]) #### this change to list of one from above capture
+                lr_out_count.append(ras_Suspend_lr_out[0])     ####  so added this line since we are only concerned 
+                counter_list_capture.append(lr_out_count)      ####  with lr_out 
+                                                               #### same with the next elif for lr_in
             elif i in "lrin":
-                lr_in_count.append(ras_Overrun_lr_in[0][1])
+                #lr_in_count.append(ras_Overrun_lr_in[0][1])
+                lr_in_count.append(ras_Overrun_lr_in[0])
                 counter_list_capture.append(lr_in_count)
                 
             elif i =='statechange':
