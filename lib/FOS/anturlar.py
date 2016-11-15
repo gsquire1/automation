@@ -23,8 +23,8 @@ GLOBAL_CONSTANT_NAME            ClassName
 
 class FabricInfo:
     """
-        a class to return iformations about a Fabric including
-        The FID is required make the class specific to the FID
+        A class to return information about a Fabric.
+        The FID is required make the class specific to the FID.
         
     """
     
