@@ -224,7 +224,23 @@ def mapsenable( pol, al, ml ):
     
  
  
-def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=True, policy_is="Dolly" ):
+def add_RoR_rules_on_each_rule():
+    
+    """
+    
+    
+    """
+
+    sw_info = anturlar.SwitchInfo()
+    fid_now = sw_info.ls_now()
+    cons_out = anturlar.fos_cmd(" ")
+    
+    
+    
+    
+    return()
+ 
+def add_rules_each_monitor_type(add_max=False, add_all=True, add_each_monitor=False, policy_is="Dolly" ):
     """
         create rules with each different combination of monitor for each type of logical group
         
@@ -238,18 +254,21 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
     #sw_ip = sw_info.ipaddress()
     #f = anturlar.FabricInfo(fid_now)
     
-    #### this list goes with FC Ports as the type of logical group
-    #monitor_list_port_health_fc_port = ["CRC", "ITW", "LOSS_SYNC", "UTIL", "CRED_ZERO", "THPUT_DEGRADE", ]
-    #### this list goes with FLOW as the type of logical group
-    #monitor_list_perf_flow_port = ["TX_THPUT", "RX_THPUT", "RX_FCNT", "TX_FCNT"]
-    #### this list goes wtth SFP as the type of logical groups
-    monitor_list_for_ios  = ["RD_PENDING_IO_8K", "WR_PENDING_IO_8K", "RD_PENDING_IO_8_64K", "WR_PENDING_IO_8_64K", \
+    ###########################################################################
+    ###########################################################################
+    ####
+    #### MONITOR LIST  - list of all of the monitor types available for all switches
+    ####
+    ###################################################################################################################
+    ###################################################################################################################
+    
+    monitor_list_for_ios  = ["RD_PENDING_IO_LT_8K", "WR_PENDING_IO_LT_8K", "RD_PENDING_IO_8_64K", "WR_PENDING_IO_8_64K", \
                              "RD_PENDING_IO_64_512K", "WR_PENDING_IO_64_512K", "RD_PENDING_IO_GE_512K", "WR_PENDING_IO_GE_512K", \
                              
-                             "RD_STATUS_TIME_8K", "WR_STATUS_TIME_8K", "RD_STATUS_TIME_8_64K", "WR_STATUS_TIME_8_64K", \
+                             "RD_STATUS_TIME_LT_8K", "WR_STATUS_TIME_LT_8K", "RD_STATUS_TIME_8_64K", "WR_STATUS_TIME_8_64K", \
                              "RD_STATUS_TIME_64_512K", "WR_STATUS_TIME_64_512K", "RD_STATUS_TIME_GE_512K", "WR_STATUS_TIME_GE_512K", \
                              
-                             "RD_1stDATA_TIME_LE_8K", "WR_1stXFER_RDY_LE_8K", "RD_1stDATA_TIME_8_64K", "WR_1stXFER_RDY_8_64K", \
+                             "RD_1stDATA_TIME_LT_8K", "WR_1stXFER_RDY_LT_8K", "RD_1stDATA_TIME_8_64K", "WR_1stXFER_RDY_8_64K", \
                              "RD_1stDATA_TIME_64_512K", "WR_1stXFER_RDY_64_512K", "RD_1stDATA_TIME_GE_512K", "WR_1stXFER_RDY_GE_512K" ]
     
     
@@ -262,8 +281,8 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                                         "SEC_DCC","SEC_HTTP","SEC_CMD","SEC_IDB","SEC_LV","SEC_CERT", \
                                         "SEC_FCS","SEC_SCC","SEC_AUTH_FAIL","SEC_TELNET","SEC_TS", \
                                         "DID_CHG","FLOGI","FAB_CFG","EPORT_DOWN","FAB_SEG","ZONE_CHG", \
-                                        
-                                        "RX","TX","UTIL", "FAN_AIR_FLOW_DIR", "IT_FLOW", "OVER_SUB_RATIO"]
+                                        "ENCR_BLK","ENCR_DISC","ENCR_SHRT_FRM","PID", \
+                                        "RX","TX","UTIL", "FAN_AIRFLOW_MISMATCH", "IT_FLOW", "OVER_SUB_RATIO"]
     
     monitor_list_with_no_timebase =  [ "PWR_HRS", " RXP", "VOLTAGE", "CURRENT", "TXP", "SFP_TEMP", "VTAP_IOPS", "BE_LATENCY_IMPACT", \
                                        "DAYS_TO_EXPIRE", "IP_JITTER", "IP_RTT", "JITTER", "RTT", "BLADE_STATE", "DEV_LATENCY_IMPACT", \
@@ -325,17 +344,26 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
     
     monitor_list_combined  =  monitor_list_for_ios + monitor_list_for_traffic_perf + monitor_list_for_monitor_type + monitor_list_with_no_timebase
     monitor_list_quick_sfp =  monitor_list_with_no_timebase
-    timebase_list = ["min", "hour", "day", "none"]
+    timebase_list = ["min", "hour", "day", "none", "week"]
     
     operator_list = [ "l", "le", "g", "ge", "eq" ]
     
-    actions_list = [ "raslog", "email", "snmp", "fence", "fence,decom", "fms", "none", "sfp_marginal", "sw_marginal", "sw_critical"]  #### do we need other actions here - sddq 
+    actions_list = [ "raslog", "email", "snmp", "fence", "fence,decom", "fms", "none", "sfp_marginal", "sw_marginal", "sw_critical", "sddq"]  #### do we need other actions here - sddq 
     
     cons_out = anturlar.fos_cmd("mapspolicy --create %s" % policy_is)
     rule_name = "monitor_test___"
     stopnow = 0
     stophere = 100000
     monitor_number = 0
+    
+    
+    
+    #### debug
+    
+    print("add max value is            %s  " % add_max )
+    print("add each monitor value is   %s  " % add_each_monitor)
+    print("add all value is            %s  " % add_all)
+    print("Policy value is             %s  " % policy_is)
     
     
  
@@ -363,7 +391,7 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
         timebase_list = ["min","none" ]
         operator_list = [ "g", ]
-        actions_list  = [ "raslog", ]
+        actions_list  = [ "snmp", ]
         for r in ext_all_groups:
            
 
@@ -443,8 +471,10 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
     
     
     if add_all:
-        f = "%s" % ("logs/MAPS_RULES_EXT_GROUPS.txt")
+        f = "%s" % ("logs/MAPS_RULES_EXT_GROUPS_add_all.txt")
+        g = "%s" % ("logs/MAPS_ALL_RULES_RESULTS_add_all.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        gg = liabhar.FileStuff(g, 'w+b')  #### reset the log file for all commands that were created
         for r in ext_all_groups:
             cleanup_all_rules()
 
@@ -460,10 +490,17 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                             if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+                            else:
+                                gg.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))  
+                            
+                                cons_out = anturlar.fos_cmd("mapsrule --delete %s " % rule_to_add)
         ff.close()
+        gg.close()
+        
         #
         f = "%s" % ("logs/MAPS_RULES_ALL_OTHERS.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        gg = liabhar.FileStuff(g, 'w+b')  #### reset the log file for all commands that were created
         for r in all_other_groups_list:
             cleanup_all_rules()
             for p in monitor_list_combined:
@@ -477,10 +514,17 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                             if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+                            else:
+                                gg.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))  
+                            
+                                cons_out = anturlar.fos_cmd("mapsrule --delete %s " % rule_to_add)
+        
         ff.close()
+        gg.close()
         #
         f = "%s" % ("logs/MAPS_RULES_SFP_GROUPS.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        gg = liabhar.FileStuff(g, 'w+b')  #### reset the log file for all commands that were created
         for r in sfp_group_list:
             cleanup_all_rules()
             for p in monitor_list_combined:
@@ -494,10 +538,17 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                             if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+                            else:
+                                gg.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))  
+                            
+                                cons_out = anturlar.fos_cmd("mapsrule --delete %s " % rule_to_add)
+        
         ff.close()
+        gg.close()
         #
         f = "%s" % ("logs/MAPS_RULES_PORT_GROUPS.txt")
         ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+        gg = liabhar.FileStuff(g, 'w+b')  #### reset the log file for all commands that were created
         for r in fc_logical_group_list:
             cleanup_all_rules()
             for p in monitor_list_combined:
@@ -511,7 +562,12 @@ def add_rules_each_monitor_type(add_max=False, add_each_monitor=False, add_all=T
                             if "Invalid Monitor" not in cons_out and "Timebase" not in cons_out and "Invalid action" not in cons_out:
                                 monitor_number += 1 
                                 ff.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))
+                            else:
+                                gg.write("\n--  %s  --  %s  --  %s    -- %s   --   %s   --   %s   --END  "  %  (r, p, t, o, a, cons_out))  
+                            
+                                cons_out = anturlar.fos_cmd("mapsrule --delete %s " % rule_to_add)
         ff.close()
+        gg.close()
         #
         #
     ###################################################################################################################
