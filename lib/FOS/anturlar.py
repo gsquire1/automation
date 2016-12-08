@@ -815,7 +815,9 @@ class SwitchInfo:
             find the logical switch numbers and the domains
         """
         capture_cmd = fos_cmd("lscfg --show")
-        ras = re.compile('IDs\):\s+([\( 0-9bsd)]+)(?=\\r\\n)')  
+        #ras = re.compile('IDs\):\s+([\( 0-9bsd)]+)(?=\\r\\n)')
+        ras = re.compile('([\(0-9bsd)]{4,12})')
+        
         ras = ras.findall(capture_cmd)
         
         return(ras)
@@ -1691,21 +1693,7 @@ class Maps(SwitchInfo):
         
         return(ras)
 
-    #def get_rules(self):
-    #    capture_cmd = fos_cmd("mapsrule --show -all")
-    #    ras = re.compile('(def[_ ,\/\()-=\.|<>A-Za-z0-9]+)')
-    #    ras = ras.findall(capture_cmd)
-    #    ras = str(ras)
-    #    ras = ras.replace("'","")
-    #    ras = ras.replace("[","")
-    #    ras = ras.replace("]","")
-    #    
-    #    ras = ras.replace("|,", "")
-    #    
-    #    return(ras)
-    #    
-
-        
+         
         
     def get_policies(self, p = 's' ):
         #### ruturn the policy rules list for p
@@ -1716,7 +1704,7 @@ class Maps(SwitchInfo):
         
         if p == "s":
             capture_cmd = fos_cmd("mapspolicy --show -summary")
-            ras = re.compile('(dflt[_a-z]+\s+:\s+[0-9]+)')
+            ras = re.compile('([_\w\d]+)\s+(?=:)')
             ras = ras.findall(capture_cmd)
             
             return(ras)
@@ -1739,24 +1727,34 @@ class Maps(SwitchInfo):
         """
         capture_cmd = fos_cmd("mapspolicy --show -summary")
         ras = re.compile('([_\w\d]+)\s+(?=:)')
+        
         ras = ras.findall(capture_cmd)
-        i = 0
-        try:
-            while i <=3:
-                ras.pop(0)
-                i +=1
-        except IndexError:
-            return("")
-            
-        ras_str = str(ras)
-        ras_str = ras_str.replace("'","")
-        ras_str = ras_str.replace("[","")
-        ras_str = ras_str.replace("]","")
-        ras_str = ras_str.replace(",","")
-        ras_final = ras_str.split(" ")
         
-        return(ras_final)
+        dp = [ "dflt_aggressive_policy", "dflt_moderate_policy", "dflt_conservative_policy", "dflt_base_policy" ]
+        for p in dp :
+            try:
+                ras.remove(p)
+            except ValueError:
+                pass
+ 
+        return(ras)
+    
+    def get_active_policy(self):
+        """
+        get the active policy of MAPS
         
+        Active Policy is 'dflt_aggressive_policy'.
+        
+        """
+        
+        capture_cmd = fos_cmd("mapspolicy --show -summary")
+        ras = re.compile("Active Policy is '([_\w\d]+)'")
+        
+        ras = ras.findall(capture_cmd)
+        
+        return(ras)
+        
+    
     
     def get_relay_server_info(self):
         """
@@ -2044,13 +2042,50 @@ class FlowV(SwitchInfo):
         """
         cmd_out = fos_cmd("flow --show ")
         
-        print("\n\n\n",cmd_out , "\n\n\n\n")
+        #print("\n\n\n",cmd_out , "\n\n\n\n")
         #ras = re.compile('([_-a-z0-9A-z]{1,20})[ \|]+[\*,-|a-zA-Z0-9]+(?=\n)')
-        ras = re.compile('\n([_a-z0-9A-Z]{1,20})(?= |)')
+        ras = re.compile('\n([_a-z0-9A-Z]{1,20})\s+(?=|)')
         ras = ras.findall(cmd_out)
         
-        print(ras)
+        #print(ras)
         return(ras)
+    
+    def get_nondflt_flows(self):
+        """
+        
+        """
+        cmd_out = fos_cmd("flow --show ")
+        
+        #print("\n\n\n",cmd_out , "\n\n\n\n")
+        #ras = re.compile('([_-a-z0-9A-z]{1,20})[ \|]+[\*,-|a-zA-Z0-9]+(?=\n)')
+        ras = re.compile('\n([_a-z0-9A-Z]{1,20})\s+(?=|)')
+        ras = ras.findall(cmd_out)
+        
+        df = [ "sys_gen_all_simports", "sys_analytics_vtap", "sys_mon_all_fports", "sys_mon_all_vms" ]
+        for d in df:
+            try:
+                ras.remove(d)
+            except ValueError:
+                pass
+        
+        return(ras)
+        
+    def get_active_flows(self):
+        """
+         get the active flows only
+         
+            mon_eport_38        |mon+
+        
+        
+        """
+        cmd_out = fos_cmd("flow --show ")
+
+        ras = re.compile('\n([_a-z0-9A-Z]{1,20})\s*\|[mongeir]{3,3}\+')
+        ras = ras.findall(cmd_out)
+        
+        return(ras)
+        
+        
     
     def flow_config(self):
         """

@@ -79,6 +79,8 @@ def testprocess( theargs, run_these, password ):
                 
     #tn = anturlar.connect_tel(theargs, password )
     tn = anturlar.connect_tel_noparse(host_ip, user, password )
+    conout = anturlar.fos_cmd("setcontext %s " % theargs.fid )
+    
     #print("@@"*40)
     #print("IN BIRLINNN Just after the connect to telnet")
     #print("@@"*40)
