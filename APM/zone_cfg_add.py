@@ -801,7 +801,9 @@ def main():
     print(pa.verbose)
     #print(pa.firmware)
     print(pa.cmdprompt)
+    print(pa.fid)
     print("@"*40)
+    #sys.exit()
     
 ###################################################################################################################
 ###################################################################################################################
@@ -836,6 +838,10 @@ def main():
     
     en = anturlar.Maps()
     fab_stuff = anturlar.FabricInfo(en.currentFID())
+    print("$$$$$$$$$$$$$$")
+    print(fab_stuff)
+
+    sys.exit()
     #fabmems = fab_stuff.fabric_members()
     myzone_info = fab_stuff.zone_info()
     try:

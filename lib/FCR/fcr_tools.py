@@ -44,13 +44,15 @@ def test_cofra_functions():
     
 def test_anturlar_functions():
     #a = ex_port_list()
-    fcri = anturlar.FcrInfo()
+    #fcri = anturlar.FcrInfo()
+    #fabi = anturlar.FabricInfo()
+    zones = anturlar.Zone()
     #si = anturlar.SwitchInfo()
     #su = cofra.SwitchUpdate()
     #a = fcri.__getportlist__("EX-Port")
     #b = fcri.all_ex_ports_with_edge_fid()
     print("1111111111111111111111111111111")
-    b = fcri.all_ex_ports_with_edge_fid()
+    b = zones.def_zone()
     print("2222222222222222222222222222222")
     print(b)
     sys.exit()
@@ -743,19 +745,19 @@ def def_zone_reset(fid1, fid2):
     
 def create_ls(number_of_ls):
     si = anturlar.SwitchInfo()
-    sleep = liabhar.count_down(10)
+    #sleep = liabhar.count_down(10)
     a = number_of_ls
     print(a)
     print("9999999999999999999999999999999999999999999")
-    reg_ex = [b"no] "]
+    reg_ex = [b"[y/n]?:"]
     for i in a:
         print(i)
         print(type(i))
-        sys.exit()
+        #sys.exit()
         z = anturlar.fos_cmd_regex("lscfg --create %s" % i, reg_ex, 9) #### use regex because return is something other than "root:"
-        anturlar.fos_cmd("yes")
+        anturlar.fos_cmd("y")
         anturlar.fos_cmd("lscfg --show")
-        sleep
+        #sleep
     print("done")
         
     
