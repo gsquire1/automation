@@ -2466,7 +2466,7 @@ def fos_cmd_regex(cmd, reg,dblevel=0):
         print(" in  fos_cmd_regex()    ")
         print("========================")
 
-def fos_cmd(cmd, dl=10):
+def fos_cmd(cmd, dl=0):
     global tn
     try: 
         usrn = var.sw_user + '> '
