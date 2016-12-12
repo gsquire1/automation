@@ -2412,7 +2412,6 @@ def power_cmd(cmd, dl=0):
         #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(dl)
-        tn.set_debuglevel(10)
         reg_ex_list = [b"cli->", b"\(yes, no\)  : ", b"seconds.", b"\$ ", telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
@@ -2707,4 +2706,168 @@ def remote_os_ver(ip="127.0.0.1", dl=0):
 
     return(os_is)
 
+
+
+def connect_console(HOST,port,db=0, *args):
+    """
+      connect to the console
+      
+      HOST         =    the ip address of console 
+      usrname      =    will be created from the port number    example  port17
+      password     =    pass
+      port         =    console port number -- example  3017
+      
+      db           =    set the telnet debug level  default is 0 / off  can be set up to 10 
+      other args   =    none at this time 
+    
+    
+    """
+    global tn
+    
+    
+    var = 1
+    reg_list = [b"aaaaa: ",  b"Login incorrect", b"option : ", b"root> ", b"login: ", b"r of users: "]   #### using b for byte string
+    reg_list_r = [b".*\n", b":root> "]
+    
+    password = "pass"
+    capture = ""
+    option = 1
+    #############################################################################
+    #### parse the user name for console login
+    ####
+    port = str(port)
+    usrname = parse_port(port)
+    print("connecting via Telnet to  " + HOST + " on port " + port )
+    print(HOST)
+    print(usrname)
+    print(password)
+    print(port)
+    
+    tn = telnetlib.Telnet(HOST,port)
+    print("tn value is  ", tn)
+    tn.set_debuglevel(db)
+    
+    
+    print("-------------------------------------------------ready to read lines")
+    #############################################################################
+    #### login 
+    capture = tn.read_until(b"login: ")
+    print(capture)
+    tn.write(usrname.encode('ascii') + b"\r\n")
+    #if password:
+    capture = tn.read_until(b"assword: ")
+    print(capture)
+    tn.write(password.encode('ascii') + b"\r\n")
+        
+    print("\n\n\n\n\n\n\n\n")
+    
+    #############################################################################
+    #### login to the switch
+    reg_list = [ b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>" ]  
+    while var <= 4:
+        #print("start of the loop var is equal to ")
+        capture = ""
+        capture = tn.expect(reg_list)
+        print(capture)
+        
+        if capture[0] == 0:
+            tn.write(b"1")
+                    
+        if capture[0] == 1:
+            tn.write(b"root\r\n")
+                
+        if capture[0] == 2:
+            tn.write(b"assword\r\n")
+                    
+        if capture[0] == 3:
+            print(capture)
+            print("this found root")
+            break
+        
+        if capture[0] == 4:
+            print(capture)
+            print("\n\n\n\n\n\nFOUND USERS: \n\n")
+            tn.write(b"\r\n")
+            #capture = tn.expect(reg_list)
+            #break
+        if capture[0] == 5:
+            print(capture)
+            var += 4
+            break
+        
+        var += 1
+      
+    capture = tn.expect(reg_list, 20)
+    if capture[0] == 1 :
+        tn.write(b"root\r\n")
+        capture = tn.expect(reg_list, 20)
+        tn.write(b"password\r\n")
+        capture = tn.expect(reg_list, 20)
+        
+
+    capture = tn.expect(reg_list, 20)
+    
+    return(tn)
+
+
+
+
+
+
+def parse_port(port):
+    """
+        pass the port number of the console 
+        return the port number that can be used in the connect_console procedure
+    
+        example port is 3017 and the return value will be port17
+        
+    """
+    
+    print("port number " , port )
+    print("\n\n")
+    print("My type is %s"%type(port))
+    print("\n\n\n\n")
+    ras = re.compile('([0-9]{2})([0-9]{2})')
+    ras_result = ras.search(port)
+    print("port front  is  ",  ras_result.group(1))
+    print("port back is    ",  ras_result.group(2))
+    usrname = ras_result.group(2)
+    if usrname < "10":
+        ras = re.compile('([0]{1})([0-9]{1})')
+        ras_result = ras.search(usrname)
+        usrname = ras_result.group(2)
+    usrname = "port" + usrname
+    return usrname
+
+
+
+
+
+def send_cmd_console(cmd, db=10):
+    """
+        send a command to the console when connected
+    
+    """
+    
+    
+    global tn
+    
+    tn.set_debuglevel(db)
+    
+    capture = ""
+    cmd_look = cmd.encode()
+    
+    #reg_ex_list = [b".*:root> "]
+    reg_ex_list = [b"root> ", b"admin> ", b"ogin:", b"assword:"]
+    print(cmd)
+    tn.write(cmd.encode('ascii') + b"\n")
+    capture = tn.expect(reg_ex_list,3600)
+    #print(capture[0])
+    #print(capture[1])
+    #print(capture[2])
+    capture = capture[2]
+    capture = capture.decode()
+    print(capture, end="")
+    
+    return(capture)
 

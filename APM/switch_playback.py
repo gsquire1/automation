@@ -1105,6 +1105,12 @@ def parse_port(port):
     return usrname
 
 def send_cmd(cmd, db=10):
+    """
+    send a command to the console when connected
+    
+    """
+    
+    
     global tn
     
     tn.set_debuglevel(db)

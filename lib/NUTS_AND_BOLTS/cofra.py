@@ -10,7 +10,7 @@ import csv
 import os
 import ast
 import ipaddress
-
+import time
 
 
 class doFirmwareDownload():
@@ -1976,9 +1976,67 @@ def check_ip_format(ipaddr):
         return(False)
     
 
+def power_cycle(power_pole_info):
+    """
+      
+      power pole info can be retrieved from sw_matrix_tools file
+      or sent as a list of  ip1, port1, ip2, port2
+      
+    """
+ 
+    
+    try:
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off")
+            time.sleep(2)
+            
+        for pp in range(0, len(power_pole_info), 2):
+            print('POWERPOLE')
+            print(power_pole_info[pp])
+            print(power_pole_info[pp+1])
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on")
+            time.sleep(2)
+    except:
+        if  '' == power_pole_info[0]:
+            print("\n"*20)
+            print("NO POWER POLE INFO FOUND ")
+            print("HA "*10)
+            print("you have to walk to power cycle the switch")
+            print("I will wait ")
+            liabhar.JustSleep(30)
+        else:
+            print("POWER TOWER INFO")
+            print(power_pole_info[0])
+            print(power_pole_info)
+            liabhar.JustSleep(30)
     
     
     
+    return(True)
+    
+    
+    
+    
+def pwr_cycle(pwr_ip, pp, stage, db=0):
+    
+    tnn = anturlar.connect_tel_noparse_power(pwr_ip, 'user', 'pass', db)
+    anturlar.power_cmd("cd access/1\t/1\t%s" % pp ,10) 
+    anturlar.power_cmd("show\r\n" ,10)
+    
+    anturlar.power_cmd(stage, 5)
+    anturlar.power_cmd("yes", 5)
+    
+    #liabhar.JustSleep(10)
+    anturlar.power_cmd("exit", 10)
+     
+    print("\r\n"*10)
+    print("Waiting for the switch to boot")
+    print("\r\n"*5)
+    
+    return(0) 
     
     
     

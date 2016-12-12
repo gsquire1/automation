@@ -80,7 +80,7 @@ def parse_args(args):
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
     #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
-    #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
+    parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
@@ -620,110 +620,136 @@ def get_ip_from_file(chassis_name):
                         
     return(ip)
 
-def sw_set_pwd_timeout(pswrd,tn):
-   
-    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
-    reg_login = [ b"login:"]
-    reg_assword = [ b"assword: ", b"root> "]
-    reg_change_pass = [ b"key to proceed", b"incorrect" ]
-    reg_complete   = [ b"zation completed"]
-    reg_linertn    = [ b"\\r\\n" ]
-    
-    print("\n\nlooking for completed task\n\n")
-    capture = tn.expect(reg_complete, 10)
-    tn.write(b"\r\n")
-    print("\n\nwrite to tn a newline \n\n")
-    print("\n\nlooking for login and send root\n\n")
-        #capture = tn.expect(reg_linertn)
-    capture = tn.expect(reg_login, 60)
-    
-    tn.write(b"root\r\n")
-    capture = tn.expect(reg_assword, 20)
-    print("\n\nlooking for password and send fibranne\n\n")
-    tn.write(b"fibranne\r\n")
-    capture = tn.expect(reg_change_pass, 20)
-    tn.write(b"\r\n")
-    capture = tn.expect(reg_linertn)
-
-    
-    while True:    
-        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
-        #### if root is found break out
-        print("CAPTURE is  ")
-        print(capture)
-        
-        if capture[0] == 1:
-            print(capture)
-            print("this found root")
-            break
-        tn.write(b"password\r\n")
-  
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"root\r\n")
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"password\r\n")
-    capture = tn.expect(reg_list, 20)
-    tn.write(b"timeout 0 \r\n")
-    capture = tn.expect(reg_list, 20)
-    
-    return(True)
-    
-
-
- 
- 
- 
-   
-def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
-    """
-        open the log file for reading and add the following
-        1. license
-        2. create fids and base switch is previously set
-        3. put ports into the FIDS
-        4. update domains
-        5. update switch name
-        6. enable fcr
-        7.
+def pwr_cycle_fabric():
     """
     
-    ff = ""
-    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
-    print(f)
-    
+    """
+    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = 'ini/SwitchMatrix.csv'
     try:
-        with open(f, 'r') as file:
-            ff = file.read()
-    except IOError:
-        print("\n\nThere was a problem opening the file" , f)
-        sys.exit()
+        csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
+    except OSError:
+        print("Cannot find the file SwitchMatrix.csv")
+        return(False)
+     
+    for line in csv_file:
+        chassis_name_from_file = (line['Chassisname'])
+             
+        power_pole_info   = pwr_pole_info(chassis_name_from_file)    
         
-    print("look for the info\r\n")
-    print(ff)
-    ras_license     = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', ff)
-    
-    print(ras_license)
-    ras_ls_list     = re.findall('LS LIST\s+:\s+\[(.+)\]', ff)
-    ras_base        = re.findall('BASE SWITCH\s+:\s+\[(.+)\]', ff)
-    ras_switchname  = re.findall('SWITCH NAME\s+:\s+\[(.+)\]', ff)
-    ras_vf          = re.findall('VF SETTING\s+:\s+\[(.+)\]', ff)
-    ras_fcr         = re.findall('FCR ENABLED\s+:\s+\[(.+)\]', ff)
-    ras_xisl        = re.findall('ALLOW XISL\s+:\s+\[(.+)\]', ff)
-    ras_ports       = re.findall('Ports\s+:\s+\[(.+)\]', ff)
-    
-    ll = ras_license[0]
-    ll.replace("'","")        #### remove the comma with string command  
-    lic_list = ll.split(",")  #### change the data from string to list
-
-    all_list = []
-    all_list += [lic_list]
-    all_list += [ras_ls_list]
-    all_list += [ras_base]
-    all_list += [ras_switchname]
+        print("@"*30)
+        print("power cycle    with  power pole info  ")
+        print(chassis_name_from_file)
+        print(power_pole_info)
+        print("\r\n"*2)
+        cons_out = power_cycle(power_pole_info)
         
-    
-    return(all_list)
+    return()
 
-    
+#def sw_set_pwd_timeout(pswrd,tn):
+#   
+#    reg_list = [ b"Enter your option", b"login: ", b"Password: ", b"root> ", b"users: " ]
+#    reg_login = [ b"login:"]
+#    reg_assword = [ b"assword: ", b"root> "]
+#    reg_change_pass = [ b"key to proceed", b"incorrect" ]
+#    reg_complete   = [ b"zation completed"]
+#    reg_linertn    = [ b"\\r\\n" ]
+#    
+#    print("\n\nlooking for completed task\n\n")
+#    capture = tn.expect(reg_complete, 10)
+#    tn.write(b"\r\n")
+#    print("\n\nwrite to tn a newline \n\n")
+#    print("\n\nlooking for login and send root\n\n")
+#        #capture = tn.expect(reg_linertn)
+#    capture = tn.expect(reg_login, 60)
+#    
+#    tn.write(b"root\r\n")
+#    capture = tn.expect(reg_assword, 20)
+#    print("\n\nlooking for password and send fibranne\n\n")
+#    tn.write(b"fibranne\r\n")
+#    capture = tn.expect(reg_change_pass, 20)
+#    tn.write(b"\r\n")
+#    capture = tn.expect(reg_linertn)
+#
+#    
+#    while True:    
+#        capture = tn.expect(reg_assword, 20)  #### looking for Enter new password
+#        #### if root is found break out
+#        print("CAPTURE is  ")
+#        print(capture)
+#        
+#        if capture[0] == 1:
+#            print(capture)
+#            print("this found root")
+#            break
+#        tn.write(b"password\r\n")
+#  
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"root\r\n")
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"password\r\n")
+#    capture = tn.expect(reg_list, 20)
+#    tn.write(b"timeout 0 \r\n")
+#    capture = tn.expect(reg_list, 20)
+#    
+#    return(True)
+#    
+
+
+ 
+ 
+ 
+   
+#def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=False, fcr=False ):
+#    """
+#        open the log file for reading and add the following
+#        1. license
+#        2. create fids and base switch is previously set
+#        3. put ports into the FIDS
+#        4. update domains
+#        5. update switch name
+#        6. enable fcr
+#        7.
+#    """
+#    
+#    ff = ""
+#    f = ("%s%s%s"%("logs/Switch_Info_for_playback_",switch_ip,".txt"))
+#    print(f)
+#    
+#    try:
+#        with open(f, 'r') as file:
+#            ff = file.read()
+#    except IOError:
+#        print("\n\nThere was a problem opening the file" , f)
+#        sys.exit()
+#        
+#    print("look for the info\r\n")
+#    print(ff)
+#    ras_license     = re.findall('LICENSE LIST\s+:\s+\[(.+)\]', ff)
+#    
+#    print(ras_license)
+#    ras_ls_list     = re.findall('LS LIST\s+:\s+\[(.+)\]', ff)
+#    ras_base        = re.findall('BASE SWITCH\s+:\s+\[(.+)\]', ff)
+#    ras_switchname  = re.findall('SWITCH NAME\s+:\s+\[(.+)\]', ff)
+#    ras_vf          = re.findall('VF SETTING\s+:\s+\[(.+)\]', ff)
+#    ras_fcr         = re.findall('FCR ENABLED\s+:\s+\[(.+)\]', ff)
+#    ras_xisl        = re.findall('ALLOW XISL\s+:\s+\[(.+)\]', ff)
+#    ras_ports       = re.findall('Ports\s+:\s+\[(.+)\]', ff)
+#    
+#    ll = ras_license[0]
+#    ll.replace("'","")        #### remove the comma with string command  
+#    lic_list = ll.split(",")  #### change the data from string to list
+#
+#    all_list = []
+#    all_list += [lic_list]
+#    all_list += [ras_ls_list]
+#    all_list += [ras_base]
+#    all_list += [ras_switchname]
+#        
+#    
+#    return(all_list)
+#
+#    
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
@@ -737,7 +763,7 @@ def main():
     
 #######################################################################################################################
 ####
-#### 
+####   Parse the command line indo
 ####
 #######################################################################################################################
     pa = parse_args(sys.argv)
@@ -757,56 +783,28 @@ def main():
 ####   SwitchMatrix file
 #### then get the info from the SwitchMatrix file using the Chassis Name
 #### 
-#### 
+#### If the fabric is selected power cycle all of the switches
 ####
-    if pa.ipaddr:
-        print("do IP steps")
-        pa.chassis_name = console_info_from_ip(pa.ipaddr)
+####
+    
+    
+    
+    if pa.fabwide:
+        print("power cycle all of the switches in SwitchMatrix File")
         
-    cons_info         = console_info(pa.chassis_name)
-    #console_ip        = cons_info[0]
-    #console_port      = cons_info[1]
-    #console_ip_bkup   = cons_info[2]
-    #console_port_bkup = cons_info[3]
-    power_pole_info   = pwr_pole_info(pa.chassis_name)    
-    #usr_pass          = get_user_and_pass(pa.chassis_name)
-    #user_name         = usr_pass[0]
-    #usr_psswd         = usr_pass[1]
-    #ipaddr_switch     = get_ip_from_file(pa.chassis_name)
- 
- 
+        pwr_cycle_fabric()
+          
+    else:
+        if pa.ipaddr:
+            print("do IP steps")
+            pa.chassis_name = console_info_from_ip(pa.ipaddr)
+            
+        cons_info         = console_info(pa.chassis_name)
 
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+        power_pole_info   = pwr_pole_info(pa.chassis_name)    
     
-    #print("\r\n\r\nLICENSE ADD TO SWITCH \r\n\r\n")
-    #print(ipaddr_switch)
-    
-    #cc = cofra.SwitchUpdate()
-    #cons_out = cc.playback_licenses()
-    #cons_out  = cc.playback_ls()
+        cons_out = power_cycle(power_pole_info)
 
-    
-    #cons_out = cc.playback_switch_names()
-    
-    #cons_out = cc.playback_switch_domains()
-    #cons_out = cc.playback_add_ports()
-    #cons_out = cc.playback_timeout()
-    #tn       = cc.reboot_reconnect()
-    #cons_out = anturlar.fos_cmd("passwddefault")
-    #cons_out = anturlar.fos_cmd("logout")
-    
-    #liabhar.JustSleep(30)
-    cons_out = power_cycle(power_pole_info)
-    #liabhar.JustSleep(10)
-    #print("reconnect via telnet")
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    
-    #cons_out = sw_set_pwd_timeout(usr_psswd, tn)
-    
-    #cons_out = anturlar.fos_cmd("switchshow")
-    #print(cons_out)
-    
-    #anturlar.close_tel()
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
     print(date_is)
