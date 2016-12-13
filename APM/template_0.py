@@ -265,7 +265,66 @@ def main():
     print("Leaving the script\r\n\r\n")
     liabhar.count_down(30)                               ####   count down to the next command 
     
+#######################################################################################################################
+#######################################################################################################################
+####
+####  This starts the template section for configshow output comparison (after some type of switch operation).
+####  First snippet of code simply opens a connection, changes to requested fid, sends output of configshow to a file.
+####
+#######################################################################################################################
+#######################################################################################################################
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
+    cons_out = anturlar.fos_cmd("setcontext %s " % pa.fid)  
+    dt = liabhar.dateTimeStuff()                                        #### create the object for date and time stuff
+    date_is = dt.current_no_dash_at_end()                               #### get the current time for file naming purposes
+    #print("\n\nDate is %s" % date_is)
     
+    liabhar.count_down(5)                                               ####   count down to the next command 
+    #configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % ("10.38.35.131","ftp1", ipaddr_switch, "ftp2")
+    f = "%s%s%s%s"%("logs/Configupload_test_case_file",ipaddr_switch,date_is,".txt")
+    ff = liabhar.FileStuff(f, 'w+b')                                    #### open the log file for writing       
+    header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch,"\n==============================\n\n")                                 #### write a header line at top of file
+    ff.write(header)
+    #cons_out = anturlar.fos_cmd (configup_cmd)
+    ff.write(anturlar.fos_cmd("configshow"))
+    ff.close()                                                          #### close this file for comparison later
+#######################################################################################################################
+#######################################################################################################################
+####
+####  do anything else you want to try (small sample of examples):
+####  anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+####  anturlar.fos_cmd("cfgenable")
+####  anturlar.fos_cmd("switchdisable")
+####  anturlar.fos_cmd("switchenable")
+####
+####  In the below snippet we run tsclockerver: anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+####  Then grab output of configshow, drop into a file and compare that with original
+####
+#######################################################################################################################
+#######################################################################################################################
+
+    
+    anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    date_is = dt.current_no_dash_at_end()
+    f1 = "%s%s%s%s"%("logs/Configupload_test_case_file",ipaddr_switch,date_is,".txt")
+    ff = liabhar.FileStuff(f1, 'w+b')  #### reset the log file        
+    header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch, "\n==============================\n\n")  
+    ff.write(header)
+    #cons_out = anturlar.fos_cmd (configup_cmd)
+    ff.write(anturlar.fos_cmd("configshow"))
+    ff.close()
+    
+    diff_f  = liabhar.file_diff(f,f1)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("Result ")
+    print(diff_f)
+
+    #return(cons_out)
+    return(True)
+
 if __name__ == '__main__':
     
     main()
