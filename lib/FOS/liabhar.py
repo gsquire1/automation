@@ -44,7 +44,15 @@ class dateTimeStuff:
         for n in ["-", ".", ":"," "]:
             w = w.replace(n,"_")
         w = w + "_"
-        return(w)    
+        return(w)
+    
+    def current_no_dash_at_end(self):
+        i = datetime.datetime.today()  #### ISO format 2013-02-21 06:35:45.707450
+        w = str(i)
+        for n in ["-", ".", ":"," "]:
+            w = w.replace(n,"_")
+        #w = w + "_"
+        return(w)
     
     def stamp(self):
         t = time.time()  #### timestamp in form 1361446545.52
