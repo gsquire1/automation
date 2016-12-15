@@ -123,6 +123,7 @@ def parse_args(args):
     parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
+    parser.add_argument('-i',   '--iterations', type=int, default=1, help="number of iterations")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -182,8 +183,10 @@ def main():
     print(pa.quiet)
     print(pa.verbose)
     print(pa.cmdprompt)
+    print(pa.iterations)
     print("@"*40)
     print("@"*40)
+    #sys.exit()
 #######################################################################################################################
 #######################################################################################################################
 ####
@@ -301,7 +304,9 @@ def main():
 #######################################################################################################################
 
     
-    anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    #anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+    tn = cofra.ha_failover(pa.iterations)
+    cons_out = anturlar.fos_cmd("setcontext %s " % pa.fid)
     date_is = dt.current_no_dash_at_end()
     f1 = "%s%s%s%s"%("logs/Configupload_test_case_file",ipaddr_switch,date_is,".txt")
     ff = liabhar.FileStuff(f1, 'w+b')  #### reset the log file        
