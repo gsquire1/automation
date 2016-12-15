@@ -73,37 +73,29 @@ def parent_parser():
     pp = argparse.ArgumentParser(add_help=False)
     #pp.add_argument("--repeat", help="repeat repeat")
     pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-    pp.add_argument("-fa", "--file_action", help="0 to stop after creating file 1 to create new file and continue 2 skip file create and use your own file", type=int, default=0 )
-    #pp.add_argument("ip", help="IP address of SUT")
-    #pp.add_argument("user", help="username for SUT")
-    #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
+    pp.add_argument("-fa", "--file_action", help="0 to stop after creating file                            \
+                                                  1 to create new file and continue                        \
+                                                  2 skip file create and use your own file                 \
+                                                  3 rebuild the switch from previously saved file          ", \
+                                                  type=int, default=0 )
+ 
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
-    return pp 
+    return(pp) 
 
 def parse_args(args):
     
-    verb_value = "99"
+ 
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
-    #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
     parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt", action="store_true")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     parser.add_argument('-f',    '--filename',   help="File name to use instead of the default file", default="for_playback")
     parser.add_argument('-d',    '--cust_date',      help=argparse.SUPPRESS, )
-    #parser.add_argument('-s', '--suite', type=str, help="Suite file name", required=True)
-    #parser.add_argument('-p', '--password', help="password")
-    #group = parser.add_mutually_exclusive_group()
-    #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
-    #group.add_argument("-q", "--quiet", action="store_true")
-    #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
-    #parser.add_argument("ip", help="IP address of SUT")
-    #parser.add_argument("user", help="username for SUT")    
-        
+         
     args = parser.parse_args()
     print(args)
     
@@ -119,14 +111,9 @@ def parse_args(args):
         print('To start at the command prompt both switch type and command prompt is requried')
         sys.exit()
     
+    if not args.firmware:
+        print("0 to stop after creating file 1 to create new file and continue 2 skip file create and use your own file")
     
-    #sys.exit()
-    #print("Connecting to IP :  " + args.ip)
-    #print("user             :  " + args.user)
-    #verbose    = args.verbose
-     
-     
-
     return(parser.parse_args())
 
 
@@ -145,7 +132,7 @@ def info_help_OSError():
     print("\n"*5)
     sys.exit()
 
-def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
+def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     
     global tn
     
@@ -376,7 +363,7 @@ def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
 
 
 
-def connect_console(HOST,usrname,password,port,db=10, *args):
+def connect_console(HOST,usrname,password,port,db=0, *args):
     
     global tn
     
@@ -509,7 +496,7 @@ def connect_console(HOST,usrname,password,port,db=10, *args):
     return(tn)
 
     
-def stop_at_cmd_prompt(db=9):
+def stop_at_cmd_prompt(db=0):
     global tn
     
     tn.set_debuglevel(db)
@@ -536,7 +523,7 @@ def stop_at_cmd_prompt(db=9):
     
     return(capture)
        
-def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
+def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
 
     #liabhar.count_down(10)
     
@@ -649,7 +636,7 @@ def env_variables(swtype, gateway_ip, db=10): #put new gateway variable here
     
     return(capture)
 
-def pwr_cycle(pwr_ip, pp, stage, db=10):
+def pwr_cycle(pwr_ip, pp, stage, db=0):
     
     tnn = anturlar.connect_tel_noparse_power(pwr_ip, 'user', 'pass', db)
     
@@ -1104,7 +1091,7 @@ def parse_port(port):
     usrname = "port" + usrname
     return usrname
 
-def send_cmd(cmd, db=10):
+def send_cmd(cmd, db=0):
     """
     send a command to the console when connected
     
@@ -1483,12 +1470,16 @@ def load_config(ipaddr_switch, user_name,usr_psswd, filename):
     
     #cc = cofra.SwitchUpdate("for_playback")
     cc = cofra.SwitchUpdate(filename)
-    
-    cons_out = cc.playback_licenses()
-    cons_out = cc.playback_ls()
-    cons_out = cc.playback_switch_names()
-    cons_out = cc.playback_switch_domains()
-    cons_out = cc.playback_add_ports()
+                                                      ####   format of each playback feature             ####
+    cons_out = cc.playback_licenses()                     ####   list of strings
+    tn_maybe        = cc.playback_ls()                           ####   list of strings
+    #print("\r\ngetting another tn\r\n")
+    #print(tn)
+    #print(tn_maybe)
+    #sys.exit()
+    cons_out = cc.playback_switch_names()                 ####   list     --  fid: switchname 
+    cons_out = cc.playback_switch_domains()               ####   list     --  fid: domain 
+    cons_out = cc.playback_add_ports()                    ####   list    --   fid: list of ports
     cons_out = cc.playback_add_ports_ex()
     tn       = cc.reboot_reconnect()
     cons_out = anturlar.fos_cmd("switchshow")
