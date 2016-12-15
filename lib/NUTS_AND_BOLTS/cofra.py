@@ -644,12 +644,28 @@ class SwitchUpdate():
         print("@"*44)
         print(ras_base)
         print("@"*44)
+        tn = ''
         
         try:
             ls_list = ras[0]
             c = ls_list.split(",")
         
             for i in c:
+                
+                
+                if i == c[0] and i != '128':     #### check that the first fid is not 128 
+                    
+                    cons_out = anturlar.fos_cmd_regex("lscfg --change 128 -newfid %s " % i , reg_ex_yes_no, 9)
+                    if "n]?: " in cons_out:
+                        anturlar.fos_cmd("yes", 9)
+                        liabhar.count_down(120)
+                        tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
+                        print("\r\n\r\nvalue of tn %s  \r\n\r\n" % tn)
+                        
+                    else:
+                        print("did not find yes / no question ")
+                        pass
+                 
                 
                 if ras_base[0] in i:
                     cons_out = anturlar.fos_cmd_regex("lscfg --create %s -base" % i , reg_ex_yes_no, 9)
@@ -676,7 +692,12 @@ class SwitchUpdate():
         except:
             print("There was an error attempting to create a FID in playback_ls_to_switch")
             return(False)
+        
+        
+        #return(tn)
+                
         return(True)
+        
         
     def playback_switch_names(self):
         """
