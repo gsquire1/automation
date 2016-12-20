@@ -1997,7 +1997,7 @@ def check_ip_format(ipaddr):
         return(False)
     
 
-def power_cycle(power_pole_info):
+def power_cycle(power_pole_info, times=1):
     """
       
       power pole info can be retrieved from sw_matrix_tools file
@@ -2060,7 +2060,50 @@ def pwr_cycle(pwr_ip, pp, stage, db=0):
     return(0) 
     
     
+def power_cycle_iterations(power_pole_info, times=1):
+    """
+        do powercycle on directors
+        do hareboot on pizza box
+    """
+    #### steps
+    ####  1. Determine Pizza box or Director
+    ####  2. save username and password
+    ####  3. HA Failover or HA reboot
+    ####  4. wait some time
+    ####  5. reconnect
+
+    sw_info = anturlar.SwitchInfo()
+    ip_addr = sw_info.ipaddress()
+    chassis = sw_info.am_i_director
+
+    while times > 0:
+        print("\n\n\n")
+        print("@"*60)
+        print("Powercycles remaining -- %s " % times)
+        print("@"*60)
+        times -= 1
+        liabhar.count_down(10)
+        power_cycle(power_pole_info, times)
+        # if chassis:
+        #     capture = anturlar.fos_cmd("echo Y | hafailover")    
+        # else:
+        #     capture = anturlar.fos_cmd("hareboot")
+        liabhar.count_down(3001)
+        tn = anturlar.connect_tel_noparse(ip_addr,'root','password')
+        switch_sync = sw_info.synchronized()
+        print("\n\n")
+        print("@"*60)
+        print("VALUE OF switch_sync is   --   %s   " % switch_sync)
+        print("@"*60)
+        while  switch_sync is False:
+            liabhar.count_down(120)
+            switch_sync = sw_info.synchronized()
+            print("\n\n")
+            print("@"*60)
+            print("The VALUE OF switch_sync is   --   %s   " % switch_sync)
+            print("@"*60)
     
+    return(tn)    
     
     
     

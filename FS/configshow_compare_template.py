@@ -272,7 +272,7 @@ def main():
     
     liabhar.count_down(3)                                               ####   count down to the next command 
     #configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % ("10.38.35.131","ftp1", ipaddr_switch, "ftp2")
-    f = "%s%s%s%s"%("logs/Configupload_test_case_file",ipaddr_switch,date_is,".txt")
+    f = "%s%s%s%s"%("logs/Configupload_test_case_file","_"+ipaddr_switch+"_",date_is,".txt")
     ff = liabhar.FileStuff(f, 'w+b')                                    #### open the log file for writing       
     header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch,"\n==============================\n\n")                                 #### write a header line at top of file
     ff.write(header)
@@ -303,12 +303,16 @@ def main():
 #######################################################################################################################
 #######################################################################################################################
 
-    
+    tn = cofra.clear_stats()
     #anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
-    tn = cofra.ha_failover(pa.iterations)
+    #tn = cofra.ha_failover(pa.iterations)
+    tn = cofra.power_cycle_iterations(power_pole_info, pa.iterations)
+    
+    
+    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
     cons_out = anturlar.fos_cmd("setcontext %s " % pa.fid)
     date_is = dt.current_no_dash_at_end()
-    f1 = "%s%s%s%s"%("logs/Configupload_test_case_file",ipaddr_switch,date_is,".txt")
+    f1 = "%s%s%s%s"%("logs/Configupload_test_case_file","_"+ipaddr_switch+"_",date_is,".txt")
     ff = liabhar.FileStuff(f1, 'w+b')  #### reset the log file        
     header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch, "\n==============================\n\n")  
     ff.write(header)
