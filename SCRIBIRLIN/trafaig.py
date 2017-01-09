@@ -150,6 +150,8 @@ def main():
         
         strt_cmd = maim_pain + " " + size + cmd_options
     
+    
+     
         print("server info to connect with \n")
         print("IP address        :   %s " % serv_ip )
         print("User Name         :   %s " % serv_usr)
@@ -167,7 +169,7 @@ def main():
         #  traffic_tools.traff_get_port_list(serv_ip, serv_usr, serv_pwd, strt_cmd)
     ###########################################################################
     
-        print("\n\n\n\n\n\n\n\n\n\n")
+        print("\n"*4)
         print(t[2])    
         if t[2] != "Username":
             os_ver = anturlar.remote_os_ver(serv_ip,9)

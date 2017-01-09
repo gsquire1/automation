@@ -114,6 +114,14 @@ def parse_args(args):
     if not args.firmware:
         print("0 to stop after creating file 1 to create new file and continue 2 skip file create and use your own file")
     
+    if args.file_action >= 4:
+        print("\n\nfa (file action ) is required to be 0,1,2,3    \n\n \
+                       0 to stop after creating file  \n\
+                        1 to create new file and execute the Netinstall and restore the switch \n\
+                        2 skip file create and use your own file to restore the switch \n\
+                        3 rebuild the switch from previously saved file \n\n\n")
+        sys.exit()
+
     return(parser.parse_args())
 
 
@@ -148,7 +156,8 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
                 b"key to proceed.", \
                 b"Authentication failure" , \
                 b" login: ", \
-                b"no]"                     ]
+                b"no]" , \
+                b"all':"            ]
 
 
     password = "pass"
@@ -271,10 +280,13 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     
     
     if capture[0] == 0:
-        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        #tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
+        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer  #### send a 4 to kill all sessions
         #print("\n"*11)
         #tn.write(b"\n")
         capture = tn.expect(reg_list)
+        if capture[0] == 12:
+            tn.write(b"all\n")
         print(capture)
     else:
         tn.write(b"\n")
@@ -527,7 +539,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
 
     #liabhar.count_down(10)
     
-    db = 9
+    #db = 0
     capture = ""
     ras = re.compile('.\d{1,3}.\d{1,3}.(\d{1,3}).\d{1,3}')
     gw_octet = ras.findall(gateway_ip)
@@ -559,11 +571,11 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     #print("@"*80)
     tn.write(b"date\n")
     
-    capture = tn.expect(reg_list, 120)
-    
+    #capture = tn.expect(reg_list, 120)
+    capture = tn.expect(reg_list)
     tn.write(b"printenv\n")
-    capture = tn.expect(reg_list, 120)
-    
+    #capture = tn.expect(reg_list, 120)
+    capture = tn.expect(reg_list)
     netmask   = "255.255.240.0"
     #### for all switches except WEDGE (for now) need the bootargs ip=off setting
     ###  the exceptions are below for skybolt and wedge
@@ -587,49 +599,57 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         ethact = "FM2@DTSEC4"
         a = ("setenv ethprime FM2@DTSEC4 \n")
         tn.write(a.encode('ascii'))
-        capture = tn.expect(reg_list, 30)
-        
-    capture = tn.expect(reg_list, 10) ####   ### add this capture since the next two writes are running together.
+        #capture = tn.expect(reg_list, 30)
+        capture = tn.expect(reg_list)
+    #capture = tn.expect(reg_list, 10) ####   ### add this capture since the next two writes are running together.
                                       ####
-    
+    capture = tn.expect(reg_list)
     a = ("setenv ethact %s \n" % ethact)
     tn.write(a.encode('ascii'))
-    capture = tn.expect(reg_list, 30) #######Changed all these to 30
+    #capture = tn.expect(reg_list, 30) #######Changed all these to 30
+    capture = tn.expect(reg_list)
     g = ("setenv gatewayip %s \n" % gateway_ip)
     tn.write(g.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     n = ("setenv netmask %s\n"%netmask)
     tn.write(n.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     b = ("setenv bootargs %s\n"%bootargs)
     tn.write(b.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     e = ("setenv ethrotate %s\n"%ethrotate)
     tn.write(e.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     s = ("setenv serverip %s\n"%server_ip)
     tn.write(s.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
-    
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     #i = ("setenv ipaddr 10.38.134.2\n")
     i = ("setenv ipaddr %s\n" % fake_ip)
     tn.write(i.encode('ascii'))
-    capture = tn.expect(reg_list, 30)
-    
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list)
     tn.write(b"saveenv\n")
-    capture = tn.expect(reg_list_done,60)
-    capture = tn.expect(reg_list, 30)
-    tn.write(b"printenv\n")    
-    capture = tn.expect(reg_list, 90)
+    #capture = tn.expect(reg_list_done,60)
+    #capture = tn.expect(reg_list, 30)
+    capture = tn.expect(reg_list_done)
+    capture = tn.expect(reg_list)
     
+    tn.write(b"printenv\n")    
+    #capture = tn.expect(reg_list, 90)
+    capture = tn.expect(reg_list)
     
     #liabhar.JustSleep(60)
     
     p = ("ping %s  \n" % gateway_ip)
     tn.write(p.encode('ascii'))
     tn.write(b"\n")
-    capture = tn.expect(reg_list, 30)
-    
+    #capture = tn.expect(reg_list, 300)
+    capture = tn.expect(reg_list)
     print("oh my \n")
     print("\n\nCOMPLETE with loading ENV VARIABLES\n\n")
     #liabhar.JustSleep(60)
@@ -661,7 +681,8 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     
     reg_list = [ b"^=> "]
     reg_bash = [ b".*?bash-2.04#", b".*?=> ", b"bash-2.04#"]
-    #reg_bash = [ b"bash-2.04", b"=> "]
+    reg_bash = [ b"bash-2.04", b"=> "]
+    reg_bash = [ b"bash-2.04"]
     reg_bash_only = [ b"bash-2.04" ]
     reg_linkup = [ b".*?ink is up"]
     
@@ -807,31 +828,38 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
 #######################################################################################################################
 #######################################################################################################################
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\n")
-    capture = tn.expect(reg_bash, 30)
+    #capture = tn.expect(reg_bash, 30)
+    capture = tn.expect(reg_bash)
     i = "ifconfig eth0 %s netmask 255.255.240.0 up\n" % sw_ip 
     tn.write(i.encode('ascii'))
-    capture = tn.expect(reg_bash, 30)
+    #capture = tn.expect(reg_bash, 30)
+    capture = tn.expect(reg_bash)
     gw = "route add default gw %s \n" % gateway_ip
     tn.write(gw.encode('ascii'))
-    capture = tn.expect(reg_linkup,30)
+    #capture = tn.expect(reg_linkup,30)
+    capture = tn.expect(reg_bash)
     #tn.write(b"\n")
-    capture = tn.expect(reg_bash, 20)
+    #capture = tn.expect(reg_bash, 20)
+    capture = tn.expect(reg_bash)
     m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\n" ####CHANGE SERVER TO VARIABLE
     tn.write(m.encode('ascii'))
-    capture = tn.expect(reg_bash, 30)
+    #capture = tn.expect(reg_bash, 30)
+    capture = tn.expect(reg_bash)
     ### firmwarepath
     firmpath = "cd /load/SQA/fos/%s/%s\n" % (frm_no_bld, frm_version)
     tn.write(firmpath.encode('ascii'))
-    capture = tn.expect(reg_bash,160)
+    #capture = tn.expect(reg_bash,160)
+    capture = tn.expect(reg_bash)
     #### need to capture when this hangs anc was not able to connect to the server
     ####  this appears to timeout and the last recieve string was
     ####    \xco\xc0\x80  80 repeated 10 times
     tn.write(b"./install release\n")
-    capture = tn.expect(reg_bash,160)
+    #capture = tn.expect(reg_bash,160)
+    capture = tn.expect(reg_bash)
     ####  this does not capture the bash  and from the console the last recv b'30`\x00\x180\xf0
     
-
     return(0)
+
 
 def do_net_install(sw_info_filename):
     """
@@ -968,7 +996,10 @@ def do_net_install(sw_info_filename):
 ####
 #######################################################################################################################
     reg_list_bash = [b"bash-2.04#"]
-    cons_out = tn.expect(reg_list_bash,900)
+    print("H"*80)
+    print("looking fo bash forever")
+    #cons_out = tn.expect(reg_list_bash,900)
+    cons_out = tn.expect(reg_list_bash)
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
     print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")

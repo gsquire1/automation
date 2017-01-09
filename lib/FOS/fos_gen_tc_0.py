@@ -239,6 +239,7 @@ def switch_config_show():
         flow_names          = f_info.flow_names()
         flows_nondflt       = f_info.get_nondflt_flows()
         flows_active        = f_info.get_active_flows()
+        flow_details        = f_info.get_flow_details()
         #flow_cnfg           = f_info.flow_config()
         maps_config         = anturlar.fos_cmd("mapsconfig --show")          
         #######
@@ -271,6 +272,7 @@ def switch_config_show():
         ff.write("FLOW Names list          :    %s \r\n" % flow_names)
         ff.write("FLOW non dflt Flows      :    %s \r\n" % flows_nondflt)
         ff.write("FLOWs Active             :    %s \r\n" % flows_active)
+        ff.write("FLOW Details             :    %s \r\n" % flow_details)
         ff.write("---------------------------------------------------------------------\r\n")
         
     ff.close()
@@ -361,6 +363,7 @@ def fabric_switch_config_show():
         flows_nondflt       = f_info.get_nondflt_flows()
         flows_active        = f_info.get_active_flows()
         #flow_cnfg           = f_info.flow_config()
+        flow_details        = f_info.get_flow_details()
         
         
         anturlar.close_tel()
@@ -404,6 +407,7 @@ def fabric_switch_config_show():
         ff.write("FLOW Names list          :    %s \r\n" % flow_names)
         ff.write("FLOW non dflt Flows      :    %s \r\n" % flows_nondflt)
         ff.write("FLOWs Active             :    %s \r\n" % flows_active)
+        ff.write("FLOW Details             :    %s \r\n" % flow_details)
         ff.write("---------------------------------------------------------------------\r\n")
         
         #ff.write("FLOW CONFIG         :   \r\n   %s \r\n" % flow_cnfg)

@@ -2085,6 +2085,27 @@ class FlowV(SwitchInfo):
         
         return(ras)
         
+    def get_flow_details(self):
+        """
+        
+        """
+        cmd_out = fos_cmd("flow --show ")
+
+        ras = re.compile('\n([_a-z0-9A-Z]{1,20})\s*\|[+mongeir]{3,4}\s+\|([-*0-9a-f]{1,6})\s+\|([-*0-9a-f]{1,6})\s+\|([-*0-9]{1,4})\s+\|([-*0-9]{1,4})\s+\|([a-z]{1,5})\s+\|([-0-9]{1,5})\s+\|([-_A-Za-z0-9]{1,16})\s*\|([-A-Za-z0-9]{1,4})\s*\|([-A-Za-z0-9]{1,4})\s*\|([ -_A-Za-z0-9]{1,47})\s*\|([-,0-9]{1,6})')
+        ras = ras.findall(cmd_out)
+        
+        return(ras)
+    
+    def get_egr_stats(self, act_flow):
+        """
+        
+        
+        """
+        
+        cmd_out = fos_cmd("flow --show %s "% act_flow)
+        
+        
+        return(cmd_out)
         
     
     def flow_config(self):
@@ -2592,6 +2613,8 @@ def traff_output(dl= 0):
                 pass
         
     except:
+        
+        print("error in anturlar traff_ouput ")
         pass
 
   

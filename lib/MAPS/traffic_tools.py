@@ -5,7 +5,7 @@
 #### Home location is
 ####
 ###############################################################################
-
+import sys
 import anturlar
 import re
 import liabhar
@@ -43,41 +43,83 @@ def bcu_version():
     ras = ras.findall(cmdout)
     
     return(ras)
-    
+  
+
     
 def start_linux_pre_3_2(h, start_cmd):
+    """
+       the command is passed into this procedure and the drive letters are added to the command
+       if there are Clariion devices the LUNZ devices are skipped
+       
     
+    """
     
     db_level = 9
     remote_list = []
     start_pain = start_cmd
-    
-    for i in [1,2,3,4]:
+    ###################################################################################################################
+    #### use catapult to capture the  drives and and Volumn ID  -- use this if they are Clariion to not add
+    ####     the drives with LUNZ Volumn ID  since they are not target IDs
+    ####
+    cmdout = anturlar.traff_cmd("catapult -p")
+    ras = re.compile('[ \d]+/dev/sd([a-z]+)\s+[:0-9]+\s+[A-Z]+\s+([A-Z]+)')
+    remove_lunz = ras.findall(cmdout)
+        
+    for i in [4,2,3,1]:
+        
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/0" % i , db_level )
         ras = re.compile('/dev/sd([a-z]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+        
+        print("ras"*30)
+        print(ras)
+        print(remove_lunz)
+        print(remote_list)
+        
+        print("ras"*30)
+        
+        for r in ras:
+            for lunz in remove_lunz:
+                print(r)
+                print(lunz[0])
+                print(lunz[1])  
+                
+                if lunz[0] == r and lunz[1] != "LUNZ":
+     
+                    if r not in remote_list:
+                        remote_list += [r] 
+                  
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/1" % i , db_level )
         ras = re.compile('/dev/sd([a-z]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+        
+        for r in ras:
+            for lunz in remove_lunz:
+        
+            
+                if lunz[0] == r and lunz[1] != "LUNZ":
+             
+                    if r not in remote_list:
+                        remote_list += [r] 
+ 
     
     print("remote port list  :  %s  " % remote_list )
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     
-    ####  put the list is the correct syntax
+    ####  put the list is the correct syntax by adding comma
     new_list = ",".join(remote_list)
         
     print("NEW LIST IS   :   %s " % new_list)
+    print("#"*80)
     
     #### combine the command with the drive list
     start_pain_sd = start_pain + ' -f"/dev/sd;%s"' % new_list
     print("NEWEST COMMAND  %s   " % start_pain_sd)
     reg_list = [b'([\w\d]+)']
-    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
-    cmdout = anturlar.traff_output()
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list,9)
+    cmdout = anturlar.traff_output(9)
     
     anturlar.close_tel()    
 
@@ -87,20 +129,56 @@ def start_linux_post_3_2(h, start_cmd):
     db_level = 9
     remote_list = []
     start_pain = start_cmd
-    
+         ###################################################################################################################
+    #### use catapult to capture the  drives and and Volumn ID  -- use this if they are Clariion to not add
+    ####     the drives with LUNZ Volumn ID  since they are not target IDs
+    ####
+    cmdout = anturlar.traff_cmd("catapult -p")
+    ras = re.compile('[ \d]+/dev/sd([a-z]+)\s+[:0-9]+\s+[A-Z]+\s+([A-Z]+)')
+    remove_lunz = ras.findall(cmdout)
     
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
         ras = re.compile('/dev/sd([a-z]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+    
+        print("ras"*30)
+        print(ras)
+        print(remove_lunz)
+        print(remote_list)
+        
+        print("ras"*30)
+        
+        for r in ras:
+            for lunz in remove_lunz:
+                print(r)
+                print(lunz[0])
+                print(lunz[1])  
+                
+                if lunz[0] == r and lunz[1] != "LUNZ":
+     
+                    if r not in remote_list:
+                        remote_list += [r]    
+        
+        
+        
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
         ras = re.compile('/dev/sd([a-z]+)')
         ras = ras.findall(cmdout)
         remote_list = remote_list + ras
     
+    
+        for r in ras:
+            for lunz in remove_lunz:
+        
+            
+                if lunz[0] == r and lunz[1] != "LUNZ":
+             
+                    if r not in remote_list:
+                        remote_list += [r] 
+     
     print("remote port list  :  %s  " % remote_list )
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     
@@ -131,12 +209,39 @@ def start_windows_pre_3_2(h, start_cmd):
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/0" % i , db_level )
         ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+        
+        print("ras"*30)
+        print(ras)
+        print(remove_lunz)
+        print(remote_list)
+        
+        print("ras"*30)
+        
+        for r in ras:
+            for lunz in remove_lunz:
+                print(r)
+                print(lunz[0])
+                print(lunz[1])  
+                
+                if lunz[0] == r and lunz[1] != "LUNZ":
+     
+                    if r not in remote_list:
+                        remote_list += [r] 
+        
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/1" % i , db_level )
         ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+      
+        for r in ras:
+            for lunz in remove_lunz:
+        
+            
+                if lunz[0] == r and lunz[1] != "LUNZ":
+             
+                    if r not in remote_list:
+                        remote_list += [r] 
+ 
     
     print("remote port list  :  %s  " % remote_list )
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
@@ -169,12 +274,44 @@ def start_windows_post_3_2(h, start_cmd):
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
         ras = re.compile('rive([0-9]+)')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+
+        print("ras"*30)
+        print(ras)
+        print(remove_lunz)
+        print(remote_list)
+        
+        print("ras"*30)
+        
+        for r in ras:
+            for lunz in remove_lunz:
+                print(r)
+                print(lunz[0])
+                print(lunz[1])  
+                
+                if lunz[0] == r and lunz[1] != "LUNZ":
+     
+                    if r not in remote_list:
+                        remote_list += [r]  
+        
+        
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
         ras = re.compile('rive([0-9]{1,3})')
         ras = ras.findall(cmdout)
-        remote_list = remote_list + ras
+
+    
+        for r in ras:
+            for lunz in remove_lunz:
+        
+            
+                if lunz[0] == r and lunz[1] != "LUNZ":
+             
+                    if r not in remote_list:
+                        remote_list += [r] 
+ 
+    
+    
+    
     
     print("remote port list  :  %s  " % remote_list )
     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
