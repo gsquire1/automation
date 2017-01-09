@@ -749,6 +749,7 @@ def main():
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
     fi = anturlar.FabricInfo()
     si = anturlar.SwitchInfo()
+    su = cofra.SwitchUpdate()
     fcr = anturlar.FcrInfo()
     
     if pa.fabwide:
@@ -779,6 +780,7 @@ def main():
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
             print("\n"+"@"*40)
             pass
+    su.reboot_reconnect()
     anturlar.close_tel()
     sys.exit()
 

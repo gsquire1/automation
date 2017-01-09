@@ -79,7 +79,7 @@ def user_start():
 
 def tbc_creator():
     
-    test_file = '/home/RunFromHere/ini/TBC1_SwitchMatrix.csv'
+    test_file = '/home/RunFromHere/ini/TBC_SwitchMatrix_MASTER.csv'
     tbc_file = '/home/RunFromHere/ini/Fabric_Services.tbc'
     all_power_ips = []
     try:
@@ -96,8 +96,8 @@ def tbc_creator():
                 cp0_ip = (row['CP0 IP'])                # CP_0 IP
                 cp1_ip = (row['CP1 IP'])                # CP_1 IP
                 fabric_name = (chassisname)             #Fabric name
-                admin_pwd = ['password']                # Admin Password
-                root_pwd = ['password']                 # Root Password
+                admin_pwd = (row['Password'])           # Admin Password
+                root_pwd = (row['Password'])            # Root Password
                 pwr_1 = (row['Power1 IP'])              # Power_1
                 pwr_1_port = (row['Power1 Port'])       # Power_1_Port
                 pwr_2 = (row['Power2 IP'])              # Power_2
@@ -122,6 +122,8 @@ def tbc_creator():
                     cp0ip = "%s_cp0_ip              %s" % (chassisname, cp0_ip)
                     cp1ip = "%s_cp0_ip              %s" % (chassisname, cp1_ip)
                 fabric_name = "%s_fabric_name         %s" % (chassisname, chassisname)
+                root_pwd = "%s_root_pwd         %s" % (chassisname, root_pwd)
+                admin_pwd = "%s_admin_pwd         %s" % (chassisname, admin_pwd)
                 power_1 = "%s_pwr_1           %s %s" % (chassisname, pwr_1, pwr_1_port)
                 power_ips = pwr_1
                 if(pwr_2):
@@ -142,6 +144,8 @@ def tbc_creator():
                     f.write(cp0ip+"\n")
                     f.write(cp1ip+"\n")
                 f.write(fabric_name+"\n")
+                f.write(root_pwd+"\n")
+                f.write(admin_pwd+"\n")
                 f.write(power_1+"\n")
                 if (pwr_2):
                     f.write(power_2+"\n")
@@ -161,6 +165,7 @@ def tbc_creator():
                 f.write(pwd+"\n")
                 f.write("\n\n")
         print("\n\nALL FINISHED\n\n")
+        print("\n\nFILE WRITTEN TO: %s\n\n" % tbc_file)
     except FileNotFoundError:
         print('\n\nFile(s) Not Found (Line 158 in fcr_tools.py)')
         return(False)
@@ -683,7 +688,7 @@ def timeserversetup():
     cmd = anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
     print(cmd)
     ha_failover()
-    cmd = anturlar.fos_cmd("date")
+    cmd = anturlar.fos_cmd("date") 
     print(cmd)
     return (cmd)
 
