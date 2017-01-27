@@ -204,6 +204,12 @@ def start_windows_pre_3_2(h, start_cmd):
     remote_list = []
     start_pain = start_cmd
     
+    
+    cmdout = anturlar.traff_cmd("catapult -p")
+    ras = re.compile('[ \d]+/dev/sd([a-z]+)\s+[:0-9]+\s+[A-Z]+\s+([A-Z]+)')
+    remove_lunz = ras.findall(cmdout)
+    
+    
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/0" % i , db_level )
@@ -218,15 +224,7 @@ def start_windows_pre_3_2(h, start_cmd):
         print("ras"*30)
         
         for r in ras:
-            for lunz in remove_lunz:
-                print(r)
-                print(lunz[0])
-                print(lunz[1])  
-                
-                if lunz[0] == r and lunz[1] != "LUNZ":
-     
-                    if r not in remote_list:
-                        remote_list += [r] 
+            remote_list += [r] 
         
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu rport --osname %s/1" % i , db_level )
@@ -234,13 +232,7 @@ def start_windows_pre_3_2(h, start_cmd):
         ras = ras.findall(cmdout)
       
         for r in ras:
-            for lunz in remove_lunz:
-        
-            
-                if lunz[0] == r and lunz[1] != "LUNZ":
-             
-                    if r not in remote_list:
-                        remote_list += [r] 
+            remote_list += [r] 
  
     
     print("remote port list  :  %s  " % remote_list )
@@ -268,53 +260,48 @@ def start_windows_post_3_2(h, start_cmd):
     remote_list = []
     start_pain = start_cmd
     
+    cmdout = anturlar.traff_cmd("catapult -p")
+    ras = re.compile('[ \d]+/dev/sd([a-z]+)\s+[:0-9]+\s+[A-Z]+\s+([A-Z]+)')
+    remove_lunz = ras.findall(cmdout)
+    
     
     for i in [1,2,3,4]:
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/0" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/0" % i , db_level )
-        ras = re.compile('rive([0-9]+)')
+        
+        ras = re.compile('[\-:.A-Za-z0-9]rive([0-9]+)')
         ras = ras.findall(cmdout)
 
         print("ras"*30)
+        print("windows post 3 2  ")
+        print("date for  %s /0 " % i)
         print(ras)
         print(remove_lunz)
         print(remote_list)
-        
         print("ras"*30)
         
         for r in ras:
-            for lunz in remove_lunz:
-                print(r)
-                print(lunz[0])
-                print(lunz[1])  
+            remote_list += [r]  
                 
-                if lunz[0] == r and lunz[1] != "LUNZ":
-     
-                    if r not in remote_list:
-                        remote_list += [r]  
-        
-        
         cmdout = anturlar.traff_cmd("bcu port --statsclr %s/1" % i, db_level)
         cmdout = anturlar.traff_cmd("bcu fcpim --lunlist %s/1" % i , db_level )
-        ras = re.compile('rive([0-9]{1,3})')
+        ras = re.compile('.*rive([0-9]{1,3})')
         ras = ras.findall(cmdout)
 
+        print("ras"*30)
+        print("windows post 3 2  ")
+        print("date for  %s /1 " % i)
+        print(ras)
+        print(remove_lunz)
+        print(remote_list)
+        print("ras"*30)
     
         for r in ras:
-            for lunz in remove_lunz:
+            remote_list += [r] 
         
-            
-                if lunz[0] == r and lunz[1] != "LUNZ":
-             
-                    if r not in remote_list:
-                        remote_list += [r] 
- 
-    
-    
-    
-    
+    print("#"*80)
     print("remote port list  :  %s  " % remote_list )
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    print("A"*80)
     
     ####  put the list is the correct syntax
     new_list = ",".join(remote_list)
@@ -325,15 +312,15 @@ def start_windows_post_3_2(h, start_cmd):
     start_pain_sd = start_pain + ' -f"\\\.\PhysicalDrive;%s"\r\n' % new_list
     print("NEWEST COMMAND  %s   " % start_pain_sd)
     reg_list = [b'([.\w\d]+)']
-    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list)
-    cmdout = anturlar.traff_output()
+    cmdout = anturlar.fos_cmd_regex(start_pain_sd , reg_list,9)
+    cmdout = anturlar.traff_output(9)
     
     anturlar.close_tel()
     
     
     
 
-def traff_get_port_list(ip, user, pwd, start_command, os_ver):
+def traff_get_port_list(ip, user, pwd, start_command, os_ver, verbose=0):
     
     
     #### add the variable pain_main in the command line
@@ -345,12 +332,12 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
     #start_pain = "pain -t8 -M60 -b8k -o -u -n -l69 -q5 "
     #start_pain = start_command
     
-    #print("aaaaaaaaaaaaaaaaaaaaaaaa")
-    #print(type(ip))
-    #print(user)
-    #print(pwd)
-    #print("aaaaaaaaaaaaaaaaaaaaaaaa")
+ 
     db_level = 9
+    if verbose >= 2:
+        print("V"*80)
+        print("in the Traffic get port list ")
+        
     #remote_list = []
     
     h = anturlar.connect_tel_noparse_traffic(ip, user, pwd)
@@ -361,12 +348,15 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
     #this_platform = liabhar.platform()
     this_bcu_version = bcu_version()
     
+    print("V"*80)
     print("\n\nPLATFORM IS        :   %s  " % this_platform)
     print("ADAPTER HW-PATH    :   %s  " % this_bcu_version)
-    
+    print("V"*80)
+     
     
     if "windows" in this_platform:
-        if "3.2" in this_bcu_version[0] :
+        if "3.0" in this_bcu_version[0] or "3.1" in this_bcu_version[0] or "3.2" in this_bcu_version[0] :
+            
             print("START POST windows  ")
             #cmdout = anturlar.traff_cmd("catapult -p -t" , db_level )
             #cmdout = anturlar.traff_cmd("cd sqa\t" , db_level )
@@ -378,18 +368,19 @@ def traff_get_port_list(ip, user, pwd, start_command, os_ver):
             start_windows_pre_3_2(h, start_command)
         
     elif "linux" in this_platform:
-        if "3.2" in this_bcu_version[0]:
+        if "3.0" in this_bcu_version[0] or "3.1" in this_bcu_version[0] or "3.2" in this_bcu_version[0] :
             print("START POST linux ")
-            #sys.exit()
+            
             start_linux_post_3_2(h, start_command)
         else:
             print("START PRE linux")
-            #sys.exit()
+            print("start command    %s  " % start_command)
+            
             start_linux_pre_3_2(h, start_command)
         
     else:
         print("not sure of the platform") 
-    
+        sys.exit()
     
     
     ####  windows style

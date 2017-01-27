@@ -44,19 +44,28 @@ import traffic_tools
 
 def parent_parser():
     
-    pp = argparse.ArgumentParser(add_help=False)
-    pp.add_argument("filename", help="Traffic config filename")
+    pp = argparse.ArgumentParser(description="starts traffic defined in traffic config file", add_help=False)
+    pp.add_argument("filename", help="Traffic config filename.csv")
     group = pp.add_mutually_exclusive_group()
+    #### verboseeeeeeeeee usage is -vvv  then if verbose == 3 is most verbose output
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
-    return pp 
+    return(pp) 
 
 def parse_args(args):
     verb_value = "99"
+    verb_value = "0"
+    
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
+    
+    parser.add_argument('-r',  '--random',     help="random values for block size duration")
+    parser.add_argument('-o',  '--override',   help="override other options when starting traffic")
+    parser.add_argument('-b',  '--block',      help="block size override")
+    parser.add_argument('-d',  '--duration',   help="time duration override")
+    
     args = parser.parse_args()
-        
+    
     return(parser.parse_args())
 
 
@@ -90,10 +99,26 @@ def main():
         print("found the file")
     else:
         print("Could not find the file  %s  " % pa.filename)
+
     this_platform = liabhar.platform()
-    #print("PLATFORM IS  :  %s  " % this_platform)
+    
+    if pa.verbose >= 2:
+        print("V"*80)
+        print("Platform type is  \n")
+        print(this_platform)
+        print("\n")
+        print("A"*80)
+    print("PLATFORM IS  :  %s  " % this_platform)
+    
+   
+    
     traff_to_start = get_switch_info(pa.filename)
-    #print(traff_to_start)
+    if pa.verbose >= 2:
+        print("V"*80)
+        print("traffic command to start")
+        print(traff_to_start)
+        print("B"*80)
+    
     for s in traff_to_start:
         print("SERVER COMMANDS ")
         print(s)
@@ -160,7 +185,7 @@ def main():
         print("Size              :   %s " % size)
         print("command Options   :   %s " % cmd_options)
         print("start command is  :   %s " % strt_cmd)
-          
+        #time.sleep(60.2)
     ###########################################################################
     #### commenting out for debug purpose
     ####
@@ -173,9 +198,18 @@ def main():
         print(t[2])    
         if t[2] != "Username":
             os_ver = anturlar.remote_os_ver(serv_ip,9)
-            print("\n"*44)
-            print(os_ver)
-            p = Process(target=traffic_tools.traff_get_port_list, args=(serv_ip, serv_usr, serv_pwd, strt_cmd, os_ver))
+            
+            
+            if pa.verbose >= 2:
+                print("V"*80)
+                print("Version of Traffic switch")
+                print(os_ver)
+                print("C"*80)
+                print("wait and then start the traffic")
+                      
+                #liabhar.count_down(30)
+                
+            p = Process(target=traffic_tools.traff_get_port_list, args=(serv_ip, serv_usr, serv_pwd, strt_cmd, os_ver,  pa.verbose))
             p.daemon = True
             p.start()
             #p.join()

@@ -355,7 +355,12 @@ def platform():
         os = "OS X"
     elif _platform == "win32":
         os = "Windows"
-        
+    else:
+        os = "dont know"
+    print("OS VERSION")
+    print(os)
+    print(_platform)
+    print("OS VERSION")
     return(os)    
 
 
