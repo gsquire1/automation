@@ -124,7 +124,6 @@ def parse_args(args):
 
     return(parser.parse_args())
 
-
 def info_help_OSError():
     """
     """
@@ -168,7 +167,7 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     ####
     port = str(port)
     usrname = parse_port(port)
-    print("connecting via Telnet to  " + HOST + " on port " + port )
+    print("connecting via Telnet to  Console  " + HOST + " on port " + port )
     print(HOST)
     print(usrname)
     print(password)
@@ -213,49 +212,14 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     ####
     tn = connect_console(HOST,usrname,password,port,db=10, *args)
   
-    #capture = tn.expect(reg_list, 20)
-    #if capture[0] == 10:     #### console server management
-    #    #######################################################################
-    #    ####
-    #    #### send the username and password for the console login
-    #    ####
-    #    ####
-    #    capture = tn.expect(reg_list, 130)
-    #    print("@"*80)
-    #    print(capture)
-    #    print("@"*80)
-    #    print("STEP TWO OF LOGIN TO THE CONSOLE ")
-    #    print("CONSOLE==LOGIN======"*4)
-    #
-    #    tn.write(usrname.encode('ascii') + b"\r\n")
-    #    capture = tn.expect(reg_list)
-    #    tn.write(password.encode('ascii') + b"\r\n\n")
-    #    capture = tn.expect(reg_list,120)
-    #    
-    #    tn.write(struct.pack('!b', 49))   #### use the struct to send a integer       
-    #    capture = tn.expect(reg_list,120)
-    #    
-    #    print(capture)
-    #else:
-    #    tn.write(b"\n")
-    #print("1___"*20)
-    #print(capture)
-    #print(capture[0])
-    #print("*"*10)
-    #tn.write(b"\n")
-    #capture = tn.expect(reg_list, 130)
-    #print("2___"*20)
-    #print(capture)
-    #print(capture[0])
-    #print("*"*10)
 
     ###################################################################################################################
     ####
     ####  this sends number 1 when there are more than one user on the console
     ####
     ###################################################################################################################
-    print("CONNECTED TO CONSOLE IN PLAYBACK ")
-    liabhar.JustSleep(60)
+    print("CONNECTED TO CONSOLE IN PLAYBACK and ENABLE ROOT ")
+    #liabhar.JustSleep(60)
     
     #if capture[0] == 0:
     #    tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
@@ -268,9 +232,12 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     #    tn.write(b"\n")
     
     print("3___"*20)
-    tn.write(b"\n")
+    tn.write(b"password\n")
     capture = tn.expect(reg_list)
+    
+    print("send password   and login as root ")
     print(capture)
+    print("LOGIN CHANGE PASSWORDS  A"*3)
     ###################################################################################################################
     ####
     ####  find login or the user that is logged in. 
@@ -281,28 +248,36 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     
     if capture[0] == 0:
         #tn.write(struct.pack('!b', 49))   #### use the struct to send a integer
-        tn.write(struct.pack('!b', 49))   #### use the struct to send a integer  #### send a 4 to kill all sessions
+        tn.write(struct.pack('!b', 52))   #### use the struct to send a integer  #### send a 4 to kill all sessions
         #print("\n"*11)
         #tn.write(b"\n")
         capture = tn.expect(reg_list)
         if capture[0] == 12:
             tn.write(b"all\n")
+        print("send password   and login as root ")
         print(capture)
+        print("LOGIN CHANGE PASSWORDS  A"*3)
     else:
         tn.write(b"\n")
         capture = tn.expect(reg_list)
+        print("send password   and login as root ")
         print(capture)
+        print("LOGIN CHANGE PASSWORDS  A"*3)
     
     if capture[0] == 4:          ####  found the users: after starting a regular session
         print("FOUND USER ")
         tn.write(b"\n")
         capture = tn.expect(reg_list)  ####  nothing to do execpt wait for the login or user prompt
-        
+        print("send password   and login as root ")
+        print(capture)
+        print("LOGIN CHANGE PASSWORDS  A"*3)
     if capture[0] == 2:#### if Password is found we did not enter the user name yet.
         print("FOUND PASSWORD  ")
         tn.write(b"\n")          ####  so send a \n so we can get the login prompt
         capture = tn.expect(reg_list)
-
+        print("send password   and login as root ")
+        print(capture)
+        print("LOGIN CHANGE PASSWORDS  A"*3)
     if capture[0] == 3:           ##### if root is logged in should be able to continue from here
         print("FOUND ROOT : ")
              
@@ -310,53 +285,103 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
         print("FOUND ADMIN : ")   #### 
         tn.write(b"exit\n")
         capture = tn.expect(reg_list)
-          
+        print("send exit and and login as root ")
+        print(capture)
+        print("LOGIN CHANGE PASSWORDS  A"*3)
+              
     if capture[0] == 1:            ####  found login login as Admin 
         print("FOUND LOGIN : ")    ####    change the root permissions for root then loggin as root
         tn.write(b"admin\n")
         capture = tn.expect(reg_list)
+        print("send exit and login as root next ")
+        print(capture)
+        print("LOGIN CHANGE PASSWORDS  B"*3)
+        
         if capture[0] == 2:                 ####  is password
             print("FIND 2  "*10 )
             tn.write(b"password\n")
             capture = tn.expect(reg_list)
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
+        
         if capture[0] == 8:                 ####   old password for admin
             tn.write(b"password\n")
             capture = tn.expect(reg_list)
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password1\n")         #### enter new password
             capture = tn.expect(reg_list)
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password1\n")         #### enter new password
             capture = tn.expect(reg_list)
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password\n")         #### enter new user password
             capture = tn.expect(reg_list)
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password\n")         #### enter new user password
             capture = tn.expect(reg_list) 
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"userconfig --change root -e yes\n")         #### enable root
             capture = tn.expect(reg_list)
-            
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"rootaccess --set all\n")         #### enable root
             capture = tn.expect(reg_list)
-            
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"yes\n")         #### question Please confirm to proceed
             capture = tn.expect(reg_list)
-            
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             
             tn.write(b"exit\n")         #### enable root
             capture = tn.expect(reg_list)   
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"root\n")         #### enable root
             capture = tn.expect(reg_list)   
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"fibranne\n")         #### enable root
             capture = tn.expect(reg_list) 
-            
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"fibranne\n")         #### enable root
             capture = tn.expect(reg_list) 
-           
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password\n")         #### enable root
             capture = tn.expect(reg_list) 
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"password\n")         #### enable root
             capture = tn.expect(reg_list) 
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
             tn.write(b"firmwareshow\n")         #### enable root
             capture = tn.expect(reg_list) 
-
+            print("send password   and login as root ")
+            print(capture)
+            print("LOGIN CHANGE PASSWORDS  A"*3)
 
                         
     print("\n"*8)
@@ -372,8 +397,6 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     liabhar.JustSleep(10)
 
     return(tn)
-
-
 
 def connect_console(HOST,usrname,password,port,db=0, *args):
     
@@ -492,9 +515,9 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
         var += 1
     capture = ""  
     capture = tn.expect(reg_list, 20)
-    print("*"*80)
+    print("Console "*10)
     print(capture)
-    print("*"*80)    
+    print("Console_"*10)    
     if capture[0] == 1 :
         #print("SENDINGROOT")
         tn.write(b"root\n")
@@ -506,7 +529,6 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     #capture = tn.expect(reg_list, 20)
     
     return(tn)
-
     
 def stop_at_cmd_prompt(db=0):
     global tn
@@ -518,7 +540,7 @@ def stop_at_cmd_prompt(db=0):
     #
     #
     reg_list = [ b"Hit ESC to stop autoboot: "]
-    
+ 
     tn.write(b"/sbin/reboot\n")
     capture = tn.expect(reg_list, 3600)
     
@@ -557,25 +579,27 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     #tn.write(b"printenv\n")
     reg_list = [b"=>"]
     reg_list_done = [b"done",b"NVRAM..."]
-    
+    reg_alive     = [b"is alive\r\n=>"]
+    reg_bash = [ b"bash-2.04"]
     #### check if the switch is at the boot prompt
-    #### if it is at the switch prompt it is wrong
-    
-    
-    #tn.write(b"\n")
-    #
-    #capture = tn.expect(reg_list, 120)
-    #print("env_variable - capture")
-    #print("@"*80)
-    #print(capture)
-    #print("@"*80)
+    #### if it is at the switch prompt it is wrong    
+ 
     tn.write(b"date\n")
-    
-    #capture = tn.expect(reg_list, 120)
+
     capture = tn.expect(reg_list)
+    print("send the date   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("A"*80)
+    
     tn.write(b"printenv\n")
     #capture = tn.expect(reg_list, 120)
     capture = tn.expect(reg_list)
+    print("send printenv   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("B"*80)
+    
     netmask   = "255.255.240.0"
     #### for all switches except WEDGE (for now) need the bootargs ip=off setting
     ###  the exceptions are below for skybolt and wedge
@@ -601,60 +625,119 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         tn.write(a.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
         capture = tn.expect(reg_list)
+        print("send set the ethprime value    and look for =>")
+        print("\n\n")
+        print(capture)
+        print("C"*80)
     #capture = tn.expect(reg_list, 10) ####   ### add this capture since the next two writes are running together.
                                       ####
     capture = tn.expect(reg_list)
+    print("send not sure what was sent   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("D"*80)
+    
     a = ("setenv ethact %s \n" % ethact)
     tn.write(a.encode('ascii'))
     #capture = tn.expect(reg_list, 30) #######Changed all these to 30
     capture = tn.expect(reg_list)
+    print("send ethatc command   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("E"*80)
+    
     g = ("setenv gatewayip %s \n" % gateway_ip)
     tn.write(g.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send gateway ip    and look for =>")
+    print("\n\n")
+    print(capture)
+    print("F"*80)
+    
     n = ("setenv netmask %s\n"%netmask)
     tn.write(n.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send netmask   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("G"*80)
     b = ("setenv bootargs %s\n"%bootargs)
     tn.write(b.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send bootargs    and look for =>")
+    print("\n\n")
+    print(capture)
+    print("H"*80)
     e = ("setenv ethrotate %s\n"%ethrotate)
     tn.write(e.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send ethrotate   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("I"*80)
+    
     s = ("setenv serverip %s\n"%server_ip)
     tn.write(s.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send serverip    and look for =>")
+    print("\n\n")
+    print(capture)
+    print("J"*80)
     #i = ("setenv ipaddr 10.38.134.2\n")
     i = ("setenv ipaddr %s\n" % fake_ip)
     tn.write(i.encode('ascii'))
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list)
+    print("send setenv ipaddr    and look for =>")
+    print("\n\n")
+    print(capture)
+    print("K"*80)
+    
     tn.write(b"saveenv\n")
     #capture = tn.expect(reg_list_done,60)
     #capture = tn.expect(reg_list, 30)
     capture = tn.expect(reg_list_done)
+    print("send Save env   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("L"*80)
+    
     capture = tn.expect(reg_list)
+    print("send second capture command   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("M"*80)
     
     tn.write(b"printenv\n")    
     #capture = tn.expect(reg_list, 90)
     capture = tn.expect(reg_list)
-    
+    print("send printenv   and look for =>")
+    print("\n\n")
+    print(capture)
+    print("N"*80)
     #liabhar.JustSleep(60)
     
     p = ("ping %s  \n" % gateway_ip)
     tn.write(p.encode('ascii'))
     tn.write(b"\n")
     #capture = tn.expect(reg_list, 300)
-    capture = tn.expect(reg_list)
+    capture = tn.expect(reg_alive)
+    print("send PING command   and look for  alive =>")
+    print("\n\n")
+    print(capture)
+    print("O"*80)
+    print("send send nothing just leaving   ")
     print("oh my \n")
+    print("          leaving the env variable proc ")
     print("\n\nCOMPLETE with loading ENV VARIABLES\n\n")
     #liabhar.JustSleep(60)
     
-    return(capture)
+    return(True)
 
 def pwr_cycle(pwr_ip, pp, stage, db=0):
     
@@ -679,7 +762,8 @@ def pwr_cycle(pwr_ip, pp, stage, db=0):
     
 def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
     
-    reg_list = [ b"^=> "]
+    #reg_list = [ b"^=> "]
+    reg_list =  [b"=>"]
     reg_bash = [ b".*?bash-2.04#", b".*?=> ", b"bash-2.04#"]
     reg_bash = [ b"bash-2.04", b"=> "]
     reg_bash = [ b"bash-2.04"]
@@ -699,70 +783,91 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     if switch_type == '170':  ####  CHEWBACCA
         nbt = "makesinrec 0x1000000 \n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  A "*8)
         ####
         nbt = "tftpboot 0x2000000 chewbacca/uImage \n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  B "*8)
         ####
         nbt = "tftpboot 0x3000000 chewbacca/ramdisk_v1.0.img \n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  C "*8)
         ####
         nbt = "tftpboot 0xc00000 chewbacca/silkworm.dtb \n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  C "*8)
         ####
         nbt = "bootm 0x2000000 0x3000000 0xc00000 \n"
         tn.write(nbt.encode('ascii'))
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_bash_only)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  E "*8)
+    
     
     if switch_type == '133':  ####  ODIN
         nbt = "tftpboot 0x1000000 net_install26_odin.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '66' or switch_type == '71' or switch_type == '118' or switch_type == '109'):
         #### 5100  Stinger   tomahawk  tom_too
         nbt = "tftpboot 0x1000000 net_install_v7.2.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '120' or switch_type == '121' or switch_type == '64' or switch_type == '83' or switch_type == '62' or switch_type == '77'):
         ####  DCX zentron  pluto zentron  thor  7800
         nbt = "tftpboot 0x1000000 net_install26_8548.img\n"
         tn.write(nbt.encode('ascii'))
         #capture = tn.expect(reg_list, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x1000000\n")
         #capture = tn.expect(reg_bash_only, 30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         
         
     if switch_type == '148':  #### SKYBOLT
         tn.write(b"makesinrec 0x1000000 \n")
         #capture = tn.expect(reg_list,30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x2000000 skybolt/uImage \n")
         #capture = tn.expect(reg_list,30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x3000000 skybolt/ramdisk.skybolt \n")
         #capture = tn.expect(reg_list,30
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"tftpboot 0x4000000 skybolt/silkworm.dtb \n")
         #capture = tn.expect(reg_bash,30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_list)
         tn.write(b"bootm 0x2000000 0x3000000 0x4000000 \n")
         #caputure = tn.expect(reg_bash_only,30)
-        capture = tn.expect(reg_bash)
+        capture = tn.expect(reg_bash_only)
         
     if (switch_type == '141' or switch_type == '142'):  #### YODA 
         tn.write(b"makesinrec 0x1000000 \n")
@@ -830,26 +935,51 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     tn.write(b"export PATH=/usr/sbin:/sbin:$PATH\n")
     #capture = tn.expect(reg_bash, 30)
     capture = tn.expect(reg_bash)
+    print("send export PATH  and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  F "*8)
     i = "ifconfig eth0 %s netmask 255.255.240.0 up\n" % sw_ip 
     tn.write(i.encode('ascii'))
     #capture = tn.expect(reg_bash, 30)
     capture = tn.expect(reg_bash)
+    print("send the ifconfig    and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  G "*8)
     gw = "route add default gw %s \n" % gateway_ip
     tn.write(gw.encode('ascii'))
     #capture = tn.expect(reg_linkup,30)
     capture = tn.expect(reg_bash)
+    print("send the route add default  and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  H "*8)
     #tn.write(b"\n")
     #capture = tn.expect(reg_bash, 20)
-    capture = tn.expect(reg_bash)
+    #capture = tn.expect(reg_bash)
+    #print("send the date   and look for =>")
+    #print("\n\n")
+    #print(capture)
+    #print("Kernel  I "*8)
     m = "mount -o tcp,nolock,rsize=32768,wsize=32768 10.38.2.20:/export/sre /load\n" ####CHANGE SERVER TO VARIABLE
     tn.write(m.encode('ascii'))
     #capture = tn.expect(reg_bash, 30)
     capture = tn.expect(reg_bash)
+    print("send mount command   and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  J "*8)
     ### firmwarepath
     firmpath = "cd /load/SQA/fos/%s/%s\n" % (frm_no_bld, frm_version)
     tn.write(firmpath.encode('ascii'))
     #capture = tn.expect(reg_bash,160)
     capture = tn.expect(reg_bash)
+    print("send the firmware path   and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  K "*8)
+    print("\nRelax for a few minutes, this step takes a while  ")
     #### need to capture when this hangs anc was not able to connect to the server
     ####  this appears to timeout and the last recieve string was
     ####    \xco\xc0\x80  80 repeated 10 times
@@ -857,9 +987,12 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
     #capture = tn.expect(reg_bash,160)
     capture = tn.expect(reg_bash)
     ####  this does not capture the bash  and from the console the last recv b'30`\x00\x180\xf0
+    print("send  install release   and look for bash")
+    print("\n\n")
+    print(capture)
+    print("Kernel  L "*8)
     
-    return(0)
-
+    return(True)
 
 def do_net_install(sw_info_filename):
     """
@@ -901,8 +1034,7 @@ def do_net_install(sw_info_filename):
     print(usr_psswd)
     print(usr_pass)
     print(pa.filename)
-     
-     
+    
     if not pa.cmdprompt:
         try:
             tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
@@ -914,7 +1046,6 @@ def do_net_install(sw_info_filename):
         
         anturlar.close_tel()
      
-    
         my_ip                = sw_dict["switch_ip"]
         my_cp_ip_list        = sw_dict["cp_ip_list"]
         sw_name              = sw_dict["switch_name"]
@@ -936,7 +1067,7 @@ def do_net_install(sw_info_filename):
         sw_type = pa.switchtype
         my_ip = ipaddr_switch
         print("SETTING THE DIRECTOR OR PIZZA BOX VARIABLE")
-    #sys.exit()
+
  
 ###################################################################################################################
 ###################################################################################################################
@@ -956,10 +1087,6 @@ def do_net_install(sw_info_filename):
         tn_cp1 = connect_console(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
         tn_list.append(tn_cp1)
     
-    
-    #for tn in tn_list:
-    #    cons_out = send_cmd("switchshow")
-    
     print("\n\nOUT OF CONNECTION TO CONSOLE\n\n")
 #######################################################################################################################
 ####
@@ -970,7 +1097,7 @@ def do_net_install(sw_info_filename):
         for tn in tn_list:
             cons_out = stop_at_cmd_prompt(0)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            print("FIND THE COMMAND PROMPT    \n")
+            print("FIND THE COMMAND PROMPT  1  \n")
             print(cons_out)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             print("NOW SET THE ENV VARIABLES  ")
@@ -978,8 +1105,10 @@ def do_net_install(sw_info_filename):
     
     for tn in tn_list:
         cons_out = env_variables(sw_type,gateway_ip, 0)
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+        print("\n"*4)
+        print("P"*80)
+        print("\n"*2)
+        print("Q"*80) 
         print(cons_out)
         if sw_director_or_pizza:
             load_kernel(sw_type, my_cp_ip_list[cnt], gateway_ip, pa.firmware)
@@ -998,17 +1127,12 @@ def do_net_install(sw_info_filename):
     reg_list_bash = [b"bash-2.04#"]
     print("H"*80)
     print("looking fo bash forever")
-    #cons_out = tn.expect(reg_list_bash,900)
-    cons_out = tn.expect(reg_list_bash)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")
-    print(cons_out)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\nLINE 1176\n")
-
-
+ 
+    print("\n"*4)
+    print("&"*80)
+    print("\n"*4)
+    print("&"*80) 
+ 
     try:
         for pp in range(0, len(power_pole_info), 2):
             print('POWERPOLE')
@@ -1040,11 +1164,7 @@ def do_net_install(sw_info_filename):
 #######################################################################################################################
 #######################################################################################################################
 ####
-#### 
-    #### is there another way to tell if switch is ready ??
-    #### instead of waiting
-    ####  maybe looking at switch Domain and if it is uncomfirmed then switch is not ready
-    ####
+####
 #######################################################################################################################
 #######################################################################################################################
 ####
@@ -1054,43 +1174,25 @@ def do_net_install(sw_info_filename):
     print("\n"*6)
     print("@"*40)
     print("Close Console sessions and login via telnet")
-    print("Sleep for a minute at line 1144")
+    print("Sleep for a minute at line 1200")
     print("\n"*6)     
-    #liabhar.count_down(300)
-    #time.sleep(360)
-    #cons_out = sw_set_pwd_timeout(usr_psswd,10)
-    #print("@"*40)
-    #print("TN   TN    TN")
-    #print(tn_list)
-    #print("@"*40)
-
 
     reg_list_after_reboot = [b"is in sync", b"initialization completed."]
     cons_out = tn.expect(reg_list_after_reboot,900)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-    print("HERE WE ARE WAITING FOR THE SWITCH TO REBOOT SOMETIMES TOO LONG OTHERS NOT LONG ENOUGH")
+    print("\n"*4)
+    print("&"*80)
     print(cons_out)
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("IF WE SEE BASH PROMPT HAS BEEN DETECTED WE CAN TAKE OUT THE WAIT 600")
-    print("SEARCH FOR LOOKLOOK ")
-    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+    print("\n"*4)
+    print("&"*80)
+ 
     liabhar.count_down(60)
     
     for tn in tn_list:
         tn.close()
-    #liabhar.JustSleep(600)
-    #liabhar.count_down(600)
+ 
     tn_list = []
     print("\n\nCONNECT TO THE CONSOLE NOW\n\n")
-    #if sw_director_or_pizza:
-    #tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
-    #tn_list.append(tn_cp0)
-    #
-    #if sw_director_or_pizza:
-    #    tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
-    #    tn_list.append(tn_cp1)
-    #
+ 
     tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
     tn_list.append(tn_cp0)
     
@@ -1100,11 +1202,7 @@ def do_net_install(sw_info_filename):
     
     for tn in tn_list:
         tn.close()
-    
-    
-    
-    
-
+ 
 def parse_port(port):
     print("port number " , port )
     print("\n\n")
@@ -1174,8 +1272,7 @@ def console_info_from_ip(ipaddr):
             #sys.exit()
             
     return(swtch_name)
-    
-    
+       
 def console_info(chassis_name):
     """
     
@@ -1216,7 +1313,6 @@ def console_info(chassis_name):
             #sys.exit()
             
     return(a)
-
 
 def pwr_pole_info(chassis_name):
     """
@@ -1431,7 +1527,6 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
         
     
     return(all_list)
-
    
 def user_start():
     go = False
@@ -1548,8 +1643,6 @@ def cant_find_file_message(complete_name,filename):
  
     sys.exit()
     
-
-
 def enter_file_ext():
     go = False
     start = 'n'
@@ -1592,8 +1685,7 @@ def enter_file_ext():
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################   
-    
-    
+
 def main():
 
     global tn
@@ -1978,7 +2070,7 @@ def main():
             for tn in tn_list:
                 cons_out = stop_at_cmd_prompt(0)
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                print("FIND THE COMMAND PROMPT    \n")
+                print("FIND THE COMMAND PROMPT  2  \n")
                 print(cons_out)
                 print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                 print("NOW SET THE ENV VARIABLES  ")
@@ -1986,8 +2078,10 @@ def main():
             
             for tn in tn_list:
                 cons_out = env_variables(sw_type,gateway_ip, 0)
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
+                print("\n"*4)
+                print("R"*80)
+                print("\n"*4)
+                print("S"*80) 
                 print(cons_out)
                 
                 load_kernel(sw_type, my_cp_ip_list[cnt], gateway_ip, pa.firmware)
@@ -2009,15 +2103,17 @@ def main():
         if not pa.cmdprompt:
             cons_out = stop_at_cmd_prompt(9)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            print("PIZZA BOX  FIND THE COMMAND PROMPT   \n")
+            print("PIZZA BOX  FIND THE COMMAND PROMPT  4  \n")
             print(cons_out)
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             print("PIZZA BOX  NOW SET THE ENV VARIABLES  ")
             print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             
         cons_out = env_variables(sw_type, gateway_ip, 9)
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print("\n"*4)
+        print("T"*80)
+        print("\n"*4)
+        print("U"*80)
         print("\nLINE 1063")
         print(cons_out)
         load_kernel(sw_type, my_ip, gateway_ip, pa.firmware)
