@@ -775,6 +775,7 @@ def main():
         if not nos:
             anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
             anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+            #anturlar.fos_cmd("tsclockserver LOCL")
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')

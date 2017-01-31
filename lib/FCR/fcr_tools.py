@@ -80,7 +80,7 @@ def user_start():
 def tbc_creator():
     
     test_file = '/home/RunFromHere/ini/TBC_SwitchMatrix_MASTER.csv'
-    tbc_file = '/home/RunFromHere/ini/Fabric_Services.tbc'
+    tbc_file = '/home/RunFromHere/ini/TBC_Fabric_Services.tbc'
     all_power_ips = []
     try:
         with open(test_file, 'r') as switch_matrix, open(tbc_file, 'r+') as f:
@@ -120,7 +120,7 @@ def tbc_creator():
                 if (console_2):
                     console_2 = "%s_cp1_console         %s %s" % (chassisname, console_2, console_2_port)
                     cp0ip = "%s_cp0_ip              %s" % (chassisname, cp0_ip)
-                    cp1ip = "%s_cp0_ip              %s" % (chassisname, cp1_ip)
+                    cp1ip = "%s_cp1_ip              %s" % (chassisname, cp1_ip)
                 fabric_name = "%s_fabric_name         %s" % (chassisname, chassisname)
                 root_pwd = "%s_root_pwd         %s" % (chassisname, root_pwd)
                 admin_pwd = "%s_admin_pwd         %s" % (chassisname, admin_pwd)
