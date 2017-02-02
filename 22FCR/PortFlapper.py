@@ -768,25 +768,22 @@ def main():
     #### and write the file
 
     for i in ipaddr_switch:
-        try: ###New
+        try: 
             tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
-        except OSError: ##New
-            print("Switch %s not available" % i)  ##New
+        except OSError:
+            print("Switch %s not available" % i) 
         nos = si.nos_check()
         if not nos:
             print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            ports = fcr.all_ex_ports()
-            devices = fcr.fcr_proxy_dev()
-            backbone_ip = fcr.fcr_backbone_ip()
-            all_ip = fcr.fcr_fab_wide_ip()
-            #edge_ip = all_ip.symmetric_difference(backbone_ip)
-            edge_ip = fcr.ipv4_fcr()
+            si = anturlar.SwitchInfo()
+            ex_list = si.ex_ports()
+            print(ex_list)
+            sys.exit()
+            # ports = fcr.all_ex_ports_with_edge_fid()
+            # devices = fcr.fcr_proxy_dev()
+            # backbone_ip = fcr.fcr_backbone_ip()
+            # all_ip = fcr.fcr_fab_wide_ip()
             print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-            print(edge_ip)
-            #sys.exit()
-            #a = (len(ports))
-            #print(ports)
-            #print(devices)
             f = ('logs/PortFlapper.txt')
             try:
                 with open(f, 'w') as file:
@@ -798,24 +795,26 @@ def main():
                 print("\n\nThere was a problem opening the file:" , f)
                 sys.exit()
             file.close()
+            #sys.exit()
+            for i in ports:
+                print(i)
             sys.exit()
-            for i in range(0,a):
-                print(ports[i])
-                slot = (ports[i][0])
-                print(slot)
-                port = (ports[i][1])
-                print(port)
-                anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
-                liabhar.count_down(15)
-                anturlar.fos_cmd("portenable %s/%s" % (slot, port))
-                liabhar.count_down(15)
-                devices_check =  fcr.fcr_proxy_dev()
-                if devices_check != devices:
-                    print ("WTF")
-                    #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
-                    liabhar.email_sender_html("gsquire1@msn.com", "gsquire1@brocade.com", "portflapper failed", "portflapper failed")
-                    sys.exit()
-            sys.exit()
+            #     print(ports[i])
+            #     slot = (ports[i][0])
+            #     print(slot)
+            #     port = (ports[i][1])
+            #     print(port)
+            #     anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
+            #     liabhar.count_down(15)
+            #     anturlar.fos_cmd("portenable %s/%s" % (slot, port))
+            #     liabhar.count_down(15)
+            #     devices_check =  fcr.fcr_proxy_dev()
+            #     if devices_check != devices:
+            #         print ("WTF")
+            #         #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
+            #         liabhar.email_sender_html("gsquire1@msn.com", "gsquire1@brocade.com", "portflapper failed", "portflapper failed")
+            #         sys.exit()
+            # sys.exit()
                 
             
             port = [ports[0]]

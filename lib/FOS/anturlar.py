@@ -1150,14 +1150,12 @@ class FcrInfo(FabricInfo, SwitchInfo):
     
     def all_ex_ports_with_edge_fid(self):
         """
-            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command, 
+            Capture all ex ports for both Chassis and Pizza Box using "switchshow" command. Returns
+            slot # ("0" for pizzabox), port number, edge_fid.
         """
         if self.am_i_director:
-            fos_cmd("setcontext %s" % self.base_check()) ###################NEW
+            fos_cmd("setcontext %s" % self.base_check())
             capture_cmd = self.__getportlist__("EX-Port")
-            print(capture_cmd)
-            length = len(capture_cmd)
-            print(length)
             ex = []
             for i in capture_cmd:
                 slot = i[0]
@@ -1169,19 +1167,14 @@ class FcrInfo(FabricInfo, SwitchInfo):
                 ex.append(ex_list)
             return(ex)
         else:
-            fos_cmd("setcontext %s" % self.base_check()) ###################NEW
+            fos_cmd("setcontext %s" % self.base_check())
             capture_cmd = self.__getportlist__("EX-Port")
-            print(capture_cmd)
-            #sys.exit()
-            length = len(capture_cmd)
-            print(length)
             ex = []
             for i in capture_cmd:
                 a = fos_cmd("portcfgexport %s" % (i[1]))
                 fid = (re.findall('Edge Fabric ID:\s+(\d{1,3})', a))
-                print(fid)
                 fid = int(fid[0])
-                ex_list = [i[1], fid]
+                ex_list = [int("0"), i[1], fid]
                 ex.append(ex_list)
             return(ex)
     
@@ -1225,27 +1218,29 @@ class FcrInfo(FabricInfo, SwitchInfo):
             Return is a list of IPs.
         """
          
-        fcrcfg = FcrInfo()
+        fci = FcrInfo()
         fcrstatus = self.__sw_basic_info__()
         if fcrstatus[3] is not False:  # Test if base config'd and if so
-            base = fcrcfg.base_check() # get the base FID number
+            base = fci.base_check() # get the base FID number
             f = FabricInfo(base) ###########NEW OBJECT FOR BASE FID
+            # print(f)
+            # sys.exit()
             get_fabric_ip = f.ipv4_list() ###########NEW OBJECT FOR BASE FID
         else:
-            get_fabric_ip = fcrcfg.ipv4_list()
+            get_fabric_ip = fci.ipv4_list()
         get_fcr_fabric = self.ipv4_fcr()
-        try:
-            fcr_fab_ip_list = (get_fabric_ip + get_fcr_fabric)
-        except TypeError:
-            print("\n############################")
-            print("Either fcrfabricshow and/or fabricshow are coming up as not available or not there.")
-            print("Or this script must be run from a base switch if VF is set")
-            print("############################\n")
-            sys.exit()
+        #try:
+        fcr_fab_ip_list = (get_fabric_ip + get_fcr_fabric)
+        # except TypeError:
+        #     print("\n############################")
+        #     print("Either fcrfabricshow and/or fabricshow are coming up as not available or not there.")
+        #     print("Or this script must be run from a base switch if VF is set")
+        #     print("############################\n")
+        #     sys.exit()
         all_ips = []
         for ip in fcr_fab_ip_list:
             connect_tel_noparse(ip,'root','password')
-            get_fabric_ip = fcrcfg.ipv4_list()
+            get_fabric_ip = fci.ipv4_list()
         entire_fcr_fab_ip_list = (get_fabric_ip + fcr_fab_ip_list)
         all_ips = (set(entire_fcr_fab_ip_list))
         final_ip_list = (list(all_ips))
