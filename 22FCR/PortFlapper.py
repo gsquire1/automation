@@ -26,6 +26,7 @@ import liabhar
 import cofra
 import csv
 import time
+#import fcr_tools
 
 ###############################################################################
 ####
@@ -73,7 +74,7 @@ def parent_parser():
     #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
-    #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
+    pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
@@ -380,7 +381,7 @@ def load_kernel(switch_type, sw_ip, frm_version):
     tn.write(b"./install release\r\n")
     capture = tn.expect(reg_bash,600)
 
-    return(0)
+#     return(0)
 
 def parse_port(port):
     print("port number " , port )
@@ -775,77 +776,43 @@ def main():
         nos = si.nos_check()
         if not nos:
             print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            si = anturlar.SwitchInfo()
-            ex_list = si.ex_ports()
-            print(ex_list)
-            sys.exit()
-            # ports = fcr.all_ex_ports_with_edge_fid()
-            # devices = fcr.fcr_proxy_dev()
-            # backbone_ip = fcr.fcr_backbone_ip()
-            # all_ip = fcr.fcr_fab_wide_ip()
+            ports = fcr.all_ex_ports_with_edge_fid()
+            devices = fcr.fcr_proxy_dev()
+            #backbone_ip = fcr.fcr_backbone_ip()
             print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
             f = ('logs/PortFlapper.txt')
             try:
                 with open(f, 'w') as file:
                     file.write("EX-Ports = %s\n" % str(ports))
                     file.write("Proxy Devices = %s\n" % str(devices))
-                    file.write("Backbone_IPs = %s\n" % str(backbone_ip))
-                    file.write("Fabric Wide IPs = %s\n" % str(all_ip))
+                    #file.write("Backbone_IPs = %s\n" % str(backbone_ip))
             except IOError:
                 print("\n\nThere was a problem opening the file:" , f)
                 sys.exit()
             file.close()
-            #sys.exit()
             for i in ports:
-                print(i)
-            sys.exit()
-            #     print(ports[i])
-            #     slot = (ports[i][0])
-            #     print(slot)
-            #     port = (ports[i][1])
-            #     print(port)
-            #     anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
-            #     liabhar.count_down(15)
-            #     anturlar.fos_cmd("portenable %s/%s" % (slot, port))
-            #     liabhar.count_down(15)
-            #     devices_check =  fcr.fcr_proxy_dev()
-            #     if devices_check != devices:
-            #         print ("WTF")
-            #         #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
-            #         liabhar.email_sender_html("gsquire1@msn.com", "gsquire1@brocade.com", "portflapper failed", "portflapper failed")
-            #         sys.exit()
-            # sys.exit()
-                
-            
-            port = [ports[0]]
-            print(a)
-            print(devices)
-            print(ports)
-            print(ports[0])
+                slot = i[0]
+                port = i[1]
+                if slot:
+                    anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
+                    liabhar.count_down(15)
+                    anturlar.fos_cmd("portenable %s/%s" % (slot, port))
+                    liabhar.count_down(15)
+                else:
+                    anturlar.fos_cmd("portdisable %s" % (port))
+                    liabhar.count_down(15)
+                    anturlar.fos_cmd("portenable %s" % (port))
+                    liabhar.count_down(15)
 
-            while a >= 1:
-                print("Q")
-                a = a-1
-            
-            
+                devices_check =  fcr.fcr_proxy_dev()
+                if devices_check != devices:
+                    print ("WTF")
+                    #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
+                    liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper failed","portflapper failed","")
+                    sys.exit()
+            liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper passed","portflapper passed","")        
             sys.exit()
-            #swinfo = si.__sw_basic_info__()
-            #if swinfo[5] is not False:
-            #    #base = swinfo[5]
-            #    #anturlar.fos_cmd("setcontext %s" % base)
-            #    ports = fcr.all_ex_ports() 
-            #    devices = fcr.fcr_proxy_dev()
-            #    for i in ports:
-            #        print (i)
-            #else:
-            #    ports = fcr.all_ex_ports()
-            #    devices = fcr.fcr_proxy_dev()
-            #a = [len(ports)]
-            #print(a)
-            #print(devices)
-            #sys.exit()
-            #anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
-            #anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+                
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')

@@ -7,15 +7,18 @@
 FCR TOOLS - different functions to get information from switches and/or fabrics in regards to FCR configuration
 
 """
+
 from multiprocessing import Process,Queue
 import anturlar
 import liabhar
 import cofra
 import switch_playback
 import sys, os, csv, re, filecmp, difflib, readline
+sys.path.append('/home/automation/22FCR')
 from configparser import SafeConfigParser
 import ast
 import readline, pprint
+import PortFlapper
 
 
 
@@ -765,10 +768,47 @@ def create_ls(number_of_ls):
         anturlar.fos_cmd("lscfg --show")
         #sleep
     print("done")
-        
-    
 
         
+class ReverseData():
+    """EXAMPLE ITERATOR - Iterator for looping over a sequence backwards."""
+    def __init__(self, data):
+        self.data = data
+        self.index = len(data)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index == 0:
+            raise StopIteration
+        self.index = self.index - 1
+        return self.data[self.index]   
+
+def test():
+    rev=ScriptRuns(5)
+    #print(iter(rev))
+    for i in rev:
+        print(i)
+        PortFlapper.main()
+
+class ScriptRuns():
+    """Iterator for looping over a sequence backwards."""
+    def __init__(self, times):
+        self.times = times
+        #self.index = len(data)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.times == 0:
+            raise StopIteration
+        self.times = self.times - 1
+        #PortFlapper
+        #print(self.times)
+        #return self.data[self.index]
+        return self.times
     
     
 
