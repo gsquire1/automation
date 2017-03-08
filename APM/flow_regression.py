@@ -95,7 +95,7 @@ def parent_parser():
     #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
-    pp.add_argument("file", help="csv file that has info for the test")
+    pp.add_argument("file", help="csv file that has info for the test \n Chassisname,FID ")
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -322,7 +322,6 @@ def main():
 #### 
 #### then get the info from the SwitchMatrix file using the Chassis Name
 #### 
-####
 ####  Type,Chassisname,IP Address,Username,Password,Console1 IP,Console1 Port,Console2 IP,Console2 Port,
 ####       Power1 IP,Power1 Port,Power2 IP,Power2 Port,Power3 IP,Power3 Port,Power4 IP,Power4 Port,
 ####            KVM IP,KVM Port,Web Username,Web Password,Admin Password
@@ -335,7 +334,8 @@ def main():
         print("\n\ninfo from flow reg file\n\n")
         print(reg_list)
     
-   
+####  this is common steps to get the information from a csv file
+####    for this test we only need the chassis name and fid
     for i in range(0,len(reg_list),2):
         chass_1     = reg_list[i]
         target_fid  = reg_list[i+1]
@@ -383,24 +383,18 @@ def main():
         write_to_results_file(a,ipaddr_switch,date_is)
         
         liabhar.cls()
-        
-     
-            
-        
-        flow_all = flow.get_nondflt_flows()
-        
-        if pa.verbose:
-            verb_list_print(flow_all)
-    
-           
+#######################################################################################################################
+#######################################################################################################################
+####
+####
+#######################################################################################################################
+
         cons_out = anturlar.fos_cmd("flow --deact all")
-        
+        cons_out = anturlar.fos_cmd("echo y | flow --delete all -force")   #### remove all flows
         
         cons_out = anturlar.fos_cmd("flow --act sys_mon_all_fports")
-        
-        liabhar.JustSleep(120) 
-        stats = flow.get_egr_stats("sys_mon_all_fports")
-        
+        liabhar.JustSleep(360) 
+        stats = flow.get_egr_stats("sys_mon_all_fports")        
         liabhar.JustSleep(120) 
      
         write_to_results_file(stats,ipaddr_switch,date_is)
@@ -417,6 +411,40 @@ def main():
             
         cons_out = anturlar.fos_cmd("flow --deact all")
         
+        #### find the SID DID pairs and create each monitor
+        ####
+        if pa.verbose:
+            print("LIST OF FLOWS \n")
+            print(stats)
+            ras = re.compile('\|([0-9a-f]{1,4})\s+\|([0-9a-f]{6})\|([0-9a-f]{6})')
+            ingr_sid_did_list = ras.findall(stats)
+            print("regex ")
+            print(ingr_sid_did_list)
+        
+        name_number = 0
+        for ingr_p, sid, did in ingr_sid_did_list:
+            print(ingr_p)
+            print(sid)
+            print(did)
+            print("\n")
+        
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_a%s -fea mon -ingrport %s -srcdev %s -dstdev %s -noact " % (name_number,ingr_p,sid,did))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_b%s -fea mon  -ingrport %s -dstdev %s -noact  "           % (name_number,ingr_p,did))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_c%s -fea mon  -ingrport %s -srcdev %s -noact  "          % (name_number,ingr_p,sid))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_d%s -fea mon  -ingrport %s -srcdev * -dstdev %s -noact " % (name_number,ingr_p,did))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_e%s -fea mon  -ingrport %s -srcdev %s -dstdev * -noact " % (name_number,ingr_p,sid))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_f%s -fea mon  -egrport %s -srcdev %s -dstdev %s -noact " % (name_number,ingr_p,did,sid))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_g%s -fea mon  -egrport %s -srcdev %s  -noact "           % (name_number,ingr_p,did))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_h%s -fea mon  -egrport %s -dstdev %s  -noact "            % (name_number,ingr_p,sid))
+            
+            
+            name_number += 1 
+        flow_all = flow.get_nondflt_flows()
+        
+        if pa.verbose:
+            verb_list_print(flow_all)
+        
+            
         
         for f in flow_all:
             cons_out = anturlar.fos_cmd("flow --act %s " % f)

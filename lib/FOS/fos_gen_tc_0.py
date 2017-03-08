@@ -68,7 +68,7 @@ def show_vc(slot, port ):
         
     
     
-def send_cmds(filename , loops = 1):
+def send_cmds(filename , loops = 10000):
     """
         function to read cmds from a file and send them to the switch
         
