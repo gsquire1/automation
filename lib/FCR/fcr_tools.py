@@ -810,5 +810,19 @@ class ScriptRuns():
         #return self.data[self.index]
         return self.times
     
-    
+def reverse():
+    print("***********************************")
+    print("IN FUNTION NOW")
+    print("***********************************")
+    print(data)
+    for index in range(len(data) -1, -1, -1):
+        yield data[index]
+        for char in reverse("golf"):
+            print(char)    
+        
+# def wtf(data):
+#     #     yield data[index]
+#     #     #print(a)
+#     for char in reverse("golf"):
+#         print(char)
 
