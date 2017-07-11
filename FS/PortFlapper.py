@@ -712,7 +712,7 @@ def replay_from_file(switch_ip, lic=False, ls=False, base=False, sn=False, vf=Fa
 
  
     
-def main():
+def main(porttype):
 
     global tn
     
@@ -728,8 +728,9 @@ def main():
     #print(pa.quiet)
     #print(pa.verbose)
     #print(pa.firmware)
-    #print("@"*40)
-    #sys.exit()
+    print(porttype)
+    print("@"*40)
+    sys.exit()
 
    
     ##########################################################################
@@ -752,7 +753,7 @@ def main():
     tn = anturlar.connect_tel_noparse(pa.ipaddr,user_name,usr_psswd)
     fi = anturlar.FabricInfo()
     si = anturlar.SwitchInfo()
-    fcr = anturlar.FcrInfo()
+    #fcr = anturlar.FcrInfo()
     
     if pa.fabwide:
         ipaddr_switch   = fi.ipv4_list()
@@ -775,22 +776,27 @@ def main():
             print("Switch %s not available" % i) 
         nos = si.nos_check()
         if not nos:
-            print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            ports = fcr.all_ex_ports_with_edge_fid()
-            devices = fcr.fcr_proxy_dev()
-            #backbone_ip = fcr.fcr_backbone_ip()
+            #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            f_ports = si.f_ports()
+            e_ports = si.e_ports()
+            print(fports)
+            print(eports)
+            sys.exit()
+            #devices = fcr.fcr_proxy_dev()
             print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            fabric_check =  fi.fabric_members()
+            #print(fabric_check)
             f = ('logs/PortFlapper.txt')
             try:
                 with open(f, 'w') as file:
-                    file.write("EX-Ports = %s\n" % str(ports))
-                    file.write("Proxy Devices = %s\n" % str(devices))
-                    #file.write("Backbone_IPs = %s\n" % str(backbone_ip))
+                    file.write("F-Ports = %s\n" % str(fports))
+                    file.write("E-Ports = %s\n" % str(eports))
             except IOError:
                 print("\n\nThere was a problem opening the file:" , f)
                 sys.exit()
             file.close()
-            for i in ports:
+            print(eports) ################ if...else statement to use eport or fport
+            for i in eports:
                 slot = i[0]
                 port = i[1]
                 if slot:
@@ -803,15 +809,15 @@ def main():
                     liabhar.count_down(15)
                     anturlar.fos_cmd("portenable %s" % (port))
                     liabhar.count_down(15)
-
-                devices_check =  fcr.fcr_proxy_dev()
-                if devices_check != devices:
-                    print ("WTF")
-                    #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
-                    liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper failed","portflapper failed","")
-                    sys.exit()
-            liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper passed","portflapper passed","")        
-            sys.exit()
+                fabric_check1 =  fi.fabric_members()
+            if fabric_check != fabric_check1:
+                print ("WTF")
+                #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
+                liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper failed","portflapper failed","")
+                sys.exit()
+            liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper passed","portflapper passed","")
+            anturlar.close_tel()
+            return(True)
                 
         else:
             print("\n"+"@"*40)

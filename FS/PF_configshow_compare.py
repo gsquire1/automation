@@ -22,7 +22,7 @@ import telnetlib
 import getpass
 import argparse
 import re
-#import csv
+import PortFlapper
 #import time
 
 #######################################################################################################################
@@ -104,6 +104,7 @@ def parent_parser():
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
     pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
+    pp.add_argument("porttype", type=str, help="Choose the port type to operate on (eports/fports)")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
@@ -124,6 +125,8 @@ def parse_args(args):
     parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     parser.add_argument('-i',   '--iterations', type=int, default=1, help="number of iterations")
+    #parser.add_argument('-eports', '--eports', type=int, default=0, help="bounce all eports")
+    #parser.add_argument('-fports', '--fports', type=int, default=0, help="bounce all fports")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
@@ -132,6 +135,7 @@ def parse_args(args):
     #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
     #parser.add_argument("ip", help="IP address of SUT")
     #parser.add_argument("user", help="username for SUT")
+
     
     
     ###################################################################################################################
@@ -153,6 +157,11 @@ def parse_args(args):
         
     if not args.cmdprompt and args.switchtype:
         print('To start at the command prompt both switch type and command prompt is requried')
+        sys.exit()
+        
+    porttype = args.porttype
+    if porttype != porttype.isalpha() and len(porttype) != 6:
+        print("\nYOU MUST USE EITHER 'eports' or 'fports' in the CLI\n")
         sys.exit()
  
     return parser.parse_args()
@@ -184,6 +193,7 @@ def main():
     print(pa.verbose)
     print(pa.cmdprompt)
     print(pa.iterations)
+    print(pa.porttype)
     print("@"*40)
     print("@"*40)
     #sys.exit()
@@ -223,16 +233,17 @@ def main():
  ######################################################################################################################
  ####
  ####   connect via telnet:
- ####   if you want to connect to the console it is available in anturlar and an example below
+ ####   if you want to connect to the console it is available in anturlar and an example is available below
  ####
  ####
  ######################################################################################################################
  ######################################################################################################################
  ####   Config_up_down_compare.main()
 
-    # cons_out = anturlar.fos_cmd("firmwareshow")                          ####   send any command with anturlar.fos_cmd
-    # print("\r\n")
-    # liabhar.JustSleep(5)                                                ####   sleep without printing anything
+    #cons_out = anturlar.fos_cmd("firmwareshow")                          ####   send any command with anturlar.fos_cmd
+    #print("\r\n")
+    #liabhar.JustSleep(5)                                                ####   sleep without printing anything
+    #print(cons_out)
     # print("now closing telnet session ") 
     # #anturlar.close_tel()                                                 ####  close the telnet session
 #######################################################################################################################   
@@ -244,6 +255,7 @@ def main():
 #######################################################################################################################
 #######################################################################################################################
     #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)   ####  connect to console w/o parser info
+    #cons_out = anturlar.fos_cmd("firmwareshow")
     #cons_out = anturlar.fos_cmd("setcontext %s " % pa.fid)                 ####  change to the fid given on the command  
     #tn = anturlar.connect_console(console_ip,console_port)                 ####  use the console ip and console port info
     #cons_out = anturlar.fos_cmd("switchshow")                              ####  send a command via the console
@@ -287,7 +299,7 @@ def main():
         if " date = " not in l:
             ff.write(l)
     ff.close()                                                          #### close this file for comparison later
-    #sys.exit()
+
 #######################################################################################################################
 #######################################################################################################################
 ####
@@ -303,10 +315,65 @@ def main():
 #######################################################################################################################
 #######################################################################################################################
 
-    tn = cofra.clear_stats()
+    # tn = cofra.clear_stats()
+    # print(pa.porttype)
+    # #sys.exit()
+    # porttype = pa.porttype
+    # print(porttype)
+    # PortFlapper.main(porttype)
+#############################################################################################
+    si = anturlar.SwitchInfo()
+    fi = anturlar.FabricInfo()
+    fabric_check =  fi.fabric_members()
+    f_ports = si.f_ports()
+    e_ports = si.e_ports()
+    print("\n\n\n\n")
+    print(f_ports)
+    print(e_ports)
+    print("\n\n\n\n")
+    if pa.porttype == "eports":
+        ports = e_ports
+    else:
+        ports = f_ports
+    i = ipaddr_switch
+    
+    # try: 
+    #     tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
+    # except OSError:
+    #     print("Switch %s not available" % i) 
+    nos = si.nos_check()
+    if not nos:
+        for i in ports:
+            slot = i[0]
+            port = i[1]
+            if slot:
+                anturlar.fos_cmd("portdisable %s/%s" % (slot, port))
+                liabhar.count_down(15)
+                anturlar.fos_cmd("portenable %s/%s" % (slot, port))
+                liabhar.count_down(15)
+            else:
+                anturlar.fos_cmd("portdisable %s" % (port))
+                liabhar.count_down(15)
+                anturlar.fos_cmd("portenable %s" % (port))
+                liabhar.count_down(15)
+        fabric_check1 =  fi.fabric_members()
+        if fabric_check != fabric_check1:
+            print ("WTF")
+            #email_sender_html(you, me, subj, html_to_send, htmlfile_path = "" )
+            liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper failed","portflapper failed","")
+            sys.exit()
+        anturlar.close_tel()
+        #return(True)         
+    else:
+        print("\n"+"@"*40)
+        print('\nTHIS IS A NOS SWITCH> SKIPPING')
+        print("\n"+"@"*40)
+        pass
+    #anturlar.close_tel()
+####################################################################################################################
     #anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
     #tn = cofra.ha_failover(pa.iterations)
-    tn = cofra.power_cycle_iterations(power_pole_info, pa.iterations)
+    #tn = cofra.power_cycle_iterations(power_pole_info, pa.iterations)
     
     
     tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
@@ -334,8 +401,8 @@ def main():
     print("#"*80)
     print("Result ")
     print(diff_f)
+    liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","portflapper passed","portflapper passed","")
 
-    #return(cons_out)
     return(True)
     
 if __name__ == '__main__':
