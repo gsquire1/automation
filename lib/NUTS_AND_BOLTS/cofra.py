@@ -229,6 +229,7 @@ class DoFirmwaredownloadChoice():
         #ras = re.compile('([\.a-z0-9]+)(?:_)')
         ras = re.compile('([\.a-z0-9]{6})')
         ras = ras.search(firmdown)
+         
         frm_no_bld_down = ras.group(1)
         
         #ras_up = re.compile('([\.a-z0-9]+)(?:_)')
@@ -242,6 +243,7 @@ class DoFirmwaredownloadChoice():
         if 'amp' in firmup:
             frm_no_bld_up = frm_no_bld_up + '_amp'
         self.firmup_folder = frm_no_bld_up
+  
         
         #self.check_version()
         
@@ -262,19 +264,23 @@ class DoFirmwaredownloadChoice():
         ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
         ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
         ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+[\\r\\n]*\s+([\._a-z0-9]{6,18})')
+        
         ras = ras.search(capture_cmd)
         ras_dir = ras_dir.search(capture_cmd)
         
         f=""
         capture_cmd = anturlar.fos_cmd("hashow")
         print(capture_cmd)
+        
+        
         if "hashow: Not supported" in capture_cmd:
             f = ras.group(1)
         else:
             f = ras_dir.group(1)
         
+         
         
-        #print("switch RAS is :  %s  " % ras.group(1))
+        #print("saswitch RAS is :  %s  " % ras.group(1))
         #print("director RAS is  : %s " % ras_dir.group(1))
         
         #try:
@@ -331,11 +337,23 @@ class DoFirmwaredownloadChoice():
         if ras != self.firmup:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.3.0/%s,fwdlacct"%(self.firmup)
             firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmup_folder, self.firmup)
+            #### private build
+            #firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/users/home55/gcheung/project/builds/%s,fwdlacct"%(self.firmup)
         else:
             #firmware_cmd = "firmwaredownload -sfbp scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/v7.2.1/%s,fwdlacct"%(self.firmdown)
             firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/var/ftp/pub/sre/SQA/fos/%s/%s,fwdlacct"%(self.firmdown_folder, self.firmdown)
+            ##### private build
+            #firmware_cmd = "firmwaredownload -p scp 10.38.2.25,scp,/users/home55/gcheung/project/builds/%s,fwdlacct"%(self.firmdown)
+        
+        
+        
+        
         reg_ex_list = [b'root> ', b'Y/N\) \[Y]:', b'HA Rebooting', b'Connection to host lost.', \
                        b'with new firmware', b'Firmware has been downloaded']
+        
+        
+         
+        
         
         #capture_own_regex = anturlar.fos_cmd_regex(firmware_cmd, reg_ex_list)
         print("\n\nstart firmwaredownload")
@@ -993,62 +1011,68 @@ class SwitchUpdate():
                 liabhar.JustSleep(30)
         
     
-    def reboot_reconnect(self, doreboot=True):
+    def reboot_reconnect(self, doreboot=True, notimes=1 ):
         
         #### set the online state of the switch
         ### to be checked later 
         state = False
+        count = 0
         
-        if doreboot:
-            anturlar.fos_cmd("echo Y | reboot")
-            liabhar.count_down(120)
+        while count <= notimes: 
+        
+            if doreboot:
+                anturlar.fos_cmd("echo Y | reboot")
+                liabhar.count_down(120)
+                
+            while True:
+                try:
+                    print("@"*44)
+                    print(self.switch_ip)
+                    print(self.user)
+                    print(self.password)
+                    print("@"*44)
+                    
+                    tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
+                    si = anturlar.SwitchInfo()
+                    
+                    chassis = si.director()
+                    print("**********************************")
+                    print(chassis)
+        
+                    if chassis:
+                        state = si.synchronized()
+                    else:
+                        state = si.switch_state()
+                        print(")))))))))))))))")
+                        print(state)
+                        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                        if state == ("Online"):
+                            state = True
+                            print(state)
+                        else:
+                            state = False
+                           
+                    break
+                
+                except:
+                    print("Retry the Telnet connection")
+                    liabhar.count_down(30)
+                    pass
             
-        while True:
-            try:
-                print("@"*44)
-                print(self.switch_ip)
-                print(self.user)
-                print(self.password)
-                print("@"*44)
-                
-                tn = anturlar.connect_tel_noparse(self.switch_ip, self.user, self.password)
-                si = anturlar.SwitchInfo()
-                
-                chassis = si.director()
-                print("**********************************")
-                print(chassis)
-    
+            while not state:
+                liabhar.count_down(33)
                 if chassis:
                     state = si.synchronized()
                 else:
                     state = si.switch_state()
-                    print(")))))))))))))))")
-                    print(state)
-                    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
                     if state == ("Online"):
                         state = True
-                        print(state)
                     else:
                         state = False
-                       
-                break
+                #state = si.synchronized()
+            count += 1
             
-            except:
-                print("Retry the Telnet connection")
-                liabhar.count_down(30)
-                pass
         
-        while not state:
-            liabhar.count_down(33)
-            if chassis:
-                state = si.synchronized()
-            else:
-                state = si.switch_state()
-                if state == ("Online"):
-                    state = True
-                else:
-                    state = False
-            #state = si.synchronized()
         #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
         return(tn)
 
@@ -2107,6 +2131,142 @@ def power_cycle_iterations(power_pole_info, times=1):
     
     
     
+def reboot_reconnect( switch_ip, user, passwrd, doreboot=True, notimes=10 ):
+        """
+        
+        
+        """
+        #### set the online state of the switch
+        ### to be checked later 
+        state = False
+        count = 1
+        
+        while count <= notimes: 
+        
+            if doreboot:
+                anturlar.fos_cmd("echo Y | reboot")
+                liabhar.count_down(420)
+                
+            while True:
+                try:
+                    print("@"*44)
+                    print(switch_ip)
+                    print(user)
+                    print(passwrd)
+                    print("@"*44)
+                
+                    tn = anturlar.connect_tel_noparse(switch_ip, user, passwrd)
+                    si = anturlar.SwitchInfo()
+                    
+                    chassis = si.director()
+                    print("**********************************")
+                    print(chassis)
+        
+                    if chassis:
+                        state = si.synchronized()
+                    else:
+                        state = si.switch_state()
+                        print("\n)))))))))))))))\n")
+                        print(state)
+                        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                        if state == ("Online"):
+                            state = True
+                            print(state)
+                        else:
+                            state = False
+                           
+                    break
+                
+                except:
+                    print("Retry the Telnet connection")
+                    liabhar.count_down(30)
+                    pass
+            
+            while not state:
+                liabhar.count_down(300)
+                if chassis:
+                    state = si.synchronized()
+                else:
+                    state = si.switch_state()
+                    if state == ("Online"):
+                        state = True
+                        liabhar.count_down(300)
+                    else:
+                        state = False
+                #state = si.synchronized()
+            count += 1
+            
+        
+        #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
+        return(tn)
     
     
+def firmdownload_reconnect( switch_ip, user, passwrd, firm_cmd, doreboot=True, notimes=1 ):
+        """
+        
+        
+        """
+        #### set the online state of the switch
+        ### to be checked later 
+        state = False
+        count = 0
+        
+        while count <= notimes: 
+        
+            if doreboot:
+                anturlar.fos_cmd("echo Y | %s " % firm_cmd)
+                liabhar.count_down(420)
+                
+            while True:
+                try:
+                    print("@"*44)
+                    print(switch_ip)
+                    print(user)
+                    print(passwrd)
+                    print("@"*44)
+                
+                    tn = anturlar.connect_tel_noparse(switch_ip, user, passwrd)
+                    si = anturlar.SwitchInfo()
+                    
+                    chassis = si.director()
+                    print("**********************************")
+                    print(chassis)
+        
+                    if chassis:
+                        state = si.synchronized()
+                    else:
+                        state = si.switch_state()
+                        print("\n)))))))))))))))\n")
+                        print(state)
+                        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                        if state == ("Online"):
+                            state = True
+                            print(state)
+                        else:
+                            state = False
+                           
+                    break
+                
+                except:
+                    print("Retry the Telnet connection")
+                    liabhar.count_down(30)
+                    pass
+            
+            while not state:
+                liabhar.count_down(300)
+                if chassis:
+                    state = si.synchronized()
+                else:
+                    state = si.switch_state()
+                    if state == ("Online"):
+                        state = True
+                        liabhar.count_down(300)
+                    else:
+                        state = False
+                #state = si.synchronized()
+            count += 1
+            
+        
+        #tn = anturlar.connect_tel_noparse(self.ip, self.user, self.password)
+        return(tn)
     

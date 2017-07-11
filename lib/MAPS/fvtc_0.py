@@ -205,9 +205,7 @@ def tc_01_01_03_01():
     sw_rules = p.get_rules()
     
     
-     
-    
-     #### set up the log file info
+    #### set up the log file info
     f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
     
     f = liabhar.FileStuff(f_path, 'w+b')
@@ -223,18 +221,6 @@ def tc_01_01_03_01():
     
     df_rules = df_rules.split()
    
-   
-    #print("@"*80)
-    #print("@"*80)
-    #print(sw_rules)
-    #print("@"*80)
-    #print("@"*80)
-    #j = 0
-    #while j < len(sw_rules):
-    #    print(sw_rules[j])
-    #    j += 1
-    #    
-    
    
     count_df = len(df_rules)
     count = len(sw_rules)
@@ -258,6 +244,8 @@ def tc_01_01_03_01():
         
     print("The number of rules that differ are %s " % rule_differ)
     print("The number of additional rules on the switch %s " % ( count - count_df))
+    print("Total number of switch rules    %s  \r\n" % len(sw_rules))
+    print("Total number of default rules   %s  \r\n" % len(df_rules))
     print(len(sw_rules))
     print(len(df_rules))
     f.write("The number of rules that differ are %s \r\n" % rule_differ)
@@ -274,16 +262,57 @@ def tc_01_01_03_01():
     print(test_result)
     f.write(maps_tools.format_results(test_summary, test_result))
     
-    #print("#"*80)
-    #print("#"*80)
-    #print("#"*80)
-    #print("#"*80)
-    #
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    i =0
+    rule_differ = 0
+    while i < loop_count:
+        print("\n\ncomparing switch rule with default rule ")
+        #print("%s      %s " % (sw_rules[i], i ))
+        print(df_rules[i])
+        print("default rule       %s" % i )
+        if df_rules[i] not in sw_rules:
+            rule_differ += 1
+            test_result += df_rules[i]
+            test_result += ' step1'
+            test_result += ' Fail\n'
+            print("\nFail Fail Fail Fail\n\n")
+        
+        i += 1
+        
+    print("The number of rules that differ are %s " % rule_differ)
+    print("The number of additional rules on the switch %s " % ( count_df - count))
+    print("Total number of switch rules    %s  \r\n" % len(sw_rules))
+    print("Total number of default rules   %s  \r\n" % len(df_rules))
+    print(test_result)
+    print(len(sw_rules))
+    print(len(df_rules))
+    f.write("The number of rules that differ are %s \r\n" % rule_differ)
+    f.write("The number of additional rules on the switch %s \r\n" % ( count_df - count))
+    f.write("Total number of switch rules    %s  \r\n" % len(sw_rules))
+    f.write("Total number of default rules   %s  \r\n" % len(df_rules))
+
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    
     #print(df_rules)
-    #
-    #print("#"*80)
-    #print("#"*80)
-    #print("#"*80)
+    
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    
+    #print(sw_rules)
+    
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    
     
     return(test_result)
 
@@ -1962,7 +1991,7 @@ def tc_02_01_01_01():
     
     #fid_now = en.currentFID()
     
-    f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','chassisname')
+    f = cofra.DoSupportsave('10.38.243.102','ftp2','ftp','chassisname')
     
     x = 5555
     while x <= 3600:
@@ -2049,7 +2078,7 @@ def tc_07_01_06_01():
     x = 0
     while x <= 100:
     
-        f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','supportsave/test_case_07_01_06_01')
+        f = cofra.DoSupportsave('10.38.243.102','ftp2','ftp','supportsave/test_case_07_01_06_01')
         print("\nSupportsave Complete\n")
         liabhar.JustSleep(60)
         cpu_now   = en.cpu_usage()
@@ -2148,7 +2177,7 @@ def tc_01_01_template():
     
     #fid_now = en.currentFID()
     
-    f = cofra.DoSupportsave('10.38.46.23','ftp2','ftp','chassisname')
+    f = cofra.DoSupportsave('10.38.243.102','ftp2','ftp','chassisname')
     
     x = 0
     while x <= 3600:
@@ -2290,7 +2319,21 @@ def cleanup_non_def_rules():
     return()
     
     
+def add_RoR_rules():
+    """
     
+    """
+    
+    maps_tools.add_RoR_rules_on_each_rule()
+
+
+
+    
+    return(True)
+
+
+
+
 
 def end():
     pass

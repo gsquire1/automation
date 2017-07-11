@@ -388,7 +388,7 @@ def main():
 ####
 ####
 #######################################################################################################################
-
+        cons_out = anturlar.fos_cmd("fosexec --fid all -cmd 'flow --deact all'")
         cons_out = anturlar.fos_cmd("flow --deact all")
         cons_out = anturlar.fos_cmd("echo y | flow --delete all -force")   #### remove all flows
         
@@ -413,11 +413,13 @@ def main():
         
         #### find the SID DID pairs and create each monitor
         ####
+        
+        ras = re.compile('\|([0-9a-f]{1,4})\s+\|([0-9a-f]{6})\|([0-9a-f]{6})')
+        ingr_sid_did_list = ras.findall(stats)      
+        
         if pa.verbose:
             print("LIST OF FLOWS \n")
             print(stats)
-            ras = re.compile('\|([0-9a-f]{1,4})\s+\|([0-9a-f]{6})\|([0-9a-f]{6})')
-            ingr_sid_did_list = ras.findall(stats)
             print("regex ")
             print(ingr_sid_did_list)
         
@@ -431,8 +433,8 @@ def main():
             cons_out = anturlar.fos_cmd("flow --create regress_flow_a%s -fea mon -ingrport %s -srcdev %s -dstdev %s -noact " % (name_number,ingr_p,sid,did))
             cons_out = anturlar.fos_cmd("flow --create regress_flow_b%s -fea mon  -ingrport %s -dstdev %s -noact  "           % (name_number,ingr_p,did))
             cons_out = anturlar.fos_cmd("flow --create regress_flow_c%s -fea mon  -ingrport %s -srcdev %s -noact  "          % (name_number,ingr_p,sid))
-            cons_out = anturlar.fos_cmd("flow --create regress_flow_d%s -fea mon  -ingrport %s -srcdev * -dstdev %s -noact " % (name_number,ingr_p,did))
-            cons_out = anturlar.fos_cmd("flow --create regress_flow_e%s -fea mon  -ingrport %s -srcdev %s -dstdev * -noact " % (name_number,ingr_p,sid))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_d%s -fea mon  -ingrport %s -srcdev '*' -dstdev %s -noact " % (name_number,ingr_p,did))
+            cons_out = anturlar.fos_cmd("flow --create regress_flow_e%s -fea mon  -ingrport %s -srcdev %s -dstdev '*' -noact " % (name_number,ingr_p,sid))
             cons_out = anturlar.fos_cmd("flow --create regress_flow_f%s -fea mon  -egrport %s -srcdev %s -dstdev %s -noact " % (name_number,ingr_p,did,sid))
             cons_out = anturlar.fos_cmd("flow --create regress_flow_g%s -fea mon  -egrport %s -srcdev %s  -noact "           % (name_number,ingr_p,did))
             cons_out = anturlar.fos_cmd("flow --create regress_flow_h%s -fea mon  -egrport %s -dstdev %s  -noact "            % (name_number,ingr_p,sid))

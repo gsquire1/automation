@@ -9,7 +9,8 @@
 import anturlar
 import liabhar
 import re
-  
+ 
+
   
 def test_case_flow():
     """
@@ -232,14 +233,204 @@ def add_RoR_rules_on_each_rule():
     """
 
     sw_info = anturlar.SwitchInfo()
+    chass_name = sw_info.chassisname()
+    fid_under_test = sw_info.currentFID()
     fid_now = sw_info.ls_now()
+    sw_type = sw_info.switch_type()
+    
     cons_out = anturlar.fos_cmd(" ")
     
     
+    df_rules = maps_default_rule()
+    if sw_type == "171":
+        df_rules = AMP_rules()
+        
+     
+    numb = 0
+    timebase = [ "min", "hour", "day", "week" ]
+    operator = "ge"
+    policy   = "dolly"
+    actions  = [ "snmp" , "raslog", "email" ]
     
     
-    return()
+    df_rules_list = df_rules.split()
+    
+    
+    
+    for r in df_rules_list:
+        print(r)  
+    
+    print("number is ")
+    print(numb)
+    print("timebase are  ")
+    for t in timebase:
+        print(t)
+    print("operator ")
+    print(operator)
+    print("policy to use ")
+    for a in actions:
+        print(a)
+    print("\n"*4)
+    
+    ####
+    ####  open a file to log the results
+    ####
+    #f = "%s" % ("logs/MAPS_RoR_rules_allowed_%s_fid_%s.txt" % (chass_name[0], fid_under_test))
+    #ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
+    g =  "%s" % ("logs/MAPS_RoR_rules_pass_fail_log_%s_fid_%s.txt" % (chass_name[0], fid_under_test))
+    gg = liabhar.FileStuff(g, 'w+b')  #### reset the log file
+    c =  "%s" % ("logs/MAPS_RoR_rules_allowed_complete_%s_fid_%s.txt" % (chass_name[0], fid_under_test))
+    cc = liabhar.FileStuff(c, 'w+b')
+    #### reset the log file    ####
+    ####  create a policy to add the rules to
+    ####
+    #cons_out = anturlar.fos_cmd("mapspolicy --create %s " % policy)
+    ####  WEDGE__________17_____________:FID17:root> mapspolicy --create Nervio
+    ####  2017/03/30-15:01:55, [MAPS-1110], 100096, FID 17, INFO, WEDGE__________17_____________, Policy Nervio is created.
+    ####  WEDGE__________17_____________:FID17:root> 
+    #cons_out = anturlar.fos_cmd("\n")
+    print(len(cons_out))
+    print(cons_out)
+    cmdprompt_length = len(cons_out)
+    cmdprompt_only = cons_out.replace(" ","")
+    
+    cc.write("\n")
+    cc.write("#"*80)
+    cc.write("\n")
+    regexp = [b'no]']
+
+    cons_out = anturlar.fos_cmd_regex("mapsconfig --purge", regexp )
+    
+    cc.write("-"*80)
+    cc.write("\n")
+    cc.write("%s" % (cons_out))
+    cc.write("\n")
+    cc.write("-"*80)
+    
+    cons_out = anturlar.fos_cmd("yes")
+
+    cc.write("-"*80)
+    cc.write("\n")
+    cc.write("%s" % (cons_out))
+    cc.write("\n")
+    cc.write("-"*80)
  
+    cons_out = anturlar.fos_cmd("mapspolicy --create %s " % policy)
+    print(len(cons_out))
+    print(cons_out)
+    cmdprompt_length = len(cons_out)
+    cmdprompt_only = cons_out.replace(" ","")
+ 
+ 
+    for r in df_rules_list:
+        for tb in timebase:
+            for ac in actions:
+                
+                cons_out = anturlar.fos_cmd("mapspolicy --addrule %s -rulename %s " % (policy, r ))
+                    ####  WEDGE__________17_____________:FID17:root>  mapspolicy --addrule dolly -rulename defALL_100M_16GSWL_QSFPCURRENT_10
+                    ####  2017/03/30-15:03:58, [MAPS-1114], 100097, FID 17, INFO, WEDGE__________17_____________, Rule defALL_100M_16GSWL_QSFPCURRENT_10 added to Policy dolly.
+                    ####  WEDGE__________17_____________:FID17:root> 
+                
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only, "")
+                    
+                    gg.write("mapspolicy --addrule %s -rulename %s " % (policy, r ))
+                    gg.write(",")
+                    gg.write(message)
+                
+                cc.write("\n")
+                cc.write("#"*80)
+                cc.write("\n")
+                cc.write("%s " % ("mapspolicy --addrule %s -rulename %s " % (policy, r )))
+                cc.write("\n")
+                cc.write("%s " % (cons_out))
+                 
+                 
+                ror_command = "mapsrule --createror RoR_rule_%s -monitor %s -timebase %s -op %s -value 1 -action %s -policy %s "  % ( numb, r, tb, operator, ac, policy )
+                 
+                cons_out  =  anturlar.fos_cmd("%s" % ror_command)
+                 
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only,"") 
+                    gg.write(ror_command)
+                    gg.write(",")
+                    gg.write(message)
+                    
+                    #gg.write("\n"*4)
+                    #gg.write("#"*80)
+                    #gg.write(cons_out)
+                    #gg.write("\n"*3)
+                    #gg.write(cmdprompt_only)
+                    #gg.write("\n"*2)
+                    #gg.write("@"*80)
+                    #gg.write("\n"*5)
+                    
+                 
+                cc.write("\n")
+                cc.write("-"*80)
+                cc.write("\n")
+                cc.write("%s " % (ror_command))
+                cc.write("\n")
+                cc.write("%s " % (cons_out)) 
+               
+                cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only, "")
+                    gg.write("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                    gg.write(",")
+                    gg.write(message)
+                    
+                cc.write("\n")
+                cc.write("-"*80)
+                cc.write("\n")
+                cc.write("%s " % ("mapspolicy --delrule %s -rulename %s " % ( policy, r)))
+                cc.write("\n")
+                cc.write("%s " % (cons_out)) 
+                
+                cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename RoR_rule_%s " % ( policy, numb))
+                
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only, "")
+                    gg.write("mapspolicy --delrule %s -rulename RoR_rule_%s " % ( policy, numb))
+                    gg.write(",")
+                    gg.write(message)
+                
+                cc.write("\n")
+                cc.write("-"*80)
+                cc.write("\n")
+                cc.write("%s " % ("mapspolicy --delrule %s -rulename RoR_rule_%s " % ( policy, numb)))
+                cc.write("\n")
+                cc.write("%s " % (cons_out))
+                
+                cons_out = anturlar.fos_cmd("mapsrule --delete RoR_rule_%s " % numb )
+                
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only, "")
+                    gg.write("mapspolicy --delrule %s -rulename RoR_rule_%s " % ( policy, numb))
+                    gg.write(",")
+                    gg.write(message)
+                
+                
+                cc.write("\n")
+                cc.write("-"*80)
+                cc.write("\n")
+                cc.write("%s " % ("mapsrule --delete RoR_rule_%s " % numb))
+                cc.write("\n")
+                cc.write("%s " % (cons_out))   
+                    
+                numb += 1
+    
+    ####
+    ####  close the log file
+    ####
+    #ff.close()
+    gg.close()
+    cc.close()
+    return(True)
+ 
+
+
 def add_rules_each_monitor_type(add_max=False, add_all=True, add_each_monitor=False, policy_is="Dolly" ):
     """
         create rules with each different combination of monitor for each type of logical group
@@ -247,7 +438,8 @@ def add_rules_each_monitor_type(add_max=False, add_all=True, add_each_monitor=Fa
         
         
     """
-    
+    global tn
+    tn.set_debuglevel(10)
     sw_info = anturlar.SwitchInfo()
     fid_now = sw_info.ls_now()
     cons_out = anturlar.fos_cmd(" ")
@@ -1083,8 +1275,15 @@ def maps_default_rule():
             defALL_16GLWL_SFPRXP_1995               |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(RXP/NONE>=1995)  ,\
             defALL_16GLWL_SFPTXP_1995               |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(TXP/NONE>=1995)  ,\
             defALL_16GLWL_SFPSFP_TEMP_90            |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(SFP_TEMP/NONE>=90)  ,\
-            defALL_16GLWL_SFPVOLTAGE_3000           |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(VOLTAGE/NONE<=3000)  ,\
+            defALL_16GLWL_SFPVOLTAGE_3000           |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(VOLTAGE/NONE<=3000) ,\
             defALL_16GLWL_SFPSFP_TEMP_n5            |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_16GLWL_SFP(SFP_TEMP/NONE<=-5)  ,\
+            defALL_2Km_32GLWL_QSFPCURRENT_10        |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(CURRENT/NONE>=10)     ,\
+            defALL_2Km_32GLWL_QSFPRXP_3548          |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(RXP/NONE>=3548)       ,\
+            defALL_2Km_32GLWL_QSFPSFP_TEMP_75       |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(SFP_TEMP/NONE>=75)    ,\
+            defALL_2Km_32GLWL_QSFPSFP_TEMP_n5       |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(SFP_TEMP/NONE<=-5)    ,\
+            defALL_2Km_32GLWL_QSFPTXP_4466          |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(TXP/NONE>=4466)       ,\
+            defALL_2Km_32GLWL_QSFPVOLTAGE_3010      |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(VOLTAGE/NONE<=3010)   ,\
+            defALL_2Km_32GLWL_QSFPVOLTAGE_3604      |SFP_MARGINAL,RASLOG,SNMP,EM   |ALL_2Km_32GLWL_QSFP(VOLTAGE/NONE>=3604)   ,\
             defALL_QSFPCURRENT_10                   |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_QSFP(CURRENT/NONE>=10)  ,\
             defALL_QSFPVOLTAGE_3600                 |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_QSFP(VOLTAGE/NONE>=3600)  ,\
             defALL_QSFPRXP_2180                     |SFP_MARGINAL,RASLOG,SNMP,EMAIL|ALL_QSFP(RXP/NONE>=2180)  ,\
@@ -1244,9 +1443,6 @@ def maps_default_rule():
                 defALL_25Km_16GLWL_SFPCURRENT_90	\
                 defALL_25Km_16GLWL_SFPRXP_2238	\
                 defALL_25Km_16GLWL_SFPSFP_TEMP_75	\
-                defALdefALL_100M_16GSWL_QSFPRXP_2187	\
-                defALL_100M_16GSWL_QSFPSFP_TEMP_85	\
-                defALL_100M_16GSWL_QSFPSFP_TEMP_n5	\
                 defALL_25Km_16GLWL_SFPSFP_TEMP_n5	\
                 defALL_25Km_16GLWL_SFPTXP_4466	\
                 defALL_25Km_16GLWL_SFPVOLTAGE_2850	\
@@ -1446,8 +1642,6 @@ def maps_default_rule():
                 defALL_E_PORTSUTIL_90	\
                 defALL_EXT_GE_PORTSCRC_0	\
                 defALL_EXT_GE_PORTSCRC_1	\
-                defALL_EXT_GE_PORTSINV_LEN_0	\
-                defALL_EXT_GE_PORTSINV_LEN_1	\
                 defALL_EXT_GE_PORTSLOS_0	\
                 defALL_EXT_GE_PORTSLOS_1	\
                 defALL_F_PORTS_IO_FRAME_LOSS	\
@@ -1854,11 +2048,11 @@ def maps_default_rule():
                 defALL_E_PORTSENCR_BLK	\
                 defALL_E_PORTSENCR_DISC	\
                 defALL_E_PORTSENCR_SHORT_FRM	\
-                defSWITCHERR_PORTS_10	\
-                defSWITCHERR_PORTS_11  	\
-                defSWITCHERR_PORTS_25  	\
-                defSWITCHERR_PORTS_5  	\
-                defSWITCHERR_PORTS_6 	\
+                defSWITCHERR_PORTS_P_10	\
+                defSWITCHERR_PORTS_P_11  	\
+                defSWITCHERR_PORTS_P_25  	\
+                defSWITCHERR_PORTS_P_5  	\
+                defSWITCHERR_PORTS_P_6 	\
                 defALL_E_PORTSTX_95	\
                 defALL_E_PORTSRX_95	\
                 defALL_E_PORTSUTIL_95	\
@@ -1877,17 +2071,643 @@ def maps_default_rule():
                 defALL_F_PORTSTX_95	\
                 defALL_F_PORTSRX_95	\
                 defALL_F_PORTSUTIL_95	\
-                defALL_PORTS_IO_LATENCY_CLEAR_UNQUAR \
                 defALL_TSTEMP_IN_RANGE \
                 defSWITCHBB_FCR_CNT_MAX  \
                 defALL_F_PORTSRX_90   \
                 defALL_F_PORTSUTIL_90   \
                 defALL_F_PORTSTX_90   \
+                defALL_2Km_32GLWL_QSFPCURRENT_10    \
+                defALL_2Km_32GLWL_QSFPRXP_3548      \
+                defALL_2Km_32GLWL_QSFPSFP_TEMP_75   \
+                defALL_2Km_32GLWL_QSFPSFP_TEMP_n5   \
+                defALL_2Km_32GLWL_QSFPTXP_4466      \
+                defALL_2Km_32GLWL_QSFPVOLTAGE_3010  \
+                defALL_2Km_32GLWL_QSFPVOLTAGE_3604  \
+                defALL_PORTS_IO_FRAME_LOSS_UNQUAR   \
+                defALL_PORTS_IO_PERF_IMPACT_UNQUAR  \
                "
 
     
-    return(l) 
-     
+    return(l)
+
+def AMP_rules():
+    
+    l =    "defALL_10GLWL_SFPCURRENT_95	\
+            defALL_10GLWL_SFPRXP_2230	\
+            defALL_10GLWL_SFPSFP_TEMP_90	\
+            defALL_10GLWL_SFPSFP_TEMP_n5	\
+            defALL_10GLWL_SFPTXP_2230	\
+            defALL_10GLWL_SFPVOLTAGE_2970	\
+            defALL_10GLWL_SFPVOLTAGE_3600	\
+            defALL_10GSWL_SFPCURRENT_10	\
+            defALL_10GSWL_SFPRXP_1999	\
+            defALL_10GSWL_SFPSFP_TEMP_90	\
+            defALL_10GSWL_SFPSFP_TEMP_n5	\
+            defALL_10GSWL_SFPTXP_1999	\
+            defALL_10GSWL_SFPVOLTAGE_3000	\
+            defALL_10GSWL_SFPVOLTAGE_3600	\
+            defALL_16GLWL_SFPCURRENT_70	\
+            defALL_16GLWL_SFPRXP_1995	\
+            defALL_16GLWL_SFPSFP_TEMP_90	\
+            defALL_16GLWL_SFPSFP_TEMP_n5	\
+            defALL_16GLWL_SFPTXP_1995	\
+            defALL_16GLWL_SFPVOLTAGE_3000	\
+            defALL_16GLWL_SFPVOLTAGE_3600	\
+            defALL_16GSWL_SFPCURRENT_12	\
+            defALL_16GSWL_SFPRXP_1259	\
+            defALL_16GSWL_SFPSFP_TEMP_85	\
+            defALL_16GSWL_SFPSFP_TEMP_n5	\
+            defALL_16GSWL_SFPTXP_1259	\
+            defALL_16GSWL_SFPVOLTAGE_3000	\
+            defALL_16GSWL_SFPVOLTAGE_3600	\
+            defALL_25Km_16GLWL_SFPCURRENT_90	\
+            defALL_25Km_16GLWL_SFPRXP_2238	\
+            defALL_25Km_16GLWL_SFPSFP_TEMP_75	\
+            defALL_25Km_16GLWL_SFPSFP_TEMP_n5	\
+            defALL_25Km_16GLWL_SFPTXP_4466	\
+            defALL_25Km_16GLWL_SFPVOLTAGE_2850	\
+            defALL_25Km_16GLWL_SFPVOLTAGE_3750	\
+            defALL_AE_PORTS_RX_IOPS	\
+            defALL_AE_PORTS_RX_IOPS_600K	\
+            defALL_AE_PORTS_RX_IOPS_750K	\
+            defALL_AE_PORTS_RX_IOPS_900K	\
+            defALL_AE_PORTSRX_PER_90	\
+            defALL_D_PORTSCRC_1	\
+            defALL_D_PORTSCRC_2	\
+            defALL_D_PORTSCRC_3	\
+            defALL_D_PORTSCRC_D1000	\
+            defALL_D_PORTSCRC_D1500	\
+            defALL_D_PORTSCRC_D500	\
+            defALL_D_PORTSCRC_H30	\
+            defALL_D_PORTSCRC_H60	\
+            defALL_D_PORTSCRC_H90	\
+            defALL_D_PORTSITW_1	\
+            defALL_D_PORTSITW_2	\
+            defALL_D_PORTSITW_3	\
+            defALL_D_PORTSITW_D1000	\
+            defALL_D_PORTSITW_D1500	\
+            defALL_D_PORTSITW_D500	\
+            defALL_D_PORTSITW_H30	\
+            defALL_D_PORTSITW_H60	\
+            defALL_D_PORTSITW_H90	\
+            defALL_D_PORTSLF_1	\
+            defALL_D_PORTSLF_2	\
+            defALL_D_PORTSLF_3	\
+            defALL_D_PORTSLF_D1000	\
+            defALL_D_PORTSLF_D1500	\
+            defALL_D_PORTSLF_D500	\
+            defALL_D_PORTSLF_H30	\
+            defALL_D_PORTSLF_H60	\
+            defALL_D_PORTSLF_H90	\
+            defALL_D_PORTSLOSS_SYNC_1	\
+            defALL_D_PORTSLOSS_SYNC_2	\
+            defALL_D_PORTSLOSS_SYNC_3	\
+            defALL_D_PORTSLOSS_SYNC_D1000	\
+            defALL_D_PORTSLOSS_SYNC_D1500	\
+            defALL_D_PORTSLOSS_SYNC_D500	\
+            defALL_D_PORTSLOSS_SYNC_H30	\
+            defALL_D_PORTSLOSS_SYNC_H60	\
+            defALL_D_PORTSLOSS_SYNC_H90	\
+            defALL_DP_FRM_DROP	\
+            defALL_E_PORTSC3TXTO_10	\
+            defALL_E_PORTSC3TXTO_20	\
+            defALL_E_PORTSC3TXTO_5	\
+            defALL_E_PORTSCRC_0	\
+            defALL_E_PORTSCRC_10	\
+            defALL_E_PORTSCRC_2	\
+            defALL_E_PORTSCRC_20	\
+            defALL_E_PORTSCRC_21	\
+            defALL_E_PORTSCRC_40	\
+            defALL_E_PORTSITW_15	\
+            defALL_E_PORTSITW_20	\
+            defALL_E_PORTSITW_21	\
+            defALL_E_PORTSITW_40	\
+            defALL_E_PORTSITW_41	\
+            defALL_E_PORTSITW_80	\
+            defALL_E_PORTSLF_0	\
+            defALL_E_PORTSLF_3	\
+            defALL_E_PORTSLF_5	\
+            defALL_E_PORTSLOSS_SIGNAL_0	\
+            defALL_E_PORTSLOSS_SIGNAL_3	\
+            defALL_E_PORTSLOSS_SIGNAL_5	\
+            defALL_E_PORTSLOSS_SYNC_0	\
+            defALL_E_PORTSLOSS_SYNC_3	\
+            defALL_E_PORTSLOSS_SYNC_5	\
+            defALL_E_PORTSLR_10	\
+            defALL_E_PORTSLR_11	\
+            defALL_E_PORTSLR_2	\
+            defALL_E_PORTSLR_20	\
+            defALL_E_PORTSLR_4	\
+            defALL_E_PORTSLR_5	\
+            defALL_E_PORTSPE_0	\
+            defALL_E_PORTSPE_10	\
+            defALL_E_PORTSPE_2	\
+            defALL_E_PORTSPE_3	\
+            defALL_E_PORTSPE_5	\
+            defALL_E_PORTSPE_7	\
+            defALL_E_PORTSSTATE_CHG_10	\
+            defALL_E_PORTSSTATE_CHG_11	\
+            defALL_E_PORTSSTATE_CHG_2	\
+            defALL_E_PORTSSTATE_CHG_20	\
+            defALL_E_PORTSSTATE_CHG_4	\
+            defALL_E_PORTSSTATE_CHG_5	\
+            defALL_FANFAN_STATE_FAULTY	\
+            defALL_FANFAN_STATE_ON	\
+            defALL_FANFAN_STATE_OUT	\
+            defALL_OTHER_SFPCURRENT_50	\
+            defALL_OTHER_SFPRXP_5000	\
+            defALL_OTHER_SFPSFP_TEMP_85	\
+            defALL_OTHER_SFPSFP_TEMP_n13	\
+            defALL_OTHER_SFPTXP_5000	\
+            defALL_OTHER_SFPVOLTAGE_2960	\
+            defALL_OTHER_SFPVOLTAGE_3630	\
+            defALL_PORTSLF_0	\
+            defALL_PORTSLF_3	\
+            defALL_PORTSLF_5	\
+            defALL_PORTSLOSS_SIGNAL_0	\
+            defALL_PORTSLOSS_SIGNAL_3	\
+            defALL_PORTSLOSS_SIGNAL_5	\
+            defALL_PORTSSFP_STATE_FAULTY	\
+            defALL_PORTSSFP_STATE_IN	\
+            defALL_PORTSSFP_STATE_OUT	\
+            defALL_PSPS_STATE_FAULTY	\
+            defALL_PSPS_STATE_ON	\
+            defALL_PSPS_STATE_OUT	\
+            defALL_TSTEMP_IN_RANGE	\
+            defALL_TSTEMP_OUT_OF_RANGE	\
+            defALL_VTAP_HOST_PORTS_AVG_ROS_PER_100	\
+            defALL_VTAP_HOST_PORTS_AVG_ROS_PER_150	\
+            defALL_VTAP_HOST_PORTS_AVG_ROS_PER_200	\
+            defALL_VTAP_HOST_PORTS_MAX_ROS_PER_150	\
+            defALL_VTAP_HOST_PORTS_MAX_ROS_PER_200	\
+            defALL_VTAP_HOST_PORTS_MAX_ROS_PER_300	\
+            defALL_VTAP_TGT_PORTS_AVG_PENDIOS_100	\
+            defALL_VTAP_TGT_PORTS_AVG_PENDIOS_150	\
+            defALL_VTAP_TGT_PORTS_AVG_PENDIOS_250	\
+            defALL_VTAP_TGT_PORTS_MAX_PENDIOS_200	\
+            defALL_VTAP_TGT_PORTS_MAX_PENDIOS_300	\
+            defALL_VTAP_TGT_PORTS_MAX_PENDIOS_400	\
+            defCHASSIS_AMP_RX_IOPS	\
+            defCHASSIS_AMP_RX_IOPS_5M	\
+            defCHASSISBAD_FAN_CRIT	\
+            defCHASSISBAD_FAN_MARG	\
+            defCHASSISBAD_PWR_CRIT	\
+            defCHASSISBAD_TEMP_CRIT	\
+            defCHASSISBAD_TEMP_MARG	\
+            defCHASSISCERT_VALIDITY_15	\
+            defCHASSISCERT_VALIDITY_20	\
+            defCHASSISCERT_VALIDITY_30	\
+            defCHASSISCERTS_EXPIRED	\
+            defCHASSISCPU_80	\
+            defCHASSISETH_MGMT_PORT_STATE_DOWN	\
+            defCHASSISETH_MGMT_PORT_STATE_UP	\
+            defCHASSISFLASH_USAGE_90	\
+            defCHASSISMEMORY_USAGE_75	\
+            defCMD_STATUS_FAB_LATENCY	\
+            defCO_CMD_STATUS_FAB_LATENCY	\
+            defCO_FAB_LATENCY_TO_INIT	\
+            defCO_FAB_LATENCY_TO_TARG	\
+            defCO_FRT_FAB_LATENCY	\
+            defCO_OTHER_CMD_PENDING_IOs	\
+            defCO_OTHER_CMD_PENDING_IOs_5MIN	\
+            defCO_OTHER_CMD_PENDING_IOs_DAY	\
+            defCO_OTHER_CMD_PENDING_IOs_SEC	\
+            defCO_OTHER_CMD_STATUS_TIME_5MIN	\
+            defCO_OTHER_CMD_STATUS_TIME_DAY	\
+            defCO_OTHER_CMD_STATUS_TIME_IO	\
+            defCO_OTHER_CMD_STATUS_TIME_SEC	\
+            defCO_RD_1stDATA_TIME_64_512K_5MIN	\
+            defCO_RD_1stDATA_TIME_64_512K_DAY	\
+            defCO_RD_1stDATA_TIME_64_512K_IO	\
+            defCO_RD_1stDATA_TIME_64_512K_SEC	\
+            defCO_RD_1stDATA_TIME_8_64K_5MIN	\
+            defCO_RD_1stDATA_TIME_8_64K_DAY	\
+            defCO_RD_1stDATA_TIME_8_64K_IO	\
+            defCO_RD_1stDATA_TIME_8_64K_SEC	\
+            defCO_RD_1stDATA_TIME_GE512K_5MIN	\
+            defCO_RD_1stDATA_TIME_GE512K_DAY	\
+            defCO_RD_1stDATA_TIME_GE512K_IO	\
+            defCO_RD_1stDATA_TIME_GE512K_SEC	\
+            defCO_RD_1stDATA_TIME_LT8K_5MIN	\
+            defCO_RD_1stDATA_TIME_LT8K_DAY	\
+            defCO_RD_1stDATA_TIME_LT8K_IO	\
+            defCO_RD_1stDATA_TIME_LT8K_SEC	\
+            defCO_RD_PEND_IO_64_512K	\
+            defCO_RD_PEND_IO_64_512K_5MIN	\
+            defCO_RD_PEND_IO_64_512K_DAY	\
+            defCO_RD_PEND_IO_64_512K_SEC	\
+            defCO_RD_PEND_IO_8_64K	\
+            defCO_RD_PEND_IO_8_64K_5MIN	\
+            defCO_RD_PEND_IO_8_64K_DAY	\
+            defCO_RD_PEND_IO_8_64K_SEC	\
+            defCO_RD_PEND_IO_GE512K	\
+            defCO_RD_PEND_IO_GE512K_5MIN	\
+            defCO_RD_PEND_IO_GE512K_DAY	\
+            defCO_RD_PEND_IO_GE512K_SEC	\
+            defCO_RD_PEND_IO_LT8K	\
+            defCO_RD_PEND_IO_LT8K_5MIN	\
+            defCO_RD_PEND_IO_LT8K_DAY	\
+            defCO_RD_PEND_IO_LT8K_SEC	\
+            defCO_RD_STATUS_TIME_64_512K_5MIN	\
+            defCO_RD_STATUS_TIME_64_512K_DAY	\
+            defCO_RD_STATUS_TIME_64_512K_IO	\
+            defCO_RD_STATUS_TIME_64_512K_SEC	\
+            defCO_RD_STATUS_TIME_8_64K_5MIN	\
+            defCO_RD_STATUS_TIME_8_64K_DAY	\
+            defCO_RD_STATUS_TIME_8_64K_IO	\
+            defCO_RD_STATUS_TIME_8_64K_SEC	\
+            defCO_RD_STATUS_TIME_GE512K_5MIN	\
+            defCO_RD_STATUS_TIME_GE512K_DAY	\
+            defCO_RD_STATUS_TIME_GE512K_IO	\
+            defCO_RD_STATUS_TIME_GE512K_SEC	\
+            defCO_RD_STATUS_TIME_LT8K_5MIN	\
+            defCO_RD_STATUS_TIME_LT8K_DAY	\
+            defCO_RD_STATUS_TIME_LT8K_IO	\
+            defCO_RD_STATUS_TIME_LT8K_SEC	\
+            defCO_SCSI_ABTS_5MIN	\
+            defCO_SCSI_ABTS_DAY	\
+            defCO_SCSI_ABTS_SEC	\
+            defCO_SCSI_TO_5MIN	\
+            defCO_SCSI_TO_DAY	\
+            defCO_SCSI_TO_SEC	\
+            defCO_WR_1stXFER_RDY_64_512K_5MIN	\
+            defCO_WR_1stXFER_RDY_64_512K_DAY	\
+            defCO_WR_1stXFER_RDY_64_512K_IO	\
+            defCO_WR_1stXFER_RDY_64_512K_SEC	\
+            defCO_WR_1stXFER_RDY_8_64K_5MIN	\
+            defCO_WR_1stXFER_RDY_8_64K_DAY	\
+            defCO_WR_1stXFER_RDY_8_64K_IO	\
+            defCO_WR_1stXFER_RDY_8_64K_SEC	\
+            defCO_WR_1stXFER_RDY_GE512K_5MIN	\
+            defCO_WR_1stXFER_RDY_GE512K_DAY	\
+            defCO_WR_1stXFER_RDY_GE512K_IO	\
+            defCO_WR_1stXFER_RDY_GE512K_SEC	\
+            defCO_WR_1stXFER_RDY_LT8K_5MIN	\
+            defCO_WR_1stXFER_RDY_LT8K_DAY	\
+            defCO_WR_1stXFER_RDY_LT8K_IO	\
+            defCO_WR_1stXFER_RDY_LT8K_SEC	\
+            defCO_WR_PEND_IO_64_512K	\
+            defCO_WR_PEND_IO_64_512K_5MIN	\
+            defCO_WR_PEND_IO_64_512K_DAY	\
+            defCO_WR_PEND_IO_64_512K_SEC	\
+            defCO_WR_PEND_IO_8_64K	\
+            defCO_WR_PEND_IO_8_64K_5MIN	\
+            defCO_WR_PEND_IO_8_64K_DAY	\
+            defCO_WR_PEND_IO_8_64K_SEC	\
+            defCO_WR_PEND_IO_GE512K	\
+            defCO_WR_PEND_IO_GE512K_5MIN	\
+            defCO_WR_PEND_IO_GE512K_DAY	\
+            defCO_WR_PEND_IO_GE512K_SEC	\
+            defCO_WR_PEND_IO_LT8K	\
+            defCO_WR_PEND_IO_LT8K_5MIN	\
+            defCO_WR_PEND_IO_LT8K_DAY	\
+            defCO_WR_PEND_IO_LT8K_SEC	\
+            defCO_WR_STATUS_TIME_64_512K_5MIN	\
+            defCO_WR_STATUS_TIME_64_512K_DAY	\
+            defCO_WR_STATUS_TIME_64_512K_IO	\
+            defCO_WR_STATUS_TIME_64_512K_SEC	\
+            defCO_WR_STATUS_TIME_8_64K_5MIN	\
+            defCO_WR_STATUS_TIME_8_64K_DAY	\
+            defCO_WR_STATUS_TIME_8_64K_IO	\
+            defCO_WR_STATUS_TIME_8_64K_SEC	\
+            defCO_WR_STATUS_TIME_GE512K_5MIN	\
+            defCO_WR_STATUS_TIME_GE512K_DAY	\
+            defCO_WR_STATUS_TIME_GE512K_IO	\
+            defCO_WR_STATUS_TIME_GE512K_SEC	\
+            defCO_WR_STATUS_TIME_LT8K_5MIN	\
+            defCO_WR_STATUS_TIME_LT8K_DAY	\
+            defCO_WR_STATUS_TIME_LT8K_IO	\
+            defCO_WR_STATUS_TIME_LT8K_SEC	\
+            defFAB_LATENCY_TO_INIT	\
+            defFAB_LATENCY_TO_TARG	\
+            defFLOW_COUNT_PER_60	\
+            defFLOW_COUNT_PER_75	\
+            defFLOW_COUNT_PER_90	\
+            defFRT_FAB_LATENCY	\
+            defIT_COUNT_PER_60	\
+            defIT_COUNT_PER_75	\
+            defIT_COUNT_PER_90	\
+            defITL_COUNT_PER_60	\
+            defITL_COUNT_PER_75	\
+            defITL_COUNT_PER_90	\
+            defMO_CMD_STATUS_FAB_LATENCY	\
+            defMO_FAB_LATENCY_TO_INIT	\
+            defMO_FAB_LATENCY_TO_TARG	\
+            defMO_FRT_FAB_LATENCY	\
+            defMO_OTHER_CMD_PENDING_IOs	\
+            defMO_OTHER_CMD_PENDING_IOs_5MIN	\
+            defMO_OTHER_CMD_PENDING_IOs_DAY	\
+            defMO_OTHER_CMD_PENDING_IOs_SEC	\
+            defMO_OTHER_CMD_STATUS_TIME_5MIN	\
+            defMO_OTHER_CMD_STATUS_TIME_DAY	\
+            defMO_OTHER_CMD_STATUS_TIME_IO	\
+            defMO_OTHER_CMD_STATUS_TIME_SEC	\
+            defMO_RD_1stDATA_TIME_64_512K_5MIN	\
+            defMO_RD_1stDATA_TIME_64_512K_DAY	\
+            defMO_RD_1stDATA_TIME_64_512K_IO	\
+            defMO_RD_1stDATA_TIME_64_512K_SEC	\
+            defMO_RD_1stDATA_TIME_8_64K_5MIN	\
+            defMO_RD_1stDATA_TIME_8_64K_DAY	\
+            defMO_RD_1stDATA_TIME_8_64K_IO	\
+            defMO_RD_1stDATA_TIME_8_64K_SEC	\
+            defMO_RD_1stDATA_TIME_GE512K_5MIN	\
+            defMO_RD_1stDATA_TIME_GE512K_DAY	\
+            defMO_RD_1stDATA_TIME_GE512K_IO	\
+            defMO_RD_1stDATA_TIME_GE512K_SEC	\
+            defMO_RD_1stDATA_TIME_LT8K_5MIN	\
+            defMO_RD_1stDATA_TIME_LT8K_DAY	\
+            defMO_RD_1stDATA_TIME_LT8K_IO	\
+            defMO_RD_1stDATA_TIME_LT8K_SEC	\
+            defMO_RD_PEND_IO_64_512K	\
+            defMO_RD_PEND_IO_64_512K_5MIN	\
+            defMO_RD_PEND_IO_64_512K_DAY	\
+            defMO_RD_PEND_IO_64_512K_SEC	\
+            defMO_RD_PEND_IO_8_64K	\
+            defMO_RD_PEND_IO_8_64K_5MIN	\
+            defMO_RD_PEND_IO_8_64K_DAY	\
+            defMO_RD_PEND_IO_8_64K_SEC	\
+            defMO_RD_PEND_IO_GE512K	\
+            defMO_RD_PEND_IO_GE512K_5MIN	\
+            defMO_RD_PEND_IO_GE512K_DAY	\
+            defMO_RD_PEND_IO_GE512K_SEC	\
+            defMO_RD_PEND_IO_LT8K	\
+            defMO_RD_PEND_IO_LT8K_5MIN	\
+            defMO_RD_PEND_IO_LT8K_DAY	\
+            defMO_RD_PEND_IO_LT8K_SEC	\
+            defMO_RD_STATUS_TIME_64_512K_5MIN	\
+            defMO_RD_STATUS_TIME_64_512K_DAY	\
+            defMO_RD_STATUS_TIME_64_512K_IO	\
+            defMO_RD_STATUS_TIME_64_512K_SEC	\
+            defMO_RD_STATUS_TIME_8_64K_5MIN	\
+            defMO_RD_STATUS_TIME_8_64K_DAY	\
+            defMO_RD_STATUS_TIME_8_64K_IO	\
+            defMO_RD_STATUS_TIME_8_64K_SEC	\
+            defMO_RD_STATUS_TIME_GE512K_5MIN	\
+            defMO_RD_STATUS_TIME_GE512K_DAY	\
+            defMO_RD_STATUS_TIME_GE512K_IO	\
+            defMO_RD_STATUS_TIME_GE512K_SEC	\
+            defMO_RD_STATUS_TIME_LT8K_5MIN	\
+            defMO_RD_STATUS_TIME_LT8K_DAY	\
+            defMO_RD_STATUS_TIME_LT8K_IO	\
+            defMO_RD_STATUS_TIME_LT8K_SEC	\
+            defMO_SCSI_ABTS_5MIN	\
+            defMO_SCSI_ABTS_DAY	\
+            defMO_SCSI_ABTS_SEC	\
+            defMO_SCSI_TO_5MIN	\
+            defMO_SCSI_TO_DAY	\
+            defMO_SCSI_TO_SEC	\
+            defMO_WR_1stXFER_RDY_64_512K_5MIN	\
+            defMO_WR_1stXFER_RDY_64_512K_DAY	\
+            defMO_WR_1stXFER_RDY_64_512K_IO	\
+            defMO_WR_1stXFER_RDY_64_512K_SEC	\
+            defMO_WR_1stXFER_RDY_8_64K_5MIN	\
+            defMO_WR_1stXFER_RDY_8_64K_DAY	\
+            defMO_WR_1stXFER_RDY_8_64K_IO	\
+            defMO_WR_1stXFER_RDY_8_64K_SEC	\
+            defMO_WR_1stXFER_RDY_GE512K_5MIN	\
+            defMO_WR_1stXFER_RDY_GE512K_DAY	\
+            defMO_WR_1stXFER_RDY_GE512K_IO	\
+            defMO_WR_1stXFER_RDY_GE512K_SEC	\
+            defMO_WR_1stXFER_RDY_LT8K_5MIN	\
+            defMO_WR_1stXFER_RDY_LT8K_DAY	\
+            defMO_WR_1stXFER_RDY_LT8K_IO	\
+            defMO_WR_1stXFER_RDY_LT8K_SEC	\
+            defMO_WR_PEND_IO_64_512K	\
+            defMO_WR_PEND_IO_64_512K_5MIN	\
+            defMO_WR_PEND_IO_64_512K_DAY	\
+            defMO_WR_PEND_IO_64_512K_SEC	\
+            defMO_WR_PEND_IO_8_64K	\
+            defMO_WR_PEND_IO_8_64K_5MIN	\
+            defMO_WR_PEND_IO_8_64K_DAY	\
+            defMO_WR_PEND_IO_8_64K_SEC	\
+            defMO_WR_PEND_IO_GE512K	\
+            defMO_WR_PEND_IO_GE512K_5MIN	\
+            defMO_WR_PEND_IO_GE512K_DAY	\
+            defMO_WR_PEND_IO_GE512K_SEC	\
+            defMO_WR_PEND_IO_LT8K	\
+            defMO_WR_PEND_IO_LT8K_5MIN	\
+            defMO_WR_PEND_IO_LT8K_DAY	\
+            defMO_WR_PEND_IO_LT8K_SEC	\
+            defMO_WR_STATUS_TIME_64_512K_5MIN	\
+            defMO_WR_STATUS_TIME_64_512K_DAY	\
+            defMO_WR_STATUS_TIME_64_512K_IO	\
+            defMO_WR_STATUS_TIME_64_512K_SEC	\
+            defMO_WR_STATUS_TIME_8_64K_5MIN	\
+            defMO_WR_STATUS_TIME_8_64K_DAY	\
+            defMO_WR_STATUS_TIME_8_64K_IO	\
+            defMO_WR_STATUS_TIME_8_64K_SEC	\
+            defMO_WR_STATUS_TIME_GE512K_5MIN	\
+            defMO_WR_STATUS_TIME_GE512K_DAY	\
+            defMO_WR_STATUS_TIME_GE512K_IO	\
+            defMO_WR_STATUS_TIME_GE512K_SEC	\
+            defMO_WR_STATUS_TIME_LT8K_5MIN	\
+            defMO_WR_STATUS_TIME_LT8K_DAY	\
+            defMO_WR_STATUS_TIME_LT8K_IO	\
+            defMO_WR_STATUS_TIME_LT8K_SEC	\
+            defNON_E_F_PORTSCRC_0	\
+            defNON_E_F_PORTSCRC_10	\
+            defNON_E_F_PORTSCRC_2	\
+            defNON_E_F_PORTSCRC_20	\
+            defNON_E_F_PORTSCRC_21	\
+            defNON_E_F_PORTSCRC_40	\
+            defNON_E_F_PORTSITW_15	\
+            defNON_E_F_PORTSITW_20	\
+            defNON_E_F_PORTSITW_21	\
+            defNON_E_F_PORTSITW_40	\
+            defNON_E_F_PORTSITW_41	\
+            defNON_E_F_PORTSITW_80	\
+            defNON_E_F_PORTSLF_0	\
+            defNON_E_F_PORTSLF_3	\
+            defNON_E_F_PORTSLF_5	\
+            defNON_E_F_PORTSLOSS_SIGNAL_0	\
+            defNON_E_F_PORTSLOSS_SIGNAL_3	\
+            defNON_E_F_PORTSLOSS_SIGNAL_5	\
+            defNON_E_F_PORTSLOSS_SYNC_0	\
+            defNON_E_F_PORTSLOSS_SYNC_3	\
+            defNON_E_F_PORTSLOSS_SYNC_5	\
+            defNON_E_F_PORTSLR_10	\
+            defNON_E_F_PORTSLR_11	\
+            defNON_E_F_PORTSLR_2	\
+            defNON_E_F_PORTSLR_20	\
+            defNON_E_F_PORTSLR_4	\
+            defNON_E_F_PORTSLR_5	\
+            defNON_E_F_PORTSPE_0	\
+            defNON_E_F_PORTSPE_10	\
+            defNON_E_F_PORTSPE_2	\
+            defNON_E_F_PORTSPE_3	\
+            defNON_E_F_PORTSPE_5	\
+            defNON_E_F_PORTSPE_7	\
+            defNON_E_F_PORTSSTATE_CHG_10	\
+            defNON_E_F_PORTSSTATE_CHG_11	\
+            defNON_E_F_PORTSSTATE_CHG_2	\
+            defNON_E_F_PORTSSTATE_CHG_20	\
+            defNON_E_F_PORTSSTATE_CHG_4	\
+            defNON_E_F_PORTSSTATE_CHG_5	\
+            defOTHER_CMD_PENDING_IOs	\
+            defOTHER_CMD_PENDING_IOs_5MIN	\
+            defOTHER_CMD_PENDING_IOs_DAY	\
+            defOTHER_CMD_PENDING_IOs_SEC	\
+            defOTHER_CMD_STATUS_TIME_5MIN	\
+            defOTHER_CMD_STATUS_TIME_DAY	\
+            defOTHER_CMD_STATUS_TIME_IO	\
+            defOTHER_CMD_STATUS_TIME_SEC	\
+            defRD_1stDATA_TIME_64_512K_5MIN	\
+            defRD_1stDATA_TIME_64_512K_DAY	\
+            defRD_1stDATA_TIME_64_512K_IO	\
+            defRD_1stDATA_TIME_64_512K_SEC	\
+            defRD_1stDATA_TIME_8_64K_5MIN	\
+            defRD_1stDATA_TIME_8_64K_DAY	\
+            defRD_1stDATA_TIME_8_64K_IO	\
+            defRD_1stDATA_TIME_8_64K_SEC	\
+            defRD_1stDATA_TIME_GE512K_5MIN	\
+            defRD_1stDATA_TIME_GE512K_DAY	\
+            defRD_1stDATA_TIME_GE512K_IO	\
+            defRD_1stDATA_TIME_GE512K_SEC	\
+            defRD_1stDATA_TIME_LT8K_5MIN	\
+            defRD_1stDATA_TIME_LT8K_DAY	\
+            defRD_1stDATA_TIME_LT8K_IO	\
+            defRD_1stDATA_TIME_LT8K_SEC	\
+            defRD_PEND_IO_64_512K	\
+            defRD_PEND_IO_64_512K_5MIN	\
+            defRD_PEND_IO_64_512K_DAY	\
+            defRD_PEND_IO_64_512K_SEC	\
+            defRD_PEND_IO_8_64K	\
+            defRD_PEND_IO_8_64K_5MIN	\
+            defRD_PEND_IO_8_64K_DAY	\
+            defRD_PEND_IO_8_64K_SEC	\
+            defRD_PEND_IO_GE512K	\
+            defRD_PEND_IO_GE512K_5MIN	\
+            defRD_PEND_IO_GE512K_DAY	\
+            defRD_PEND_IO_GE512K_SEC	\
+            defRD_PEND_IO_LT8K	\
+            defRD_PEND_IO_LT8K_5MIN	\
+            defRD_PEND_IO_LT8K_DAY	\
+            defRD_PEND_IO_LT8K_SEC	\
+            defRD_STATUS_TIME_64_512K_5MIN	\
+            defRD_STATUS_TIME_64_512K_DAY	\
+            defRD_STATUS_TIME_64_512K_IO	\
+            defRD_STATUS_TIME_64_512K_SEC	\
+            defRD_STATUS_TIME_8_64K_5MIN	\
+            defRD_STATUS_TIME_8_64K_DAY	\
+            defRD_STATUS_TIME_8_64K_IO	\
+            defRD_STATUS_TIME_8_64K_SEC	\
+            defRD_STATUS_TIME_GE512K_5MIN	\
+            defRD_STATUS_TIME_GE512K_DAY	\
+            defRD_STATUS_TIME_GE512K_IO	\
+            defRD_STATUS_TIME_GE512K_SEC	\
+            defRD_STATUS_TIME_LT8K_5MIN	\
+            defRD_STATUS_TIME_LT8K_DAY	\
+            defRD_STATUS_TIME_LT8K_IO	\
+            defRD_STATUS_TIME_LT8K_SEC	\
+            defSCSI_ABTS_5MIN	\
+            defSCSI_ABTS_DAY	\
+            defSCSI_ABTS_SEC	\
+            defSCSI_TO_5MIN	\
+            defSCSI_TO_DAY	\
+            defSCSI_TO_SEC	\
+            defSWITCHERR_PORTS_P_10	\
+            defSWITCHERR_PORTS_P_11	\
+            defSWITCHERR_PORTS_P_25	\
+            defSWITCHERR_PORTS_P_5	\
+            defSWITCHERR_PORTS_P_6	\
+            defSWITCHFAULTY_PORTS_10	\
+            defSWITCHFAULTY_PORTS_11	\
+            defSWITCHFAULTY_PORTS_25	\
+            defSWITCHFAULTY_PORTS_5	\
+            defSWITCHFAULTY_PORTS_6	\
+            defSWITCHMARG_PORTS_10	\
+            defSWITCHMARG_PORTS_11	\
+            defSWITCHMARG_PORTS_25	\
+            defSWITCHMARG_PORTS_5	\
+            defSWITCHMARG_PORTS_6	\
+            defSWITCHSEC_AUTH_FAIL_0	\
+            defSWITCHSEC_AUTH_FAIL_2	\
+            defSWITCHSEC_AUTH_FAIL_4	\
+            defSWITCHSEC_CERT_0	\
+            defSWITCHSEC_CERT_2	\
+            defSWITCHSEC_CERT_4	\
+            defSWITCHSEC_CMD_0	\
+            defSWITCHSEC_CMD_2	\
+            defSWITCHSEC_CMD_4	\
+            defSWITCHSEC_DCC_0	\
+            defSWITCHSEC_DCC_2	\
+            defSWITCHSEC_DCC_4	\
+            defSWITCHSEC_FCS_0	\
+            defSWITCHSEC_FCS_2	\
+            defSWITCHSEC_FCS_4	\
+            defSWITCHSEC_HTTP_0	\
+            defSWITCHSEC_HTTP_2	\
+            defSWITCHSEC_HTTP_4	\
+            defSWITCHSEC_IDB_0	\
+            defSWITCHSEC_IDB_2	\
+            defSWITCHSEC_IDB_4	\
+            defSWITCHSEC_LV_0	\
+            defSWITCHSEC_LV_2	\
+            defSWITCHSEC_LV_4	\
+            defSWITCHSEC_SCC_0	\
+            defSWITCHSEC_SCC_2	\
+            defSWITCHSEC_SCC_4	\
+            defSWITCHSEC_TELNET_0	\
+            defSWITCHSEC_TELNET_2	\
+            defSWITCHSEC_TELNET_4	\
+            defSWITCHSEC_TS_D10	\
+            defSWITCHSEC_TS_D2	\
+            defSWITCHSEC_TS_D4	\
+            defSWITCHSEC_TS_H1	\
+            defSWITCHSEC_TS_H2	\
+            defSWITCHSEC_TS_H4	\
+            defWR_1stXFER_RDY_64_512K_5MIN	\
+            defWR_1stXFER_RDY_64_512K_DAY	\
+            defWR_1stXFER_RDY_64_512K_IO	\
+            defWR_1stXFER_RDY_64_512K_SEC	\
+            defWR_1stXFER_RDY_8_64K_5MIN	\
+            defWR_1stXFER_RDY_8_64K_DAY	\
+            defWR_1stXFER_RDY_8_64K_IO	\
+            defWR_1stXFER_RDY_8_64K_SEC	\
+            defWR_1stXFER_RDY_GE512K_5MIN	\
+            defWR_1stXFER_RDY_GE512K_DAY	\
+            defWR_1stXFER_RDY_GE512K_IO	\
+            defWR_1stXFER_RDY_GE512K_SEC	\
+            defWR_1stXFER_RDY_LT8K_5MIN	\
+            defWR_1stXFER_RDY_LT8K_DAY	\
+            defWR_1stXFER_RDY_LT8K_IO	\
+            defWR_1stXFER_RDY_LT8K_SEC	\
+            defWR_PEND_IO_64_512K	\
+            defWR_PEND_IO_64_512K_5MIN	\
+            defWR_PEND_IO_64_512K_DAY	\
+            defWR_PEND_IO_64_512K_SEC	\
+            defWR_PEND_IO_8_64K	\
+            defWR_PEND_IO_8_64K_5MIN	\
+            defWR_PEND_IO_8_64K_DAY	\
+            defWR_PEND_IO_8_64K_SEC	\
+            defWR_PEND_IO_GE512K	\
+            defWR_PEND_IO_GE512K_5MIN	\
+            defWR_PEND_IO_GE512K_DAY	\
+            defWR_PEND_IO_GE512K_SEC	\
+            defWR_PEND_IO_LT8K	\
+            defWR_PEND_IO_LT8K_5MIN	\
+            defWR_PEND_IO_LT8K_DAY	\
+            defWR_PEND_IO_LT8K_SEC	\
+            defWR_STATUS_TIME_64_512K_5MIN	\
+            defWR_STATUS_TIME_64_512K_DAY	\
+            defWR_STATUS_TIME_64_512K_IO	\
+            defWR_STATUS_TIME_64_512K_SEC	\
+            defWR_STATUS_TIME_8_64K_5MIN	\
+            defWR_STATUS_TIME_8_64K_DAY	\
+            defWR_STATUS_TIME_8_64K_IO	\
+            defWR_STATUS_TIME_8_64K_SEC	\
+            defWR_STATUS_TIME_GE512K_5MIN	\
+            defWR_STATUS_TIME_GE512K_DAY	\
+            defWR_STATUS_TIME_GE512K_IO	\
+            defWR_STATUS_TIME_GE512K_SEC	\
+            defWR_STATUS_TIME_LT8K_5MIN	\
+            defWR_STATUS_TIME_LT8K_DAY	\
+            defWR_STATUS_TIME_LT8K_IO	\
+            defWR_STATUS_TIME_LT8K_SEC	\
+        "
+
+    return(l)
+
 def cleanup_policy( policy_list):
     """
         cleanup any user added policies, rules

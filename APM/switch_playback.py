@@ -158,7 +158,7 @@ def info_help_OSError():
     print("\n"*5)
     sys.exit()
 
-def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
+def connect_console_enable_root(HOST,usrname,password,port,db=10, *args):
     
     global tn
     
@@ -254,9 +254,9 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
     tn.write(b"password\n")
     capture = tn.expect(reg_list)
     
-    print("send password   and login as root ")
-    print(capture)
-    print("LOGIN CHANGE PASSWORDS  A"*3)
+    #print("send password   and login as root ")
+    #print(capture)
+    #print("LOGIN CHANGE PASSWORDS  A"*3)
     ###################################################################################################################
     ####
     ####  find login or the user that is logged in. 
@@ -275,13 +275,13 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
             tn.write(b"all\n")
         print("send password   and login as root ")
         print(capture)
-        print("LOGIN CHANGE PASSWORDS  A"*3)
+        print("LOGIN CHANGE PASSWORDS  A FOUND OPTION: "*3)
     else:
         tn.write(b"\n")
         capture = tn.expect(reg_list)
         print("send password   and login as root ")
         print(capture)
-        print("LOGIN CHANGE PASSWORDS  A"*3)
+        print("LOGIN CHANGE PASSWORDS  A FOUND OPTION: but fell to ELSE"*3)
     
     if capture[0] == 4:          ####  found the users: after starting a regular session
         print("FOUND USER ")
@@ -289,14 +289,14 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
         capture = tn.expect(reg_list)  ####  nothing to do execpt wait for the login or user prompt
         print("send password   and login as root ")
         print(capture)
-        print("LOGIN CHANGE PASSWORDS  A"*3)
+        print("LOGIN CHANGE PASSWORDS  A EXIT FOUND USER "*3)
     if capture[0] == 2:#### if Password is found we did not enter the user name yet.
         print("FOUND PASSWORD  ")
         tn.write(b"\n")          ####  so send a \n so we can get the login prompt
         capture = tn.expect(reg_list)
         print("send password   and login as root ")
         print(capture)
-        print("LOGIN CHANGE PASSWORDS  A"*3)
+        print("LOGIN CHANGE PASSWORDS  A EXIT FOUND PASSWORD "*3)
     if capture[0] == 3:           ##### if root is logged in should be able to continue from here
         print("FOUND ROOT : ")
              
@@ -314,7 +314,7 @@ def connect_console_enable_root(HOST,usrname,password,port,db=0, *args):
         capture = tn.expect(reg_list)
         print("send exit and login as root next ")
         print(capture)
-        print("LOGIN CHANGE PASSWORDS  B"*3)
+        print("LOGIN CHANGE PASSWORDS  B LOGIN AS ADMIN"*3)
         
         if capture[0] == 2:                 ####  is password
             print("FIND 2  "*10 )
@@ -1178,7 +1178,7 @@ def do_net_install(sw_info_filename):
 #######################################################################################################################
     reg_list_bash = [b"bash-2.04#"]
     print("H"*80)
-    print("looking fo bash forever")
+    print("looking for bash forever")
  
     print("\n"*4)
     print("&"*80)
@@ -1226,7 +1226,7 @@ def do_net_install(sw_info_filename):
     print("\n"*6)
     print("@"*40)
     print("Close Console sessions and login via telnet")
-    print("Sleep for a minute at line 1200")
+    print("Sleep for a minute at line 1230")
     print("\n"*6)     
 
     reg_list_after_reboot = [b"is in sync", b"initialization completed."]
@@ -1249,7 +1249,7 @@ def do_net_install(sw_info_filename):
     tn_list.append(tn_cp0)
     
     if sw_director_or_pizza:
-        tn_cp1 = connect_console(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
+        tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
         tn_list.append(tn_cp1)
     
     for tn in tn_list:
