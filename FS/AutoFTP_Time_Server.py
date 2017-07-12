@@ -774,15 +774,18 @@ def main():
         nos = si.nos_check()
         if not nos:
             anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
+            anturlar.fos_cmd("supportftp -e")
+            anturlar.fos_cmd("supportftp -t 8")
             anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
+            #anturlar.fos_cmd("echo Y | reboot")
             #anturlar.fos_cmd("tsclockserver LOCL")
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
             print("\n"+"@"*40)
             pass
-    su.reboot_reconnect()
-    anturlar.close_tel()
+        tn = su.reboot_reconnect()
+        anturlar.close_tel()
     sys.exit()
 
 if __name__ == '__main__':
