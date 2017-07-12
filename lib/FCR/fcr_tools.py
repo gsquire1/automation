@@ -18,7 +18,7 @@ sys.path.append('/home/automation/22FCR')
 from configparser import SafeConfigParser
 import ast
 import readline, pprint
-import PortFlapper
+import EX_PortFlapper
 
 
 

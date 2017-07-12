@@ -550,3 +550,182 @@ def check_version():
     
     
     
+    
+    
+
+def capture_switch_info(extend_name="", fid=128):
+    """
+      this is used in several scripts to save the switch info before and after some events
+      the extend name is pass to this procedure to make the before file and after file
+      unique and able to compare the two
+    
+    """
+   
+    
+    si_ls = anturlar.SwitchInfo()
+    ls_all = si_ls.ls()
+    switch_ip  = si_ls.ipaddress()
+    
+    f = "%s%s%s"%("logs/Switch_Info_cudc",switch_ip,"_%s.txt" % extend_name)
+    header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
+                               "","", "==============================\n")  
+    ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
+    
+    if fid == 0 :
+        fid = ls_all
+    else:
+        ls_all = []
+        ls_all.append(fid)
+    
+    if not ls_all:
+        ls_all.append(128)
+
+    
+    print("\n"*5)
+    print("#"*40)
+    print(ls_all)
+    print("\n")
+    print(type(ls_all))
+    
+
+    
+    
+    for l in ls_all:
+        cons_out = anturlar.fos_cmd("setcontext %s " % l )
+        
+        si = anturlar.SwitchInfo()
+        mi = anturlar.Maps()
+        fi = anturlar.FlowV()
+        fcr = anturlar.FcrInfo()
+        
+        vdx                  = si.nos_check()
+        switch_ip            = si.ipaddress()
+        switch_cp_ips        = si.cp_ipaddrs_get()
+        license_list         = si.getLicense()
+        ls_list              = si.ls()
+        first_ls             = si.ls_now()
+        switch_id            = si.switch_id()
+        fid_now              = si.currentFID()
+        try:
+            theswitch_name   = si.switch_name()
+        except IndexError:
+            theswitch_name   = "unknown"
+            pass
+        chassis_name         = si.chassisname()
+        director_pizza       = si.director()
+        vf_enabled           = si.vf_enabled()
+        sw_type              = si.switch_type()
+        base_sw              = si.base_check()
+        sim_ports            = si.sim_ports()
+        ex_ports             = fcr.all_ex_ports() 
+        fcr_state            = si.fcr_enabled()
+        ports_and_ls         = si.all_ports_fc_only()
+        psw_reset_value      = "YES"
+        xisl_st_per_ls       = si.allow_xisl()
+        maps_policy_sum      = mi.get_policies()
+        maps_non_dflt_policy = mi.get_nondflt_policies()
+        
+        flow_per_ls          = fi.flow_names()
+        blades               = si.blades()
+        deflt_switch         = si.default_switch()
+        #sfp_info             = si.sfp_info()
+        maps_email_cfg       = mi.get_email_cfg()
+        maps_actions         = mi.get_actions()
+        logical_groups       = mi.logicalgroup_count()
+        relay_server_info    = mi.get_relay_server_info()
+        credit_recov_info    = mi.credit_recovery()
+        dns_info             = mi.dns_config_info()
+        sfpinfo              = si.sfp_info()
+        
+        
+        
+        
+            
+        ###################################################################################################################
+        ###################################################################################################################
+        ####
+        #### print the variables for review
+        ####
+        ###################################################################################################################
+        ###################################################################################################################
+        
+        print("\n\n\n")
+        print("SWITCH IP         :  %s  " % switch_ip)
+        print("SWITCH NAME       :  %s  " % theswitch_name)
+        #print("SWITCH DOMAIN     :  %s  " % domain_list)
+        print("LS LIST           :  %s  " % ls_list)
+        print("DEFAULT SWITCH    :  %s  " % deflt_switch)
+        print("BASE SWITCH       :  %s  " % base_sw)
+        print("EX_PORTS          :  %s  " % ex_ports)
+        print("VF SETTING        :  %s  " % vf_enabled)
+        print("SWITCH TYPE       :  %s  " % sw_type)
+        print("TIMEOUT VALUE     :  0   " )
+        print("RESET PASSWORD    :  %s " % psw_reset_value)
+        print("FCR ENABLED       :  %s " % fcr_state)
+        print("BLADES            :  %s " % blades)
+        print("LICENSE LIST      :  %s  " % license_list)
+        
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    ####
+    ####  Write to the file
+    ####
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+        
+        f = "%s%s%s"%("logs/Switch_Info_cudc",switch_ip,"_%s.txt" % extend_name)
+        header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",\
+                               "","", "==============================\n")  
+        ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for appending
+        ff.write(header)
+        ###################################################################################################################
+        ff.write("SWITCH IP                :  %s  \n" % switch_ip)
+        ff.write("CURRENT FID              :  %s  \n" % l)
+        ff.write("LS LIST                  :  %s  \n" % ls_list)
+        ff.write("DEFAULT SWITCH           :  %s  \n" % deflt_switch)
+        ff.write("BASE SWITCH              :  %s  \n" % base_sw)
+        ff.write("EX_PORTS                 :  %s  \n" % ex_ports)
+        ff.write("SWITCH NAME              :  %s  \n" % theswitch_name)
+        ff.write("CHASSIS NAME             :  %s  \n" % chassis_name)
+        ff.write("DIRECTOR STATUS          :  %s  \n" % director_pizza)
+        ff.write("VF SETTING               :  %s  \n" % vf_enabled)
+        ff.write("SWITCH TYPE              :  %s  \n" % sw_type)
+        #ff.write("TIMEOUT VALUE            :  0   \n" )
+        ff.write("RESET PASSWORD           :  %s  \n" % psw_reset_value)
+        ff.write("FCR ENABLED              :  %s  \n" % fcr_state)
+        ff.write("Ports                    :  %s  \n" % ports_and_ls)
+        ff.write("SIM PORTS                :  %s  \n" % sim_ports)
+        ff.write("Blades                   :  %s  \n" % blades)
+        
+        ff.write("LICENSE LIST             :  %s  \n" % license_list)
+        ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
+        ff.write("="*80)
+        ff.write("\n")
+        ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
+        ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
+        ff.write("EMAIL CFG                :  %s  \n" % maps_email_cfg)
+        ff.write("MAPS ACTIONS             :  %s  \n" % maps_actions)
+        #ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
+        ff.write("LOGICAL GROUPS           :  \n")
+        for g in logical_groups:
+            ff.write("\t\t\t %s ,  %s \n" % ( g[0] , g[1] ))
+        ff.write("RELAY SERVER HOST IP     :  %s  \n" % relay_server_info)
+        ff.write("CREDIT RECOVERY INFO     :  %s  \n" % credit_recov_info)
+        ff.write("DNS CONFIG INFO          :  %s  \n" % dns_info)
+        ff.write("="*80)
+        ff.write("\n")
+        ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
+        ff.write("\n"*2)
+        ff.close()
+        
+        #cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
+        
+        
+    return(True)
+        
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################   
