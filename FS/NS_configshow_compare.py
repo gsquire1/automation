@@ -285,6 +285,7 @@ def main():
     liabhar.count_down(3)                                               ####   count down to the next command 
     #configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % ("10.38.35.131","ftp1", ipaddr_switch, "ftp2")
     f = "%s%s%s%s"%("logs/NameServer_test_case_file","_"+ipaddr_switch+"_",date_is,".txt")
+    f1 = "%s%s%s%s"%("logs/NameServer_test_case_file","_"+ipaddr_switch+"_",date_is,".txt")
     ff = liabhar.FileStuff(f, 'w+b')                                    #### open the log file for writing       
     #header = "%s%s%s%s" % ("\nNAMESERVER CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch,"\n==============================\n\n") #### write a header line at top of file
     header = "%s%s%s%s" % ("\nNAMESERVER CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch, "\n==============================\n\n")

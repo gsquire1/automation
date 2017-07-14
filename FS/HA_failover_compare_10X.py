@@ -114,6 +114,7 @@ def parse_args(args):
     parser.add_argument('-cp',  '--cmdprompt', help="switch is already at command prompt")
     parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     parser.add_argument('-r',   '--steps', type=int, help="Steps that will be executed")
+    parser.add_argument('-i',   '--iterations', type=int, default=1, help="How many iterations will be run that will be executed")
     #parser.add_argument('-p', '--password', help="password")
     #group = parser.add_mutually_exclusive_group()
     #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -568,11 +569,11 @@ def capture_switch_info(extend_name="", fid=128):
     #sfp_info             = si.sfp_info()
     maps_email_cfg       = mi.get_email_cfg()
     maps_actions         = mi.get_actions()
-    logical_groups       = mi.logicalgroup_count()
+    #logical_groups       = mi.logicalgroup_count()
     relay_server_info    = mi.get_relay_server_info()
     credit_recov_info    = mi.credit_recovery()
     dns_info             = mi.dns_config_info()
-    sfpinfo              = si.sfp_info()
+    #sfpinfo              = si.sfp_info()
     
     
     
@@ -636,14 +637,14 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("Blades                   :  %s  \n" % blades)
     
     ff.write("LICENSE LIST             :  %s  \n" % license_list)
-    ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
+    #ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
     ff.write("="*80)
     ff.write("\n")
     ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum )
     ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
     ff.write("EMAIL CFG                :  %s  \n" % maps_email_cfg)
     ff.write("MAPS ACTIONS             :  %s  \n" % maps_actions)
-    ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
+    #ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
     ff.write("RELAY SERVER HOST IP     :  %s  \n" % relay_server_info)
     ff.write("CREDIT RECOVERY INFO     :  %s  \n" % credit_recov_info)
     ff.write("DNS CONFIG INFO          :  %s  \n" % dns_info)
@@ -741,14 +742,14 @@ def main():
         
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        switch_info = capture_switch_info("compare_orig", fid_to_compare)
+        switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
         
 
     ###################################################################################################################
     #### path to the first file to compare
-    #switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
     
     switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
+    switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
     
     liabhar.JustSleep(10)
     
@@ -778,7 +779,7 @@ def main():
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
-    tn = cofra.ha_failover(10)
+    tn = cofra.ha_failover(pa.iterations)
     
     liabhar.count_down(120)
     
@@ -799,25 +800,7 @@ def main():
     # 
     ####
     #### 
-    #### other interrptioons
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
-    ####
+    #### other interuptions
     ####
     ####
     ###################################################################################################################
@@ -831,7 +814,7 @@ def main():
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
         
-        switch_info = capture_switch_info("compare", fid_to_compare)
+        switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
     ###################################################################################################################
     #### path to the second file to compare
         switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
@@ -848,9 +831,9 @@ def main():
         print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
         print("#"*80)
         print("#"*80)
+
         
-        
-        diff_f  = liabhar.file_diff(switch_data_0,switch_data_1)
+        diff_f  = liabhar.file_diff(switch_data_0, switch_data_1)
         print("#"*80)
         print("#"*80)
         print("#"*80)
@@ -864,14 +847,14 @@ def main():
     ####
     #cons_out = anturlar.fos_cmd("mapsdb --show all")
     #print(cons_out)
-    #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-    cons_out = anturlar.fos_cmd("mapspolicy --enable Nervio")
+    cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
+    #cons_out = anturlar.fos_cmd("mapspolicy --enable Nervio")
     anturlar.close_tel()
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
     print(date_is)
-    print(type(steps_to_run))
-    print(steps_to_run)
+
+    liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","HA_Failover passed","HA_Failover passed","")
     
 if __name__ == '__main__':
     
