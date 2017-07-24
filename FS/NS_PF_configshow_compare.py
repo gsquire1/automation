@@ -85,7 +85,8 @@ import Config_up_down_compare
 ####  165   X6-4 (Venator)
 ####  166   X6-8 (Allegience)
 ####  170   Chewbacca
-####
+####  173   Tyr
+####  204   Anakin 
 ####
 ####
 ####
