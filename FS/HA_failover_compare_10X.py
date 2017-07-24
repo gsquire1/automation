@@ -651,6 +651,7 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("="*80)
     ff.write("\n")
     ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
+    ff.write(anturlar.fos_cmd("configshow"))
     ff.write("\n"*2)
     ff.close()
     
@@ -779,19 +780,25 @@ def main():
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
-    tn = cofra.ha_failover(pa.iterations)
-    
-    liabhar.count_down(120)
-    
-    
+    g = pa.iterations
+    for i in range(g):
+        tn = cofra.ha_failover(1)
+        liabhar.count_down(120)
+        switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
+        diff_f  = liabhar.file_diff(switch_data_0, switch_data_1)
+        print(diff_f)
+        if not diff_f:
+                liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","NS_portflapper failed a checkpoint","NS_portflapper failed a checkpoint","")
+                sys.exit()
+        #sys.exit()
     
     ###################################################################################################################
     ####
     #### power cycle slots
     ####
     
-    ss = anturlar.SwitchInfo()
-    slot_list = ss.blades(True)
+    #ss = anturlar.SwitchInfo()
+    #slot_list = ss.blades(True)
     #### skip if switch is a pizza box
     #if "not a d" not in slot_list:
     #     pc_result = slot_pwr_cycle(slot_list)
