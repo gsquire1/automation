@@ -216,26 +216,40 @@ class FabricInfo:
         return(ras_result)
 
 
-    def zone_info(self):
+    def zone_info(self, zone_capture):
         """
            return info all about the zones
-            
+           zone_capture needs to be a 1,2 or 3
+           1 = Entire cfgshow output
+           2 = Defined only
+           3 = Effective only
         """
         #### need to add zone names
-        
         capture_cmd = fos_cmd("cfgshow")
-        #### find the effective config
-        #### cfgshow
-        ####   The Fabric is busy, try again later.
-        #ras = re.compile('Effective configuration:\s+cfg:([_0-9A-Za-z])')
-        ras = re.compile('(Effective configuration):\s+\\n\s+cfg:\s([_A-Za-z0-9]+)(?=\\t)')
-        ras_result = ras.search(capture_cmd)
-        if not ras_result:
-            r_list = "NO Config Found"
+        entire = ('Defined configuration:\r\n\s[ 0-9a-zA-Z:;_,\r\n\t]+\r\n')
+        defined = ('Defined configuration:\r\n\s[ 0-9a-zA-Z:;_,\r\n\t]+(?=Effective)')
+        effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \r\n\t]+')
+        #effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \n\t]+')
+
+        if zone_capture == 1:
+            ras = re.compile(entire)
+            a = ras.findall(capture_cmd)
+            zone = (str(a[0]))
+            return(zone)
+        elif zone_capture == 2:
+            ras = re.compile(defined)
+            wtf = ras.findall(capture_cmd)
+            define = (str(wtf[0]))
+            return(define)
+        elif zone_capture == 3:
+            ras = re.compile(effective)
+            wtf = ras.findall(capture_cmd)
+            eff = (str(wtf[0]))
+            return(eff)
         else:
-            result = [ ras_result.group(1), ras_result.group(2)]
-            r_list = [result]
-        return(r_list)
+            print ("No Zone match or a number other than 1,2,3 passed in. Exiting Script")
+            sys.exit()
+        
         
 class SwitchInfo:
     """

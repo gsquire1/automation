@@ -765,7 +765,7 @@ def main():
     else:
         ipaddr_switch       = [pa.ipaddr]
     anturlar.close_tel()
-    
+
     #### pass ip(s)to login procedure
     #### and write the file
 
@@ -779,40 +779,50 @@ def main():
         # print(f_ports)
         # print(e_ports)
         # sys.exit()
-        fabric_check =  fi.fabric_members()
+        #fabric_check =  fi.fabric_members()
         cons_out = anturlar.fos_cmd("setcontext %s " % pa.fid)  
         dt = liabhar.dateTimeStuff()                                        #### create the object for date and time stuff
         date_is = dt.current_no_dash_at_end()                               #### get the current time for file naming purposes
         #print("\n\nDate is %s" % date_is)
+        effectivezone = fi.zone_info(123)
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print(effectivezone)
+        sys.exit()
         
-        liabhar.count_down(3)                                               ####   count down to the next command 
+        liabhar.count_down(1)                                               ####   count down to the next command 
         #configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % ("10.38.35.131","ftp1", ipaddr_switch, "ftp2")
-        f = "%s%s%s%s"%("logs/Extensive_Zoning_test_case_file","_"+ipaddr_switch+"_",date_is,".txt")
-        f1 = "%s%s%s%s"%("logs/Extensive_Zoning_test_case_file_compare","_"+ipaddr_switch+"_",date_is,".txt")
-        ff = liabhar.FileStuff(f, 'w+b')                                    #### open the log file for writing       
-        header = "%s%s%s%s" % ("\nNEXTENSIVE ZONING CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch, "\n==============================\n\n") #### write a header line at top of file
+        f = "%s%s%s%s"%("logs/Extensive_Zoning_test_case_file_orig","_"+i+"_",date_is,".txt")
+        f1 = "%s%s%s%s"%("logs/Extensive_Zoning_test_case_file_compare","_"+i+"_",date_is,".txt")
+        f2 = "%s%s%s%s"%("logs/Extensive_original_zone","_"+i+"_",date_is,".txt")
+        #### open f2 write original zone "cfgshow" so we can put the switch back to original zone cfg 
+        ff = liabhar.FileStuff(f2, 'w+b')
+        header = "%s%s%s%s" % ("\nORIGINAL ZONING CAPTURE FILE \n", "  sw_info ipaddr  ",ipaddr_switch, "\n==============================\n\n") #### write a header line at top of file
         ff.write(header)
+        ff.write(anturlar.fos_cmd("cfgshow"))
+        ff.close()
+        #### open f (Write original extensive zoning switchconfig, nsshow, nsallshow and config show for comparison later)
+        ff = liabhar.FileStuff(f, 'w+b')
         ff.write(anturlar.fos_cmd("nsshow"))
         ff.write(anturlar.fos_cmd("nsallshow"))
         ff.write(anturlar.fos_cmd("configshow"))
         ff.close()
-        g = open(f, "r")
-        lines = g.readlines()
-        g.close()
-        ff = liabhar.FileStuff(f, 'w+b')
-        for l in lines:
-            if " date = " not in l:
-                ff.write(l)
-        ff.close() 
-        f = ('logs/PortFlapper.txt')
-        try:
-            with open(f, 'w') as file:
-                file.write("F-Ports = %s\n" % str(fports))
-                file.write("E-Ports = %s\n" % str(eports))
-        except IOError:
-            print("\n\nThere was a problem opening the file:" , f)
-            sys.exit()
-        file.close()
+        # g = open(f, "r")
+        # lines = g.readlines()
+        # g.close()
+        # ff = liabhar.FileStuff(f, 'w+b')
+        # for l in lines:
+        #     if " date = " not in l:
+        #         ff.write(l)
+        # ff.close() 
+        # f = ('logs/PortFlapper.txt')
+        # try:
+        #     with open(f, 'w') as file:
+        #         file.write("F-Ports = %s\n" % str(fports))
+        #         file.write("E-Ports = %s\n" % str(eports))
+        # except IOError:
+        #     print("\n\nThere was a problem opening the file:" , f)
+        #     sys.exit()
+        # file.close()
         print(eports) ################ if...else statement to use eport or fport
         for i in eports:
             slot = i[0]
