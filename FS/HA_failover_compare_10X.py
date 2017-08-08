@@ -743,7 +743,7 @@ def main():
         
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
+        #$$$$$$$$$$$$$$$$$$$$$$$$switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
         
 
     ###################################################################################################################
@@ -771,7 +771,7 @@ def main():
     ####
     ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
     ####
-    pp = cofra.SwitchUpdate()
+    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$pp = cofra.SwitchUpdate()
     #tn = pp.reboot_reconnect()
     
     #liabhar.count_down(60)

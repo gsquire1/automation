@@ -99,7 +99,6 @@ class FabricInfo:
         return(ras_result_all)
     
     
-    #def ipv4_plus_fcr_list(self, pa,pw):
     def ipv4_plus_fcr_list(self,usr,pw):
         """
             Return a string of the ipv4 plus switches attached via FCR
@@ -230,7 +229,8 @@ class FabricInfo:
         defined = ('Defined configuration:\r\n\s[ 0-9a-zA-Z:;_,\r\n\t]+(?=Effective)')
         effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \r\n\t]+')
         #effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \n\t]+')
-
+        global tn
+        tn.set_debuglevel(9)
         if zone_capture == 1:
             ras = re.compile(entire)
             a = ras.findall(capture_cmd)
@@ -249,7 +249,12 @@ class FabricInfo:
         else:
             print ("No Zone match or a number other than 1,2,3 passed in. Exiting Script")
             sys.exit()
-        
+
+    def zone_cfgtransshow(self, dblevel=0):
+        capture_cmd = fos_cmd("cfgtransshow --opentrans", dblevel)
+        ras = re.compile('(?<=-)\r\n\s?(\d{1,3})')
+        digit = ras.findall(capture_cmd)
+        return(digit)
         
 class SwitchInfo:
     """
@@ -843,7 +848,6 @@ class SwitchInfo:
         """
         capture_cmd = fos_cmd("switchshow | grep Rbridge")
         ras = re.search(r'Rbridge', capture_cmd)
-        print(ras)
         if ras:
             return(True)
         else:
@@ -2202,7 +2206,7 @@ def connect_tel(pa, pw):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        tn.set_debuglevel(9)
+        tn.set_debuglevel(0)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\n")
         if password:
@@ -2352,7 +2356,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        tn.set_debuglevel(9)
+        tn.set_debuglevel(0)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\r\n")
         if password:
@@ -2384,7 +2388,7 @@ def connect_tel_noparse_power(HOST,usrname,password, *args):
  
 def connect_tel_noparse_traffic(HOST,usrname,password, *args):
     global tn
-    tn.set_debuglevel(9)
+    tn.set_debuglevel(0)
     try:
          
         usrn = usrname + '> '
@@ -2403,7 +2407,7 @@ def connect_tel_noparse_traffic(HOST,usrname,password, *args):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        tn.set_debuglevel(9)
+        tn.set_debuglevel(0)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\r\n")
         
