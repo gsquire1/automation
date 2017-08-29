@@ -347,8 +347,11 @@ def main():
     #     print("Switch %s not available" % i) 
     nos = si.nos_check()
     if not nos:
-        g = pa.iterations
-        for i in range(g):
+        h = pa.iterations
+        for i in range(h):
+            print("\n\nWe are on loop number:")
+            print(i+1)
+            print("\n\n")
             for i in ports:
                 slot = i[0]
                 port = i[1]
@@ -391,7 +394,6 @@ def main():
             if not diff_f:
                 liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","NS_portflapper failed a checkpoint","NS_portflapper failed a checkpoint","")
                 sys.exit()
-        #g = g-1
     else:
         print("\n"+"@"*40)
         print('\nTHIS IS A NOS SWITCH> SKIPPING')

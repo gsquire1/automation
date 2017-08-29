@@ -726,7 +726,6 @@ def main():
     ####   configure some settings that are not defualt to confirm they remain after disruptions
     ####
     cons_out = send_cmd("creditrecovmode --cfg onLrThresh")
-    cons_out = send_cmd("creditrecovmode --cfg onLrThresh -lrtthreshold 7")
     cons_out = send_cmd("creditrecovmode --fe_crdloss off")
     cons_out = send_cmd("creditrecovmode --be_crdloss off")
     cons_out = send_cmd("creditrecovmode --be_losync off")
@@ -736,21 +735,21 @@ def main():
     
     ###################################################################################################################
     ####
-    ####   capture teh configuration file  if the user selected 1 or 3
+    ####   capture the configuration file  if the user selected 1 or 3
     ####
-    
+    switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
     if steps_to_run == 1 or steps_to_run == 3:
         
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        #$$$$$$$$$$$$$$$$$$$$$$$$switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
-        
+        #switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
+        switch_data_0 = ("logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch)
 
     ###################################################################################################################
     #### path to the first file to compare
     
-    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
-    switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
+        #switch_data_0 = ("logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch)
+        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
     
     liabhar.JustSleep(10)
     
@@ -769,28 +768,22 @@ def main():
     ####
     ###################################################################################################################
     ####
-    ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
-    ####
-    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$pp = cofra.SwitchUpdate()
-    #tn = pp.reboot_reconnect()
-    
-    #liabhar.count_down(60)
-    ###################################################################################################################
-    ####
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
     g = pa.iterations
-    for i in range(g):
-        tn = cofra.ha_failover(1)
+    while g > 0:
+        tn = cofra.ha_failover(g)
         liabhar.count_down(120)
-        switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
+        #switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
+        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
         diff_f  = liabhar.file_diff(switch_data_0, switch_data_1)
         print(diff_f)
+        g = g-1
         if not diff_f:
-                liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","NS_portflapper failed a checkpoint","NS_portflapper failed a checkpoint","")
-                sys.exit()
-        #sys.exit()
+                 liabhar.email_sender_html("gsquire@brocade.com","gsquire@brocade.com","NS_portflapper failed a checkpoint","NS_portflapper failed a checkpoint","")
+                 sys.exit()
+
     
     ###################################################################################################################
     ####
@@ -816,18 +809,17 @@ def main():
     
     if steps_to_run == 2 or steps_to_run == 3:
         liabhar.JustSleep(10)
-        liabhar.count_down(360)
+        #liabhar.count_down(360)
         #cons_out = anturlar.fos_cmd("setcontext 128")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
         
-        switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
     ###################################################################################################################
     #### path to the second file to compare
         switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
         
         liabhar.cls()
-        #### compare the two files
+        
         print("#"*80)
         print("#"*80)
         print("#######")
