@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+####
+####  old methond of calling python3
+#!/usr/bin/env python3
+
 
 import datetime
 import sys

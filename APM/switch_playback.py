@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+####
+#  this is the old way of calling python3   
 #!/opt/python3/bin/python3
 #Graham
 
@@ -21,11 +25,18 @@ import struct
 
 import argparse
 import re
+import csv
+import time
+
+###############################################################################
+####
+####  import user modules
+####
+###############################################################################
 import anturlar
 import liabhar
 import cofra
-import csv
-import time
+
 
 ###############################################################################
 ####
@@ -66,7 +77,7 @@ import time
 ####  166   X6-8 (Allegience)
 ####  170   Chewbacca
 ####   173 TYR
-####
+#### 
 ###############################################################################
 
 
@@ -1959,433 +1970,12 @@ def main():
 ####                                                                                                               ####
 #######################################################################################################################
 #######################################################################################################################
-    #if pa.verbose >=3:
-    #    start_of_func_print("   In MAIN   Check for file_action == 2 ")
-    #    
-    #if pa.file_action == 2:
-    #    print("USER FILE and NETINSTALL")
-    #    ####what is file name
-    #    
-    #    d = liabhar.dateTimeStuff()
-    #    pa.cust_date = d.simple_no_dash()
-    #    pa.cust_date = d.current_no_dash()
-    #    pa.filename = pa.filename + "_for_playback"
-    #    pa.filename = pa.cust_date + pa.filename
-    #    sw_info_filename = pa.filename
-    #    complete_name = "%s"%("logs/Switch_Info_%s_%s.txt" % (ipaddr_switch, pa.filename))
-    #    do_net_install(sw_info_filename)
-    #    
-    #    
-    #    complete_name = "%s"%("logs/Switch_Info_%s_%s.txt" % (ipaddr_switch, pa.filename))  #### substitute this way
-    #    pa.filename   = "%s"%(pa.filename)                                                  ####  or file might not be
-    #    #### see note at the end of this line                                               ####   found
-    #    if not os.path.isfile(complete_name):  #### this should be checked in parser
-    #        cant_find_file_message(complete_name,pa.filename)
-    #        
-    #    connect_console_enable_root(console_ip,user_name,usr_pass,console_port,10)
-    #       
-    #    if console_ip_bkup != "" and console_ip_bkup != "0":
-    #        connect_console_enable_root(console_ip_bkup,user_name,usr_pass,console_port_bkup,10)
-    #     
-    #    load_config(ipaddr_switch,user_name, usr_pass, pa.filename)
-    #    
-    #    sys.exit()
-    #    
-    #    try:
-    #        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    #    except OSError:
-    #        info_help_OSError()
-    #    
-    #if pa.verbose >=3:
-    #    start_of_func_print("   In MAIN   Check for file_action != 2 ")
-    #    
-    #if pa.file_action != 2:
-    #    d = liabhar.dateTimeStuff()
-    #    pa.cust_date = d.simple_no_dash()
-    #    pa.cust_date = d.current_no_dash()
-    #    pa.filename = pa.cust_date + pa.filename
-    #    print(pa.filename)
-    #    print(pa.cust_date)
-    #    print("++++++++++++++++++++++++++")
-    #
-    #
-    #
-
-        
-###################################################################################################################
-###################################################################################################################
-#### if the switch is NOT at the command prompt 
-#### then get all the info from the switch and save to a file
-####  cofra.get_info_from_the_switch creates a file
-####
-#### If the switch is at the command prompt
-####  then args -cp must be used
-####
-    #if pa.verbose >=3:
-    #    start_of_func_print("   In MAIN   Check for file_action == 2  the SECOND TIME  \n\
-    #                        and not at the command prompt \n")
-    #    
-    #if pa.file_action == 2:
-    #    print("skip the file creation section")
-    #    try:
-    #        print("SKIP FILE CREATE and the REQUIRED INFO HERE ")
-    #        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    #        si = anturlar.SwitchInfo()
-    #        sw_director_or_pizza = si.director()
-    #        sw_type = si.switch_type()
-    #        my_ip = si.ipaddress()
-    #
-    #        anturlar.close_tel()
-    #    except OSError:
-    #    
-    #        info_help_OSError()
-    #        #### this will exit here
-    #    
-    #else:
-    #    
-    #    if not pa.cmdprompt: #Only run if NOT at Command prompt????
-    #        try:
-    #            tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-    #        except OSError:
-    #            info_help_OSError()
-    #            #### this will exit here
-    #            
-    #        #sw_dict = cofra.get_info_from_the_switch("for_playback", 128)
-    #        sw_dict = cofra.get_info_from_the_switch(pa.filename, 128)
-    #        my_ip                = sw_dict["switch_ip"]
-    #        my_cp_ip_list        = sw_dict["cp_ip_list"]
-    #        sw_name              = sw_dict["switch_name"]
-    #        sw_chass_name        = sw_dict["chassis_name"]
-    #        sw_director_or_pizza = sw_dict["director"]
-    #        sw_domains           = sw_dict["domain_list"]
-    #        sw_ls_list           = sw_dict["ls_list"]
-    #        sw_base_fid          = sw_dict["base_sw"]
-    #        sw_xisl              = sw_dict["xisl_state"]
-    #        sw_type              = sw_dict["switch_type"]
-    #        sw_license           = sw_dict["license_list"]
-    #        sw_vf_setting        = sw_dict["vf_setting"]
-    #        sw_fcr_enabled       = sw_dict["fcr_enabled"]
-    #        sw_port_list         = sw_dict["port_list"]
-    #        sw_ex_port_list      = sw_dict["ex_ports"]
-    #
-    #
-    #        print("\n"*20)
-    #        print("SWITCH IP            : %s   " % my_ip)
-    #        print("CP IP List           : %s   " % my_cp_ip_list)
-    #        print("SWITCH NAME          : %s   " % sw_name)
-    #        print("CHASSIS NAME         : %s   " % sw_chass_name)
-    #        print("DIRECTOR             : %s   " % sw_director_or_pizza)
-    #        print("SWITCH DOMAINS       : %s   " % sw_domains)
-    #        print("LOGICAL SWITCH LIST  : %s   " % sw_ls_list)
-    #        print("BASE FID             : %s   " % sw_base_fid)
-    #        print("XISL STATE           : %s   " % sw_xisl)
-    #        print("SWITCH TYPE          : %s   " % sw_type)
-    #        print("LICENSE LIST         : %s   " % sw_license)
-    #        print("VF SETTING           : %s   " % sw_vf_setting)
-    #        print("FCR SETTING          : %s   " % sw_fcr_enabled)
-    #        print("PORT LIST            : %s   " % sw_port_list)
-    #        print("EX_PORT_LIST         : %s   " % sw_ex_port_list)
-    #        print("@"*40)
-    #        print("@"*40)
-    #        print("CONSOLE INFO         : %s   " % cons_info)
-    #        print("\n")
-    #        print("POWER POLE INFO      : %s   " % power_pole_info)
-    #        
-    #        
-    ####################################################################################################################
-    #####
-    #####  close telnet connection 
-    #####
-    ####################################################################################################################
-    #        
-    #        anturlar.close_tel()
-    #    else:
-    #        sw_type = pa.switchtype
-    #        my_ip   = ipaddr_switch
-    #        sw_director_or_pizza = False
-    #        my_cp_ip_list = []
-    #    #sys.exit()    
-    ###################################################################################################################
-    ###################################################################################################################
-    ####
-    #### if I am Director then get the CP0 and CP1 IP addresses
-    ####    before connecting to the console
-    #### 
-    ###################################################################################################################
-    ###################################################################################################################
-    #
-    #    print("@"*40)
-    #    print("switch is a director          %s  "    % sw_director_or_pizza)
-    #    print("console_ip                    %s  "    %  console_ip)
-    #    print("console port                  %s  "    %  console_port)
-    #    print("user name is                  %s  "    %  user_name)
-    #    print("password                      %s  "    % usr_pass)
-    #    print("console_ip   backup           %s  "    % console_ip_bkup)
-    #    print("console port backup           %s  "    % console_port_bkup)
-    #    print("CP IP list (chassis CP0 CP1)  %s  "    % my_cp_ip_list)
-    #    if sw_director_or_pizza:
-    #        print("CP0                           %s  "    % my_cp_ip_list[1])
-    #        print("CP1                           %s  "    % my_cp_ip_list[2])  
-    #          
-    #          
-    ##if pa.file_action == 0:
-    ##    complete_name = ("Switch_Info_%s_%s.txt" % (my_ip, pa.filename))
-    ##    print("Data for the switch is stored in logs directory as: %s " % complete_name)
-    ##    sys.exit()
-    #    
-    #    
-    ##sys.exit()   #stop here for getting the switch info only
+   
 
     print("#"*6000)
     sys.exit()
-###################################################################################################################
-###################################################################################################################
-####
-####  if I am Director then connect to console 1 and find the cmdprompt
-####     then connect to console 2 and find the cmdprompt
-####
-####     switch IP now needs to be the CP0 and CP1 values
-####
-####    tn_list = []
-####    if sw_director_or_pizza:
-####        tn_cp0 = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
-####        
-####        tn_cp1 = connect_console_enable_root(console_ip_bkup, user_name,usr_pass,console_port_bkup,0)
-####        #tn_list = []
-####        tn_list.append(tn_cp0)
-####        tn_list.append(tn_cp1)
-####        
-####        for tn in tn_list:
-####            cons_out = send_cmd("switchshow")
-####        
-####    
-###########################################################################################################################
-########
-########  reboot and find the command prompt 
-########
-####        cnt = 1
-####        if pa.verbose >=3:
-####            start_of_func_print("   In MAIN   REBOOT and find the command prompt CHASSIS  \n\
-####                                and run the laod the env_variables procedure")
-####            
-####        if not pa.cmdprompt:
-####            for tn in tn_list:
-####                cons_out = stop_at_cmd_prompt(0)
-####                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####                print("FIND THE COMMAND PROMPT  2  \n")
-####                print(cons_out)
-####                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####                print("NOW SET THE ENV VARIABLES  ")
-####                print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####            
-####            for tn in tn_list:
-####                cons_out = env_variables(sw_type,gateway_ip, 0)
-####                print("\n"*4)
-####                print("R"*80)
-####                print("\n"*4)
-####                print("S"*80) 
-####                print(cons_out)
-####                
-####                load_kernel(sw_type, my_cp_ip_list[cnt], gateway_ip, pa.firmware)
-####                cnt += 1
-####        
-####    else:
-####    ###########################################################################
-####    #### im a pizza box
-####    ###########################################################################
-####        if pa.verbose >=3:
-####            start_of_func_print("   In MAIN   REBOOT and find the command prompt PIZZA  \n\
-####                                and run load the env_variables procedure")
-####         
-####        tn = connect_console_enable_root(console_ip, user_name, usr_pass, console_port, 0)
-####        tn_list.append(tn)
-####       
-####     
-###########################################################################################################################
-########
-########  reboot and find the command prompt
-########
-####        if not pa.cmdprompt:
-####            cons_out = stop_at_cmd_prompt(9)
-####            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####            print("PIZZA BOX  FIND THE COMMAND PROMPT  4  \n")
-####            print(cons_out)
-####            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####            print("PIZZA BOX  NOW SET THE ENV VARIABLES  ")
-####            print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####            
-####        cons_out = env_variables(sw_type, gateway_ip, 0)
-####        print("\n"*4)
-####        print("T"*80)
-####        print("\n"*4)
-####        print("U"*80)
-####        print("\nLINE 1063")
-####        print(cons_out)
-####        load_kernel(sw_type, my_ip, gateway_ip, pa.firmware)
-####        #Need to check for BASH prompt here "bash-2.04#"
-####    
-###########################################################################################################################
-###########################################################################################################################
-######## this step is the same for director or pizza box
-########
-########  turn each port off then turn each port on (otherwise the delay between did not power cycle the switch)
-########bash-2.04#
-###########################################################################################################################
-####    reg_list_bash = [b".*?bash-2\.04#"]
-####    cons_out = tn.expect(reg_list_bash,900)
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-####    print("LOOKING FOR BASH PROMPT AFTER LOADING THE KERNEL")
-####    print(cons_out)
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    print("\nLINE 1176\n")
-####
-####    if pa.verbose >=3:
-####        start_of_func_print("   In MAIN   REBOOT after Loading the ENV variables and KERNEL  \n\
-####                            ")
-####    try:
-####        for pp in range(0, len(power_pole_info), 2):
-####            print('POWERPOLE')
-####            print(power_pole_info[pp])
-####            print(power_pole_info[pp+1])
-####            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off",10)
-####            time.sleep(4)
-####            
-####        for pp in range(0, len(power_pole_info), 2):
-####            print('POWERPOLE')
-####            print(power_pole_info[pp])
-####            print(power_pole_info[pp+1])
-####            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on",10)
-####            time.sleep(4)
-####    except:
-####        if  '' == power_pole_info[0]:
-####            print("\n"*20)
-####            print("NO POWER POLE INFO FOUND ")
-####            print("HA "*10)
-####            print("you have to walk to power cycle the switch")
-####            print("I will wait ")
-####            liabhar.JustSleep(30)
-####        else:
-####            print("POWER TOWER INFO")
-####            print(power_pole_info[0])
-####            print(power_pole_info)
-####            liabhar.JustSleep(30)
-####            
-###########################################################################################################################
-###########################################################################################################################
-########
-######## 
-####    #### is there another way to tell if switch is ready ??
-####    #### instead of waiting
-####    ####  maybe looking at switch Domain and if it is uncomfirmed then switch is not ready
-####    ####
-###########################################################################################################################
-###########################################################################################################################
-########
-########
-###########################################################################################################################
-####
-####    print("\n"*6)
-####    print("@"*40)
-####    print("Close Console sessions and login via telnet")
-####    print("Sleep for a minute at line 2262")
-####    print("\n"*6)     
-####
-####    reg_list_after_reboot = [b"is in sync", b"initialization completed."]
-####    cons_out = tn.expect(reg_list_after_reboot,900)
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-####    print("HERE WE ARE WAITING FOR THE SWITCH TO REBOOT SOMETIMES TOO LONG OTHERS NOT LONG ENOUGH")
-####    
-####    print(cons_out)
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    print("IF WE SEE BASH PROMPT HAS BEEN DETECTED WE CAN TAKE OUT THE WAIT 600")
-####    print("SEARCH FOR LOOKLOOK ")
-####    print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-####    liabhar.count_down(60)
-####    
-####    for tn in tn_list:
-####        tn.close()
-####    #liabhar.JustSleep(600)
-####    #liabhar.count_down(600)
-####    
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ###################################################################################################################
-####    ####
-####    ####
-####    ####  add the config from a file
-####    ####
-####    ####  login 
-####    try:
-####        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"password")
-####        
-####    #    if tn == "":
-####    #        tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-####    #
-####        
-####    except:
-####        sys.exit()
-####    #    tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-####    #
-####    
-####    #if pa.verbose >=3:
-####    #    start_of_func_print("   In MAIN   START  sw_set_pwd_timeout    \n")
-####    #    
-####    #cons_out = sw_set_pwd_timeout(usr_psswd, tn)
-####    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-####    #print("tn is   %s  " % tn )
-####    ##tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
-####    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-####    #print("\n\n\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&") 
-####    #
-####    if pa.verbose >=3:
-####        start_of_func_print("   In MAIN    user_start  procedure  to start at line 2322")
-####        
-####    user_start()
-####    
-####    print("\n\nLICENSE ADD TO SWITCH \n\n")
-####    print(my_ip)
-####    
-####    ###################################################################################################################
-####    ####  
-####    ####  ask the user which file to use
-####    ####   prepopulate with the file from above
-####    ####    check the existience of the file
-####    ####    correct it or exit
-####    ####
-####    ###################################################################################################################
-####    print("USE USER INPUTED FILE NAME OR DEFAULT")
-####    sys.exit()
-####    #cc = cofra.SwitchUpdate("for_playback")
-####    cc = cofra.SwitchUpdate(pa.filename)
-####    
-####    cons_out = cc.playback_licenses()
-####    cons_out = cc.playback_ls()
-####    cons_out = cc.playback_switch_names()
-####    cons_out = cc.playback_switch_domains()
-####    cons_out = cc.playback_add_ports()
-####    cons_out = cc.playback_add_ports_ex()
-####    tn       = cc.reboot_reconnect()
-####    cons_out = anturlar.fos_cmd("switchshow")
-####    print(cons_out)
-####    cons_out = anturlar.fos_cmd("timeout 0")
-####    print(cons_out)
-####     
-####    anturlar.close_tel()
-####    #tn.write(b"exit\n")
-####    #tn.close()
-####     
-####    dt = liabhar.dateTimeStuff()
-####    date_is = dt.current()
-####    print(date_is)
+
+
     
 if __name__ == '__main__':
     

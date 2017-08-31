@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+####
+####  old method of  calling python3 
 #!/opt/python3/bin/python3
 
 import telnetlib

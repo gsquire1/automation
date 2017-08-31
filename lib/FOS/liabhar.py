@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+####
+####  old method of colling python3
+#!/usr/bin/env python3
+
 
 import smtplib
 import random
