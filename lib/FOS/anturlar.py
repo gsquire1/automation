@@ -344,7 +344,8 @@ class SwitchInfo:
             True = director
             False = pizza box
         """
-        capture_cmd = fos_cmd("hashow")
+  
+        capture_cmd = fos_cmd("hashow",0)
         #print('ZZZZZZZZZZZ')
         #print(capture_cmd)
         self.am_i_director = True

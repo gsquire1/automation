@@ -648,7 +648,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     ###  the exceptions are below for skybolt and wedge                                                            ####
     bootargs  = "bootargs ip=off"                                                                                  ####
     
-    if swtype == '162' or swtype == '166' or swtype == '165' :   #### HANDLE WEDGE and Allegiance bootargs here    ####
+    if swtype == '162' or swtype == '166' or swtype == '165'  or swtype == '173':   #### HANDLE WEDGE and Allegiance bootargs here    ####
         bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
     if swtype == '170':   ####  CHEWBACCA
         bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
@@ -659,7 +659,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     ####  ethact default is ENET0                                                                                  ####
     ####   for some switches is other values are needed and are set by switch type                                 ####
     ethact    = "ENET0"
-    if swtype == '162' or swtype == '148' or swtype == '170':     #### set the wedge and skybolt values for ethact ####  
+    if swtype == '162' or swtype == '148' or swtype == '170' or swtype == '173':     #### set the wedge and skybolt values for ethact ####  
         ethact = "FM1@DTSEC2"
     
     if swtype == '166' or swtype == '165':                   ####   ethprime is a new env variable and             ####
@@ -683,7 +683,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     ###################################################################################################################
     ###################################################################################################################
     
-    if swtype == '162' or swtype == '165' or swtype == '166':              ####  wedge requires a Enter command or ####
+    if swtype == '162' or swtype == '165' or swtype == '166' :              ####  wedge requires a Enter command or ####
         newline = "\n"                                                     ####  hangs at the prompt               ####
         tn.write(newline.encode('ascii'))                                  ####                                    ####
         capture = tn.expect(reg_list)
@@ -869,6 +869,48 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         print("Kernel  C "*8)
         ####
         nbt = "tftpboot 0xc00000 chewbacca/silkworm.dtb \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  C "*8)
+        ####
+        nbt = "bootm 0x2000000 0x3000000 0xc00000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash_only)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  E "*8)
+    
+    
+    if switch_type == '173':  ####  TYR
+        nbt = "makesinrec 0x1000000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  A "*8)
+        ####
+        nbt = "tftpboot 0x2000000 tyr/uImage \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  B "*8)
+        ####
+        nbt = "tftpboot 0x3000000 tyr/ramdisk_v1.0.img \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  C "*8)
+        ####
+        nbt = "tftpboot 0xc00000 tyr/silkworm_bd173.dtb \n"
         tn.write(nbt.encode('ascii'))
         capture = tn.expect(reg_list)
         print("send the date   and look for =>")
