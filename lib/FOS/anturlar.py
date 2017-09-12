@@ -2464,6 +2464,29 @@ def power_cmd(cmd, dl=0):
         print("========================")
         print("handle the EOF case here")
         print("========================")
+        
+def power_cmd_raritan(cmd, dl=0):
+    global tn
+    try: 
+        telnet_closed = "telnet connection closed"
+        telnet_closed = telnet_closed.encode()
+        #traff_prompt = "\(yes, no\)  : "
+        #traff_prompt = traff_prompt.encode()
+        
+        tn.set_debuglevel(dl)
+        reg_ex_list = [b">", b"\[y/n]" , telnet_closed] # b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        capture = ""
+        print(cmd)
+        tn.write(cmd.encode('ascii') + b"\r\n")
+        capture = tn.expect(reg_ex_list)
+        capture = capture[2]
+        capture = capture.decode()
+        print(capture, end="")
+        return capture
+    except EOFError:
+        print("========================")
+        print("handle the EOF case here")
+        print("========================")
 
 def fos_cmd_regex(cmd, reg,dblevel=0):
     ###########################################################################
