@@ -841,18 +841,15 @@ def main():
     print("$$$$$$$$$$$$$$")
     print(fab_stuff)
 
-    sys.exit()
+    cons_out = anturlar.fos_cmd("setcontext %s" % pa.fid)
+    cons_out = anturlar.fos_cmd("switchshow")
+    
     #fabmems = fab_stuff.fabric_members()
-    myzone_info = fab_stuff.zone_info()
+    myzone_info = fab_stuff.zone_info(1)
     try:
         myzone = myzone_info[0][1]
     except IndexError:
         myzone = "NewZone"
-    
-    #my_swid = en.switch_id()
-    print("\n\n")
-    #print("Fabric members and my switch ID")
-    #print(fabmems,  my_swid )
     
     liabhar.JustSleep(10)
     cons_out = anturlar.fos_cmd("switchshow")
