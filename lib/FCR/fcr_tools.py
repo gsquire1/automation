@@ -40,7 +40,7 @@ def test_cofra_functions():
     #b = fcri.all_ex_ports_with_edge_fid()
     print("1111111111111111111111111111111")
     #b = su.playback_add_ports()
-    b = su.playback_add_ports_ex("root", "password")
+    b = su.switch_power_off_on("root", "password")
     print("2222222222222222222222222222222")
     print(b)
     sys.exit()
