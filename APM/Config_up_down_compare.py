@@ -744,26 +744,15 @@ def main():
     ####
     
     if steps_to_run == 1 or steps_to_run == 3:
-        
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
         switch_info = capture_switch_info("compare_orig", fid_to_compare)
         
-
     ###################################################################################################################
     #### path to the first file to compare
     #switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
     
-    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
-    
+    switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch    
     liabhar.JustSleep(10)
-    
-    ###################################################################################################################
-    #### this is how to reconnect with telnet
-    #
-    #print("reconnect via telnet")
-    #tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
-    #
+
     ###################################################################################################################
     ###################################################################################################################
     ###################################################################################################################
@@ -784,10 +773,12 @@ def main():
     ####
     cd = cofra.cfgupload(pa.ftp_ipaddress, pa.ftp_username,pa.ftp_password)
     
-    #tn = cofra.ha_failover(1)
-    
     liabhar.count_down(120)
     cons_out = anturlar.fos_cmd("echo Y | maspconfig --purge ")
+    
+    
+    
+    
     
     cd = cofra.cfgdownload(pa.ftp_ipaddress, pa.ftp_username,pa.ftp_password)
     liabhar.count_down(120)
@@ -808,10 +799,6 @@ def main():
     if steps_to_run == 2 or steps_to_run == 3:
       #  liabhar.JustSleep(10)
         liabhar.count_down(60)
-        #cons_out = anturlar.fos_cmd("setcontext 128")
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        
         switch_info = capture_switch_info("compare", fid_to_compare)
     ###################################################################################################################
     #### path to the second file to compare
@@ -829,8 +816,7 @@ def main():
         print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
         print("#"*80)
         print("#"*80)
-        
-        
+            
         diff_f  = liabhar.file_diff(switch_data_0,switch_data_1)
         print("#"*80)
         print("#"*80)
@@ -839,17 +825,12 @@ def main():
         print("Result ")
         print(diff_f)
     
-     
     ###################################################################################################################
-    ####  put additional commands here before disconnecting from telnet
     ####
-
+    ####   disconnecting from telnet
+    ####
+    ###################################################################################################################
     anturlar.close_tel()
-#   dt = liabhar.dateTimeStuff()
-#  date_is = dt.current()
-#  print(date_is)
-#    print(type(steps_to_run))
-#    print(steps_to_run)
     
 if __name__ == '__main__':
     
