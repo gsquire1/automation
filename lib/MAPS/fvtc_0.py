@@ -2059,7 +2059,7 @@ def tc_07_01_06_01():
     
     fab_stuff = anturlar.FabricInfo(en.currentFID())
     fabmems = fab_stuff.fabric_members()
-    myzone = fab_stuff.zone_info()
+    myzone = fab_stuff.zone_info(1)
     eports = en.e_ports()
    
     cpu_start   = en.cpu_usage()

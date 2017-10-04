@@ -1716,17 +1716,9 @@ def switch_power_off_on(chassis_name, mode = 'on'):
             anturlar.close_tel()
     return(True)
 
-def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 1):
+def cfgupload(ftp_ip, ftp_user, ftp_pass ):
     """
-        capture any information for testing of the configdownload 
-        - including mapspolicy --show
-                    mapsconfig --show
-                    flow --show
-                    flow --show -ctrlcfg
-                    relayconfig --show
-                    bottleneckmon --status
-                    
-        then perform configupload
+        perform configupload
         
         config upload 
         
@@ -1749,45 +1741,18 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass, clear = 1):
     ####
     
     sw_info = anturlar.SwitchInfo()
-    sw_info_ls = sw_info.ls()
-    fid_now = sw_info.ls_now()
-    
+  
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
      
-    f = "%s%s%s"%("logs/Configupload_test_case_file",sw_ip,".txt")
-    
-    if clear == 1 :
-        ff = liabhar.FileStuff(f, 'w+b')  #### reset the log file
-    else:
-        ff = liabhar.FileStuff(f, 'a+b')  #### open for appending
-        
-    header = "%s%s%s%s" % ("\nCONFIGUPLOAD CAPTURE FILE \n", "  sw_info ipaddr  ",sw_ip, "\n==============================\n\n")  
-    ff.write(header)
-    ff.close()
-    
-    ff = liabhar.FileStuff(f, 'a+b')  #### open the log file for writing
-    ff.write(str(sw_info_ls))
-    ff.write("\n"*2)
-    
-    cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
-    #cons_out = anturlar.fos_cmd(" ")
-    configup_cmd = ("configupload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
-    ftp_ip, ftp_user, ftp_pass
+    configup_cmd = ("configupload -all -p ftp %s,%s,%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
+    #ftp_ip, ftp_user, ftp_pass
     cons_out = anturlar.fos_cmd (configup_cmd)
     return(cons_out)
 
-def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
+def cfgdownload(ftp_ip, ftp_user, ftp_pass ):
     """
-        capture any information for testing of the configdownload 
-        - including mapspolicy --show
-                    mapsconfig --show
-                    flow --show
-                    flow --show -ctrlcfg
-                    relayconfig --show
-                    bottleneckmon --status
-                    
-        then perform configupload
+        perform configupload
         
         config upload 
         
@@ -1803,6 +1768,8 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
         
         configdownload [- all ] [-p ftp | -ftp] ["host","user","path"[,"passwd"]]
         configdownload [- all ] [-p scp | -scp ] ["host","user","path"]
+        
+        this is disruptive procedure 
         
     """
     #### capture maps config all FIDS
@@ -1816,15 +1783,22 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass, clear = 0):
     
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
-     
-    if switch_state == "Online":
+    
+    for l in sw_info_ls:
+        cons_out = anturlar.fos_cmd("setcontext %s" % l)
         anturlar.fos_cmd("switchdisable")
-    else:
-        pass
+         
+    cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
+         
+    configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
+    cons_out = anturlar.fos_cmd (configdown_cmd)
+    
+    for l in sw_info_ls:
+        cons_out = anturlar.fos_cmd("setcontext %s" % l)
+        anturlar.fos_cmd("switchenable")
     
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
-    configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,/configs/%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
-    cons_out = anturlar.fos_cmd (configdown_cmd)
+    
     return(cons_out)
     
     
