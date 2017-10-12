@@ -748,7 +748,7 @@ class SwitchUpdate():
     
         return(True)
     
-    def playback_switch_domains(self):
+    def playback_switchget_info_from_the_switch_domains(self):
         """
         
         """
@@ -1716,7 +1716,7 @@ def switch_power_off_on(chassis_name, mode = 'on'):
             anturlar.close_tel()
     return(True)
 
-def cfgupload(ftp_ip, ftp_user, ftp_pass ):
+def cfgupload(ftp_ip, ftp_user, ftp_pass, path=""):
     """
         perform configupload
         
@@ -1736,21 +1736,24 @@ def cfgupload(ftp_ip, ftp_user, ftp_pass ):
         configdownload [- all ] [-p scp | -scp ] ["host","user","path"]
         
     """
-    #### capture maps config all FIDS
-    #### capture flow config all FIDS
+    #### 
     ####
-    
     sw_info = anturlar.SwitchInfo()
-  
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
+    d = liabhar.dateTimeStuff()
+    date_stamp = str(d.current_no_dash()).replace("_","")
+    
+    if not path:
+        filename_date = sw_ip + "_" + date_stamp + ".txt"
+    else:
+        filename_date = path + "/" + sw_ip + "_" + date_stamp + ".txt"
      
-    configup_cmd = ("configupload -all -p ftp %s,%s,%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
-    #ftp_ip, ftp_user, ftp_pass
+    configup_cmd = ("configupload -all -p ftp %s,%s,%s,%s") % (ftp_ip, ftp_user, filename_date, ftp_pass)
     cons_out = anturlar.fos_cmd (configup_cmd)
-    return(cons_out)
+    return(filename_date)
 
-def cfgdownload(ftp_ip, ftp_user, ftp_pass ):
+def cfgdownload(ftp_ip, ftp_user, ftp_pass, path_and_file):
     """
         perform configupload
         
@@ -1784,15 +1787,20 @@ def cfgdownload(ftp_ip, ftp_user, ftp_pass ):
     cons_out = anturlar.fos_cmd(" ")
     sw_ip = sw_info.ipaddress()
     
+    if not  sw_info_ls:
+        anturlar.fos_cmd("switchdisable")
     for l in sw_info_ls:
         cons_out = anturlar.fos_cmd("setcontext %s" % l)
         anturlar.fos_cmd("switchdisable")
          
     cons_out = anturlar.fos_cmd("setcontext %s" % fid_now)
          
-    configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,%s.txt,%s") % (ftp_ip, ftp_user, sw_ip, ftp_pass)
+    configdown_cmd = ("echo Y | configdownload -all -p ftp %s,%s,%s,%s") % (ftp_ip, ftp_user, path_and_file, ftp_pass)
     cons_out = anturlar.fos_cmd (configdown_cmd)
     
+    
+    if not  sw_info_ls:
+        anturlar.fos_cmd("switchenable")
     for l in sw_info_ls:
         cons_out = anturlar.fos_cmd("setcontext %s" % l)
         anturlar.fos_cmd("switchenable")
