@@ -1,12 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.4
 
 import sys
 import time
 import select
 import paramiko
 
-host = 'user@10.39.36.112'
+host = '10.39.36.112'
 i = 1
+ip = "10.39.36.112"
+uname = "user"
+user = "user"
+pwd = "pass"
+#host = "10.38.36.24"
+yesSync = 0
+output=""
 
 #
 # Try to connect to the host.
@@ -14,11 +21,11 @@ i = 1
 #
 while True:
     print("Trying to connect to %s (%i/30)" % (host, i))
-
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(host)
+        ssh.connect(ip, username=user, password=pwd)
+        channel = ssh.get_transport().open_session()
         print("Connected to %s" % host)
         break
     except paramiko.AuthenticationException:
@@ -35,7 +42,10 @@ while True:
         sys.exit(1)
 
 # Send the command (non-blocking)
-stdin, stdout, stderr = ssh.exec_command("my_long_command --arg 1 --arg 2")
+print("**************************************")
+paramiko.agent.AgentRequestHandler(channel)
+print(channel)
+rl, wl, xl = channel.exec_command("ls")
 
 # Wait for the command to terminate
 while not stdout.channel.exit_status_ready():

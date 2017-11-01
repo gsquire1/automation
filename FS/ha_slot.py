@@ -1,12 +1,10 @@
-#!/usr/bin/python
-
-
+#!/usr/bin/python3.4
 
 import paramiko
 import sys
 import time
 
-ip = "10.38.36.250"
+ip = "10.38.36.240"
 uname = "root"
 pwd = "password"
 yesSync = 0

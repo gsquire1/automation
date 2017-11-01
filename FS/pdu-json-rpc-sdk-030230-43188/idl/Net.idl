@@ -1,0 +1,308 @@
+/**
+ * Network Configuration
+ */
+module net {
+
+    /** Automatic network configuration protocols */
+    enumeration AutoConfigs {
+	STATIC,				///< No automatic configuration
+	DHCP,				///< Use DHCP for automatic configuration (used for IPv4)
+	AUTO				///< Use automatic configuration (used for IPv6)
+    };
+
+    /** Device IP configuration */
+    structure NetworkConfigIP {
+	boolean gai_prefer_ipv6;	///< getaddrinfo prefers IPv6 addresses
+    };
+
+    /** IPv4 Routing entry */
+    structure IPv4RoutingEntry {
+	string dest;			///< Destination address
+	string nexthop;			///< Next hop address / Router
+	string intf;			///< Network interface
+    };
+
+    /** Device IPv4 configuration */
+    structure NetworkConfigIPv4 {
+	boolean enabled;		///< IPv4 enabled
+	AutoConfigs autocfg;		///< Automatic configuration protocol
+	string ipaddr;			///< Device IP address
+	string netmask;			///< Network mask
+	string gateway;			///< Gateway IP address
+	string hostname;		///< Device hostname
+	vector<string> dns_suffixes;	///< List of DNS domain suffixes
+	boolean override_dns;		///< Override nameserver information from DHCP
+	string dns_ip_1;		///< Primary nameserver IP
+	string dns_ip_2;		///< Secondary nameserver IP
+	string domain_name;		///< Domain name
+    };
+
+    /** Device IPv6 configuration */
+    structure NetworkConfigIPv6 {
+	boolean enabled;		///< IPv6 enabled
+	AutoConfigs autocfg;		///< Automatic configuration protocol
+	string ipaddr;	///< Device IPv6 address / Prefix Length
+	string gateway;			///< Gateway IP address
+	string hostname;		///< Device hostname
+	vector<string> dns_suffixes;	///< List of DNS domain suffixes
+	boolean override_dns;		///< Override nameserver information from DHCP
+	string dns_ip_1;		///< Primary nameserver IP
+	string dns_ip_2;		///< Secondary nameserver IP
+	string domain_name;		///< Domain name
+    };
+
+    /** IPv6 Routing entry */
+    structure IPv6RoutingEntry {
+	string dest;			///< Destination address
+	string nexthop;			///< Next hop address
+	string intf;			///< Network interface
+    };
+
+    /** Device IPv6 active values */
+    structure NetworkActiveValuesIPv6 {
+	boolean enabled;		///< IPv6 enabled
+	AutoConfigs autocfg;		///< Automatic configuration protocol
+	vector<string> ipaddrs;		///< List of active IPv6 addresses / Prefix Length
+	vector<IPv6RoutingEntry> routes;///< List of active IPv6 routes
+	boolean ra_managed;		///< Managed flag set in RAs
+	boolean ra_otherconf;		///< Otherconf flag set in RAs
+	vector<string> dns_suffixes;	///< List of DNS domain suffixes
+	string dns_ip_1;		///< Primary nameserver IP
+	string dns_ip_2;		///< Secondary nameserver IP
+    };
+
+    /** Network service configuration */
+    structure ServiceConfig {
+	string service;			///< Service name
+	boolean enable;			///< \c true if the service is enabled
+	int port;			///< Service TCP port
+    };
+
+    /** LAN interface speed */
+    enumeration LanSpeed {
+	LAN_SPEED_AUTO,			///< Use auto-negotiation to set speed
+	LAN_SPEED_10MBIT,		///< 10 MBit/s
+	LAN_SPEED_100MBIT,		///< 100 MBit/s
+	LAN_SPEED_1000MBIT,		///< 1 GBit/s
+	LAN_SPEED_UNKNOWN		///< Unknown speed
+    };
+
+    /** LAN interface duplex mode */
+    enumeration LanDuplex {
+	LAN_DUPLEX_AUTO,		///< Use auto-negotiation to set duplex mode
+	LAN_DUPLEX_HALF,		///< Half duplex
+	LAN_DUPLEX_FULL,		///< Full duplex
+	LAN_DUPLEX_UNKNOWN		///< Unknown duplex mode
+    };
+
+    /** LAN interface link mode */
+    structure LanLinkMode {
+	LanSpeed speed;			///< Interface speed
+	LanDuplex duplex;		///< Interface duplex mode
+    };
+
+    /** LAN interface mode */
+    enumeration InterfaceMode_2_0_0 {
+	IF_MODE_WIRED,			///< Use wired network interface
+	IF_MODE_WIRELESS,		///< Use wireless network interface
+	IF_MODE_USB_DEVICE		///< Use ethernet gadget on USB device port
+    };
+
+    /** LAN interface state */
+    structure InterfaceState_2_0_0 {
+	InterfaceMode_2_0_0 mode;	///< Wired or wireless interface configured?
+	InterfaceMode_2_0_0 activeMode;	///< Currently used interface type
+	boolean wirelessSupported;	///< \c if a wireless interface is available
+    };
+
+    /** LAN interface settings */
+    structure LanInterfaceSettings {
+	LanSpeed speed;			///< Speed
+	LanDuplex duplex;		///< Duplex mode
+    };
+
+    /** Current LAN interface parameters */
+    structure LanInterfaceParameters_2_0_0 {
+	LanSpeed speed;			///< Current speed
+	LanDuplex duplex;		///< Current duplex mode
+	boolean autonegotiation;	///< \c true if auto-negotiation is enabled
+	boolean link;			///< \c true if a link is detected
+	vector<LanLinkMode> supportedModes; ///< Supported link modes
+    };
+
+    /** WLAN authentication mode */
+    enumeration AuthenticationMode {
+	AUTH_NONE,			///< No authentication
+	AUTH_PSK,			///< Pre-shared key authentication
+	AUTH_EAP			///< EAP authentication
+    };
+
+    /** EAP outer authentication method */
+    enumeration EapOuterMethod {
+	EAP_PEAP			///< PEAP authentication
+    };
+
+    /** EAP inner authentication method */
+    enumeration EapInnerMethod {
+	EAP_MSCHAPv2			///< MSCHAPv2 authentication
+    };
+
+    /** EAP authentication settings */
+    structure EapSettings_2_0_0 {
+	string         identity;	///< EAP identity
+	string         password;	///< EAP password
+	EapOuterMethod outerMethod;	///< Outer authentication method
+	EapInnerMethod innerMethod;	///< Inner authentication method
+	string         caCertificate;	///< CA certificate
+	boolean        forceTrustedCert;  ///< Enforce trusted certificates
+	boolean        allowOffTimeRangeCerts;  ///< allow expired and not yet valid TLS certificates
+	boolean        allowNotYetValidCertsIfTimeBeforeBuild; ///< allow not yet valid TLS certificates if
+							       ///< the system time is before the build time
+    };
+
+    /** Wireless interface settings */
+    structure WirelessInterfaceSettings_2_0_0 {
+	string             ssid;		///< SSID
+	AuthenticationMode authentication;	///< Authentication mode
+	string             psk;			///< Pre-shared key (for PSK authentication)
+	EapSettings_2_0_0  eap;			///< EAP settings (for EAP authentication)
+	string             bssid;		///< BSSID, leave empty for automatic access point selection
+    };
+
+    /** Network configuration interface */
+    interface Net_3_0_0 {
+
+	constant int ERR_INVALID_PARAMS = 1; ///< Invalid parameters
+
+	/**
+	 * Set common IP parameters.
+	 *
+	 * @param cfg  New IP settings
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigIP(in NetworkConfigIP cfg);
+
+	/**
+	 * Retrieve the common IP parameters.
+	 *
+	 * @param cfg         Result: Configured IP settings
+	 */
+	void getNetworkConfigIP(out NetworkConfigIP cfg);
+
+	/**
+	 * Set the IPv4 configuration.
+	 *
+	 * @param cfg4  New IPv4 settings
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigIPv4(in NetworkConfigIPv4 cfg4);
+
+	/**
+	 * Retrieve the IPv4 configuration.
+	 *
+	 * @param cfg4         Result: Configured IPv4 settings
+	 * @param cfg4current  Result: Active values (e.g. in case of DHCP)
+	 */
+	void getNetworkConfigIPv4(out NetworkConfigIPv4 cfg4, out NetworkConfigIPv4 cfg4current);
+
+	void getNetworkConfigRoutesIPv4(out vector<IPv4RoutingEntry> static_routes, out vector<IPv4RoutingEntry> active_routes);
+	int setNetworkConfigRoutesIPv4(in vector<IPv4RoutingEntry> static_routes);
+
+	void getNetworkConfigRoutesIPv6(out vector<IPv6RoutingEntry> static_routes, out vector<IPv6RoutingEntry> active_routes);
+	int setNetworkConfigRoutesIPv6(in vector<IPv6RoutingEntry> static_routes);
+	/**
+	 * Set the IPv6 configuration.
+	 *
+	 * @param cfg6  New IPv6 settings
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigIPv6(in NetworkConfigIPv6 cfg6);
+
+	/**
+	 * Retrieve the IPv6 configuration.
+	 *
+	 * @param cfg6         Result: Configured IPv6 settings
+	 * @param ipv6current  Result: Active values (e.g. in case of DHCP, stateless config)
+	 */
+	void getNetworkConfigIPv6(out NetworkConfigIPv6 cfg6, out NetworkActiveValuesIPv6 ipv6current);
+
+	/**
+	 * Change the network service configuration.
+	 *
+	 * This call changes the configuration of one or more network services
+	 * identified by name. Other services are not affected. The resulting
+	 * configuration of all enabled services must be consistent, i.e.
+	 * there must be not port collisions.
+	 *
+	 * @param services  List of network services to be changed
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigServices(in vector<ServiceConfig> services);
+
+	/**
+	 * Retrieve the network service configuration.
+	 *
+	 * @param services  List of all supported network services
+	 */
+	void getNetworkConfigServices(out vector<ServiceConfig> services);
+
+	/**
+	 * Retrieve the current LAN interface configuration.
+	 *
+	 * @param state       Result: Wired or wireless interface?
+	 * @param lan         Result: Wired interface settings 
+	 * @param lancurrent  Result: Current wired interface parameters
+	 * @param wlan        Result: Wireless interface settings
+	 */
+	void getNetworkConfigInterface(out InterfaceState_2_0_0 state,
+				      out LanInterfaceSettings lan,
+				      out LanInterfaceParameters_2_0_0 lancurrent,
+				      out WirelessInterfaceSettings_2_0_0 wlan);
+
+        /**
+         * Get MAC-Addresses of lan interfaces. If wlan is not 
+	 * enabled or present, wlanmac may be set to empty string
+         */
+	void getMACs(out InterfaceState_2_0_0 state,
+		     out string ethmac, out string wlanmac);
+
+	
+	/**
+	 * Set the LAN interface configuration, enable wired networking.
+	 *
+	 * @param lancfg  New LAN interface settings
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigLan(in LanInterfaceSettings lancfg);
+
+	/**
+	 * Set the wireless configuration, enable wireless networking.
+	 *
+	 * @param wlancfg  New wireless interface settings
+	 *
+	 * @return 0 if OK
+	 * @return 1 if any parameters were invalid
+	 */
+	int setNetworkConfigWLan(in WirelessInterfaceSettings_2_0_0 wlancfg);
+
+	/**
+	 * Get the number of slave units that are directly sharing this
+	 * unit's network connection.
+	 *
+	 * @return Number of slaves directly connected to this unit.
+	 */
+	int getBridgeSlaveCount();
+
+    };
+
+}
