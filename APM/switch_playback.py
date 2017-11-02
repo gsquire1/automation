@@ -17,6 +17,7 @@ import os.path
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
 sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
+sys.path.append('/home/automation/lib/SDK')
 
 import telnetlib
 import getpass
@@ -36,6 +37,13 @@ import time
 import anturlar
 import liabhar
 import cofra
+
+###############################################################################
+#
+# SDK Modules
+#
+###############################################################################
+from raritan.rpc import Agent, pdumodel, firmware, sensors
 
 
 ###############################################################################
@@ -819,7 +827,61 @@ def pwr_cycle(pwr_ip, pp, stage, db=0):
     print("Just sent power pole  %s port %s   %s command " % (pp, stage,pwr_ip))
     print("\n"*5)
     
-    return(0) 
+    return(0)
+
+def raritan(port, status, ip="10.39.36.112", user="user", pw="pass"):
+
+    # try:
+    #     ip = sys.argv[1]
+    #     user = sys.argv[2]
+    #     pw = sys.argv[3]
+    # except IndexError:
+    #     pass # use defaults
+    
+    agent = Agent("https", ip, user, pw, disable_certificate_verification=True)
+    pdu = pdumodel.Pdu("/model/pdu/0", agent)
+    firmware_proxy = firmware.Firmware("/firmware", agent)
+    
+    inlets = pdu.getInlets()
+    ocps = pdu.getOverCurrentProtectors()
+    outlets = pdu.getOutlets()
+    
+    print ("PDU: %s" % (ip))
+    print ("Firmware version: %s" % (firmware_proxy.getVersion()))
+    print ("Number of inlets: %d" % (len(inlets)))
+    print ("Number of over current protectors: %d" % (len(ocps)))
+    print ("Number of outlets: %d" % (len(outlets)))
+    
+    outlet = outlets[port]
+    
+    outlet_metadata = outlet.getMetaData()
+    outlet_settings = outlet.getSettings()
+    
+    print ("Outlet %s:" % (format(outlet_metadata.label)))
+    print ("  Name: %s" % (outlet_settings.name if outlet_settings.name != "" else "(none)"))
+    print ("  Switchable: %s" % ("yes" if outlet_metadata.isSwitchable else "no"))
+    
+    
+    if outlet_metadata.isSwitchable:
+        outlet_state = outlet.getState()
+        print("OUTLET_GET_STATE")
+        print(outlet_state)
+        if outlet_state.available:
+            #print ("  Status :%s" % ("on" if outlet_state.value == outlet_state_sensor.OnOffState.ON.val else "off"))
+            print ("  Status :%s" % ("on" if outlet_state.powerState == pdumodel.Outlet.PowerState.PS_ON else "off"))
+        if status == "off":
+            print ("  Turning outlet off...")
+            outlet.setPowerState(outlet.PowerState.PS_OFF)
+            print ("  Sleeping 4 seconds...")
+            time.sleep(4)
+        else:
+            print ("  Turning outlet on...")
+            outlet.setPowerState(outlet.PowerState.PS_ON)
+            outlet_state = outlet.getState()
+        if outlet_state.available:
+            print ("  Status :%s" % ("on" if outlet_state.powerState == pdumodel.Outlet.PowerState.PS_ON else "off"))
+    else:
+        print("THIS PDU DOES NOT SUPPPORT CLI POWERCYCLING")
     
 def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
     
@@ -1241,20 +1303,34 @@ def do_net_install(sw_info_filename):
     print("&"*80) 
  
     try:
+
+        # if "10.39.36.112" in power_pole_info:
+        #     for pp in range(0, len(power_pole_info), 2):
+        #         raritan(power_pole_info[pp+1], "off")
+        #         raritan(power_pole_info[pp+1], "on")
+        
         for pp in range(0, len(power_pole_info), 2):
             print('POWERPOLE')
-            print(power_pole_info[pp])
-            print(power_pole_info[pp+1])
-            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off",10)
-            time.sleep(4)
+            print(pp)
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            print(power_pole_info)
+            if pp == "10.39.36.112":
+                port = (int(power_pole_info[x+1]))
+                raritan(port, "off")
+            else:
+                pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off",10)
+                time.sleep(4)
             
         for pp in range(0, len(power_pole_info), 2):
             print('POWERPOLE')
-            print(power_pole_info[pp])
-            print(power_pole_info[pp+1])
-            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on",10)
-            time.sleep(4)
+            if pp == "10.39.36.112":
+                port = (int(power_pole_info[x+1]))
+                raritan(port, "on")
+            else:
+                pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on",10)
+                time.sleep(4)
     except:
+        print("#############  EXCEPTION HIT HERE   ###############")
         if  '' == power_pole_info[0]:
             print("\n"*20)
             print("NO POWER POLE INFO FOUND ")
