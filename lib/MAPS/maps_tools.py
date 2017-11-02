@@ -438,8 +438,9 @@ def add_rules_each_monitor_type(add_max=False, add_all=True, add_each_monitor=Fa
         
         
     """
-    global tn
-    tn.set_debuglevel(10)
+   # global tn
+    #tn.set_debuglevel(10)
+    
     sw_info = anturlar.SwitchInfo()
     fid_now = sw_info.ls_now()
     cons_out = anturlar.fos_cmd(" ")
@@ -817,24 +818,17 @@ def mapscommand_list(options="0"):
         #### maybe add the next line to be the correct response
         ####
         l = ["mapsConfig -- ", \
-             #"mapsconfig --config pause -type NO_port -members 0", \
-             #"mapsconfig --config continue -type YES_port -members 0", \
              "mapsconfig --emailcfg smckie@brocade.com", \
              "mapsconfig --emailcfg ", \
-             #"mapsconfig --actions ", \
-             #"mapsconfig --import  ", \
-             #"mapsconfig --deimport ", \
-             #"mapsconfig --enablemaps ", \
-             #"mapsconfig --No_purge", \
              "mapsconfig -", \
-             #"mapsconfig --enableFPImon", \   #### commented out because it
-             #"mapsconfig --disableFPImon", \  #### is the correct command
+             "mapsconfig --raslogMode ", \
+             "mapsconfig --decomcfg ", \
              "mapsconfig --help", \
              "mapspolicy --create  ", \
              "mapspolicy --", \
              "mapspolicy --enable  ", \
-             "mapspolicy --addrule test_policy -rulename ", \
-             "mapspolicy --delrule test_policy -rulename ", \
+             "mapspolicy --addrule test_policy  ", \
+             "mapspolicy --delrule test_policy  ", \
              "mapspolicy --delete   ", \
              "mapsRule --create  ", \
              "mapsRule --config  ", \
@@ -857,35 +851,41 @@ def mapscommand_list(options="0"):
         ####
         
         sbj = "this is a test email from maps"
-        msg = "this is the body of the email from maps"
+        msg = "this is the body of the email from maps\nsending as part of \
+              automated test of MAPS command testing \n"
         
         l = ["mapsConfig --show", \
              "mapsconfig --config pause -type port -members 0", \
              "mapsconfig --config continue -type port -members 0", \
              "mapsconfig --emailcfg -address smckie@brocade.com", \
+             "mapsconfig --actions raslog,email,snmp",  \
              "mapsconfig --actions none", \
              "mapsconfig --testmail -subject $sbj -message $msg", \
              "mapsconfig --import someflowname ", \
              "mapsconfig --deimport someflowname", \
-             #"echo n | mapsconfig --enablemaps -policy dflt_conservative_policy", \
              "mapsconfig --", \
              "mapsconfig --show", \
-             #"mapsconfig --enableFPImon", \
-             #"mapsconfig --disableFPImon", \
+             "mapsconfig --raslogMode custom", \
+             "mapsconfig --decomcfg impair", \
              "mapsconfig --help", \
              "mapspolicy --create test_policy", \
              "mapspolicy --show -summary", \
              "mapspolicy --enable test_policy", \
              "mapspolicy --clone test_policy -name test_policy_clone", \
-             "mapspolicy --addrule test_policy -rulename ", \
-             "mapspolicy --delrule test_policy -rulename ", \
+             "mapspolicy --addrule test_policy -rulename defALL_E_PORTSLR_4", \
+             "mapspolicy --delrule test_policy -rulename defALL_E_PORTSLR_4", \
              "mapspolicy --delete test_policy ", \
              "mapspolicy --delete test_policy_clone",\
              "mapsRule --create rule_00 ", \
              "mapsRule --config rule_00", \
+             "mapsRule --createRoR ror_rule_00 ", \
              "mapsRule --clone rule_00 -rulename rule_00_clone", \
+             "logicalgroup --create test_clone_by_group", \
+             "mapspolicy --create test_policy", \
+             "mapsRule --cloneByGroup ALL_PORTS -frompolicy  dflt_aggressive_policy  -newpolcy test_policy -newgroup test_clone_by_group", \
              "mapsRule --delete rule_00", \
              "mapsrule --delete rule_00_clone", \
+             "mapsurle --delete "
              "mapsRule --show <ruleName | -all>", \
              "mapsRule --help ", \
              "mapssam --show ", \
@@ -2077,6 +2077,716 @@ def maps_default_rule():
                 defALL_F_PORTSUTIL_90   \
                 defALL_F_PORTSTX_90   \
                 defALL_2Km_32GLWL_QSFPCURRENT_10    \
+                defALL_2Km_32GLWL_QSFPRXP_3548      \
+                defALL_2Km_32GLWL_QSFPSFP_TEMP_75   \
+                defALL_2Km_32GLWL_QSFPSFP_TEMP_n5   \
+                defALL_2Km_32GLWL_QSFPTXP_4466      \
+                defALL_2Km_32GLWL_QSFPVOLTAGE_3010  \
+                defALL_2Km_32GLWL_QSFPVOLTAGE_3604  \
+                defALL_PORTS_IO_FRAME_LOSS_UNQUAR   \
+                defALL_PORTS_IO_PERF_IMPACT_UNQUAR  \
+               "
+
+
+ ####################################################################################################################
+    ####
+    ####  rules starting with 8.2.0
+    ####  l = mapsrules
+    ###################################################################################################################
+    
+    l="defALL_100M_16GSWL_QSFPCURRENT_10	\
+                defALL_100M_16GSWL_QSFPRXP_2187	\
+                defALL_100M_16GSWL_QSFPSFP_TEMP_85	\
+                defALL_100M_16GSWL_QSFPSFP_TEMP_n5	\
+                defALL_100M_16GSWL_QSFPVOLTAGE_2970	\
+                defALL_100M_16GSWL_QSFPVOLTAGE_3630	\
+                defALL_10GLWL_SFPCURRENT_95	\
+                defALL_10GLWL_SFPRXP_2230	\
+                defALL_10GLWL_SFPSFP_TEMP_90	\
+                defALL_10GLWL_SFPSFP_TEMP_n5	\
+                defALL_10GLWL_SFPTXP_2230	\
+                defALL_10GLWL_SFPVOLTAGE_2970	\
+                defALL_10GLWL_SFPVOLTAGE_3600	\
+                defALL_10GSWL_SFPCURRENT_10	\
+                defALL_10GSWL_SFPRXP_1999	\
+                defALL_10GSWL_SFPSFP_TEMP_90	\
+                defALL_10GSWL_SFPSFP_TEMP_n5	\
+                defALL_10GSWL_SFPTXP_1999	\
+                defALL_10GSWL_SFPVOLTAGE_3000	\
+                defALL_10GSWL_SFPVOLTAGE_3600	\
+                defALL_16GLWL_SFPCURRENT_70	\
+                defALL_16GLWL_SFPRXP_1995	\
+                defALL_16GLWL_SFPSFP_TEMP_90	\
+                defALL_16GLWL_SFPSFP_TEMP_n5	\
+                defALL_16GLWL_SFPTXP_1995	\
+                defALL_16GLWL_SFPVOLTAGE_3000	\
+                defALL_16GLWL_SFPVOLTAGE_3600	\
+                defALL_16GSWL_SFPCURRENT_12	\
+                defALL_16GSWL_SFPRXP_1259	\
+                defALL_16GSWL_SFPSFP_TEMP_85	\
+                defALL_16GSWL_SFPSFP_TEMP_n5	\
+                defALL_16GSWL_SFPTXP_1259	\
+                defALL_16GSWL_SFPVOLTAGE_3000	\
+                defALL_16GSWL_SFPVOLTAGE_3600	\
+                defALL_25Km_16GLWL_SFPCURRENT_90	\
+                defALL_25Km_16GLWL_SFPRXP_2238	\
+                defALL_25Km_16GLWL_SFPSFP_TEMP_75	\
+                defALL_25Km_16GLWL_SFPSFP_TEMP_n5	\
+                defALL_25Km_16GLWL_SFPTXP_4466	\
+                defALL_25Km_16GLWL_SFPVOLTAGE_2850	\
+                defALL_25Km_16GLWL_SFPVOLTAGE_3750	\
+                defALL_2K_QSFPCURRENT_39	\
+                defALL_2K_QSFPRXP_2000	\
+                defALL_2K_QSFPSFP_TEMP_85	\
+                defALL_2K_QSFPSFP_TEMP_n15	\
+                defALL_2K_QSFPVOLTAGE_2900	\
+                defALL_2K_QSFPVOLTAGE_3600	\
+                defALL_32GLWL_SFPCURRENT_60	\
+                defALL_32GLWL_SFPRXP_1995	\
+                defALL_32GLWL_SFPSFP_TEMP_75	\
+                defALL_32GLWL_SFPSFP_TEMP_n5	\
+                defALL_32GLWL_SFPTXP_1584	\
+                defALL_32GLWL_SFPVOLTAGE_3000	\
+                defALL_32GLWL_SFPVOLTAGE_3600	\
+                defALL_32GSWL_QSFPCURRENT_10	\
+                defALL_32GSWL_QSFPRXP_2187 \
+                defALL_32GSWL_QSFPRXP_3400	\
+                defALL_32GSWL_QSFPSFP_TEMP_75	\
+                defALL_32GSWL_QSFPSFP_TEMP_n5	\
+                defALL_32GSWL_QSFPVOLTAGE_2970	\
+                defALL_32GSWL_QSFPVOLTAGE_3630	\
+                defALL_32GSWL_SFPCURRENT_13	\
+                defALL_32GSWL_SFPRXP_2187	\
+                defALL_32GSWL_SFPSFP_TEMP_85	\
+                defALL_32GSWL_SFPSFP_TEMP_n5	\
+                defALL_32GSWL_SFPTXP_3162	\
+                defALL_32GSWL_SFPVOLTAGE_2970	\
+                defALL_32GSWL_SFPVOLTAGE_3630	\
+                defALL_40G_QSFPCURRENT_10  \
+                defALL_40G_QSFPRXP_2188     \
+                defALL_40G_QSFPRXP_44       \
+                defALL_40G_QSFPSFP_TEMP_75  \
+                defALL_40G_QSFPSFP_TEMP_n5   \
+                defALL_40G_QSFPVOLTAGE_2970  \
+                defALL_40G_QSFPVOLTAGE_3630 \
+                defALL_100G_QSFPCURRENT_10  \
+                defALL_100G_QSFPCURRENT_2  \
+                defALL_100G_QSFPRXP_2187   \
+                defALL_100G_QSFPRXP_60     \
+                defALL_100G_QSFPSFP_TEMP_75 \
+                defALL_100G_QSFPSFP_TEMP_n5  \
+                defALL_100G_QSFPTXP_3467    \
+                defALL_100G_QSFPTXP_48       \
+                defALL_100G_QSFPVOLTAGE_2970  \
+                defALL_100G_QSFPVOLTAGE_3630  \
+                defALL_ASICS_VTAP_IOPS_250K	\
+                defALL_BE_PORTS_LATENCY_CLEAR	\
+                defALL_BE_PORTS_LATENCY_IMPACT	\
+                defALL_BE_PORTSBAD_OS_5M_10	\
+                defALL_BE_PORTSBAD_OS_D_100	\
+                defALL_BE_PORTSCRC_5M_10	\
+                defALL_BE_PORTSCRC_D_100	\
+                defALL_BE_PORTSFRM_LONG_5M_10	\
+                defALL_BE_PORTSFRM_LONG_D_100	\
+                defALL_BE_PORTSFRM_TRUNC_5M_10	\
+                defALL_BE_PORTSFRM_TRUNC_D_100	\
+                defALL_BE_PORTSITW_5M_10	\
+                defALL_BE_PORTSITW_D_100	\
+                defALL_BE_PORTSLR_5M_10	\
+                defALL_BE_PORTSLR_D_100	\
+                defALL_DPIP_EXTN_FLOW_A   \
+                defALL_DPIP_EXTN_FLOW_C   \
+                defALL_DPIP_EXTN_FLOW_M    \
+                defALL_DPIP_EXTN_FLOW_MAX  \
+                defALL_ETH_PORTSSFP_STATE_FAULTY  \
+                defALL_ETH_PORTSSFP_STATE_IN      \
+                defALL_ETH_PORTSSFP_STATE_OUT  \
+                defALL_CIRCUIT_F_QOS_PKTLOSS_PER_05	\
+                defALL_CIRCUIT_F_QOS_PKTLOSS_PER_1	\
+                defALL_CIRCUIT_F_QOS_PKTLOSS_PER_5	\
+                defALL_CIRCUIT_F_QOS_UTIL_PER_50	\
+                defALL_CIRCUIT_F_QOS_UTIL_PER_75	\
+                defALL_CIRCUIT_F_QOS_UTIL_PER_90	\
+                defALL_CIRCUIT_HIGH_QOS_PKTLOSS_PER_05	\
+                defALL_CIRCUIT_HIGH_QOS_PKTLOSS_PER_1	\
+                defALL_CIRCUIT_HIGH_QOS_PKTLOSS_PER_5	\
+                defALL_CIRCUIT_HIGH_QOS_UTIL_PER_50	\
+                defALL_CIRCUIT_HIGH_QOS_UTIL_PER_75	\
+                defALL_CIRCUIT_HIGH_QOS_UTIL_PER_90	\
+                defALL_CIRCUIT_IP_HIGH_QOS_PKTLOSS_P_05	\
+                defALL_CIRCUIT_IP_HIGH_QOS_PKTLOSS_P_1	\
+                defALL_CIRCUIT_IP_HIGH_QOS_PKTLOSS_P_5	\
+                defALL_CIRCUIT_IP_HIGH_QOS_UTIL_P_50	\
+                defALL_CIRCUIT_IP_HIGH_QOS_UTIL_P_75	\
+                defALL_CIRCUIT_IP_HIGH_QOS_UTIL_P_90	\
+                defALL_CIRCUIT_IP_LOW_QOS_PKTLOSS_P_05	\
+                defALL_CIRCUIT_IP_LOW_QOS_PKTLOSS_P_1	\
+                defALL_CIRCUIT_IP_LOW_QOS_PKTLOSS_P_5	\
+                defALL_CIRCUIT_IP_LOW_QOS_UTIL_P_50	\
+                defALL_CIRCUIT_IP_LOW_QOS_UTIL_P_75	\
+                defALL_CIRCUIT_IP_LOW_QOS_UTIL_P_90	\
+                defALL_CIRCUIT_IP_MED_QOS_PKTLOSS_P_05	\
+                defALL_CIRCUIT_IP_MED_QOS_PKTLOSS_P_1	\
+                defALL_CIRCUIT_IP_MED_QOS_PKTLOSS_P_5	\
+                defALL_CIRCUIT_IP_MED_QOS_UTIL_P_50	\
+                defALL_CIRCUIT_IP_MED_QOS_UTIL_P_75	\
+                defALL_CIRCUIT_IP_MED_QOS_UTIL_P_90	\
+                defALL_CIRCUIT_LOW_QOS_PKTLOSS_PER_05	\
+                defALL_CIRCUIT_LOW_QOS_PKTLOSS_PER_1	\
+                defALL_CIRCUIT_LOW_QOS_PKTLOSS_PER_5	\
+                defALL_CIRCUIT_LOW_QOS_UTIL_PER_50	\
+                defALL_CIRCUIT_LOW_QOS_UTIL_PER_75	\
+                defALL_CIRCUIT_LOW_QOS_UTIL_PER_90	\
+                defALL_CIRCUIT_MED_QOS_PKTLOSS_PER_05	\
+                defALL_CIRCUIT_MED_QOS_PKTLOSS_PER_1	\
+                defALL_CIRCUIT_MED_QOS_PKTLOSS_PER_5	\
+                defALL_CIRCUIT_MED_QOS_UTIL_PER_50	\
+                defALL_CIRCUIT_MED_QOS_UTIL_PER_75	\
+                defALL_CIRCUIT_MED_QOS_UTIL_PER_90	\
+                defALL_CIRCUITS_IP_JITTER_PER_05	\
+                defALL_CIRCUITS_IP_JITTER_PER_15	\
+                defALL_CIRCUITS_IP_JITTER_PER_20	\
+                defALL_CIRCUITS_IP_PKTLOSS_P_05	\
+                defALL_CIRCUITS_IP_PKTLOSS_P_1	\
+                defALL_CIRCUITS_IP_PKTLOSS_P_5	\
+                defALL_CIRCUITS_IP_RTT_250	\
+                defALL_CIRCUITS_IP_UTIL_P_60	\
+                defALL_CIRCUITS_IP_UTIL_P_75	\
+                defALL_CIRCUITS_IP_UTIL_P_90	\
+                defALL_CIRCUITS_JITTER_PER_05	\
+                defALL_CIRCUITS_JITTER_PER_15	\
+                defALL_CIRCUITS_JITTER_PER_20	\
+                defALL_CIRCUITS_RTT_250	\
+                defALL_CIRCUITSCIR_PKTLOSS_PER_05	\
+                defALL_CIRCUITSCIR_PKTLOSS_PER_1	\
+                defALL_CIRCUITSCIR_PKTLOSS_PER_5	\
+                defALL_CIRCUITSCIR_STATE_0	\
+                defALL_CIRCUITSCIR_STATE_3	\
+                defALL_CIRCUITSCIR_STATE_5	\
+                defALL_CIRCUITSCIR_UTIL_60	\
+                defALL_CIRCUITSCIR_UTIL_75	\
+                defALL_CIRCUITSCIR_UTIL_90	\
+                defALL_D_PORTSCRC_1	\
+                defALL_D_PORTSCRC_2	\
+                defALL_D_PORTSCRC_3	\
+                defALL_D_PORTSCRC_D1000	\
+                defALL_D_PORTSCRC_D1500	\
+                defALL_D_PORTSCRC_D500	\
+                defALL_D_PORTSCRC_H30	\
+                defALL_D_PORTSCRC_H60	\
+                defALL_D_PORTSCRC_H90	\
+                defALL_D_PORTSITW_1	\
+                defALL_D_PORTSITW_2	\
+                defALL_D_PORTSITW_3	\
+                defALL_D_PORTSITW_D1000	\
+                defALL_D_PORTSITW_D1500	\
+                defALL_D_PORTSITW_D500	\
+                defALL_D_PORTSITW_H30	\
+                defALL_D_PORTSITW_H60	\
+                defALL_D_PORTSITW_H90	\
+                defALL_D_PORTSLF_1	\
+                defALL_D_PORTSLF_2	\
+                defALL_D_PORTSLF_3	\
+                defALL_D_PORTSLF_D1000	\
+                defALL_D_PORTSLF_D1500	\
+                defALL_D_PORTSLF_D500	\
+                defALL_D_PORTSLF_H30	\
+                defALL_D_PORTSLF_H60	\
+                defALL_D_PORTSLF_H90	\
+                defALL_D_PORTSLOSS_SYNC_1	\
+                defALL_D_PORTSLOSS_SYNC_2	\
+                defALL_D_PORTSLOSS_SYNC_3	\
+                defALL_D_PORTSLOSS_SYNC_D1000	\
+                defALL_D_PORTSLOSS_SYNC_D1500	\
+                defALL_D_PORTSLOSS_SYNC_D500	\
+                defALL_D_PORTSLOSS_SYNC_H30	\
+                defALL_D_PORTSLOSS_SYNC_H60	\
+                defALL_D_PORTSLOSS_SYNC_H90	\
+                defALL_E_PORTSC3TXTO_10	\
+                defALL_E_PORTSC3TXTO_20	\
+                defALL_E_PORTSC3TXTO_5	\
+                defALL_E_PORTSCRC_0	\
+                defALL_E_PORTSCRC_10	\
+                defALL_E_PORTSCRC_2	\
+                defALL_E_PORTSCRC_20	\
+                defALL_E_PORTSCRC_21	\
+                defALL_E_PORTSCRC_40	\
+                defALL_E_PORTSITW_15	\
+                defALL_E_PORTSITW_20	\
+                defALL_E_PORTSITW_21	\
+                defALL_E_PORTSITW_40	\
+                defALL_E_PORTSITW_41	\
+                defALL_E_PORTSITW_80	\
+                defALL_E_PORTSLF_0	\
+                defALL_E_PORTSLF_3	\
+                defALL_E_PORTSLF_5	\
+                defALL_E_PORTSLOSS_SIGNAL_0	\
+                defALL_E_PORTSLOSS_SIGNAL_3	\
+                defALL_E_PORTSLOSS_SIGNAL_5	\
+                defALL_E_PORTSLOSS_SYNC_0	\
+                defALL_E_PORTSLOSS_SYNC_3	\
+                defALL_E_PORTSLOSS_SYNC_5	\
+                defALL_E_PORTSLR_10	\
+                defALL_E_PORTSLR_11	\
+                defALL_E_PORTSLR_2	\
+                defALL_E_PORTSLR_20	\
+                defALL_E_PORTSLR_4	\
+                defALL_E_PORTSLR_5	\
+                defALL_E_PORTSPE_0	\
+                defALL_E_PORTSPE_10	\
+                defALL_E_PORTSPE_2	\
+                defALL_E_PORTSPE_3	\
+                defALL_E_PORTSPE_5	\
+                defALL_E_PORTSPE_7	\
+                defALL_E_PORTSRX_60	\
+                defALL_E_PORTSRX_75	\
+                defALL_E_PORTSRX_90	\
+                defALL_E_PORTSSTATE_CHG_10	\
+                defALL_E_PORTSSTATE_CHG_11	\
+                defALL_E_PORTSSTATE_CHG_2	\
+                defALL_E_PORTSSTATE_CHG_20	\
+                defALL_E_PORTSSTATE_CHG_4	\
+                defALL_E_PORTSSTATE_CHG_5	\
+                defALL_E_PORTSTX_60	\
+                defALL_E_PORTSTX_75	\
+                defALL_E_PORTSTX_90	\
+                defALL_E_PORTSUTIL_60	\
+                defALL_E_PORTSUTIL_75	\
+                defALL_E_PORTSUTIL_90	\
+                defALL_EXT_GE_PORTSCRC_0	\
+                defALL_EXT_GE_PORTSCRC_1	\
+                defALL_EXT_GE_PORTSLOS_0	\
+                defALL_EXT_GE_PORTSLOS_1	\
+                defALL_F_PORTSDEV_NPIV_LOGINS_PER_60	\
+                defALL_F_PORTSDEV_NPIV_LOGINS_PER_75	\
+                defALL_F_PORTSDEV_NPIV_LOGINS_PER_90	\
+                defALL_FAN_AIR_FLOW_MISMATCH	\
+                defALL_FANFAN_STATE_FAULTY	\
+                defALL_FANFAN_STATE_ON	\
+                defALL_FANFAN_STATE_OUT	\
+                defALL_HOST_PORTSC3TXTO_10	\
+                defALL_HOST_PORTSC3TXTO_11	\
+                defALL_HOST_PORTSC3TXTO_2	\
+                defALL_HOST_PORTSC3TXTO_20	\
+                defALL_HOST_PORTSC3TXTO_3	\
+                defALL_HOST_PORTSC3TXTO_4	\
+                defALL_HOST_PORTSCRC_0	\
+                defALL_HOST_PORTSCRC_10	\
+                defALL_HOST_PORTSCRC_2	\
+                defALL_HOST_PORTSCRC_20	\
+                defALL_HOST_PORTSCRC_21	\
+                defALL_HOST_PORTSCRC_40	\
+                defALL_HOST_PORTSITW_15	\
+                defALL_HOST_PORTSITW_20	\
+                defALL_HOST_PORTSITW_21	\
+                defALL_HOST_PORTSITW_40	\
+                defALL_HOST_PORTSITW_41	\
+                defALL_HOST_PORTSITW_80	\
+                defALL_HOST_PORTSLF_0	\
+                defALL_HOST_PORTSLF_3	\
+                defALL_HOST_PORTSLF_5	\
+                defALL_HOST_PORTSLOSS_SIGNAL_0	\
+                defALL_HOST_PORTSLOSS_SIGNAL_3	\
+                defALL_HOST_PORTSLOSS_SIGNAL_5	\
+                defALL_HOST_PORTSLOSS_SYNC_0	\
+                defALL_HOST_PORTSLOSS_SYNC_3	\
+                defALL_HOST_PORTSLOSS_SYNC_5	\
+                defALL_HOST_PORTSLR_10	\
+                defALL_HOST_PORTSLR_11	\
+                defALL_HOST_PORTSLR_2	\
+                defALL_HOST_PORTSLR_20	\
+                defALL_HOST_PORTSLR_4	\
+                defALL_HOST_PORTSLR_5	\
+                defALL_HOST_PORTSPE_0	\
+                defALL_HOST_PORTSPE_10	\
+                defALL_HOST_PORTSPE_2	\
+                defALL_HOST_PORTSPE_3	\
+                defALL_HOST_PORTSPE_5	\
+                defALL_HOST_PORTSPE_7	\
+                defALL_HOST_PORTSRX_60	\
+                defALL_HOST_PORTSRX_75	\
+                defALL_HOST_PORTSRX_90	\
+                defALL_HOST_PORTSSTATE_CHG_10	\
+                defALL_HOST_PORTSSTATE_CHG_11	\
+                defALL_HOST_PORTSSTATE_CHG_2	\
+                defALL_HOST_PORTSSTATE_CHG_20	\
+                defALL_HOST_PORTSSTATE_CHG_4	\
+                defALL_HOST_PORTSSTATE_CHG_5	\
+                defALL_HOST_PORTSTX_60	\
+                defALL_HOST_PORTSTX_75	\
+                defALL_HOST_PORTSTX_90	\
+                defALL_HOST_PORTSUTIL_60	\
+                defALL_HOST_PORTSUTIL_75	\
+                defALL_HOST_PORTSUTIL_90	\
+                defALL_LOCAL_PIDSIT_FLOW_16	\
+                defALL_LOCAL_PIDSIT_FLOW_32	\
+                defALL_LOCAL_PIDSIT_FLOW_8	\
+                defALL_OTHER_F_PORTSC3TXTO_10	\
+                defALL_OTHER_F_PORTSC3TXTO_11	\
+                defALL_OTHER_F_PORTSC3TXTO_2	\
+                defALL_OTHER_F_PORTSC3TXTO_20	\
+                defALL_OTHER_F_PORTSC3TXTO_3	\
+                defALL_OTHER_F_PORTSC3TXTO_4	\
+                defALL_OTHER_F_PORTSCRC_0	\
+                defALL_OTHER_F_PORTSCRC_10	\
+                defALL_OTHER_F_PORTSCRC_2	\
+                defALL_OTHER_F_PORTSCRC_20	\
+                defALL_OTHER_F_PORTSCRC_21	\
+                defALL_OTHER_F_PORTSCRC_40	\
+                defALL_OTHER_F_PORTSITW_15	\
+                defALL_OTHER_F_PORTSITW_20	\
+                defALL_OTHER_F_PORTSITW_21	\
+                defALL_OTHER_F_PORTSITW_40	\
+                defALL_OTHER_F_PORTSITW_41	\
+                defALL_OTHER_F_PORTSITW_80	\
+                defALL_OTHER_F_PORTSLF_0	\
+                defALL_OTHER_F_PORTSLF_3	\
+                defALL_OTHER_F_PORTSLF_5	\
+                defALL_OTHER_F_PORTSLOSS_SIGNAL_0	\
+                defALL_OTHER_F_PORTSLOSS_SIGNAL_3	\
+                defALL_OTHER_F_PORTSLOSS_SIGNAL_5	\
+                defALL_OTHER_F_PORTSLOSS_SYNC_0	\
+                defALL_OTHER_F_PORTSLOSS_SYNC_3	\
+                defALL_OTHER_F_PORTSLOSS_SYNC_5	\
+                defALL_OTHER_F_PORTSLR_10	\
+                defALL_OTHER_F_PORTSLR_11	\
+                defALL_OTHER_F_PORTSLR_2	\
+                defALL_OTHER_F_PORTSLR_20	\
+                defALL_OTHER_F_PORTSLR_4	\
+                defALL_OTHER_F_PORTSLR_5	\
+                defALL_OTHER_F_PORTSPE_0	\
+                defALL_OTHER_F_PORTSPE_10	\
+                defALL_OTHER_F_PORTSPE_2	\
+                defALL_OTHER_F_PORTSPE_3	\
+                defALL_OTHER_F_PORTSPE_5	\
+                defALL_OTHER_F_PORTSPE_7	\
+                defALL_OTHER_F_PORTSRX_60	\
+                defALL_OTHER_F_PORTSRX_75	\
+                defALL_OTHER_F_PORTSRX_90	\
+                defALL_OTHER_F_PORTSSTATE_CHG_10	\
+                defALL_OTHER_F_PORTSSTATE_CHG_11	\
+                defALL_OTHER_F_PORTSSTATE_CHG_2	\
+                defALL_OTHER_F_PORTSSTATE_CHG_20	\
+                defALL_OTHER_F_PORTSSTATE_CHG_4	\
+                defALL_OTHER_F_PORTSSTATE_CHG_5	\
+                defALL_OTHER_F_PORTSTX_60	\
+                defALL_OTHER_F_PORTSTX_75	\
+                defALL_OTHER_F_PORTSTX_90	\
+                defALL_OTHER_F_PORTSUTIL_60	\
+                defALL_OTHER_F_PORTSUTIL_75	\
+                defALL_OTHER_F_PORTSUTIL_90	\
+                defALL_OTHER_SFPCURRENT_50	\
+                defALL_OTHER_SFPRXP_5000	\
+                defALL_OTHER_SFPSFP_TEMP_85	\
+                defALL_OTHER_SFPSFP_TEMP_n13	\
+                defALL_OTHER_SFPTXP_5000	\
+                defALL_OTHER_SFPVOLTAGE_2960	\
+                defALL_OTHER_SFPVOLTAGE_3630	\
+                defALL_PORTS_IO_FRAME_LOSS	\
+                defALL_PORTS_IO_LATENCY_CLEAR	\
+                defALL_PORTS_IO_PERF_IMPACT	\
+                defALL_PORTSLF_0	\
+                defALL_PORTSLF_3	\
+                defALL_PORTSLF_5	\
+                defALL_PORTSLOSS_SIGNAL_0	\
+                defALL_PORTSLOSS_SIGNAL_3	\
+                defALL_PORTSLOSS_SIGNAL_5	\
+                defALL_PORTSSFP_STATE_FAULTY	\
+                defALL_PORTSSFP_STATE_IN	\
+                defALL_PORTSSFP_STATE_OUT	\
+                defALL_PSPS_STATE_FAULTY	\
+                defALL_PSPS_STATE_ON	\
+                defALL_PSPS_STATE_OUT	\
+                defALL_QSFPCURRENT_10	\
+                defALL_QSFPRXP_2180	\
+                defALL_QSFPSFP_TEMP_85	\
+                defALL_QSFPSFP_TEMP_n5	\
+                defALL_QSFPVOLTAGE_2940	\
+                defALL_QSFPVOLTAGE_3600	\
+                defALL_SLOTSBLADE_STATE_FAULTY	\
+                defALL_SLOTSBLADE_STATE_OFF	\
+                defALL_SLOTSBLADE_STATE_ON	\
+                defALL_SLOTSBLADE_STATE_OUT	\
+                defALL_TARGET_PORTSC3TXTO_0	\
+                defALL_TARGET_PORTSC3TXTO_10	\
+                defALL_TARGET_PORTSC3TXTO_2	\
+                defALL_TARGET_PORTSC3TXTO_3	\
+                defALL_TARGET_PORTSC3TXTO_5	\
+                defALL_TARGET_PORTSC3TXTO_6	\
+                defALL_TARGET_PORTSCRC_0	\
+                defALL_TARGET_PORTSCRC_10	\
+                defALL_TARGET_PORTSCRC_11	\
+                defALL_TARGET_PORTSCRC_2	\
+                defALL_TARGET_PORTSCRC_20	\
+                defALL_TARGET_PORTSCRC_5	\
+                defALL_TARGET_PORTSITW_10	\
+                defALL_TARGET_PORTSITW_11	\
+                defALL_TARGET_PORTSITW_20	\
+                defALL_TARGET_PORTSITW_21	\
+                defALL_TARGET_PORTSITW_40	\
+                defALL_TARGET_PORTSITW_5	\
+                defALL_TARGET_PORTSLF_0	\
+                defALL_TARGET_PORTSLF_3	\
+                defALL_TARGET_PORTSLF_5	\
+                defALL_TARGET_PORTSLOSS_SIGNAL_0	\
+                defALL_TARGET_PORTSLOSS_SIGNAL_3	\
+                defALL_TARGET_PORTSLOSS_SIGNAL_5	\
+                defALL_TARGET_PORTSLOSS_SYNC_0	\
+                defALL_TARGET_PORTSLOSS_SYNC_3	\
+                defALL_TARGET_PORTSLOSS_SYNC_5	\
+                defALL_TARGET_PORTSLR_0	\
+                defALL_TARGET_PORTSLR_10	\
+                defALL_TARGET_PORTSLR_2	\
+                defALL_TARGET_PORTSLR_3	\
+                defALL_TARGET_PORTSLR_5	\
+                defALL_TARGET_PORTSLR_6	\
+                defALL_TARGET_PORTSPE_0	\
+                defALL_TARGET_PORTSPE_2	\
+                defALL_TARGET_PORTSPE_3	\
+                defALL_TARGET_PORTSPE_4	\
+                defALL_TARGET_PORTSPE_5	\
+                defALL_TARGET_PORTSPE_6	\
+                defALL_TARGET_PORTSRX_60	\
+                defALL_TARGET_PORTSRX_75	\
+                defALL_TARGET_PORTSRX_90	\
+                defALL_TARGET_PORTSSTATE_CHG_0	\
+                defALL_TARGET_PORTSSTATE_CHG_15	\
+                defALL_TARGET_PORTSSTATE_CHG_2	\
+                defALL_TARGET_PORTSSTATE_CHG_3	\
+                defALL_TARGET_PORTSSTATE_CHG_7	\
+                defALL_TARGET_PORTSSTATE_CHG_8	\
+                defALL_TARGET_PORTSTX_60	\
+                defALL_TARGET_PORTSTX_75	\
+                defALL_TARGET_PORTSTX_90	\
+                defALL_TARGET_PORTSUTIL_60	\
+                defALL_TARGET_PORTSUTIL_75	\
+                defALL_TARGET_PORTSUTIL_90	\
+                defALL_TSTEMP_OUT_OF_RANGE	\
+                defALL_TUNNEL_F_QOS_PKTLOSS_PER_05	\
+                defALL_TUNNEL_F_QOS_PKTLOSS_PER_1	\
+                defALL_TUNNEL_F_QOS_PKTLOSS_PER_5	\
+                defALL_TUNNEL_F_QOS_UTIL_PER_50	\
+                defALL_TUNNEL_F_QOS_UTIL_PER_75	\
+                defALL_TUNNEL_F_QOS_UTIL_PER_90	\
+                defALL_TUNNEL_HIGH_QOS_PKTLOSS_PER_05	\
+                defALL_TUNNEL_HIGH_QOS_PKTLOSS_PER_1	\
+                defALL_TUNNEL_HIGH_QOS_PKTLOSS_PER_5	\
+                defALL_TUNNEL_HIGH_QOS_UTIL_PER_50	\
+                defALL_TUNNEL_HIGH_QOS_UTIL_PER_75	\
+                defALL_TUNNEL_HIGH_QOS_UTIL_PER_90	\
+                defALL_TUNNEL_IP_HIGH_QOS_PKTLOSS_P_05	\
+                defALL_TUNNEL_IP_HIGH_QOS_PKTLOSS_P_1	\
+                defALL_TUNNEL_IP_HIGH_QOS_PKTLOSS_P_5	\
+                defALL_TUNNEL_IP_HIGH_QOS_UTIL_P_50	\
+                defALL_TUNNEL_IP_HIGH_QOS_UTIL_P_75	\
+                defALL_TUNNEL_IP_HIGH_QOS_UTIL_P_90	\
+                defALL_TUNNEL_IP_LOW_QOS_PKTLOSS_P_05	\
+                defALL_TUNNEL_IP_LOW_QOS_PKTLOSS_P_1	\
+                defALL_TUNNEL_IP_LOW_QOS_PKTLOSS_P_5	\
+                defALL_TUNNEL_IP_LOW_QOS_UTIL_P_50	\
+                defALL_TUNNEL_IP_LOW_QOS_UTIL_P_75	\
+                defALL_TUNNEL_IP_LOW_QOS_UTIL_P_90	\
+                defALL_TUNNEL_IP_MED_QOS_PKTLOSS_P_05	\
+                defALL_TUNNEL_IP_MED_QOS_PKTLOSS_P_1	\
+                defALL_TUNNEL_IP_MED_QOS_PKTLOSS_P_5	\
+                defALL_TUNNEL_IP_MED_QOS_UTIL_P_50	\
+                defALL_TUNNEL_IP_MED_QOS_UTIL_P_75	\
+                defALL_TUNNEL_IP_MED_QOS_UTIL_P_90	\
+                defALL_TUNNEL_LOW_QOS_PKTLOSS_PER_05	\
+                defALL_TUNNEL_LOW_QOS_PKTLOSS_PER_1	\
+                defALL_TUNNEL_LOW_QOS_PKTLOSS_PER_5	\
+                defALL_TUNNEL_LOW_QOS_UTIL_PER_50	\
+                defALL_TUNNEL_LOW_QOS_UTIL_PER_75	\
+                defALL_TUNNEL_LOW_QOS_UTIL_PER_90	\
+                defALL_TUNNEL_MED_QOS_PKTLOSS_PER_05	\
+                defALL_TUNNEL_MED_QOS_PKTLOSS_PER_1	\
+                defALL_TUNNEL_MED_QOS_PKTLOSS_PER_5	\
+                defALL_TUNNEL_MED_QOS_UTIL_PER_50	\
+                defALL_TUNNEL_MED_QOS_UTIL_PER_75	\
+                defALL_TUNNEL_MED_QOS_UTIL_PER_90	\
+                defALL_TUNNELS_IP_UTIL_P_50	\
+                defALL_TUNNELS_IP_UTIL_P_75	\
+                defALL_TUNNELS_IP_UTIL_P_90	\
+                defALL_TUNNELSSTATE_CHG_0	\
+                defALL_TUNNELSSTATE_CHG_1	\
+                defALL_TUNNELSSTATE_CHG_3	\
+                defALL_TUNNELSUTIL_PER_50	\
+                defALL_TUNNELSUTIL_PER_75	\
+                defALL_TUNNELSUTIL_PER_90	\
+                defALL_WWNWWN_FAULTY	\
+                defALL_WWNWWN_ON	\
+                defALL_WWNWWN_OUT	\
+                defCHASSISBAD_FAN_CRIT	\
+                defCHASSISBAD_FAN_MARG	\
+                defCHASSISBAD_PWR_CRIT	\
+                defCHASSISBAD_PWR_MARG	\
+                defCHASSISBAD_TEMP_CRIT	\
+                defCHASSISBAD_TEMP_MARG	\
+                defCHASSISCERT_VALIDITY_15	\
+                defCHASSISCERT_VALIDITY_20	\
+                defCHASSISCERT_VALIDITY_30	\
+                defCHASSISCERTS_EXPIRED	\
+                defCHASSISCPU_80	\
+                defCHASSISDOWN_CORE_1	\
+                defCHASSISDOWN_CORE_2	\
+                defCHASSISETH_MGMT_PORT_STATE_DOWN	\
+                defCHASSISETH_MGMT_PORT_STATE_UP	\
+                defCHASSISFAULTY_BLADE_1	\
+                defCHASSISFLASH_USAGE_90	\
+                defCHASSISHA_SYNC_0	\
+                defCHASSISMEMORY_USAGE_75	\
+                defCHASSISWWN_DOWN_1	\
+                defNON_E_F_PORTSCRC_0	\
+                defNON_E_F_PORTSCRC_10	\
+                defNON_E_F_PORTSCRC_2	\
+                defNON_E_F_PORTSCRC_20	\
+                defNON_E_F_PORTSCRC_21	\
+                defNON_E_F_PORTSCRC_40	\
+                defNON_E_F_PORTSITW_15	\
+                defNON_E_F_PORTSITW_20	\
+                defNON_E_F_PORTSITW_21	\
+                defNON_E_F_PORTSITW_40	\
+                defNON_E_F_PORTSITW_41	\
+                defNON_E_F_PORTSITW_80	\
+                defNON_E_F_PORTSLF_0	\
+                defNON_E_F_PORTSLF_3	\
+                defNON_E_F_PORTSLF_5	\
+                defNON_E_F_PORTSLOSS_SIGNAL_0	\
+                defNON_E_F_PORTSLOSS_SIGNAL_3	\
+                defNON_E_F_PORTSLOSS_SIGNAL_5	\
+                defNON_E_F_PORTSLOSS_SYNC_0	\
+                defNON_E_F_PORTSLOSS_SYNC_3	\
+                defNON_E_F_PORTSLOSS_SYNC_5	\
+                defNON_E_F_PORTSLR_10	\
+                defNON_E_F_PORTSLR_11	\
+                defNON_E_F_PORTSLR_2	\
+                defNON_E_F_PORTSLR_20	\
+                defNON_E_F_PORTSLR_4	\
+                defNON_E_F_PORTSLR_5	\
+                defNON_E_F_PORTSPE_0	\
+                defNON_E_F_PORTSPE_10	\
+                defNON_E_F_PORTSPE_2	\
+                defNON_E_F_PORTSPE_3	\
+                defNON_E_F_PORTSPE_5	\
+                defNON_E_F_PORTSPE_7	\
+                defNON_E_F_PORTSRX_60	\
+                defNON_E_F_PORTSRX_75	\
+                defNON_E_F_PORTSRX_90	\
+                defNON_E_F_PORTSSTATE_CHG_10	\
+                defNON_E_F_PORTSSTATE_CHG_11	\
+                defNON_E_F_PORTSSTATE_CHG_2	\
+                defNON_E_F_PORTSSTATE_CHG_20	\
+                defNON_E_F_PORTSSTATE_CHG_4	\
+                defNON_E_F_PORTSSTATE_CHG_5	\
+                defNON_E_F_PORTSTX_60	\
+                defNON_E_F_PORTSTX_75	\
+                defNON_E_F_PORTSTX_90	\
+                defNON_E_F_PORTSUTIL_60	\
+                defNON_E_F_PORTSUTIL_75	\
+                defNON_E_F_PORTSUTIL_90	\
+                defSWITCHDID_CHG_1	\
+                defSWITCHEPORT_DOWN_1	\
+                defSWITCHEPORT_DOWN_2	\
+                defSWITCHEPORT_DOWN_4	\
+                defSWITCHFAB_CFG_1	\
+                defSWITCHFAB_CFG_2	\
+                defSWITCHFAB_CFG_4	\
+                defSWITCHFAB_SEG_1	\
+                defSWITCHFAB_SEG_2	\
+                defSWITCHFAB_SEG_4	\
+                defSWITCHFAULTY_PORTS_10	\
+                defSWITCHFAULTY_PORTS_11	\
+                defSWITCHFAULTY_PORTS_25	\
+                defSWITCHFAULTY_PORTS_5	\
+                defSWITCHFAULTY_PORTS_6	\
+                defSWITCHFLOGI_4	\
+                defSWITCHFLOGI_6	\
+                defSWITCHFLOGI_8	\
+                defSWITCHL2_DEVCNT_PER_60	\
+                defSWITCHL2_DEVCNT_PER_75	\
+                defSWITCHL2_DEVCNT_PER_90	\
+                defSWITCHLSAN_DEVCNT_PER_60	\
+                defSWITCHLSAN_DEVCNT_PER_75	\
+                defSWITCHLSAN_DEVCNT_PER_90	\
+                defSWITCHMARG_PORTS_10	\
+                defSWITCHMARG_PORTS_11	\
+                defSWITCHMARG_PORTS_25	\
+                defSWITCHMARG_PORTS_5	\
+                defSWITCHMARG_PORTS_6	\
+                defSWITCHSEC_AUTH_FAIL_0	\
+                defSWITCHSEC_AUTH_FAIL_2	\
+                defSWITCHSEC_AUTH_FAIL_4	\
+                defSWITCHSEC_CERT_0	\
+                defSWITCHSEC_CERT_2	\
+                defSWITCHSEC_CERT_4	\
+                defSWITCHSEC_CMD_0	\
+                defSWITCHSEC_CMD_2	\
+                defSWITCHSEC_CMD_4	\
+                defSWITCHSEC_DCC_0	\
+                defSWITCHSEC_DCC_2	\
+                defSWITCHSEC_DCC_4	\
+                defSWITCHSEC_FCS_0	\
+                defSWITCHSEC_FCS_2	\
+                defSWITCHSEC_FCS_4	\
+                defSWITCHSEC_HTTP_0	\
+                defSWITCHSEC_HTTP_2	\
+                defSWITCHSEC_HTTP_4	\
+                defSWITCHSEC_IDB_0	\
+                defSWITCHSEC_IDB_2	\
+                defSWITCHSEC_IDB_4	\
+                defSWITCHSEC_LV_0	\
+                defSWITCHSEC_LV_2	\
+                defSWITCHSEC_LV_4	\
+                defSWITCHSEC_SCC_0	\
+                defSWITCHSEC_SCC_2	\
+                defSWITCHSEC_SCC_4	\
+                defSWITCHSEC_TELNET_0	\
+                defSWITCHSEC_TELNET_2	\
+                defSWITCHSEC_TELNET_4	\
+                defSWITCHSEC_TS_D10	\
+                defSWITCHSEC_TS_D2	\
+                defSWITCHSEC_TS_D4	\
+                defSWITCHSEC_TS_H1	\
+                defSWITCHSEC_TS_H2	\
+                defSWITCHSEC_TS_H4	\
+                defSWITCHZONE_CFGSZ_PER_70	\
+                defSWITCHZONE_CFGSZ_PER_80	\
+                defSWITCHZONE_CFGSZ_PER_90	\
+                defSWITCHZONE_CHG_10	\
+                defSWITCHZONE_CHG_2	\
+                defSWITCHZONE_CHG_5	\
+                defALL_E_PORTSENCR_BLK	\
+                defALL_E_PORTSENCR_DISC	\
+                defALL_E_PORTSENCR_SHORT_FRM	\
+                defSWITCHERR_PORTS_P_10	\
+                defSWITCHERR_PORTS_P_11  	\
+                defSWITCHERR_PORTS_P_25  	\
+                defSWITCHERR_PORTS_P_5  	\
+                defSWITCHERR_PORTS_P_6 	\
+                defALL_E_PORTSTX_95	\
+                defALL_E_PORTSRX_95	\
+                defALL_E_PORTSUTIL_95	\
+                defALL_HOST_PORTSTX_95  	\
+                defALL_HOST_PORTSRX_95  	\
+                defALL_HOST_PORTSUTIL_95  	\
+                defALL_OTHER_F_PORTSTX_95  	\
+                defALL_OTHER_F_PORTSRX_95  	\
+                defALL_OTHER_F_PORTSUTIL_95 	\
+                defALL_TARGET_PORTSTX_95  	\
+                defALL_TARGET_PORTSRX_95  	\
+                defALL_TARGET_PORTSUTIL_95  	\
+                defNON_E_F_PORTSRX_95  	\
+                defNON_E_F_PORTSTX_95  	\
+                defNON_E_F_PORTSUTIL_95  	\
+                defALL_F_PORTSTX_95	\
+                defALL_F_PORTSRX_95	\
+                defALL_F_PORTSUTIL_95	\
+                defALL_TSTEMP_IN_RANGE \
+                defSWITCHBB_FCR_CNT_MAX  \
+                defALL_F_PORTSRX_90   \
+                defALL_F_PORTSUTIL_90   \
+                defALL_F_PORTSTX_90   \
+                defALL_2Km_32GLWL_QSFPCURRENT_75    \
                 defALL_2Km_32GLWL_QSFPRXP_3548      \
                 defALL_2Km_32GLWL_QSFPSFP_TEMP_75   \
                 defALL_2Km_32GLWL_QSFPSFP_TEMP_n5   \

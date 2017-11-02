@@ -102,7 +102,7 @@ def tc_01_01_01_02():
     cmds_list_w_usage = maps_tools.mapscommand_list("usage")
     cmds_list_w_correct = maps_tools.mapscommand_list("all")
     #### set up the log file info
-    f_path = '/home/run_from_here/logs/%s_%s' % ( test_numb, sut_ip )
+    f_path = 'logs/%s_%s' % ( test_numb, sut_ip )
     
     f = liabhar.FileStuff(f_path, 'w+b')
     f.write(header)
@@ -206,15 +206,11 @@ def tc_01_01_03_01():
     
     
     #### set up the log file info
-    f_path = '/home/run_from_here/logs/%s_%s' % (test_numb, sut_ip)
+    f_path = 'logs/%s_%s' % (test_numb, sut_ip)
     
     f = liabhar.FileStuff(f_path, 'w+b')
     f.write(header)
     
-    #sw_rules = str(sw_rules)
-    #sw_rules = sw_rules.replace("'", "") #### remove ' from string
-    #sw_rules = sw_rules.replace("[", "") #### remove open bracket
-    #sw_rules = sw_rules.replace("]", "") #### remove ending bracket
     df_rules = maps_tools.maps_default_rule()
     
     sw_rules = sw_rules.split()
@@ -241,7 +237,7 @@ def tc_01_01_03_01():
             print("\nFail Fail Fail Fail\n\n")
         
         i += 1
-        
+    print("\n"*5)
     print("The number of rules that differ are %s " % rule_differ)
     print("The number of additional rules on the switch %s " % ( count - count_df))
     print("Total number of switch rules    %s  \r\n" % len(sw_rules))
@@ -255,7 +251,8 @@ def tc_01_01_03_01():
 
 
     if test_result == "":
-        test_result = "PASS"
+        pass
+        #test_result = "PASS"
     
     print("="*80)
     print("\n\nTEST RESULTS FOR Test Case   25.01.01.03.01 ")
@@ -266,27 +263,30 @@ def tc_01_01_03_01():
     print("#"*80)
     print("#"*80)
     print("#"*80)
+    test_result2 = ""
     i =0
     rule_differ = 0
     while i < loop_count:
-        print("\n\ncomparing switch rule with default rule ")
+        print("\n\ncomparing default rule with switch rule ")
         #print("%s      %s " % (sw_rules[i], i ))
         print(df_rules[i])
         print("default rule       %s" % i )
         if df_rules[i] not in sw_rules:
             rule_differ += 1
-            test_result += df_rules[i]
-            test_result += ' step1'
-            test_result += ' Fail\n'
+            test_result2 += df_rules[i]
+            test_result2 += ' step1'
+            test_result2 += ' Fail\n'
             print("\nFail Fail Fail Fail\n\n")
         
         i += 1
-        
+    
+    print("\n"*5)
     print("The number of rules that differ are %s " % rule_differ)
     print("The number of additional rules on the switch %s " % ( count_df - count))
     print("Total number of switch rules    %s  \r\n" % len(sw_rules))
     print("Total number of default rules   %s  \r\n" % len(df_rules))
     print(test_result)
+    print(test_result2)
     print(len(sw_rules))
     print(len(df_rules))
     f.write("The number of rules that differ are %s \r\n" % rule_differ)
@@ -368,7 +368,7 @@ def tc_01_01_03_02():
     ####
     pgm = anturlar.Maps()
     sut_ip = pgm.ipaddress()
-    port_list = pgm.all_ports()
+    port_list = pgm.all_ports_fc_only()
     port_list_no_ve = pgm.all_ports_fc_only()
     e_ports = pgm.e_ports()
     f_ports = pgm.f_ports()
@@ -569,16 +569,16 @@ def tc_01_01_05_01():
     
     
     cmd_flash    = "mapsrule --create "+ flash_rule_name +" -group chassis\
-              -monitor flash_usage -value 30 -action email,raslog,snmp,sw_marginal\
+              -monitor flash_usage -value 1 -action email,raslog,snmp,sw_marginal\
               -op ge -policy environ_test" 
     
     cmd_cpu      = "mapsrule --create "+ cpu_rule_name +" -group chassis \
-               -monitor cpu -value 100 -action email,raslog,snmp\
-               -op le -policy environ_test"
+               -monitor cpu -value 1 -action email,raslog,snmp\
+               -op ge -policy environ_test"
     
     cmd_mem      = "mapsrule --create "+ mem_rule_name +"  -group chassis \
-              -monitor memory_usage -value 100 -action email,raslog,snmp  \
-              -op le -policy environ_test"
+              -monitor memory_usage -value 1 -action email,raslog,snmp  \
+              -op ge -policy environ_test"
     
     cmd_temp     = "mapsrule --create "+ temp_rule_out +" -group ALL_ts \
                -monitor temp -timebase none -value out_of_range \
@@ -733,7 +733,7 @@ def tc_01_01_05_01():
     anturlar.fos_cmd(cmd_temp_in_del)
      
     anturlar.fos_cmd("mapspolicy --enable dflt_moderate_policy")
-    anturlar.fos_cmd("mapspolicy --delete environ_test")
+    #anturlar.fos_cmd("mapspolicy --delete environ_test")
      
     print("\n\n\n\n\n")
     print("="*80)
@@ -834,48 +834,48 @@ def tc_01_01_05_02():
     
     link_loss_cmd         = "mapsrule --create sqa_all_ports_LF_N_1 \
                             -group ALL_ports -monitor LF -timebase hour \
-                            -value 2 -action email,raslog,snmp -op g \
+                            -value 0 -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     sync_loss_cmd         = "mapsrule --create sqa_all_ports_loss_sync_N_1 \
                             -group ALL_ports -monitor loss_sync -timebase min \
-                            -value 2 -action email,raslog,snmp -op g \
+                            -value 0 -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     loss_signal_cmd       = "mapsrule --create sqa_all_ports_loss_sig_N_1 \
                             -group ALL_ports -monitor loss_signal \
                             -timebase hour -value 0 -action email,raslog,snmp \
-                            -op g -policy port_health_policy"
+                            -op ge -policy port_health_policy"
     
     port_state_change_cmd = "mapsrule --create sqa_all_ports_state_change_N_0 \
                             -group ALL_ports -monitor State_CHG -timebase min \
-                            -value 1 -action email,raslog,snmp -op g \
+                            -value 0 -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     invalid_proto_cmd     = "mapsrule --create sqa_all_ports_PE_N_1 \
                             -group ALL_ports -monitor PE -timebase hour \
-                            -value 5 -action email,raslog,snmp -op g \
+                            -value 0 -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     lr_cmd                = "mapsrule --create sqa_all_ports_LR_N_1 \
                             -group ALL_ports -monitor LR -timebase min \
-                            -value 0 -action email,raslog,snmp -op g \
+                            -value 0 -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     invalid_word_cmd      = "mapsrule --create sqa_all_ports_ITW_N_1 \
                             -group ALL_ports \
-                            -monitor itw -timebase hour -value 5 \
-                            -action email,raslog,snmp -op g \
+                            -monitor itw -timebase hour -value 0 \
+                            -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     crc_cmd               = "mapsrule --create sqa_all_ports_CRC_N_1 \
                             -group ALL_ports \
-                            -monitor crc -timebase min -value 6 \
-                            -action email,raslog,snmp -op g -policy port_health_policy"
+                            -monitor crc -timebase min -value 0 \
+                            -action email,raslog,snmp -op ge -policy port_health_policy"
     
     c3tx_to_cmd           = "mapsrule --create sqa_all_ports_C3_TO_N_1 \
                             -group ALL_ports -monitor C3TXTO -timebase hour \
-                            -value 1 -action email,raslog,snmp -op g \
+                            -value 0  -action email,raslog,snmp -op ge \
                             -policy port_health_policy"
     
     
@@ -967,19 +967,19 @@ def tc_01_01_05_03():
     circuit_change_cmd    = "mapsrule --create sqa_fcip_cir_STATE \
                             -group ALL_CIRCUITS -monitor cir_state \
                             -timebase hour -value 0 \
-                            -action email,raslog,snmp -op g \
+                            -action email,raslog,snmp -op ge \
                             -policy fcip_health_policy"
     
     circuit_util_cmd     = "mapsrule --create sqa_fcip_cir_UTIL \
                             -group ALL_CIRCUITS -monitor cir_util \
                             -timebase min -value 0 \
-                            -action email,raslog,snmp -op g \
+                            -action email,raslog,snmp -op ge \
                             -policy fcip_health_policy "
     
     packet_loss_cmd      = "mapsrule --create sqa_fcip_cir_pktloss \
                             -group ALL_CIRCUITS -monitor cir_pktloss \
                             -timebase hour -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy "
+                            -op ge -policy fcip_health_policy "
     
     qos_tunnel_cmd      = " "
     
@@ -987,27 +987,27 @@ def tc_01_01_05_03():
     rtt_cmd             = "mapsrule --create sqa_fcip_rtt \
                             -group ALL_CIRCUITS -monitor rtt \
                             -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy  "
+                            -op ge -policy fcip_health_policy  "
     
     jitter_cmd          = "mapsrule --create sqa_fcip_jitter \
                             -group ALL_CIRCUITS -monitor jitter \
                             -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy  "
+                            -op ge -policy fcip_health_policy  "
     
     state_change_cmd    = "mapsrule --create sqa_fcip_statechange \
                             -group ALL_CIRCUITS -monitor state_chg \
                             -timebase hour -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy "
+                            -op ge -policy fcip_health_policy "
     
     utilization_cmd     = "mapsrule --create sqa_fcip_utilization \
                             -group ALL_CIRCUITS -monitor util \
                             -timebase hour -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy"
+                            -op ge -policy fcip_health_policy"
     
     packets_cmd         = "mapsrule --create sqa_fcip_packet_loss \
                             -group ALL_CIRCUITS -monitor pktloss \
                             -timebase hour -value 0 -action email,raslog,snmp \
-                            -op g -policy fcip_health_policy"
+                            -op ge -policy fcip_health_policy"
     
     slow_starts_cmd     = " "
     
@@ -1088,40 +1088,40 @@ def tc_01_01_05_04():
     
     rx_e_cmd   = "mapsrule --create sqa_trafperf_port_RX_E -group ALL_E_ports \
                  -monitor RX  -timebase min -value 0 -action email,raslog,snmp\
-                 -op g -policy traffic_performance_policy"
+                 -op ge -policy traffic_performance_policy"
 
     rx_f_cmd   = "mapsrule --create sqa_trafperf_port_RX_F -group ALL_F_ports \
                  -monitor RX  -timebase min -value 0 -action email,raslog,snmp\
-                 -op g -policy traffic_performance_policy"
+                 -op ge -policy traffic_performance_policy"
     
     tx_e_cmd    = "mapsrule --create sqa_trafperf_port_TX_E -group ALL_E_ports\
                   -monitor TX -timebase min -value 0 -action email,raslog,snmp\
-                  -op g -policy traffic_performance_policy"
+                  -op ge -policy traffic_performance_policy"
     
     tx_f_cmd    = "mapsrule --create sqa_trafperf_port_TX_F -group ALL_F_ports\
                   -monitor TX -timebase min -value 0 -action email,raslog,snmp\
-                  -op g -policy traffic_performance_policy"
+                  -op ge -policy traffic_performance_policy"
     
     util_e_cmd  = "mapsrule --create sqa_trafperf_port_UTIL_E \
                   -group ALL_E_ports\
                   -monitor UTIL -timebase hour -value 0 \
                   -action email,raslog,snmp\
-                  -op g -policy traffic_performance_policy"
+                  -op ge -policy traffic_performance_policy"
     
     util_f_cmd  =  "mapsrule --create sqa_trafperf_port_UTIL_F \
                    -group ALL_F_ports\
                    -monitor UTIL -timebase hour -value 0 \
                    -action email,raslog,snmp\
-                   -op g -policy traffic_performance_policy"
+                   -op ge -policy traffic_performance_policy"
     
     rx_none_cmd =  "mapsrule --create sqa_trafperf_port_RX_Non \
                    -group NON_E_F_ports -monitor RX  -timebase min -value 0 \
-                   -action email,raslog,snmp -op g \
+                   -action email,raslog,snmp -op ge \
                    -policy traffic_performance_policy"
     
     tx_none_cmd = "mapsrule --create sqa_trafperf_port_TX_Non \
                   -group NON_E_F_ports -monitor TX  -timebase min -value 0 \
-                  -action email,raslog,snmp -op g \
+                  -action email,raslog,snmp -op ge \
                   -policy traffic_performance_policy"
     
     
@@ -1651,6 +1651,7 @@ def tc_01_01_06_07():
     ###########################################################################
     ####  todo -
     ####    1.   check for pizza box or chassis now it fails for pizza line 1703??
+    ####              removed 
     ####    2.  add the slot numbers - right now it is the default 0
     ####   
     ###
@@ -1688,7 +1689,7 @@ def tc_01_01_06_07():
     
     print("slot list length is   %s  " % slot_list_len)
     print("slot list  0   %s " % slot_list[0])
-    print("slot list  1  %s " % slot_list[1])
+    #print("slot list  1  %s " % slot_list[1])
     
     
     slot_core_list = en.blades(False,True)
@@ -1743,11 +1744,7 @@ def tc_01_01_06_07():
     while cont <= 100000:
         cont +=1
         
-        
-        print("\n"*20)
-        print("#"*80)
-        print("#"*80)
-        print("#"*80)
+        print("\n"*20) ; print("#"*80) ; print("#"*80) ; print("#"*80)
         
         slot_list_len = (len(slot_list))
         ####pick a FC blade
@@ -1891,25 +1888,18 @@ def tc_01_01_06_07():
     #### confirm if the port is still in_sync once errors are started
     ####  code goes here
         
-    ##for i in bld_map:
-    ##    if "In_Sync" in (i[12]):
-    ##        chip_numb = i[8]
-    ##        chip_id = i[11]
-    ##        chip_port = i[4]
-    ##        port_in_sync = i[12]
-    ##        usr_port = i[1]
-    ##        print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
-    ##        print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
-           
-   
-        
         print("MY RANDOM NUMBER   %s " % port_to_add_err)
         print("ERR COUNTER TO INCRIMENT  %s  " % coutr_to_incr_name )
         print("ERR COUNTER TO INCRIMENT   %s " % coutr_to_incr_count)
-    
-    
+        
         cmdrtn = anturlar.fos_cmd("mapsdb --show all")
         liabhar.JustSleep(10)
+        
+        print("\n\nMY RANDOM NUMBER port to add error   %s " % port_to_add_err)
+        print("ERR COUNTER TO INCRIMENT  counter to incr name  %s  " % coutr_to_incr_name )
+        print("ERR COUNTER TO INCRIMENT  counter to incr counter  %s " % coutr_to_incr_count)
+        liabhar.JustSleep(10)     
+        
         
     return(0)
 ###############################################################################        
