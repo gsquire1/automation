@@ -830,13 +830,6 @@ def pwr_cycle(pwr_ip, pp, stage, db=0):
     return(0)
 
 def raritan(port, status, ip="10.39.36.112", user="user", pw="pass"):
-
-    # try:
-    #     ip = sys.argv[1]
-    #     user = sys.argv[2]
-    #     pw = sys.argv[3]
-    # except IndexError:
-    #     pass # use defaults
     
     agent = Agent("https", ip, user, pw, disable_certificate_verification=True)
     pdu = pdumodel.Pdu("/model/pdu/0", agent)
@@ -851,9 +844,11 @@ def raritan(port, status, ip="10.39.36.112", user="user", pw="pass"):
     print ("Number of inlets: %d" % (len(inlets)))
     print ("Number of over current protectors: %d" % (len(ocps)))
     print ("Number of outlets: %d" % (len(outlets)))
-    
+    port = (int(port))
+    port = (port-1)
+    print(type(port))
+    print(port)
     outlet = outlets[port]
-    
     outlet_metadata = outlet.getMetaData()
     outlet_settings = outlet.getSettings()
     
@@ -878,8 +873,8 @@ def raritan(port, status, ip="10.39.36.112", user="user", pw="pass"):
             print ("  Turning outlet on...")
             outlet.setPowerState(outlet.PowerState.PS_ON)
             outlet_state = outlet.getState()
-        if outlet_state.available:
-            print ("  Status :%s" % ("on" if outlet_state.powerState == pdumodel.Outlet.PowerState.PS_ON else "off"))
+        #if outlet_state.available:
+            #print ("  Status :%s" % ("on" if outlet_state.powerState == pdumodel.Outlet.PowerState.PS_ON else "off"))
     else:
         print("THIS PDU DOES NOT SUPPPORT CLI POWERCYCLING")
     
@@ -1302,47 +1297,40 @@ def do_net_install(sw_info_filename):
     print("\n"*4)
     print("&"*80) 
  
-    try:
-
-        # if "10.39.36.112" in power_pole_info:
-        #     for pp in range(0, len(power_pole_info), 2):
-        #         raritan(power_pole_info[pp+1], "off")
-        #         raritan(power_pole_info[pp+1], "on")
-        
-        for pp in range(0, len(power_pole_info), 2):
-            print('POWERPOLE')
-            print(pp)
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print(power_pole_info)
-            if pp == "10.39.36.112":
-                port = (int(power_pole_info[x+1]))
-                raritan(port, "off")
-            else:
-                pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off",10)
-                time.sleep(4)
-            
-        for pp in range(0, len(power_pole_info), 2):
-            print('POWERPOLE')
-            if pp == "10.39.36.112":
-                port = (int(power_pole_info[x+1]))
-                raritan(port, "on")
-            else:
-                pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on",10)
-                time.sleep(4)
-    except:
-        print("#############  EXCEPTION HIT HERE   ###############")
-        if  '' == power_pole_info[0]:
-            print("\n"*20)
-            print("NO POWER POLE INFO FOUND ")
-            print("HA "*10)
-            print("you have to walk to power cycle the switch")
-            print("I will wait ")
-            liabhar.JustSleep(30)
+#try:
+    
+    for pp in range(0, len(power_pole_info), 2):
+        print('POWERPOLE')
+        if power_pole_info[pp] == "10.39.36.112":
+            port = (power_pole_info[pp+1])
+            print(port)
+            raritan(port, "off")
         else:
-            print("POWER TOWER INFO")
-            print(power_pole_info[0])
-            print(power_pole_info)
-            liabhar.JustSleep(30)
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "off",10)
+            time.sleep(4)
+        
+    for pp in range(0, len(power_pole_info), 2):
+        print('POWERPOLE')
+        if power_pole_info[pp] == "10.39.36.112":
+            port = (power_pole_info[pp+1])
+            raritan(port, "on")
+        else:
+            pwr_cycle(power_pole_info[pp],power_pole_info[pp+1], "on",10)
+            time.sleep(4)
+#except:
+
+    if  '' == power_pole_info[0]:
+        print("\n"*20)
+        print("NO POWER POLE INFO FOUND ")
+        print("HA "*10)
+        print("you have to walk to power cycle the switch")
+        print("I will wait ")
+        liabhar.JustSleep(30)
+    else:
+        print("POWER TOWER INFO")
+        print(power_pole_info[0])
+        print(power_pole_info)
+        liabhar.JustSleep(30)
             
 #######################################################################################################################
 #######################################################################################################################

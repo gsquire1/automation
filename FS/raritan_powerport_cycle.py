@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import sys, time
-
-sys.path.append("pdu-python-api")
+sys.path.append('/home/automation/lib/SDK')
+#sys.path.append("pdu-python-api")
 from raritan.rpc import Agent, pdumodel, firmware, sensors
 
 
@@ -23,14 +23,14 @@ firmware_proxy = firmware.Firmware("/firmware", agent)
 inlets = pdu.getInlets()
 ocps = pdu.getOverCurrentProtectors()
 outlets = pdu.getOutlets()
-
+#print(outlets)
 print ("PDU: %s" % (ip))
 print ("Firmware version: %s" % (firmware_proxy.getVersion()))
 print ("Number of inlets: %d" % (len(inlets)))
 print ("Number of over current protectors: %d" % (len(ocps)))
 print ("Number of outlets: %d" % (len(outlets)))
-
-outlet = outlets[1]
+port=1
+outlet = outlets[port]
 
 outlet_metadata = outlet.getMetaData()
 outlet_settings = outlet.getSettings()

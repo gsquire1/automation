@@ -24,8 +24,6 @@ def connect_ssh( ip, user, pwd):
 		print(e)
 		return False
 
-
-
 def ssh_send_cmd(cmd):
 	 
 	syncOutput = ''
