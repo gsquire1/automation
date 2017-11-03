@@ -1,0 +1,171 @@
+RJSON1111111111111111111111111111111111111111
+<bound method Response.json of <Response [200]>>
+RSTATUSCODE2222222222222222222222222222222222
+200
+RTEXT3333333333333333333333333333333333333333
+
+RHEADERS4444444444444444444444444444444444444
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Authorization': 'Custom_Basic YWRtaW46eHh4OjFmOTM3ZGVhYmY2ZDMwOTMxNTE1YTI3ZmZjNTRmM2RiYjdmMjg2NmEyYTZkMzg3MGVkZDhlNDgxYmQzZjU3MDY=', 'Cache-Control': 'no-cache'}
+RCOOKIES555555555555555555555555555555555
+<RequestsCookieJar[]>
+Custom_Basic YWRtaW46eHh4OjFmOTM3ZGVhYmY2ZDMwOTMxNTE1YTI3ZmZjNTRmM2RiYjdmMjg2NmEyYTZkMzg3MGVkZDhlNDgxYmQzZjU3MDY=
+{'Authorization': 'Custom_Basic YWRtaW46eHh4OjFmOTM3ZGVhYmY2ZDMwOTMxNTE1YTI3ZmZjNTRmM2RiYjdmMjg2NmEyYTZkMzg3MGVkZDhlNDgxYmQzZjU3MDY='}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <domain-id>33</domain-id>
+    <fcid>16776225</fcid>
+    <user-friendly-name>G630_33_I1</user-friendly-name>
+    <enabled-state>2</enabled-state>
+    <up-time>1804</up-time>
+    <domain-name/>
+    <principal>0</principal>
+    <ip-address>
+      <ip-address>10.38.36.33</ip-address>
+    </ip-address>
+    <model>173.0</model>
+    <firmware-version>v8.2.0_bld50</firmware-version>
+    <vf-id>-1</vf-id>
+    <fabric-user-friendly-name>GRAHAM</fabric-user-friendly-name>
+    <ag-mode>0</ag-mode>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<class 'list'>
+['10:00:c4:f5:7c:01:05:60']
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <domain-id>33</domain-id>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <user-friendly-name>G630_33_I1</user-friendly-name>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <fcid>16776225</fcid>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <vf-id>-1</vf-id>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <principal>0</principal>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <enabled-state>2</enabled-state>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <up-time>1804</up-time>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <model>173.0</model>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <firmware-version>v8.2.0_bld50</firmware-version>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:06 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <ip-address>
+      <ip-address>10.38.36.33</ip-address>
+    </ip-address>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:07 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <domain-name/>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:07 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <fabric-user-friendly-name>GRAHAM</fabric-user-friendly-name>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:07 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+<bound method Response.json of <Response [200]>>
+<?xml version="1.0"?>
+<Response>
+  <fibrechannel-switch>
+    <name>10:00:c4:f5:7c:01:05:60</name>
+    <ag-mode>0</ag-mode>
+  </fibrechannel-switch>
+</Response>
+
+{'Date': 'Fri, 03 Nov 2017 15:31:07 GMT', 'Server': 'Apache', 'X-XSS-Protection': '1; mode=block', 'Transfer-Encoding': 'chunked', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Content-Type': 'application/yang-data+xml', 'Connection': 'close', 'Content-Secure-Policy': "default-src 'self'", 'Cache-Control': 'no-cache'}
+204
