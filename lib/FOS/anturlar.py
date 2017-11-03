@@ -512,7 +512,7 @@ class SwitchInfo:
         
         capture_cmd = fos_cmd("switchshow")
         if self.am_i_director:
-            ras = re.compile('(?:\d{1,4}\s{3,4})(?P<slotnumber>\d{1,2})\s+?(?P<port>\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-AN234816G]{2,3}\s+\w+\s+[FC]{2}') 
+            ras = re.compile('(?:\d{1,4}\s{3,4})(?P<slotnumber>\d{1,2})\s+?(?P<port>\d{1,2})\s+[-0-9a-f]{6}\s+[-idcu]{2}\s+[-ANU234816G]{2,3}\s+\w+\s+[FC]{2}') 
             ras = ras.findall(capture_cmd)
             for i in ras:
                 ras_list.append(list(i))
