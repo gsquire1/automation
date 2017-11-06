@@ -8,40 +8,139 @@ import os
 import sys
 
 
-###################################
-###################################
+###############################################################################
+###############################################################################
+
+switch_ip = "10.38.34.192"
+
+
+
+class rest_cfg:
+
+    def __init__(self, ):
+        pass
+
+
+    def rest_login(self, s_ip, username, passwrd):
+        """
+    
+        """
+        loginpath =  s_ip + "/rest/login"
+        return(requests.post(_url(loginpath), auth=(username,passwrd)))
+
+
+    def get_wwn(self, s_ip, auth_value):
+        """
+        
+        """
+        Auth_strng = {'Authorization':'%s'%auth_value}
+        path_to_wwn =  s_ip + "/rest/running/switch/fibrechannel-switch"
+        return(requests.get(_url(path_to_wwn), headers=Auth_strng))
+        
+        
+        
+###############################################################################
+#### add this to another file
+######
+
+class get_top_level_list:
+ 
+    def domain_id(self):
+        return("/rest/running/switch/fibrechannel-switch/name/")
+    
+    def user_friendly_name(self):
+        return("/rest/running/switch/fibrechannel-switch/name/")
+    
+    
+    
+    def dispatch(self, cmd):
+        """
+        """
+        method_name =  "cmd_" + str(cmd)
+        print("@"*10)
+        print(cmd)
+        print("@"*10)
+        try:
+            m = getattr(get_top_level_list(),cmd,'name')
+            
+        except AttributeError:
+            print(method_name, "not found")
+        
+        return(m)
+        
+        
+        
 
 def _url(path):
     """
     """
-    return('http://10.38.34.192'  + path)
+    return("http://" + path)
+    
+    #return('http://10.38.34.192'  + path)
 
 
 def add_task(summary, description=""):
     """
     """
-    return(requests.post(_url('/rest/login')))
+    return(requests.post(_url('/rest/')))
 
-def get_tasks():
+
+
+def get_tasks(command):
     """
     """
     return(request.get(_url('')))
     
     
+
+#def rest_login_old(s_ip,username,passwrd,):
+  #  """
+    #
+    #"""
+    #loginpath =  s_ip + "/rest/login"
+    #response = requests.post(_url(loginpath), auth=(username,passwrd))
+    #
+    #return(response)
+
+
+
 def main():
     
-    r = requests.post("http://10.38.34.192/rest/login", auth=('admin','password'))
+    switch_ip = "10.38.34.192"
+    user = "admin"
+    passwrd = "password"
+    
+    sem = get_top_level_list()
+    print("@"*80)
+    p = sem.dispatch("domain_id")
+    print(p())
+    print("@"*80)
+    p = sem.dispatch("user_friendly_name")
+    print(p())
+    print("@"*80)
+    
+    sys.exit()
+    
+    
+    
+    sm = rest_cfg()
+
+    r = sm.rest_login(switch_ip, user, passwrd)
+    
+    #r = rest_login(switch_ip, user, passwrd)
+    #r = requests.post("http://10.38.34.192/rest/login", auth=('admin','password'))
     print(r.json)
     print(r.status_code)
     print(r.text)
     print(r.headers)
     print(r.cookies)
     Auth = r.headers.get('Authorization')
-    #session = r.session()
     print(Auth)
-    
     Auth_send={'Authorization':'%s'%Auth}
     print(Auth_send)
+    
+    
+    r = sm.get_wwn(switch_ip, Auth)
     
     
     ###########################################################################
@@ -52,7 +151,8 @@ def main():
     ####     
     ####     leaf                   domain-id
     ####
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch", headers=Auth_send)
+    #r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch", headers=Auth_send)
+
     print(r.json)
     print(r.text)
     print(r.headers)
@@ -63,6 +163,7 @@ def main():
     wwn = ras[0]
 
 
+    
     r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/domain-id" % wwn , headers=Auth_send)
     print(r.json)
     print(r.text)
