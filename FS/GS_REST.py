@@ -31,15 +31,10 @@ def get_tasks():
 def main():
     
     r = requests.post("http://10.38.36.33/rest/login", auth=('admin','fibranne'))
-    print("RJSON1111111111111111111111111111111111111111")
     print(r.json)
-    print("RSTATUSCODE2222222222222222222222222222222222")
     print(r.status_code)
-    print("RTEXT3333333333333333333333333333333333333333")
     print(r.text)
-    print('RHEADERS4444444444444444444444444444444444444')
     print(r.headers)
-    print('RCOOKIES555555555555555555555555555555555')
     print(r.cookies)
     Auth = r.headers.get('Authorization')
     #session = r.session()
