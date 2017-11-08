@@ -5,7 +5,10 @@ import requests
 import json
 import  re
 import os
-import sys
+import sys     
+import time
+import untangle
+
 
 
 ###############################################################################
@@ -25,17 +28,20 @@ class rest_cfg:
         """
     
         """
-        loginpath =  s_ip + "/rest/login"
-        return(requests.post(_url(loginpath), auth=(username,passwrd)))
+        loginpath =  "http://" + s_ip + "/rest/login"
+        return(requests.post(loginpath, auth=(username,passwrd)))
 
-
+    def rest_logout(self, ):
+        pass        
+    
     def get_wwn(self, s_ip, auth_value):
         """
         
         """
         Auth_strng = {'Authorization':'%s'%auth_value}
-        path_to_wwn =  s_ip + "/rest/running/switch/fibrechannel-switch"
-        return(requests.get(_url(path_to_wwn), headers=Auth_strng))
+        
+        path_to_wwn =  "http://" + s_ip + "/rest/running/switch/fibrechannel-switch"
+        return(requests.get(path_to_wwn, headers=Auth_strng))
         
         
         
@@ -46,82 +52,102 @@ class rest_cfg:
 class get_top_level_list:
  
     def domain_id(self):
-        return("/rest/running/switch/fibrechannel-switch/name/")
-    
+        return("/rest/running/switch/fibrechannel-switch/name/" )
     def user_friendly_name(self):
-        return("/rest/running/switch/fibrechannel-switch/name/")
-    
-    
+        return("/rest/running/switch/fibrechannel-switch/name/" )    
+    def fcid(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def vf_id(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def principal(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def enabled_state(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def up_time(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def model(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def firmware_version(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def  ip_address(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def domain_name(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def fabric_user_friendly_name(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+    def ag_mode(self):
+        return("/rest/running/switch/fibrechannel-switch/name/" )
+###############################################################################
+####    helper to retrieve the URI 
+####
     
     def dispatch(self, cmd):
         """
         """
-        method_name =  "cmd_" + str(cmd)
+        #method_name =  "cmd_" + str(cmd)
         print("@"*10)
         print(cmd)
+        underscore_cmd = cmd.replace("-", "_")
         print("@"*10)
         try:
-            m = getattr(get_top_level_list(),cmd,'name')
+            m = getattr(get_top_level_list(),underscore_cmd)
             
         except AttributeError:
             print(method_name, "not found")
         
         return(m)
-        
-        
-        
 
-def _url(path):
+def _url( sw_ip, wwn, path, cmd ):
     """
     """
-    return("http://" + path)
-    
-    #return('http://10.38.34.192'  + path)
-
+    return("http://" + sw_ip  + path + wwn + "/" + cmd)
 
 def add_task(summary, description=""):
     """
     """
     return(requests.post(_url('/rest/')))
 
-
-
-def get_tasks(command):
+def get_tasks(command, switch_ip, wwn, Auth_send):
     """
     """
-    return(request.get(_url('')))
+    sem = get_top_level_list()
+    p = sem.dispatch(command)
+    cmplt_path = _url(switch_ip, wwn, p(), command )
+
+    r = requests.get(cmplt_path, headers=Auth_send)
+    return(r)
     
+def get_tasks_name(command, switch_ip, wwn, Auth_send, get_this_name):
+    """
+    """
+    sem = get_top_level_list()
+    p = sem.dispatch(command)
+    cmplt_path = _url(switch_ip, wwn, p(), command )
+    cmplt_path = cmplt_path + get_this_name
     
-
-#def rest_login_old(s_ip,username,passwrd,):
-  #  """
-    #
-    #"""
-    #loginpath =  s_ip + "/rest/login"
-    #response = requests.post(_url(loginpath), auth=(username,passwrd))
-    #
-    #return(response)
-
-
+    r = requests.get(cmplt_path, headers=Auth_send)
+    return(r)
+    
+###############################################################################
+###############################################################################
+####
+####
+####
+###############################################################################
 
 def main():
     
+    ####  chewy2
     switch_ip = "10.38.34.192"
+    ####    Odin
+    #switch_ip = "10.38.34.178"
+    ####    stinger
+    #switch_ip = "10.38.34.182"
+
     user = "admin"
     passwrd = "password"
-    
-    sem = get_top_level_list()
-    print("@"*80)
-    p = sem.dispatch("domain_id")
-    print(p())
-    print("@"*80)
-    p = sem.dispatch("user_friendly_name")
-    print(p())
-    print("@"*80)
-    
-    sys.exit()
-    
-    
+    fid = 31
+    #fid = 0
     
     sm = rest_cfg()
 
@@ -141,7 +167,6 @@ def main():
     
     
     r = sm.get_wwn(switch_ip, Auth)
-    
     
     ###########################################################################
     ###########################################################################
@@ -163,154 +188,86 @@ def main():
     wwn = ras[0]
 
 
+    sem = get_top_level_list()
+    print("@"*80)
+    p = sem.dispatch("domain-id")
+    cmplt_path = _url(switch_ip, wwn, p(),  "domain-id")
+    print(p())
+    print(cmplt_path)
     
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/domain-id" % wwn , headers=Auth_send)
+    r = requests.get(cmplt_path, headers=Auth_send)
     print(r.json)
     print(r.text)
     print(r.headers)
     
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/user-friendly-name" % wwn , headers=Auth_send)
+    print("@"*80)
+    
+    
+    p = sem.dispatch("user-friendly-name")
+    cmplt_path = _url(switch_ip, wwn, p(), "user-friendly-name" )
+    print(p())
+    print(cmplt_path)
+    
+    r = requests.get(cmplt_path, headers=Auth_send)
     print(r.json)
     print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/fcid" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/vf-id" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/principal" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/enabled-state" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/up-time" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/model" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/firmware-version" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/ip-address" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/domain-name" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/fabric-user-friendly-name" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/ag-mode" % wwn , headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-
-###############################################################################
-###############################################################################
-####
-####          LOGOUT           LOGOUT
-####
-###############################################################################
-
-    r = requests.post("http://10.38.34.192/rest/logout", headers=Auth_send)
-    #print(r.json)
     print(r.status_code)
+    print(r.headers)
+    print("@"*80)
     
-    sys.exit()
-
-
-
-
-
-
-
-
-    r = requests.get("http://10.38.34.192/rest/running/zoning/effective-configuration", headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    r = requests.get("http://10.38.34.192/rest/running/fabric/fabric-switch", headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    
-    r = requests.get("http://10.38.34.192/rest/running/brocade-interface/fibrechannel-statistics", headers=Auth_send)
-    print(r.json)
-    print(r.text)
-    print(r.headers)
-
-    
-    ###########################################################
-    ###########################################################
-    #### to run the up-time request you need the wwn of the switch
-    ####   the first request get the info to capture the wwn
-    ####
-    #### 
-    print("#"*120)
-    print("Fibrechannel-switch")
-    print("#"*120)  
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch", headers=Auth_send)
-    print(r.json)
-    print(r.status_code)
-    print(r.text)
-    print(r.headers)
-    print('@'*80)
-    print(r.encoding)
-    ras = re.compile('name>([\:0-9a-f]+)</n')
-    ras = ras.findall(r.text)
-    print(type(ras))
-    print(ras)
-    wwn = ras[0]
-    print(type(wwn))
-    print(wwn)
-    print("#"*120)
-    print("Fibrechannel-switch/up-time")
-    print("#"*120)
-    r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/up-time" % wwn, headers=Auth_send)
+    #r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/domain-id" % wwn , headers=Auth_send)
     #print(r.json)
     #print(r.text)
     #print(r.headers)
-    if r.status_code != 200:
-        print("error with the request")
-        print(r.text)
-    else:
-        pass
     
     
-
-
-
+    fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'principal', 'enabled-state', 'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode']
+    fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id']
+    for c in fcs:    
+     
+        s = get_tasks(c, switch_ip, wwn, Auth_send)
+        print("$"*80)
+        print(s.json)
+        print(s.status_code)
+        print(s.text)
+        print("&"*80)
+        time.sleep(1)
+    
+    fcs = ['vf-id',]
+     
+    for c in fcs:    
+     
+        s = get_tasks(c, switch_ip, wwn, Auth_send)
+        print("$"*80)
+        print(s)
+        print(s.json)
+        print(s.status_code)
+        print(s.text)
+        print("&"*80)
+        print(json.dumps(s.text))   #  this is not what we want
+        doc = untangle.parse(s.text)
+        #child_0 = doc.Response.fibrechannel_switch.name.cdata[0]
+        wwn = doc.Response.fibrechannel_switch.name.cdata
+        vf_id = doc.Response.fibrechannel_switch.vf_id.cdata
+        
+        print("wwn =  %s  " %  wwn)
+        print("vf_id =  %s  "  % vf_id)
+        print("&"*80)
+        time.sleep(1)
+    
+ 
+    
     r = requests.post("http://10.38.34.192/rest/logout", headers=Auth_send)
     #print(r.json)
     print(r.status_code)
     
+    
+    sys.exit()
+    #    def dispatch(self, switch_ip, cmd, auth , fid):
+    
+
+
+
 
 if __name__ == '__main__':
     
