@@ -3,7 +3,7 @@
 
 import requests
 import json
-import  re
+import re
 import os
 import sys
 
@@ -37,12 +37,14 @@ def main():
     print(r.headers)
     print(r.cookies)
     Auth = r.headers.get('Authorization')
-    #session = r.session()
+    print("this is AUTH")
     print(Auth)
     
     Auth_send={'Authorization':'%s'%Auth}
+    print('THISISAUTHSEND')
     print(Auth_send)
     
+
     
     ###########################################################################
     ###########################################################################
@@ -62,10 +64,25 @@ def main():
     print(ras)
     wwn = ras[0]
 
-    # r = requests.get("http://10.38.36.33/rest/running/switch/zoning" % wwn , headers=Auth_send)
-    # print(r.json)
-    # print(r.text)
-    # print(r.headers)
+    print('(((((((((((((((((((((EFFECTIVE_CONFIGURATION)))))))))))))))))))))')
+    r = requests.get("http://10.38.36.33/rest/running/zoning/effective-configuration",  headers=Auth_send)
+    print(r.json)
+    print(r.text)
+    print(r.headers)
+    
+    print('(((((((((((((((((((((DEFINED_CONFIGURATION)))))))))))))))))))))))')    
+    r = requests.get("http://10.38.36.33/rest/running/zoning/defined-configuration",  headers=Auth_send)
+    print(r.json)
+    print(r.text)
+    print(r.headers)
+    
+    ####   LOGOUT   ####
+    print('LOGOUT____HERE')
+    r = requests.post("http://10.38.36.33/rest/logout", headers=Auth_send)
+    #print(r.json)
+    print(r.status_code)
+    
+    sys.exit(0)
 
     r = requests.get("http://10.38.36.33/rest/running/switch/fibrechannel-switch/name/%s/domain-id" % wwn , headers=Auth_send)
     print(r.json)
@@ -143,6 +160,8 @@ def main():
     r = requests.post("http://10.38.36.33/rest/logout", headers=Auth_send)
     #print(r.json)
     print(r.status_code)
+    
+    
     
     sys.exit()
 

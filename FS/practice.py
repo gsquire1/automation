@@ -59,8 +59,9 @@ class get_top_level_list:
         print(cmd)
         print("@"*10)
         try:
+            print('MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM')
             m = getattr(get_top_level_list(),cmd,'name')
-            print(m)
+            print(m())
             
         except AttributeError:
             print(method_name, "not found")
