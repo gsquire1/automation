@@ -58,7 +58,7 @@ class rest_cfg:
 #### add this to another file
 ######
 
-class get_top_level_list:
+class get_top_level_list_fibrechannel_switch:
  
     def domain_id(self):
         return("/rest/running/switch/fibrechannel-switch/name/" )
@@ -99,7 +99,7 @@ class get_top_level_list:
         underscore_cmd = cmd.replace("-", "_")
         print("@"*10)
         try:
-            m = getattr(get_top_level_list(),underscore_cmd)
+            m = getattr(get_top_level_list_fibrechannel_switch(),underscore_cmd)
             
         except AttributeError:
             print(method_name, "not found")
@@ -124,25 +124,31 @@ def add_task(summary, description=""):
     """
     return(requests.post(_url('/rest/')))
 
-def get_tasks(command, switch_ip, wwn, Auth_send, fid = -1):
+def get_tasks(command, switch_ip, wwn, Auth_send, list_name, fid = -1):
+    """ 
     """
-    """
-    sem = get_top_level_list()
-    p = sem.dispatch(command)
-    cmplt_path = _url(switch_ip, wwn, p(), command , fid)
-
+    #sem = get_top_level_list_fibrechannel_switch()
+    #p = sem.dispatch(command)
+    
+    if list_name == "fc_switch":
+        top_level = "/rest/running/switch/fibrechannel-switch/name/"
+        
+    if list_name == "fab_switch":
+        top_level = "/rest/running/fabric/fabric-switch/name/"
+       
+    cmplt_path = _url(switch_ip, wwn, top_level, command , fid)
     r = requests.get(cmplt_path, headers=Auth_send)
-    print("@"*80)
-    print(r)
-    print("@"*80)
+
     return(r)
     
-def get_info_word(switch_ip, wwn, Auth_send, word, fid = -1):
-    """
+def get_fc_switch_leaf(switch_ip, wwn, Auth_send, word, fid = -1):
+    """return the info for a specified leaf in the module
+        brocade-fibrecahnnel-switch  yang file 
+    
     """
     #vf_id = doc.Response.fibrechannel_switch.vf_id.cdata
     # s = get_tasks('vf-id', switch_ip, wwn, Auth_send)   ## command from below
-    s = get_tasks(word,switch_ip, wwn,Auth_send, fid )
+    s = get_tasks(word,switch_ip, wwn,Auth_send, "fc_switch", fid )
     
     doc = untangle.parse(s.text)
     
@@ -174,11 +180,33 @@ def get_info_word(switch_ip, wwn, Auth_send, word, fid = -1):
         done =  doc.Response.fibrechannel_switch.principal.cdata 
 #    'domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'principal', 'enabled-state',
 #    'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode'
-    
         
+    return(done)
+
+
+def get_fabric_switch_leaf(switch_ip, wwn, Auth_send, word, fid = -1):
+    """return the info for a specified leaf in the module
+        brocade-fabric-switch  yang file 
+    
+    """
+ 
+    s = get_tasks(word,switch_ip, wwn,Auth_send, "fab_switch", fid )
+    print("debug___"*10)
+    print(s.text)
+    print("end_____"*10)
+    doc = untangle.parse(s.text)
+    print("debug___"*10)
+    print(doc)
+    print("end_____"*10)
+    if "vf-id" == word:
+        done = doc.Response.fabric_switch.vf_id.cdata
+    if "wwn" == word:
+        done = doc.Response.fabric_switch.name.cdata
+    done = doc.Response.fabric_switch.name.cdata
         
         
     return(done)
+
 ###############################################################################
 ###############################################################################
 ####
@@ -191,23 +219,20 @@ def main():
     ####  chewy2
     switch_ip = "10.38.34.192"
     ####    Odin
-    switch_ip = "10.38.34.178"
+    #switch_ip = "10.38.34.178"
     ####    stinger
     switch_ip = "10.38.34.182"
-    #### pluto +
-    switch_ip = "10.38.34.200"
+    #### wedge
+    switch_ip = "10.38.34.190"
 
     user = "admin"
     passwrd = "password"
     fid = 31
-    #fid = 0
+    
+    
     
     sm = rest_cfg()
-
     r = sm.rest_login(switch_ip, user, passwrd)
-    
-    #r = rest_login(switch_ip, user, passwrd)
-    #r = requests.post("http://10.38.34.192/rest/login", auth=('admin','password'))
     print(r.json)
     print(r.status_code)
     print(r.text)
@@ -222,7 +247,7 @@ def main():
     print("#"*80)
     print("wwn "*20)
     r31 = sm.get_wwn(switch_ip, Auth, fid)
-  #  print(r31.text)
+   # print(r31.text)
     print(r31)
     print("#"*80)
     print("wwn "*20)
@@ -247,81 +272,107 @@ def main():
     wwn31 =  r31
 
 
-    sem = get_top_level_list()
-    print("@"*80)
-    p = sem.dispatch("domain-id")
-    cmplt_path = _url(switch_ip, wwn, p(),  "domain-id")
-    print(p())
-    print(cmplt_path)
+    # sem = get_top_level_list_fibrechannel_switch()
+    # print("@"*80)
+    # p = sem.dispatch("domain-id")
+    # cmplt_path = _url(switch_ip, wwn, p(),  "domain-id")
+    # print(p())
+    # print(cmplt_path)
+    # 
+    # r = requests.get(cmplt_path, headers=Auth_send)
+    # print(r.json)
+    # print(r.text)
+    # print(r.headers)
+    # 
+    # print("@"*80)
+    # 
+    # 
+    # p = sem.dispatch("user-friendly-name")
+    # cmplt_path = _url(switch_ip, wwn, p(), "user-friendly-name" )
+    # print(p())
+    # print(cmplt_path)
+    # 
+    # r = requests.get(cmplt_path, headers=Auth_send)
+    # print(r.json)
+    # print(r.text)
+    # print(r.status_code)
+    # print(r.headers)
+    # print("@"*80)
+    # 
+    # fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'enabled-state', 'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode', 'principal']
+    # fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id']
+    # for c in fcs:    
+    #  
+    #     s = get_tasks(c, switch_ip, wwn, Auth_send)
+    #     print("$"*80)
+    #     print(s.json)
+    #     print(s.status_code)
+    #     print(s.text)
+    #     print("&"*80)
+    #     time.sleep(1)
+    #r = requests.get("http://%s/rest/running/switch/fibrechannel-switch/name"  % ( switch_ip, wwn) , headers=Auth
+    r = requests.get("http://%s/rest/running/switch/fibrechannel-switch/name/%s/up-time" % (switch_ip, wwn) , headers=Auth_send)
     
-    r = requests.get(cmplt_path, headers=Auth_send)
-    print(r.json)
+    print("@"*80)
     print(r.text)
-    print(r.headers)
-    
+    print("@"*80)
     print("@"*80)
     
-    
-    p = sem.dispatch("user-friendly-name")
-    cmplt_path = _url(switch_ip, wwn, p(), "user-friendly-name" )
-    print(p())
-    print(cmplt_path)
-    
-    r = requests.get(cmplt_path, headers=Auth_send)
-    print(r.json)
+    r = requests.get("http://%s/rest/running/fabric/fabric-switch" % (switch_ip) , headers=Auth_send)
+     
+    print("@"*80)
     print(r.text)
-    print(r.status_code)
-    print(r.headers)
     print("@"*80)
-    
-    #r = requests.get("http://10.38.34.192/rest/running/switch/fibrechannel-switch/name/%s/domain-id" % wwn , headers=Auth_send)
-    #print(r.json)
-    #print(r.text)
-    #print(r.headers)
-    
-    
-    fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'enabled-state', 'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode', 'principal']
-    fcs = ['domain-id', 'user-friendly-name', 'fcid', 'vf-id']
-    for c in fcs:    
-     
-        s = get_tasks(c, switch_ip, wwn, Auth_send)
-        print("$"*80)
-        print(s.json)
-        print(s.status_code)
-        print(s.text)
-        print("&"*80)
-        time.sleep(1)
-    
-  #  fcs = ['vf-id',]
-     
- #   for c in fcs:    
-     
-    #s = get_tasks('vf-id', switch_ip, wwn, Auth_send)
-    #cmd =  get_info_word(switch_ip, wwn,Auth_send, "cmd")
-    principal_switch = get_info_word(switch_ip, wwn31,Auth_send, "principal" , 31) 
-    vf_state = get_info_word(switch_ip, wwn31,Auth_send, "vf-id", 31)
-    principal_switch = get_info_word(switch_ip, wwn31,Auth_send, "principal" , 31)
-    domain_id =  get_info_word(switch_ip, wwn,Auth_send, "domain-id")
-    fcid =  get_info_word(switch_ip, wwn,Auth_send, "fcid")
-    user_friendly_name =  get_info_word(switch_ip, wwn,Auth_send, "user-friendly-name")
-    enabled_state = get_info_word(switch_ip, wwn,Auth_send, "enabled-state")
-    up_time = get_info_word(switch_ip, wwn,Auth_send, "up-time")
-    model = get_info_word(switch_ip, wwn,Auth_send, "model")
-    firmware_version= get_info_word(switch_ip, wwn,Auth_send, "firmware-version")
-    ip_address = get_info_word(switch_ip, wwn,Auth_send, "ip-address")
-    domain_name  = get_info_word(switch_ip, wwn,Auth_send, "domain-name")
-    fabric_u_f_name  = get_info_word(switch_ip, wwn,Auth_send, "fabric-user-friendly-name")
-    ag_mode  = get_info_word(switch_ip, wwn,Auth_send, "ag-mode")
-    
-    
-    #'domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'principal', 'enabled-state',
-    #'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode'
+    print("@"*80)
+      
    
+   
+    r = requests.get("http://%s/rest/running/fabric/fabric-switch?vf-id=31" % (switch_ip) , headers=Auth_send)
     
-#      vf_id = doc.Response.fibrechannel_switch.vf_id.cdata
-        
-#      print("wwn =  %s  " %  wwn)
-#     print("vf_id =  %s  "  % vf_id)
+    print("@"*80)
+    print(r.text)
+    print("@"*80)
+    print("@"*80)
+    
+    #r = requests.get("http://%s/rest/running/fabric/fabric-switch/name/%s/fcid/?vf-id=31" % (switch_ip,wwn31) , headers=Auth_send)
+    #r = requests.get("http://%s/rest/running/fabric/fabric-switch/name/%s/fcid" % (switch_ip,wwn) , headers=Auth_send)
+    #print("@"*80)
+    #print(r.text)
+    #print("@"*80)
+    #print("@"*80)
+    
+    
+    
+    friendly_name_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "switch-user-friendly-name" ) 
+    wwn_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "chassis-wwn" ) 
+    chass_friendly_name_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "chassis-user-friendly-name" )
+    domain_id_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "domain-id" )
+    pricipal_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "principal" )
+    fcid_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "fcid" )
+    ipaddr_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "ip-address" )
+    fcipaddr_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "fcip-address" )
+    ipv6addr_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "ipv6-address" )
+    firmrev_from_fabric_switch = get_fabric_switch_leaf(switch_ip, wwn,Auth_send, "firmware-version" ) 
+    
+    print(wwn_from_fabric_switch)
+    
+
+    principal_switch = get_fc_switch_leaf(switch_ip, wwn31,Auth_send, "principal" , 31) 
+    vf_state = get_fc_switch_leaf(switch_ip, wwn31,Auth_send, "vf-id", 31)
+    principal_switch = get_fc_switch_leaf(switch_ip, wwn31,Auth_send, "principal" , 31)
+    domain_id =  get_fc_switch_leaf(switch_ip, wwn,Auth_send, "domain-id")
+    fcid =  get_fc_switch_leaf(switch_ip, wwn,Auth_send, "fcid")
+    user_friendly_name =  get_fc_switch_leaf(switch_ip, wwn,Auth_send, "user-friendly-name")
+    enabled_state = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "enabled-state")
+    up_time = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "up-time")
+    model = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "model")
+    firmware_version= get_fc_switch_leaf(switch_ip, wwn,Auth_send, "firmware-version")
+    ip_address = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "ip-address")
+    domain_name  = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "domain-name")
+    fabric_u_f_name  = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "fabric-user-friendly-name")
+    ag_mode  = get_fc_switch_leaf(switch_ip, wwn,Auth_send, "ag-mode")
+    
+
     print("vf_id                                 :  %s  "  % vf_state)
     print("principal switch                      :  %s "  %  principal_switch)
     print("domian_id                             :  %s  " % domain_id)
@@ -338,8 +389,6 @@ def main():
     
     print("&"*80)
     time.sleep(1)
-    
- 
     
     r = requests.post("http://10.38.34.192/rest/logout", headers=Auth_send)
     print(r.status_code)
