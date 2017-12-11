@@ -146,7 +146,7 @@ class rest_cfg:
                 done = doc.Response.fabric_switch.firmware_version.cdata
             
             if done == "none":
-                pass
+                
                 print("\n\nError in fs_leaf the command requested is not one of the\
                       \ncommand requested was  %s    \
                       \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
@@ -170,13 +170,15 @@ class rest_cfg:
         """
         #vf_id = doc.Response.fibrechannel_switch.vf_id.cdata
         # s = get_tasks('vf-id', switch_ip, wwn, Auth_send)   ## command from below
-        s = self.get_tasks(word,switch_ip, wwn,Auth_send, "fc_switch", fid )
+        logger.info('Start of function fcs_leaf')
+        
+        s = self.get_tasks(word,self.ip, wwn,self.Auth, "fc_switch", fid )
         
         doc = untangle.parse(s.text)
         try:
                 
             if "vf-id" == word:
-                done = doc.Response.fibrechannel_switch.vf_id.cdata
+                done =  doc.Response.fibrechannel_switch.name.vf_id.cdata
             if "domain-id" == word:
                 done =  doc.Response.fibrechannel_switch.domain_id.cdata
             if "fcid"  == word:
@@ -206,7 +208,14 @@ class rest_cfg:
         
         
             if done == "none":
-            
+                logger.info("ERROR====="*12)
+                logger.info('Error in function fs_leaf')
+                logger.info("\n\nError in fs_leaf the command requested is not one of the\
+                    \ncommand requested was  %s    \
+                    \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
+                    \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
+                    \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
+
                 print("\n\nError in fs_leaf the command requested is not one of the\
                     \ncommand requested was  %s    \
                     \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
