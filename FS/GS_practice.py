@@ -29,7 +29,7 @@ class rest_cfg:
     
         """
         loginpath =  "http://" + s_ip + "/rest/login"
-        return(requests.post(loginpath, auth=(username,passwrd)))
+        return(requests.get(loginpath, auth=(username,passwrd)))
 
     def rest_logout(self, ):
         pass        
