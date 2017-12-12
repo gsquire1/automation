@@ -231,6 +231,73 @@ class rest_cfg:
             done = "Untangle Error"
         return(done)
     
+    def fc_stats_leaf(self, word, wwn, fid=-1):
+        """
+        
+        """
+        logger.info('Start of function fc_stats_leaf')
+        
+        s = self.get_tasks(word,self.ip, wwn,self.Auth, "fc_switch", fid )
+        
+        doc = untangle.parse(s.text)
+        try:
+                
+            if "address_errors" == word:
+                done =  doc.Response.fibrechannel_statistics.name.address_errors.cdata
+            if " " == word:
+                done =  doc.Response.fibrechannel_switch.domain_id.cdata
+            if " "  == word:
+                done =  doc.Response.fibrechannel_switch.fcid.cdata
+            if " - - " == word:
+                done =  doc.Response.fibrechannel_switch.user_friendly_name.cdata
+            if " - " == word:
+                done =  doc.Response.fibrechannel_switch.enabled_state.cdata
+            if " - "  == word:
+                done =  doc.Response.fibrechannel_switch.up_time.cdata
+            if " " == word:
+                done = doc.Response.fibrechannel_switch.model.cdata
+            if " - "  == word:
+                done =  doc.Response.fibrechannel_switch.firmware_version.cdata
+            if " - "  == word:
+                done =  doc.Response.fibrechannel_switch.ip_address.ip_address.cdata        
+            if " - "  == word:
+                done =  doc.Response.fibrechannel_switch.domain_name.cdata
+            if " - - - "  == word:
+                done =  doc.Response.fibrechannel_switch.fabric_user_friendly_name.cdata
+            if " - "  == word:
+                done =  doc.Response.fibrechannel_switch.ag_mode.cdata    
+            if " "  == word:
+                done =  doc.Response.fibrechannel_switch.principal.cdata 
+        #    'domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'principal', 'enabled-state',
+        #    'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode'
+        
+        
+            if done == "none":
+                logger.info("ERROR====="*12)
+                logger.info('Error in function fs_leaf')
+                logger.info("\n\nError in fs_leaf the command requested is not one of the\
+                    \ncommand requested was  %s    \
+                    \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
+                    \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
+                    \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
+
+                print("\n\nError in fs_leaf the command requested is not one of the\
+                    \ncommand requested was  %s    \
+                    \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
+                    \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
+                    \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
+
+        
+        except AttributeError:
+            print("Error during untangle - None was returned")
+            done = "Untangle Error"
+        except:
+            print("Error in untagle" , sys.exc_info()[0] )
+            done = "Untangle Error"
+        return(done)
+        
+      
+    
     def test(self, ):
         print("#"*80)
         print("\nTEST of rest_cfg")

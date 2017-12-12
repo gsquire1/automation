@@ -352,24 +352,74 @@ def main():
         
  
         
-        
-        
-        
-        
-        
-        
+
+###############################################################################
+###############################################################################
+####
+####  log the results
+####
+###############################################################################
+###############################################################################
+
+    logger.info('@'*120)
+    logger.info('@'*120)
     logger.info("agmode value is  :  %s " %  ag_mode_from_fcs)
     logger.info("domain id  value is  :  %s " %   domain_id_from_fcs)
     logger.info("domain name value is  :  %s " %  domain_name_from_fcs)
     logger.info("enabled state value is  :  %s " %  enabled_state_from_fcs)
-    logger.info("fabric name  value is  :  %s " %  fabric_name_from_fcs)
-     
+    logger.info("fabric name  value is  :  %s " %  fabric_name_from_fcs)     
+    logger.info('END==='*20)
+    logger.info('===END'*20)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics"  % ( pa.ip) , headers=Auth_send)
+    print("@"*80)
+    print(r.text)
+    logger.info(r.text)
+    print("@"*80)
+    print("@"*80)
+    print("=H"*80)
+    print("=H"*80)
 
-    logger.info('End of domain-id command =====================================')
+    prt = "0%2f23"
+    # #####   
+    # r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/%s/in-link-resets?vf-id=31" % (pa.ip, prt) , headers=Auth_send)
+    #
+    
+    port_address_error =  sm.fc_stats_leaf("address_errors",  wwn, pa.fid)
+
+
+
+
     logger.info('@'*120)
+    logger.info('@'*120)
+    logger.info("Address errors  on port  %s   :  %s " %  (prt, ag_mode_from_fcs))
+    
+    logger.info('END==='*20)
+    logger.info('===END'*20)
 
- 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
     #print(r.status_code)
         
