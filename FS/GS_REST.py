@@ -13,12 +13,12 @@ import untangle
 ###################################
 ###################################
 
-ip = '10.38.36.33'
+ip = '10.38.34.190'
 
 def _url(path):
     """
     """
-    return('http://10.38.36.33'  + path)
+    #return('http:// ip  + path)
 
 
 def add_task(summary, description=""):
@@ -34,7 +34,7 @@ def get_tasks():
     
 def main():
     
-    r = requests.post("http://10.38.36.33/rest/login", auth=('admin','password'))
+    r = requests.post("http://%s/rest/login" % ip, auth=('admin','password'))
     # loginpath =  "http://" + ip + "/rest/login"
     #print(r.text)
     #print(r.headers)
@@ -59,7 +59,7 @@ def main():
     ####     
     ####     leaf                   domain-id
     ####
-    fs = requests.get("http://10.38.36.33/rest/running/switch/fibrechannel-switch", headers=Auth_send)
+    fs = requests.get("http://%s/rest/running/switch/fibrechannel-switch" % ip , headers=Auth_send)
     print(fs.json)
     print(fs.text)
     print(fs.headers)
@@ -78,14 +78,14 @@ def main():
     
     print('\n\n\n')
     print('(((((((((((((((((((((DEFINED_CONFIGURATION)))))))))))))))))))))))')    
-    r = requests.get("http://10.38.36.33/rest/running/zoning/defined-configuration",  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration" % ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     #print(r.headers)
     
     print('\n\n\n')
     print('(((((((((((((((((((((DEFINED_CONFIGURATION_TESTING)))))))))))))))))))))))')    
-    r = requests.get("http://10.38.36.33/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone/zone-name/",  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone/zone-name/" % ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     print(r.headers)
@@ -211,7 +211,7 @@ def main():
 
     ####   LOGOUT   ####
     print('LOGOUT____HERE')
-    r = requests.post("http://10.38.36.33/rest/logout", headers=Auth_send)
+    r = requests.post("http://%s/rest/logout"% ip, headers=Auth_send)
     #print(r.json)
     print(r.status_code)
     if r.status_code == 204:
