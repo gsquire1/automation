@@ -12,8 +12,6 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-
-
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
 ####
@@ -102,57 +100,67 @@ class rest_cfg:
         return(r)
     
 
-    def fs_leaf(self, word, wwn, fid = -1):
+    def fs_leaf(self, word, fid = -1):
         """
         return the info for a specified leaf in the module
             brocade-fabric-switch  yang file 
-        
+                #/rest/running/switch/fibrechannel-switch
         """
         logger.info('Start of function fs_leaf')
+        done = "none"
+        
+        if fid < 1 :
+            r = requests.get("http://%s/rest/running/fabric/fabric-switch" % (self.ip), headers=self.Auth)
+        else:
+            r = requests.get("http://%s/rest/running/fabric/fabric-switch?vf-id=%s"  % (self.ip, self.fid) , headers=self.Auth)
+        
+        
+        #try:
+            
+      
+        print("fs_leaf_ONE___"*10)
+        print(r.text)
+        print("fs_leaf_end_ONE____"*10)
+        doc = untangle.parse(r.text)
+        print("fs_leaf_debug TWO ___"*10)
+        print(doc)
+        print("fs_leaf_end___TWO___"*10)
+        done = "none"
+        if "vf-id" == word:
+            done = doc.Response.fabric_switch.vf_id.cdata
+        if "wwn" == word:
+            done = doc.Response.fabric_switch.name.cdata
+        if "switch-user-friendly-name"  == word:
+            done = doc.Response.fabric_switch.switch_user_friendly_name.cdata
+        if "chassis-wwn"  == word:
+            done = doc.Response.fabric_switch.chassis_wwn.cdata
+        if "chassis-user-friendly-name" == word:
+            done = doc.Response.fabric_switch.chassis_user_friendly_name.cdata              
+        if "domain-id" == word:
+            done = doc.Response.fabric_switch.domain_id.cdata
+        if "principal" == word:
+            done = doc.Response.fabric_switch.principal.cdata
+        if "fcid" == word:
+            done = doc.Response.fabric_switch.fcid.cdata
+        if "ip-address" == word:
+            done = doc.Response.fabric_switch.ip_address.cdata
+        if "fcip-address"  == word:
+            done = doc.Response.fabric_switch.fcip_address.cdata
+        if "ipv6-address" == word:
+            done = doc.Response.fabric_switch.ipv6_address.cdata
+        if "firmware-version" == word:
+            done = doc.Response.fabric_switch.firmware_version.cdata
+        
+        if done == "none":
+            
+            print("\n\nError in fs_leaf the command requested is not one of the\
+                  \ncommand requested was  %s    \
+                  \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
+                  \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
+                  \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
         try:
-            
-            s = self.get_tasks(word, self.ip, wwn, self.Auth , "fab_switch", fid )
-            print("fs_leaf_debug___"*10)
-            print(s.text)
-            print("fs_leaf_end_____"*10)
-            doc = untangle.parse(s.text)
-            print("fs_leaf_debug___"*10)
-            print(doc)
-            print("fs_leaf_end_____"*10)
-            done = "none"
-            if "vf-id" == word:
-                done = doc.Response.fabric_switch.vf_id.cdata
-            if "wwn" == word:
-                done = doc.Response.fabric_switch.name.cdata
-            if "switch-user-friendly-name"  == word:
-                done = doc.Response.fabric_switch.switch_user_friendly_name.cdata
-            if "chassis-wwn"  == word:
-                done = doc.Response.fabric_switch.chassis_wwn.cdata
-            if "chassis-user-friendly-name" == word:
-                done = doc.Response.fabric_switch.chassis_user_friendly_name.cdata              
-            if "domain-id" == word:
-                done = doc.Response.fabric_switch.domain_id.cdata
-            if "principal" == word:
-                done = doc.Response.fabric_switch.principal.cdata
-            if "fcid" == word:
-                done = doc.Response.fabric_switch.fcid.cdata
-            if "ip-address" == word:
-                done = doc.Response.fabric_switch.ip_address.cdata
-            if "fcip-address"  == word:
-                done = doc.Response.fabric_switch.fcip_address.cdata
-            if "ipv6-address" == word:
-                done = doc.Response.fabric_switch.ipv6_address.cdata
-            if "firmware-version" == word:
-                done = doc.Response.fabric_switch.firmware_version.cdata
-            
-            if done == "none":
-                
-                print("\n\nError in fs_leaf the command requested is not one of the\
-                      \ncommand requested was  %s    \
-                      \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
-                      \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
-                      \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
- 
+            pass
+        
         except AttributeError:
             print("Error during untangle - None was returned")
             done = "Untangle Error"
@@ -163,20 +171,21 @@ class rest_cfg:
         logger.info('End of function get_wwn')
         return(done)
               
-    def fcs_leaf(self, word, wwn, fid = -1):
+    def fcs_leaf(self, word, fid = -1):
         """return the info for a specified leaf in the module
             brocade-fibrecahnnel-switch  yang file 
-        
+      
+            r = requests.get("http://%s/rest/running/switch/fibrechannel-switch?vf-id=%s"  % ( pa.ip, pa.fid) , headers=Auth_send)      
         """
-        #vf_id = doc.Response.fibrechannel_switch.vf_id.cdata
-        # s = get_tasks('vf-id', switch_ip, wwn, Auth_send)   ## command from below
         logger.info('Start of function fcs_leaf')
-        
-        s = self.get_tasks(word,self.ip, wwn,self.Auth, "fc_switch", fid )
-        
-        doc = untangle.parse(s.text)
-        try:
-                
+ 
+        if fid < 1:
+            r = requests.get("http://%s/rest/running/switch/fibrechannel-switch"  % ( self.ip) , headers=self.Auth)
+        else:
+            r = requests.get("http://%s/rest/running/switch/fibrechannel-switch?vf-id=%s"  % ( self.ip, self.fid) , headers=self.Auth)     
+        doc = untangle.parse(r.text)
+ 
+        try:  
             if "vf-id" == word:
                 done =  doc.Response.fibrechannel_switch.name.vf_id.cdata
             if "domain-id" == word:
@@ -203,32 +212,24 @@ class rest_cfg:
                 done =  doc.Response.fibrechannel_switch.ag_mode.cdata    
             if "principal"  == word:
                 done =  doc.Response.fibrechannel_switch.principal.cdata 
-        #    'domain-id', 'user-friendly-name', 'fcid', 'vf-id', 'principal', 'enabled-state',
-        #    'up-time', 'model', 'firmware-version', 'ip-address', 'domain-name', 'fabric-user-friendly-name', 'ag-mode'
-        
-        
+
             if done == "none":
                 logger.info("ERROR====="*12)
-                logger.info('Error in function fs_leaf')
-                logger.info("\n\nError in fs_leaf the command requested is not one of the\
+                logger.info('Error in function fcs_leaf')
+                logger.info("\n\nError in fcs_leaf the command requested is not one of the\
                     \ncommand requested was  %s    \
-                    \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
-                    \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
-                    \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
+                    \n\nthe list of valid commands is \nvf-id, domain-id, fcid,\
+                    \n user-freindly-name, enabled-state, up-time, model, firmware-version,\
+                    \n ip-address, domain-name, fabric-user-friendly-name,\
+                    \n ag-mode, principal\n\n"  %  word)    
 
-                print("\n\nError in fs_leaf the command requested is not one of the\
-                    \ncommand requested was  %s    \
-                    \n\nthe list of valid commands is \ndomain-id\nchassis-wwn\
-                    \nswitch-user-friendly-name\nprincipal\nfcid\nip-address\
-                    \nfcip-address\nipv6-address\nfirmware-version\n\n"  %  word)    
-
-        
+            logger.info('END of function fcs_leaf')
         except AttributeError:
             print("Error during untangle - None was returned")
-            done = "Untangle Error"
+            done = "Untangle Error from fcs_leaf "
         except:
             print("Error in untagle" , sys.exc_info()[0] )
-            done = "Untangle Error"
+            done = "Untangle Error from fcs_leaf"
         return(done)
     
     def fc_stats_leaf(self, word, wwn, fid=-1):
@@ -370,77 +371,24 @@ class rest_cfg:
         return()
     
     
+   
+
     
-    
-    def get_tasks(self, command, switch_ip, wwn, Auth_send, list_name, fid = -1):
-        """ 
-        """
-        #sem = get_top_level_list_fibrechannel_switch()
-        #p = sem.dispatch(command)
-        #print("==================  get tasks function   ===================")
-        #print("M"*80)
-        
-        
-        
-        if list_name == "fc_switch":
-            top_level = "/rest/running/switch/fibrechannel-switch/name/"
-            cmplt_path = self._url(switch_ip, wwn, top_level, command , fid)
-            r = requests.get(cmplt_path, headers=Auth_send)
-            return(r)
+            
+            
+            
+            
+            
             
         if list_name == "fab_switch":
-            top_level = "/rest/running/fabric/fabric-switch/name/"
+            top_level = "/rest/running/fabric/fabric-switch"
             cmplt_path = self._url(switch_ip, wwn, top_level, command , fid)
             r = requests.get(cmplt_path, headers=Auth_send)
             return(r)
         
-    def get_tasks_zone(self, command, switch_ip, Auth_send, list_name, fid = -1):
-        if list_name == "defined_configuration":
-            top_level = "/rest/running/zoning/"
-            if command == "alias":
-                top_level = "/rest/running/zoning/defined-configuration"
-            else:
-                return(False)
-            #if word == "alia"
-            cmplt_path = self._url_zone(switch_ip, top_level, command , fid)
-            r = requests.get(cmplt_path, headers=Auth_send)
-            return(r)
-            
-            
-           
-        # cmplt_path = self._url(switch_ip, wwn, top_level, command , fid)
-        # #cmplt_path = self._url(switch_ip, top_level, command , wwn = (None), fid = (None))
-        # r = requests.get(cmplt_path, headers=Auth_send)
-    
-        return(r)
         
-    
-    def _url( self, sw_ip, wwn, path, cmd, fid=-1 ):
-        """
-        """
-        if fid > 0:
-            print("#"*80)
-            a = "http://" + sw_ip  + path + wwn + "/" + cmd + "?vf-id=" + str(fid)
-            print(a)
-            print("#"*80)
-            return("http://" + sw_ip  + path + wwn + "/" + cmd + "?vf-id=" + str(fid))
-            
-        else:
-            return("http://" + sw_ip  + path + wwn + "/" + cmd)
-        
-    def _url_zone( self, sw_ip, path, cmd, fid=-1 ):
-        """
-        """
-        if fid > 0:
-            print("#"*80)
-            a = "http://" + sw_ip  + path + "/" + cmd + "?vf-id=" + str(fid)
-            print(a)
-            print("#"*80)
-            return("http://" + sw_ip  + path + "/" + cmd + "?vf-id=" + str(fid))
-            
-        else:
-            return("http://" + sw_ip  + path + "/" + cmd)
-        
+  
+     
     def port_numbers(self):
         done = dd.Response.fibrechannel[0].name.cdata
         print(done)
@@ -457,32 +405,5 @@ class rest_cfg:
             print(type(dd.Response.fibrechannel[x].name.cdata))
             port_list += [pl]
         print(port_list)
-        
-    def alias_names(self, fid):
-        a = self.zone_defined_leaf("alias", fid)
-        print("((((((((((((((((((((((AAAAAAAAAAAAAAA))))))))))))))))))))))")
-        print(a)
-        done = a.Response.alias[0].alias_name.cdata
-        print(done)
-        print("END_3"*40)
-        ll = len(a.Response.alias.alias_name)
-        print("length  %s   " %  ll)
-        
-        alias_name = []
-        for x in range(ll):
-            print(x)
-            
-            pl = a.Response.alias[x].alias_name.cdata
-            print(pl)
-            print(type(a.Response.alias[x].alias_name.cdata))
-            alias_name += [pl]
-        print(alias_name)
-        return(alias_name)
-
-# def add_task(summary, description=""):
-#     """
-#     """
-#     return(requests.post(_url('/rest/')))
-# 
-
+    
 
