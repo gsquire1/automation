@@ -1655,7 +1655,8 @@ def load_config(ipaddr_switch, user_name,usr_psswd, filename):
     #print(tn_maybe)
     #sys.exit()
     cons_out = cc.playback_switch_names()                 ####   list     --  fid: switchname                      ####
-    cons_out = cc.playback_switch_domains()               ####   list     --  fid: domain                          ####
+    #cons_out = cc.playback_switch_domains()               ####   list     --  fid: domain                          ####
+    cons_out = cc.playback_switchget_info_from_the_switch_domains()               ####   list     --  fid: domain                          ####
     cons_out = cc.playback_add_ports()                    ####   list    --   fid: list of ports                   ####
     cons_out = cc.playback_add_ports_ex()
     tn       = cc.reboot_reconnect()
