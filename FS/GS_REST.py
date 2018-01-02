@@ -83,7 +83,7 @@ def parse_args(args):
 ###################################
 ###################################
 
-ip = '10.38.36.33'
+#ip = '10.38.36.33'
 
 # def _url(path):
 #     """
@@ -151,7 +151,7 @@ def main():
     ####
 
     print('((((((((((((((((((WWN STARTS HERE))))))))))))))))))')
-    fs = requests.get("http://%s/rest/running/switch/fibrechannel-switch" % ip , headers=Auth_send)
+    fs = requests.get("http://%s/rest/running/switch/fibrechannel-switch" % pa.ip , headers=Auth_send)
     print(fs.json)
     print(fs.text)
     print(fs.headers)
@@ -165,12 +165,26 @@ def main():
     
     logger.info('Start of rest commands')
 
-    #r = requests.get("http://%s/rest/running/switch/fibrechannel-switch"  % ( pa.ip) , headers=Auth_send)
     r = requests.get("http://%s/rest/running/zoning/defined-configuration"  % ( pa.ip) , headers=Auth_send)
+    #r = requests.get("http://%s/rest/running/zoning/defined-configuration"  % ( pa.ip) , headers=Auth_send)
     print("@"*80)
     print(r.text)
     print("@"*80)
     print("@"*80)
+    a = r.text
+    doc = untangle.parse(a)
+    a = doc.Response.defined_configuration.cfg.cfg_name.cdata
+    print(a)
+    
+    print('LOGOUT____HERE')
+    r = requests.post("http://%s/rest/logout"% pa.ip, headers=Auth_send)
+    #print(r.json)
+    print(r.status_code)
+    if r.status_code == 204:
+        print("successful logout\n\n")
+    else:
+        print("logout was not successful\n\n")
+    sys.exit(0)
 
     #print("=H"*80)
     #print("=H"*80)
@@ -194,7 +208,7 @@ def main():
     
                 ####   LOGOUT   ####
     print('LOGOUT____HERE')
-    r = requests.post("http://%s/rest/logout"% ip, headers=Auth_send)
+    r = requests.post("http://%s/rest/logout"% pa.ip, headers=Auth_send)
     #print(r.json)
     print(r.status_code)
     if r.status_code == 204:
@@ -205,50 +219,50 @@ def main():
     
     print('\n\n\n')   
     print('(((((((((((((((((((((1111111 ZONING)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     print('(((((((((((((((((((((222222222 ALIAS LIST)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/" % paip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     print('(((((((((((((((((((((3333333 LIST OF MEMBER(S)IN ALIAS)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('(((((((((((((((((((((4444444  MEMBERS ENTRY IN ALIAS)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/member-entry" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/member-entry" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('(((((((((((((((((((((5555555  ALIAS ENTRY NAME)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/member-entry" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/alias/alias-name/Z/member-entry" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('(((((((((((((((((((((AAAAAA CFG LIST)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('(((((((((((((((((((((BBBBBB CFG LIST FID 10)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('(((((((((((((((((((((BBBBBB CFG MEMBER-ZONE FID 10)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('((((((((((((((((((((( CCCCCC CFG ZONE NAME FID 10)))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone/zone-name" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/cfg/cfg-name/FID_10/member-zone/zone-name" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
     print('((((((((((((((((((((( 1111111 DEFINED-CONFIG ZONE ))))))))))))))))))))')
-    r = requests.get("http://%s/rest/running/zoning/defined-configuration/zone" % ip,  headers=Auth_send)
+    r = requests.get("http://%s/rest/running/zoning/defined-configuration/zone" % pa.ip,  headers=Auth_send)
     print(r.json)
     print(r.text)
     
@@ -394,7 +408,7 @@ def main():
 
     ####   LOGOUT   ####
     print('LOGOUT____HERE')
-    r = requests.post("http://%s/rest/logout"% ip, headers=Auth_send)
+    r = requests.post("http://%s/rest/logout"% pa.ip, headers=Auth_send)
     #print(r.json)
     print(r.status_code)
     if r.status_code == 204:
