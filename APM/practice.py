@@ -423,7 +423,7 @@ def main():
     #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
     #print(r.status_code)
         
-    r = sm.rest_logout()
+    r = sm.rest_logout(Auth_send)
     print(r.status_code)
     
     #sys.exit()

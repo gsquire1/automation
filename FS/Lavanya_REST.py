@@ -22,7 +22,7 @@ def parent_parser():
     pp.add_argument("ip", help="IP address of SUT")
     pp.add_argument("fid", type=int, default=128, help="Choose the FID to operate on")
     pp.add_argument("user", help="username for SUT")
-    pp.add_argument("pwrd", help="password of user")
+    pp.add_argument("pw", help="password of user")
     
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -64,17 +64,16 @@ def main():
    print ("Switch ip is " + ip)
    user = pa.user
    print ("User name is " + user)
-   pwrd = pa.pwrd
+   pwrd = pa.pw
    print ("Password is " + pwrd)
 
-   #Rest login
-   rl = rest_cmd.rest_cfg.rest_login(pa)
-   print("((((((((((this is rl)))))))))))")
-   print(rl)
-   Auth_key = rl['Authorization']
-   print(Auth_key)
-   #Rest Logout
-   rl = rest_cmd.rest_cfg.rest_logout(pa)
+   
+   sm = rest_cmd.rest_cfg(pa)
+   wwn = sm.get_wwn(pa.fid)
+   Auth_send = sm.get_Auth()
+   
+   rlogout = (sm.rest_logout(Auth_send))
+   #rlogout = (rest_cmd.rest_cfg.rest_logout(Auth_send))
    sys.exit()
    response = requests.post(url_login, auth=(user, pwrd))
    rh = response.headers

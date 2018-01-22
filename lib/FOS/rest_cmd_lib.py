@@ -85,13 +85,14 @@ class rest_cfg:
             sys.exit()
         return(Auth_send)        
 
-    def rest_logout(self, ):
+    def rest_logout(self, Auth_send):
         """
             logout of the current rest session
             
         """
-        #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
-        r = requests.post("http://%s/rest/logout" % self.ip , headers=self.Auth)
+        logoutpath = "http://" + self.ip + "/rest/logout"
+        #r = requests.post("http://%s/rest/logout" % self.ip , headers=Auth_send)
+        r = (requests.post(logoutpath, headers=Auth_send))
         print(r.status_code)    
         if r.status_code == 204:
             print("successful logout\n\n")
