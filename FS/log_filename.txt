@@ -43,3 +43,9 @@
 2018-01-22 12:00:20,708 - INFO - Start of rest commands
 2018-01-22 12:00:20,712 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
 2018-01-22 12:00:20,728 - DEBUG - http://10.38.36.111:80 "GET /rest/running/zoning/defined-configuration HTTP/1.1" 200 None
+2018-01-22 12:11:07,820 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:11:08,360 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 12:13:03,460 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:13:03,499 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 403 None
+2018-01-22 12:17:43,050 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:17:43,633 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
