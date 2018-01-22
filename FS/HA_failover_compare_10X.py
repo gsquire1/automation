@@ -742,7 +742,7 @@ def main():
         
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         #cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        #switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
+        switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
         switch_data_0 = ("logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch)
 
     ###################################################################################################################
@@ -775,7 +775,7 @@ def main():
     while g > 0:
         tn = cofra.ha_failover(g)
         liabhar.count_down(120)
-        #switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
+        switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
         switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
         diff_f  = liabhar.file_diff(switch_data_0, switch_data_1)
         print(diff_f)
@@ -833,7 +833,7 @@ def main():
 
         
         diff_f  = liabhar.file_diff(switch_data_0, switch_data_1)
-        print("#"*80)
+        print("#"*80)"captue"
         print("#"*80)
         print("#"*80)
         print("#"*80)

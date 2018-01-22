@@ -1,0 +1,45 @@
+2018-01-19 15:27:12,403 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:27:12,896 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:38:26,901 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:38:27,380 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:39:58,382 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:39:58,877 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:42:41,077 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:42:41,574 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:51:18,395 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:51:18,890 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:52:21,652 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:52:22,176 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-19 15:52:40,828 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-19 15:52:41,327 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:06:37,366 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:06:37,860 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:09:18,026 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:09:18,498 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:11:02,707 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:11:03,201 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:15:38,077 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:15:38,561 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:37:18,619 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:37:19,124 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:37:19,129 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:37:19,137 - DEBUG - http://10.38.36.111:80 "POST /rest/logout HTTP/1.1" 403 None
+2018-01-22 11:38:59,959 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:39:00,438 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:39:15,633 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:39:16,155 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:52:26,849 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:52:27,337 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 11:52:27,341 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 11:52:27,349 - DEBUG - http://10.38.36.111:80 "POST /rest/logout HTTP/1.1" 403 None
+2018-01-22 12:00:20,097 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,612 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 12:00:20,615 - INFO - Start of function get_wwn
+2018-01-22 12:00:20,620 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,654 - DEBUG - http://10.38.36.111:80 "GET /rest/running/switch/fibrechannel-switch?vf-id=128 HTTP/1.1" 200 None
+2018-01-22 12:00:20,668 - INFO - End of function get_wwn
+2018-01-22 12:00:20,672 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,705 - DEBUG - http://10.38.36.111:80 "GET /rest/running/switch/fibrechannel-switch HTTP/1.1" 200 None
+2018-01-22 12:00:20,708 - INFO - Start of rest commands
+2018-01-22 12:00:20,712 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,728 - DEBUG - http://10.38.36.111:80 "GET /rest/running/zoning/defined-configuration HTTP/1.1" 200 None
