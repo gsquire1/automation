@@ -264,19 +264,24 @@ class DoFirmwaredownloadChoice():
                
     def check_version(self):
          
-        capture_cmd = anturlar.fos_cmd("firmwareshow") 
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
-        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,18})\s+\w+[\\r\\n]*\s+([\._a-z0-9]{6,18})')
-        
+        capture_cmd = anturlar.fos_cmd("firmwareshow" ) 
+        #ras = re.compile('FOS\s+([\._a-z0-9]{6,18})\\r\\n\s+([\._a-z0-9]{6,18})')
+        ras = re.compile('FOS\s+([\._a-z0-9]{6,26})\\r\\n\s+([\._a-z0-9]{6,26})')
+        ras_dir = re.compile('[ 0-9CPFOS]{19}\s+([\._a-z0-9]{6,26})\s+\w+[\\r\\n]*\s+([\._a-z0-9]{6,26})')
+        print("="*120)
+        print(capture_cmd)
+        print("="*120)
         ras = ras.search(capture_cmd)
         ras_dir = ras_dir.search(capture_cmd)
+ 
+        
         
         f=""
         capture_cmd = anturlar.fos_cmd("hashow")
         print(capture_cmd)
         
-        
+        ####   output should be this for pizza box
+        ####     hashow: Not supported on this platform
         if "hashow: Not supported" in capture_cmd:
             f = ras.group(1)
         else:
