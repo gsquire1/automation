@@ -2540,7 +2540,7 @@ def fos_cmd(cmd, dl=0):
         #traff_prompt = "]# "
         #traff_prompt = traff_prompt.encode()
         
-        tn.set_debuglevel(dl)
+        tn.set_debuglevel(10)
         reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         capture = ""
         print(cmd)
