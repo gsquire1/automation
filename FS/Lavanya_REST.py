@@ -3,7 +3,6 @@ import requests
 import argparse
 import time
 import sys
-import login_utils as login_utils
 
 sys.path.append('/home/automation/lib/FOS')
 
@@ -58,72 +57,40 @@ def main():
     
    pa = parse_args(sys.argv)
    #namespace = login_utils.parse_args(argv)
+   #print('(((((((((((((((((PA PA PA PA PA PA PA PA)))))))))))))))))')
    print(pa)
-   ip = pa.ip
-   print(ip)
-   print ("Switch ip is " + ip)
-   user = pa.user
-   print ("User name is " + user)
-   pwrd = pa.pw
-   print ("Password is " + pwrd)
+   print ("Switch ip is " + pa.ip)
+   print ("User name is " + pa.user)
+   print ("Password is " + pa.pw)
 
-   
+   ##### Call in and initialize as object module res_cmd_lib, class rest_cfg
+   ##### This rest_cmd_lib already does login and returns Auth header for future use
    sm = rest_cmd.rest_cfg(pa)
    wwn = sm.get_wwn(pa.fid)
-   Auth_send = sm.get_Auth()
+   print('WWN WWN WWN WWN WWN WWN')
+   print(wwn)
+
+   ##### This is Auth Key used for all transactions till logout
+   Auth  = sm.get_Auth() 
+   #print(Auth)
+   Auth_key = Auth['Authorization']
+   #print('AUTH_KEY')
+   #print(Auth_key)
    
-   rlogout = (sm.rest_logout(Auth_send))
-   #rlogout = (rest_cmd.rest_cfg.rest_logout(Auth_send))
-   sys.exit()
-   response = requests.post(url_login, auth=(user, pwrd))
-   rh = response.headers
-  # print(rh)
-   login_utils.post_header_handling(Auth_key)
-   
-   # #REST logout
-   # Auth_key = response.headers['Authorization']
-   # header = {'Authorization':''+Auth_key+''}
-   # url_logout = "http://"+ host +"/rest/logout"
-   # rest_logout = requests.post(url_logout, headers=header)
-   # print(rest_logout);
-   # #logout status code check
-   # rest_logout_status = rest_logout.status_code;
-   # if rest_logout_status == 204:
-   #    print ("REST logout is successfull")
-   # else:
-   #    print ("Issues observed during REST logout")
+   # ### REST LOGOUT (returns status code and successful logout message)
+   # rlogout = (sm.rest_logout(Auth))
    # sys.exit()
    
    
-   #Auth = response.headers.get('Authorization')
-   #print(Auth)
-   #printing the response code
-   #print ("Printing the response of logging URI\n");
-   #print (response.text);
-   login_status_code = response.status_code;
-   print ("Printing the login status code \n");
-   print (login_status_code);
-   
-   #checking for 200 response code
-   if login_status_code == 200:
-      print ("Rest login is successfull\n")
-   else:
-      print ("Rest login failed\n")
-   
-   #Getting the authorazation key
-   Auth_key = response.headers['Authorization'];
-   print ("REST Authorization key is %s \n " % Auth_key);
-   #header = (''Authorization:' %s' % Auth_key)
-   header = {'Authorization':''+Auth_key+''}
-   
    #Executing the basic GET uri
+
    status_flag = 1;
    while status_flag:
       #url_get = "http://"+ HOST +"/rest/running/switch/fibrechannel-switch"
       #url_get = "http://"+ HOST + "/rest/running/zoning/defined-configuration/cfg"
       uri_array = []
-      uri_array = ["http://"+ HOST +"/rest/running/switch/fibrechannel-switch",
-                                   "http://"+ HOST + "/rest/running/zoning/defined-configuration/cfg",
+      uri_array = ["http://"+ pa.ip +"/rest/running/switch/fibrechannel-switch",
+                                   #"http://"+ pa.ip + "/rest/running/zoning/defined-configuration/cfg",
                                    # "http://"+ HOST + "/rest/running/fabric/fabric-switch",
                                    # "http://"+ HOST + "/rest/running/brocade-interface/fibrechannel",
                                    # "http://"+ HOST + "/rest/running/brocade-interface/fibrechannel-statistics",
@@ -138,8 +105,13 @@ def main():
                                    # "http://"+ HOST + "/rest/running/brocade-access-gateway/n-port-settings/reliability-counter",
                                    ]
       for url_in in uri_array:
-         print ("Executing the URI \n " + url_in)
-         url_get = requests.get(url_in, headers=header)
+         if pa.fid < 1 :
+            url_2_use = url_in #"http://" + self.ip + "/rest/running/switch/fibrechannel-switch"
+         else:
+            url_2_use = url_in + "?vf-id=" + str(pa.fid)    #vf-://"/rest/running/switch/fibrechannel-switch" + "?vf-id=" + str(fid)
+         print ("Executing the URI \n " + url_2_use)
+         print(Auth)
+         url_get = requests.get(url_2_use, headers=Auth)
          time.sleep(10)
          get_status_code = url_get.status_code;
          print ("Printing the URI response");
@@ -149,33 +121,40 @@ def main():
          #checking for 200 response code
          if get_status_code == 200:
             print ("GET operation is successfull")
-         elif get_status_code == 401:
-            #Invalid session key found so re-logging
-            print ("Found invalid session key so re-logging")
-            url_login = "http://"+ HOST +"/rest/login"
-            print ("url login " + url_login);
-            response = requests.post(url_login, auth=(user, pass_word))
-   
-            #printing the response code
-            print (response.text);
-            login_status_code = response.status_code;
-            print (login_status_code);
-   
-            #checking for 200 response code
-            if login_status_code == 200:
-               print ("Rest login is successfull")
-            else:
-               print ("Rest login failed")
-   
-            #Getting the authorazation key
-            Auth_key = response.headers['Authorization'];
-            print ("Auth key " +Auth_key);
-            header = {'Authorization':''+Auth_key+''}
-         elif get_status_code == 400:
-            print ("The URI is repsonds is bad request with status code 400 \n");
          else:
-            status_flag = 0
-            print ("Issues observed while performing the GET operaion")
+            print("Didn't work")
+         # elif get_status_code == 401:
+         #    #Invalid session key found so re-logging
+         #    print ("Found invalid session key so re-logging")
+         #    url_login = "http://"+ pa.ip +"/rest/login"
+         #    print ("url login " + url_login);
+         #    response = requests.post(url_login, auth=(user, pass_word))
+         # 
+         #    #printing the response code
+         #    print (response.text);
+         #    login_status_code = response.status_code;
+         #    print (login_status_code);
+         # 
+         #    #checking for 200 response code
+         #    if login_status_code == 200:
+         #       print ("Rest login is successfull")
+         #    else:
+         #       print ("Rest login failed")
+   
+         #    #Getting the authorazation key
+         #    Auth_key = response.headers['Authorization'];
+         #    print ("Auth key " +Auth_key);
+         #    header = {'Authorization':''+Auth_key+''}
+         # elif get_status_code == 400:
+         #    print ("The URI is repsonds is bad request with status code 400 \n");
+         # else:
+         #    status_flag = 0
+         #    print ("Issues observed while performing the GET operaion")
+      
+      ### REST LOGOUT (returns status code and successful logout message)
+      rlogout = (sm.rest_logout(Auth))
+      sys.exit()
+   
    
    # #REST logout
    # url_logout = "http://"+ HOST +"/rest/logout"
