@@ -773,7 +773,7 @@ def main():
             print("Switch %s not available" % i)  ##New
         nos = si.nos_check()
         if not nos:
-            anturlar.fos_cmd("supportftp -s -h 10.38.35.131 -u ftp1 -p ftp2 -d ssaves -l ftp")
+            anturlar.fos_cmd("supportftp -s -h 172.16.114.67 -u ftp1 -p ftp2 -d ssaves -l ftp")
             anturlar.fos_cmd("supportftp -e")
             anturlar.fos_cmd("supportftp -t 8")
             anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
