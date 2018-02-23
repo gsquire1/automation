@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../RunFromHere">
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/ini" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/logs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/lib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/lib/FOS" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/lib/MAPS" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../RunFromHere/lib/NUTS_AND_BOLTS" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/.." />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+  </component>
+</module>

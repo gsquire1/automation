@@ -2,63 +2,67 @@
 
 
 ###############################################################################
-####
-####  net install a switch of any 
-####
+#
+# net install a switch of any
+#
 ###############################################################################
 
-import os, sys
+# import os, sys
+# sys.path.append('/home/automation/lib/FOS')
+# sys.path.append('/home/automation/lib/MAPS')
+# sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
+
+# import os
+import sys
+import telnetlib
+# import getpass
+import argparse
+import re
+import csv
+import time
 
 sys.path.append('/home/automation/lib/FOS')
 sys.path.append('/home/automation/lib/MAPS')
 sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
-import telnetlib
-import getpass
-
-import argparse
-import re
 import anturlar
 import liabhar
 import cofra
-import csv
-import time
-
 
 ###############################################################################
-####
-####  switch types
-####
-####  62  DCX
-####  64  5300
-####  66  5100
-####  67  Encryption switch
-####  70  5410 - embedded switch
-####  71  300
-####  72  5480 - embedded switch
-####  73  5470 - embedded switch
-####  75  M5424 - embedded switch
-####  77  DCX-4S
-####  83  7800
-####  86  5450 - embedded switch
-####  87  5460 - embedded switch
-####  92  VA-40FC
-####  109  6510
-####  117  6547  - embedded switch
-####  118  6505
-####  120  DCX 8510-8
-####  121  DCX 8510-4
-####  124  5430  - embedded switch
-####  125  5431
-####  129  6548  - embedded switch
-####  130  M6505  - embedded switch
-####  133  6520 - odin
-####  134  5432  - embedded switch
-####  
-####  141  Yoda DCX
-####  142  Yoda pluto
-####  148  Skybolt
-####
+#
+#  switch types
+#
+#  62  DCX
+#  64  5300
+#  66  5100
+#  67  Encryption switch
+#  70  5410 - embedded switch
+#  71  300
+#  72  5480 - embedded switch
+#  73  5470 - embedded switch
+#  75  M5424 - embedded switch
+#  77  DCX-4S
+#  83  7800
+#  86  5450 - embedded switch
+#  87  5460 - embedded switch
+#  92  VA-40FC
+#  109  6510
+#  117  6547  - embedded switch
+#  118  6505
+#  120  DCX 8510-8
+#  121  DCX 8510-4
+#  124  5430  - embedded switch
+#  125  5431
+#  129  6548  - embedded switch
+#  130  M6505  - embedded switch
+#  133  6520 - odin
+#  134  5432  - embedded switch
+#
+#  141  Yoda DCX
+#  142  Yoda pluto
+#  148  Skybolt
+#
 ###############################################################################
 
 
@@ -104,7 +108,7 @@ def parent_parser():
 
 
 def parse_args(args):
-    verb_value = "99"
+    # verb_value = "99"
     parent_p = parent_parser()
     parser = argparse.ArgumentParser(description="PARSER", parents=[parent_p])
     # parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
@@ -113,7 +117,9 @@ def parse_args(args):
     parser.add_argument('-ip', '--ipaddr', help="IP address of target switch")
     parser.add_argument('-cp', '--cmdprompt', help="switch is already at command prompt")
     parser.add_argument('-t', '--switchtype', help="switch type number - required with -cp")
-    parser.add_argument('-r', '--steps', type=int, help="Steps that will be executed")
+    # parser.add_argument('-r', '--steps', type=int, help="Steps that will be executed")
+    parser.add_argument('-i', '--iterations', type=int, default=1,
+                        help="How many iterations will be run that will be executed")
     # parser.add_argument('-p', '--password', help="password")
     # group = parser.add_mutually_exclusive_group()
     # group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -462,7 +468,7 @@ def get_user_and_pass(chassis_name):
     
     """
     switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
-    #switchmatrix = 'ini/SwitchMatrix.csv'
+    # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
     except OSError:
@@ -532,7 +538,6 @@ def capture_switch_info(extend_name="", fid=128):
     vdx = si.nos_check()
     switch_ip = si.ipaddress()
     switch_cp_ips = si.cp_ipaddrs_get()
-    
     license_list = si.getLicense()
     ls_list = si.ls()
     first_ls = si.ls_now()
@@ -563,10 +568,11 @@ def capture_switch_info(extend_name="", fid=128):
     # sfp_info             = si.sfp_info()
     maps_email_cfg = mi.get_email_cfg()
     maps_actions = mi.get_actions()
-    logical_groups = mi.logicalgroup_count()
+    # logical_groups       = mi.logicalgroup_count()
     relay_server_info = mi.get_relay_server_info()
     credit_recov_info = mi.credit_recovery()
     dns_info = mi.dns_config_info()
+    # sfpinfo              = si.sfp_info()
 
     ###################################################################################################################
     ###################################################################################################################
@@ -593,17 +599,13 @@ def capture_switch_info(extend_name="", fid=128):
     print("LICENSE LIST      :  %s  " % license_list)
 
     #######################################################################################################################
-    #######################################################################################################################
-    #######################################################################################################################
-    ####
-    ####  Write to the file
-    ####
-    #######################################################################################################################
-    #######################################################################################################################
+    #
+    # Write to the file
+    #
     #######################################################################################################################
 
-    # f = "%s%s%s" % ("logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
-    f = "%s%s%s" % ("/home/RunFromHere/logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
+
+    f = "%s%s%s" % ("logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n", \
                            "", "", "==============================\n")
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
@@ -627,20 +629,21 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("Blades                   :  %s  \n" % blades)
 
     ff.write("LICENSE LIST             :  %s  \n" % license_list)
-    ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
+    # ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
     ff.write("=" * 80)
     ff.write("\n")
     ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum)
     ff.write("MAPS NON DFLT POLICIES   :  %s  \n" % maps_non_dflt_policy)
     ff.write("EMAIL CFG                :  %s  \n" % maps_email_cfg)
     ff.write("MAPS ACTIONS             :  %s  \n" % maps_actions)
-    ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
+    # ff.write("LOGICAL GROUPS           :  %s  \n" % logical_groups)
     ff.write("RELAY SERVER HOST IP     :  %s  \n" % relay_server_info)
     ff.write("CREDIT RECOVERY INFO     :  %s  \n" % credit_recov_info)
     ff.write("DNS CONFIG INFO          :  %s  \n" % dns_info)
     ff.write("=" * 80)
     ff.write("\n")
     ff.write("FLOW CONFIGURATION       :  %s  \n" % flow_per_ls)
+    ff.write(anturlar.fos_cmd("configshow"))
     ff.write("\n" * 2)
     ff.close()
 
@@ -649,160 +652,165 @@ def capture_switch_info(extend_name="", fid=128):
     return (True)
 
 
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################   
 
 
 def main():
-    global tn  #### varable for telnet session
-    #######################################################################################################################
-    ####
-    ####
-    ####
-    #######################################################################################################################
+    global tn  # variable for telnet session
+
     pa = parse_args(sys.argv)
-    print(pa)
+    # print(pa)
     # print(pa.chassis_name)
-    print(pa.ipaddr)
-    print(pa.quiet)
-    print(pa.verbose)
+    # print(pa.ipaddr)
+    # print(pa.quiet)
+    # print(pa.verbose)
     # print(pa.firmware)
-    print(pa.cmdprompt)
+    # print(pa.cmdprompt)
     print("@" * 40)
 
     ###################################################################################################################
     ###################################################################################################################
-    ####
-    #### if user enter ip address then get the chassisname from the
-    ####   SwitchMatrix file
-    #### then get the info from the SwitchMatrix file using the Chassis Name
-    ####
-    ####
-    ####
+    #
+    # if user enter ip address then get the chassisname from the SwitchMatrix file
+    # then get the info from the SwitchMatrix file using the Chassis Name
+    #
+    #
+    #
     if pa.ipaddr:
         print("do IP steps")
         pa.chassis_name = console_info_from_ip(pa.ipaddr)
 
     cons_info = console_info(pa.chassis_name)
-    console_ip = cons_info[0]
-    console_port = cons_info[1]
-    console_ip_bkup = cons_info[2]
-    console_port_bkup = cons_info[3]
-    power_pole_info = pwr_pole_info(pa.chassis_name)
+    # console_ip = cons_info[0]
+    # console_port = cons_info[1]
+    # console_ip_bkup = cons_info[2]
+    # console_port_bkup = cons_info[3]
+    # power_pole_info = pwr_pole_info(pa.chassis_name)
     usr_pass = get_user_and_pass(pa.chassis_name)
     user_name = usr_pass[0]
     usr_psswd = usr_pass[1]
     ipaddr_switch = get_ip_from_file(pa.chassis_name)
-    steps_to_run = pa.steps
+    #steps_to_run = pa.steps
 
-    fid_to_compare = 128
+    # fid_to_compare = 128
 
     ###################################################################################################################
-    #### if the user does not enter a value for which steps to run prompt for user input value
-    ####
-    if not steps_to_run:
+    # if the user does not enter a value for which steps to run prompt for user input value
+    #
+    #if not steps_to_run:
         # pa.start = user_start()
-        steps_to_run = pa.start = user_start()
+        #steps_to_run = pa.start = user_start()
 
     tn = anturlar.connect_tel_noparse(ipaddr_switch, user_name, usr_psswd)
 
     ###################################################################################################################
-    ####
-    ####   configure some settings that are not defualt to confirm they remain after disruptions
-    ####
-    cons_out = send_cmd("creditrecovmode --cfg onLrThresh")
-    cons_out = send_cmd("creditrecovmode --cfg onLrThresh -lrtthreshold 7")
-    cons_out = send_cmd("creditrecovmode --fe_crdloss off")
-    cons_out = send_cmd("creditrecovmode --be_crdloss off")
-    cons_out = send_cmd("creditrecovmode --be_losync off")
-    cons_out = send_cmd("creditrecovmode --fault edgeblade")
+    #
+    #   configure some settings that are not defualt to confirm they remain after disruptions
+    #
+    # cons_out = send_cmd("creditrecovmode --cfg onLrThresh")
+    # cons_out = send_cmd("creditrecovmode --fe_crdloss off")
+    # cons_out = send_cmd("creditrecovmode --be_crdloss off")
+    # cons_out = send_cmd("creditrecovmode --be_losync off")
+    # cons_out = send_cmd("creditrecovmode --fault edgeblade")
+
 
     ###################################################################################################################
-    ####
-    ####   capture teh configuration file  if the user selected 1 or 3
-    ####
+    #
+    # capture the configuration file  if the user selected 1 or 3
+    #
 
-    if steps_to_run == 1 or steps_to_run == 3:
-        # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
-        switch_info = capture_switch_info("compare_orig", fid_to_compare)
+    # switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
+    # if steps_to_run == 1 or steps_to_run == 3:
 
-    ###################################################################################################################
-    #### path to the first file to compare
-    # switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
-
-    #switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
-    switch_data_0 = "/home/RunFromHere/logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
-
-    liabhar.JustSleep(10)
+    # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
+    # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
+    # switch_info_orig = capture_switch_info("compare_orig", fid_to_compare)  ###### File to compare before operations
+    # switchdata_0 = ("logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch)
 
     ###################################################################################################################
-    #### this is how to reconnect with telnet
+    # path to the first file to compare
+
+    # switch_data_0 = ("logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch)
+    # switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
+
+    # liabhar.JustSleep(10)
+
+    ###################################################################################################################
+    # this is how to reconnect with telnet
     # print("reconnect via telnet")
     # tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
 
     ###################################################################################################################
     ###################################################################################################################
     ###################################################################################################################
-    ####
-    #### do configupload  or other test steps here
-    ####  make other changes here before configupload or other commands 
-    ####
+    #
+    # do configupload  or other test steps here
+    #  make other changes here before configupload or other commands
+    #
+    ################################################################################################################
+    #
+    # hafailover or hareboot on pizza box
+    #  call the failover function from cofra and send the number of failovers
+    #
+
+    original = capture_switch_info("switch_info_orig", pa.fid)  # Original File1
+    #compare = capture_switch_info("switch_info_compare", pa.fid)
+
+    # if steps_to_run == 1:
+    #     print('\n\nFile written')
+    #     sys.exit(0)
+
+    g = pa.iterations
+    while g > 0:
+        tn = cofra.ha_failover(g)
+        liabhar.count_down(120)
+        # switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
+        compare = capture_switch_info("switch_info_compare", pa.fid)  ###### File to compare after operations
+        orig = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_orig.txt" % ipaddr_switch
+        compare = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_compare.txt" % ipaddr_switch
+        diff_f = liabhar.file_diff(orig, compare)
+        print(diff_f)
+        g = g - 1
+        if not diff_f:
+            liabhar.email_sender_html("graham.squire@broadcom.com", "graham.squire@broadcom.com",
+                                      "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint", "")
+            sys.exit(1)
+    #sys.exit(0)
+
     ###################################################################################################################
-    ####
-    ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
-    ####
-    pp = cofra.SwitchUpdate()
-    # tn = pp.reboot_reconnect()
+    #
+    # power cycle slots
+    #
 
-    # liabhar.count_down(60)
-    ###################################################################################################################
-    ####
-    #### hafailover or hareboot on pizza box
-    ####  call the failover function from cofra and send the number of failovers
-    ####
-    tn = cofra.ha_failover(10)
-
-    liabhar.count_down(120)
-
-    ###################################################################################################################
-    ####
-    #### power cycle slots
-    ####
-
-    ss = anturlar.SwitchInfo()
-    slot_list = ss.blades(True)
-    #### skip if switch is a pizza box
+    # ss = anturlar.SwitchInfo()
+    # slot_list = ss.blades(True)
+    # skip if switch is a pizza box
     # if "not a d" not in slot_list:
     #     pc_result = slot_pwr_cycle(slot_list)
     # else:
     #    print("NOT A DIRECTOR SO PASSING SLOT POWER CYCLE TEST")
     # 
-    ####
-    #### 
-    #### other interuptions
-    ####
-    ####
+    #
+    #
+    # other interuptions
+    #
+    #
     ###################################################################################################################
     ###################################################################################################################
     ###################################################################################################################
 
-    if steps_to_run == 2 or steps_to_run == 3:
+    # if steps_to_run == 2 or steps_to_run == 3:
         liabhar.JustSleep(10)
-        liabhar.count_down(360)
+        # liabhar.count_down(360)
         # cons_out = anturlar.fos_cmd("setcontext 128")
         # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
         # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
 
-        switch_info = capture_switch_info("compare", fid_to_compare)
         ###################################################################################################################
         #### path to the second file to compare
-        switch_data_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
+        switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
 
         liabhar.cls()
-        #### compare the two files
+
         print("#" * 80)
         print("#" * 80)
         print("#######")
@@ -814,32 +822,32 @@ def main():
         print("#" * 80)
         print("#" * 80)
 
-        diff_f = liabhar.file_diff(switch_data_0, switch_data_1)
+        diff_f = liabhar.file_diff(orig, compare)
+        print('\n\n')
+
         print("#" * 80)
         print("#" * 80)
         print("#" * 80)
         print("#" * 80)
-        print("Result ")
-        print(diff_f)
 
     ###################################################################################################################
-    ####  put additional commands here before disconnecting from telnet
-    ####
+    #  put additional commands here before disconnecting from telnet
+    #
     # cons_out = anturlar.fos_cmd("mapsdb --show all")
     # print(cons_out)
     # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-    #cons_out = anturlar.fos_cmd("mapspolicy --enable Nervio")
     anturlar.close_tel()
     dt = liabhar.dateTimeStuff()
     date_is = dt.current()
     print(date_is)
-    print(type(steps_to_run))
-    print(steps_to_run)
+
+    liabhar.email_sender_html("graham.squire@broadcom.com", "graham.squire@broadcom.com", "HA_Failover passed",
+                              "HA_Failover passed", "")
 
 
 if __name__ == '__main__':
     main()
 
 #######################################################################################################################
-#### END                                                                                                           ####
+# END
 #######################################################################################################################
