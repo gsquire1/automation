@@ -496,10 +496,11 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
     while var <= 4:
         #print("start of the loop var is equal to ")
         capture = ""
-        capture = tn.expect(reg_list,20)
-        if capture == -1:
+        capture = tn.expect(reg_list,120)
+        if capture[0] == -1:
             print(capture)
-            sys.exit()
+            #sys.exit()
+            tn.write(b"\n")
         print(capture)
         
         if capture[0] == 0:
@@ -554,7 +555,7 @@ def connect_console(HOST,usrname,password,port,db=0, *args):
         
         var += 1
     capture = ""  
-    capture = tn.expect(reg_list, 20)
+    capture = tn.expect(reg_list, 120)
     print("Console "*10)
     print(capture)
     print("Console_"*10)    

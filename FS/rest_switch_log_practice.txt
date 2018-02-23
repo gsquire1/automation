@@ -1,0 +1,11 @@
+2018-01-22 12:00:20,097 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,612 - DEBUG - http://10.38.36.111:80 "POST /rest/login HTTP/1.1" 200 None
+2018-01-22 12:00:20,615 - INFO - Start of function get_wwn
+2018-01-22 12:00:20,620 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,654 - DEBUG - http://10.38.36.111:80 "GET /rest/running/switch/fibrechannel-switch?vf-id=128 HTTP/1.1" 200 None
+2018-01-22 12:00:20,668 - INFO - End of function get_wwn
+2018-01-22 12:00:20,672 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,705 - DEBUG - http://10.38.36.111:80 "GET /rest/running/switch/fibrechannel-switch HTTP/1.1" 200 None
+2018-01-22 12:00:20,708 - INFO - Start of rest commands
+2018-01-22 12:00:20,712 - DEBUG - Starting new HTTP connection (1): 10.38.36.111
+2018-01-22 12:00:20,728 - DEBUG - http://10.38.36.111:80 "GET /rest/running/zoning/defined-configuration HTTP/1.1" 200 None
