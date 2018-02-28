@@ -44,6 +44,7 @@ sys.path.append('/home/automation/APM')
 import sw_matrix_tools
 import anturlar
 import liabhar
+import cofra
 # import cofra
 # import Config_up_down_compare
 
@@ -381,7 +382,8 @@ def main():
             if not diff_f:
                 liabhar.email_sender_html(pa.email, pa.email,
                                           "PF_configshow_compare failed a checkpoint", "PF_configshow_compare failed"
-                                          " a checkpoint", "")
+                                          "a checkpoint. Support Save and trace dump transferred", "")
+                cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
                 anturlar.close_tel()
                 sys.exit(0)
     # diff_f = liabhar.file_diff(f, f1)

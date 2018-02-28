@@ -87,9 +87,12 @@ def user_start():
                 print("\n\nthere was an error with the input\n\n")
                 sys.exit()
 
-        if start > 0 and start <= 3:
+        # if start > 0 and start <= 3:
+        l = (1,2,3)
+        if l in start:
+            # if start > 0 and <= 3:
             go = True
-            return (start)
+            return start
         else:
             sys.exit()
 
@@ -101,13 +104,14 @@ def parent_parser():
     # pp.add_argument("ip", help="IP address of SUT")
     # pp.add_argument("user", help="username for SUT")
     pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
+    pp.add_argument('email', type=str, help="email address")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
     return pp
 
 
-def parse_args(args):
+def parse_args():
     # verb_value = "99"
     parent_p = parent_parser()
     parser = argparse.ArgumentParser(description="PARSER", parents=[parent_p])
@@ -158,11 +162,11 @@ def connect_console(HOST, usrname, password, port, db=0, *args):
     reg_list_r = [b".*\n", b":root> "]
 
     password = "pass"
-    capture = ""
-    option = 1
+    # capture = ""
+    # option = 1
     #############################################################################
-    #### parse the user name for console login
-    ####
+    # parse the user name for console login
+    #
     port = str(port)
     usrname = parse_port(port)
     print("connecting via Telnet to  " + HOST + " on port " + port)
@@ -177,7 +181,7 @@ def connect_console(HOST, usrname, password, port, db=0, *args):
 
     print("-------------------------------------------------ready to read lines")
     #############################################################################
-    #### login 
+    # login
     capture = tn.read_until(b"login: ")
     print(capture)
     tn.write(usrname.encode('ascii') + b"\r\n")
@@ -189,11 +193,11 @@ def connect_console(HOST, usrname, password, port, db=0, *args):
     print("\n\n\n\n\n\n\n\n")
 
     #############################################################################
-    #### login to the switch
+    # login to the switch
     reg_list = [b"Enter your option", b"login: ", b"assword: ", b"root> ", b"users: ", b"=>"]
     while var <= 4:
         # print("start of the loop var is equal to ")
-        capture = ""
+        # capture = ""
         capture = tn.expect(reg_list)
         print(capture)
 
@@ -233,7 +237,7 @@ def connect_console(HOST, usrname, password, port, db=0, *args):
 
     capture = tn.expect(reg_list, 20)
 
-    return (tn)
+    return tn
 
 
 def stop_at_cmd_prompt(db=0):
@@ -304,8 +308,8 @@ def send_cmd(cmd, db=0):
 
     tn.set_debuglevel(db)
 
-    capture = ""
-    cmd_look = cmd.encode()
+    # capture = ""
+    # cmd_look = cmd.encode()
 
     # reg_ex_list = [b".*:root> "]
     reg_ex_list = [b"root> "]
@@ -319,7 +323,7 @@ def send_cmd(cmd, db=0):
     capture = capture.decode()
     print(capture, end="")
 
-    return (capture)
+    return capture
 
 
 def console_info_from_ip(ipaddr):
@@ -332,7 +336,7 @@ def console_info_from_ip(ipaddr):
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
     except OSError:
         print("Cannot find the file SwitchMatrix.csv")
-        return (False)
+        return False
 
     for line in csv_file:
         ip_address_from_file = (line['IP Address'])
@@ -357,7 +361,7 @@ def console_info(chassis_name):
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
     except OSError:
         print("Cannot find the file SwitchMatrix.csv")
-        return (False)
+        return False
 
     for line in csv_file:
         chassis_name_from_file = (line['Chassisname'])
@@ -369,7 +373,7 @@ def console_info(chassis_name):
             cons_2_ip = (line['Console2 IP'])
             cons_2_port = (line['Console2 Port'])
 
-            a = []
+            #a = []
             a = [cons_1_ip, cons_1_port]
 
             if cons_2_ip:
@@ -504,7 +508,7 @@ def get_ip_from_file(chassis_name):
         if chassis_name_from_file == chassis_name:
             ip = (line['IP Address'])
 
-    return (ip)
+    return ip
 
 
 def slot_pwr_cycle(slot_list):
@@ -513,12 +517,12 @@ def slot_pwr_cycle(slot_list):
     """
 
     for s in slot_list:
-        capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
+        # capture_cmd = anturlar.fos_cmd("slotpoweroff %s " % s)
 
         liabhar.JustSleep(30)
 
     for s in slot_list:
-        capture_cmd = anturlar.fos_cmd("slotpoweron %s " % s)
+        # capture_cmd = anturlar.fos_cmd("slotpoweron %s " % s)
         liabhar.JustSleep(60)
     liabhar.JustSleep(300)
     return (True)
@@ -535,14 +539,14 @@ def capture_switch_info(extend_name="", fid=128):
     fi = anturlar.FlowV()
     fcr = anturlar.FcrInfo()
 
-    vdx = si.nos_check()
+    # vdx = si.nos_check()
     switch_ip = si.ipaddress()
-    switch_cp_ips = si.cp_ipaddrs_get()
+    # switch_cp_ips = si.cp_ipaddrs_get()
     license_list = si.getLicense()
     ls_list = si.ls()
-    first_ls = si.ls_now()
-    switch_id = si.switch_id()
-    fid_now = si.currentFID()
+    # first_ls = si.ls_now()
+    # switch_id = si.switch_id()
+    # fid_now = si.currentFID()
     try:
         theswitch_name = si.switch_name()
     except IndexError:
@@ -558,7 +562,7 @@ def capture_switch_info(extend_name="", fid=128):
     fcr_state = si.fcr_enabled()
     ports_and_ls = si.all_ports_fc_only()
     psw_reset_value = "YES"
-    xisl_st_per_ls = si.allow_xisl()
+    # xisl_st_per_ls = si.allow_xisl()
     maps_policy_sum = mi.get_policies()
     maps_non_dflt_policy = mi.get_nondflt_policies()
 
@@ -576,9 +580,9 @@ def capture_switch_info(extend_name="", fid=128):
 
     ###################################################################################################################
     ###################################################################################################################
-    ####
-    #### print the variables for review
-    ####
+    #
+    # print the variables for review
+    #
     ###################################################################################################################
     ###################################################################################################################
 
@@ -589,7 +593,7 @@ def capture_switch_info(extend_name="", fid=128):
     print("LS LIST           :  %s  " % ls_list)
     print("DEFAULT SWITCH    :  %s  " % deflt_switch)
     print("BASE SWITCH       :  %s  " % base_sw)
-    print("EX_PORTS          :  %s  " % ex_ports)  ######################NEW
+    print("EX_PORTS          :  %s  " % ex_ports)
     print("VF SETTING        :  %s  " % vf_enabled)
     print("SWITCH TYPE       :  %s  " % sw_type)
     print("TIMEOUT VALUE     :  0   ")
@@ -598,17 +602,16 @@ def capture_switch_info(extend_name="", fid=128):
     print("BLADES            :  %s " % blades)
     print("LICENSE LIST      :  %s  " % license_list)
 
-    #######################################################################################################################
+    ##################################################################################################################
     #
     # Write to the file
     #
-    #######################################################################################################################
-
+    ##################################################################################################################
 
     f = "%s%s%s" % ("logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
-    header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n", \
+    header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n",
                            "", "", "==============================\n")
-    ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
+    ff = liabhar.FileStuff(f, 'w+b')  # open the log file for writing
     ff.write(header)
     ###################################################################################################################
     ff.write("SWITCH IP                :  %s  \n" % switch_ip)
@@ -649,15 +652,13 @@ def capture_switch_info(extend_name="", fid=128):
 
     # cons_out             = anturlar.fos_cmd("setcontext %s " % fid_now)
 
-    return (True)
-
-
+    return True
 
 
 def main():
     global tn  # variable for telnet session
 
-    pa = parse_args(sys.argv)
+    pa = parse_args()
     # print(pa)
     # print(pa.chassis_name)
     # print(pa.ipaddr)
@@ -679,7 +680,7 @@ def main():
         print("do IP steps")
         pa.chassis_name = console_info_from_ip(pa.ipaddr)
 
-    cons_info = console_info(pa.chassis_name)
+    # cons_info = console_info(pa.chassis_name)
     # console_ip = cons_info[0]
     # console_port = cons_info[1]
     # console_ip_bkup = cons_info[2]
@@ -689,16 +690,16 @@ def main():
     user_name = usr_pass[0]
     usr_psswd = usr_pass[1]
     ipaddr_switch = get_ip_from_file(pa.chassis_name)
-    #steps_to_run = pa.steps
+    # steps_to_run = pa.steps
 
     # fid_to_compare = 128
 
     ###################################################################################################################
     # if the user does not enter a value for which steps to run prompt for user input value
     #
-    #if not steps_to_run:
-        # pa.start = user_start()
-        #steps_to_run = pa.start = user_start()
+    # if not steps_to_run:
+    # pa.start = user_start()
+    # steps_to_run = pa.start = user_start()
 
     tn = anturlar.connect_tel_noparse(ipaddr_switch, user_name, usr_psswd)
 
@@ -711,7 +712,6 @@ def main():
     # cons_out = send_cmd("creditrecovmode --be_crdloss off")
     # cons_out = send_cmd("creditrecovmode --be_losync off")
     # cons_out = send_cmd("creditrecovmode --fault edgeblade")
-
 
     ###################################################################################################################
     #
@@ -752,8 +752,8 @@ def main():
     #  call the failover function from cofra and send the number of failovers
     #
 
-    original = capture_switch_info("switch_info_orig", pa.fid)  # Original File1
-    #compare = capture_switch_info("switch_info_compare", pa.fid)
+    # original = capture_switch_info("switch_info_orig", pa.fid)  # Original File1
+    # compare = capture_switch_info("switch_info_compare", pa.fid)
 
     # if steps_to_run == 1:
     #     print('\n\nFile written')
@@ -764,17 +764,19 @@ def main():
         tn = cofra.ha_failover(g)
         liabhar.count_down(120)
         # switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
-        compare = capture_switch_info("switch_info_compare", pa.fid)  ###### File to compare after operations
+        # compare = capture_switch_info("switch_info_compare", pa.fid)  ###### File to compare after operations
         orig = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_orig.txt" % ipaddr_switch
         compare = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_compare.txt" % ipaddr_switch
         diff_f = liabhar.file_diff(orig, compare)
         print(diff_f)
         g = g - 1
         if not diff_f:
-            liabhar.email_sender_html("graham.squire@broadcom.com", "graham.squire@broadcom.com",
+            liabhar.email_sender_html(pa.email, pa.email,
                                       "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint", "")
+            cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
             sys.exit(1)
-    #sys.exit(0)
+    # cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
+    # sys.exit(0)
 
     ###################################################################################################################
     #
@@ -799,36 +801,37 @@ def main():
     ###################################################################################################################
 
     # if steps_to_run == 2 or steps_to_run == 3:
-        liabhar.JustSleep(10)
-        # liabhar.count_down(360)
-        # cons_out = anturlar.fos_cmd("setcontext 128")
-        # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
-        # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
+    liabhar.JustSleep(10)
+    # liabhar.count_down(360)
+    # cons_out = anturlar.fos_cmd("setcontext 128")
+    # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_base_policy")
+    # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
 
-        ###################################################################################################################
-        #### path to the second file to compare
-        switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
+    ###################################################################################################################
+    # path to the second file to compare
+    # switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
 
-        liabhar.cls()
+    liabhar.cls()
 
-        print("#" * 80)
-        print("#" * 80)
-        print("#######")
-        print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @  ")
-        print("#######     @  @    @       @      @   @   @        @     @  ")
-        print("#######     @@@     @@@@    @@@@   @   @   @        @     @  ")
-        print("#######     @  @    @           @  @   @   @        @        ")
-        print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
-        print("#" * 80)
-        print("#" * 80)
+    print("#" * 80)
+    print("#" * 80)
+    print("#######")
+    print("#######     @@@@@   @@@@@   @@@@@  @   @   @      @@@@@   @  ")
+    print("#######     @  @    @       @      @   @   @        @     @  ")
+    print("#######     @@@     @@@@    @@@@   @   @   @        @     @  ")
+    print("#######     @  @    @           @  @   @   @        @        ")
+    print("#######     @   @   @@@@@   @@@@@   @@@    @@@@@    @     @ ")
+    print("#" * 80)
+    print("#" * 80)
 
-        diff_f = liabhar.file_diff(orig, compare)
-        print('\n\n')
+    diff_f = liabhar.file_diff(orig, compare)
+    print(diff_f)
+    print('\n\n')
 
-        print("#" * 80)
-        print("#" * 80)
-        print("#" * 80)
-        print("#" * 80)
+    print("#" * 80)
+    print("#" * 80)
+    print("#" * 80)
+    print("#" * 80)
 
     ###################################################################################################################
     #  put additional commands here before disconnecting from telnet
@@ -841,7 +844,7 @@ def main():
     date_is = dt.current()
     print(date_is)
 
-    liabhar.email_sender_html("graham.squire@broadcom.com", "graham.squire@broadcom.com", "HA_Failover passed",
+    liabhar.email_sender_html (pa.email, pa.email, "HA_Failover passed",
                               "HA_Failover passed", "")
 
 
