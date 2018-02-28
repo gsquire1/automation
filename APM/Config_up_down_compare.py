@@ -656,8 +656,8 @@ def make_changes():
     ls_list = s.ls()
     
     for l in ls_list:
-           cons_out = anturlar.fos_cmd("echo Y | maspconfig --purge ")
-           cons_out = anturlar.fos_cmd("flow --delete all")
+           cons_out = anturlar.fos_cmd("echo Y | mapsconfig --purge ")
+           cons_out = anturlar.fos_cmd("echo Y | flow --delete all")
             
     return(True)
     

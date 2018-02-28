@@ -13,25 +13,21 @@ import requests
 # import sys     
 # import time
 import untangle
-
+import logging
 
 import logging
 import argparse
 import rest_cmd_lib
 ###############################################################################
 ###############################################################################
-import logging
-
-###############################################################################
+####
+####  enable logger 
+####
 ###############################################################################
 ###############################################################################
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
-
-
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
 ####
 ####  file handler for logging
 fh = logging.FileHandler('rest_switch_log_practice.txt')
@@ -44,7 +40,11 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-
+###############################################################################
+###############################################################################
+####   END of configuring Logger     -  ii is before the first  function  to make it global
+###############################################################################
+###############################################################################
 
 
 def parent_parser():
@@ -139,67 +139,36 @@ def main():
 ####
 ####    create object  to be able to send rest commands
 ####
- ###############################################################################
+####     get the Autherization and wwn for the fid to
+####
+###############################################################################
 ###############################################################################
 
     sm = rest_cmd_lib.rest_cfg(pa)
-    #sm.test()            ################### this can be removed 
-    
-###############################################################################
-###############################################################################
-####
-####     get the Autherization and wwn for the fid to 
-####         
-###############################################################################
-###############################################################################
-
+ 
     wwn = sm.get_wwn(pa.fid)
     Auth_send = sm.get_Auth()
 
 ###############################################################################
 ###############################################################################
 ####
-####    do some testing
+####    do some testing here
 ####
 ###############################################################################
 ###############################################################################
 
     logger.info('Start of rest commands')
 
-    # r = requests.get("http://%s/rest/running/switch/fibrechannel-switch?vf-id=%s"  % ( pa.ip, pa.fid) , headers=Auth_send)
-    # print("@"*80)
-    # print(r.text)
-    # print("@"*80)
-    # print("@"*80)
-    # print("=H"*80)
-    # print("=H"*80)
-    # 
-    # print("fs_leaf_debug__START___"*10)
-    # print(r.text)
-    # print("fs_leaf_ONE_____"*10)
-    # doc = untangle.parse(r.text)
-    # print("fs_leaf_debug__TWO___"*10)
-    # print(doc)
-    # print("fs_leaf_end_____"*10)
-    # done = "none"
-    # 
-    # done = doc.Response.fibrechannel_switch.domain_name.cdata
-
-    domain_id_from_fcs = sm.fcs_leaf( "domain-id" ,  pa.fid)
-
+    domain_id_from_fcs = sm.fcs_leaf( "domain_id" ,  pa.fid)
+    
 
     logger.info('@'*120)
     logger.info('================ Start of Fabric Switch commands ===================')
-    
-    # logger.info(done)
-    #logger.info("domainid is  :  %s " %  done)
-    
     logger.info("from lib  :  %s  " % domain_id_from_fcs )
     logger.info('End of domain-id command =====================================')
     logger.info('@'*120)
 
-     
-    wwn_from_fabric_switch = sm.fs_leaf( "wwn" , pa.fid)
+    wwn_from_fabric_switch = sm.fs_leaf( "fcid" , pa.fid)
     # chass_friendly_name_from_fabric_switch = sm.fs_leaf("chassis-user-friendly-name" , wwn, pa.fid)
     # friendly_name_from_fabric_switch  = sm.fs_leaf(  "switch-user-friendly-name" , wwn, pa.fid) 
     # pricipal_from_fabric_switch = sm.fs_leaf( "principal" , wwn, pa.fid)
@@ -208,33 +177,56 @@ def main():
     # fcipaddr_from_fabric_switch = sm.fs_leaf( "fcip-address" , wwn, pa.fid)
     # ipv6addr_from_fabric_switch = sm.fs_leaf( "ipv6-address" , wwn, pa.fid)
     # firmrev_from_fabric_switch = sm.fs_leaf("firmware-version" , wwn, pa.fid) 
-    print(wwn)
-    print("=T"*80)
-    print("=T"*80)
-    print("=T"*80)
-    print("=T"*80)
-    print("=T"*80)
-    print("=T"*80)
-    # print(friendly_name_from_fabric_switch)
+ 
+
+    wwn_from_fabric_switch = sm.fs_leaf( "name" , pa.fid)
+    chass_wwn_fs                   = sm.fs_leaf("chassis_wwn", pa.fid)
+    domain_id_fs                    = sm.fs_leaf("domain_id", pa.fid)
+    fcid_fs                                =  sm.fs_leaf("fcid", pa.fid)
+    fcid_hex_fs                       =   sm.fs_leaf("fcid_hex", pa.fid)
+    switch_name_fs                =   sm.fs_leaf("switch_user_friendly_name", pa.fid)
+    chass_name_fs                =   sm.fs_leaf("chassis_user_friendly_name", pa.fid)
+    firmver_fs                        =   sm.fs_leaf("firmware_version", pa.fid)
+    ip_addr_fs                       =   sm.fs_leaf("ip_address", pa.fid)
+    fcip_addr_fs                     =   sm.fs_leaf("fcip_address", pa.fid)
+    ipv6_addr_fs                    =   sm.fs_leaf("ipv6_address", pa.fid)
+    principal_fs                      =   sm.fs_leaf("principal", pa.fid)
+    
+    
+    
+    
+    print("info from fabric switch leaf")
+    
+    print("=SM"*24)
+    print("=SM"*24)
+    
     print(wwn_from_fabric_switch)
-    # 
-    # print(pricipal_from_fabric_switch )  
-    # print(fcid_from_fabric_switch )  
-    # print(ipaddr_from_fabric_switch )  
-    # print(fcipaddr_from_fabric_switch ) 
-    # print(ipv6addr_from_fabric_switch )
-    # print(firmrev_from_fabric_switch )
-    # print(chass_friendly_name_from_fabric_switch)
-    #     
-    # print("=T"*80)
-    # print("=T"*80)
-    #    
-    # 
-    # 
-    # test_error_message = sm.fs_leaf("jibberish" , wwn) 
-    # print("=T"*80)
-    # print("=T"*80)
-    #  
+    print(chass_wwn_fs)
+    print(domain_id_fs)
+    print(fcid_fs)
+    print(fcid_hex_fs)
+    print(switch_name_fs  )
+    print(chass_name_fs )
+    print(firmver_fs )
+    print(ip_addr_fs )
+    print(fcip_addr_fs )
+    print(ipv6_addr_fs )
+    print(principal_fs )
+    
+    print("WWN from get_wwn function")
+    print(wwn)
+    
+    print("=T"*80)
+    print("=T"*80)
+    print("=T"*80)
+    print("=T"*80)
+    print("=T"*80)
+    print("=T"*80)
+ 
+    test_error_message = sm.fs_leaf("jibberish" , 22) 
+    print("=T"*80)
+    print("=T"*80)
+      
     
 ###############################################################################
 ###############################################################################
@@ -245,111 +237,27 @@ def main():
 ###############################################################################
 ###############################################################################  
     
+    wwn_from_fcs                 =  sm.fcs_leaf("name", pa.fid)
+    domain_id_from_fcs = sm.fcs_leaf( "domain_id" , pa.fid)
+    fcid_fcs                               =  sm.fcs_leaf("fcid" , pa.fid)
+    fcid_hex_fcs                       =   sm.fcs_leaf("fcid_hex" , pa.fid)
+    user_friendly_name_fcs   =   sm.fcs_leaf("user_friendly_name", pa.fid)
+    enabled_state_from_fcs = sm.fcs_leaf( "enabled_state" , pa.fid)
+    uptime_fcs                        =  sm.fcs_leaf("up_time", pa.fid)
+    domain_name_from_fcs = sm.fcs_leaf( "domain_name" , pa.fid)    
+    principal_fcs                     =  sm.fcs_leaf("principal", pa.fid)
     
-     
-    # 
-    # prt = "0%2f23"
-    # r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/%s/crc-errors?vf-id=31" % (pa.ip,prt) , headers=Auth_send)
-    # #r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/name" % (pa.ip ) , headers=Auth_send)
-    # print("@_G"*40)
-    # print(r.text)
-    # try:
-    #     d = untangle.parse(r.text)
-    #     dd = untangle.parse(rr.text)
-    #     print("@_B_"*40)
-    #     print(r.content)
-    #     print("@_B_"*40)
-    #     print(r.url)
-    #     print("@_B_"*40)
-    #     print(d)
-    #     print("@_B_"*40)
-    #     done = d.Response.fibrechannel_statistics.crc_errors.cdata
-    #     print(done)
-    #     print("END_"*40)
-    #     done = d.Response.fibrechannel_statistics.name.cdata
-    #     print(done)
-    #     print("END_"*40)
-    # 
-    #     done = dd.Response.fibrechannel[0].name.cdata
-    #     print(done)
-    #     print("END_3"*40)
-    #     
-    #     ll = len(dd.Response.fibrechannel)
-    #     print("length  %s   " %  ll)
-    #     
-    #     port_list = []
-    #     for x in range(ll):
-    #         print(x)
-    #         
-    #         pl = dd.Response.fibrechannel[x].name.cdata
-    #         print(pl)
-    #         print(type(dd.Response.fibrechannel[x].name.cdata))
-    #         port_list += [pl]
-    #     print(port_list)
-    #     
-    #     done = dd.Response.fibrechannel[0].name.cdata
-    #     print(done)
-    #     print("END_3"*40)
-    #     
-    #     
-    # except:
-    #     print("Error in untagle" , sys.exc_info()[0] )
-    #     done = "Untangle Error"
-    #     
-    # print("@"*80)
-    # print("@_E_"*40)
-    # 
-    # 
-    # prt = "0%2f23"
-    # #####   
-    # r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/%s/in-link-resets?vf-id=31" % (pa.ip, prt) , headers=Auth_send)
-    # 
-    # print("@_H"*40)
-    # print(r.text)
-    # print("@"*80)
-    # print("@_E"*40)
-    # 
-    # #bfc_wwn = get_bfc_wwn()
-    # 
-    # 
-    # 
-    # 
-    # 
-    # if pa.verbose > 0:
-    #     print("vf_id                                 :  %s  "  % vf_state)
-    #     print("principal switch                      :  %s "  %  principal_switch)
-    #     print("domian_id                             :  %s  " % domain_id)
-    #     print("fcid                                  :  %s  " % fcid )
-    #     print("user_friendly_name                    :  %s  "  %  user_friendly_name)
-    #     print("switch state                          :  %s  " % enabled_state )
-    #     print("up-time                               :  %s  "  %  up_time)
-    #     print("model                                 :  %s   "  %  model)
-    #     print("firmware-version                      :  %s  "  % firmware_version)
-    #     print("ip-address                            :  %s  "  %  ip_address)
-    #     print("domain-name                           :  %s  "  %  domain_name)
-    #     print("fabric-user-friendly-name             :  %s  "  % fabric_u_f_name)
-    #     print("ag-mode                               :  %s  "  % ag_mode)
-    #     
-    # print("&"*80)
-#  
-#     
-#     logger.info('@'*120)
-#     logger.info('================ Start of Fabric Switch commands ===================')
-#     r = requests.get("http://%s/rest/running/switch/fibrechannel-switch"  % ( pa.ip) , headers=Auth_send)
-#     print("@"*80)
-#     print(r.text)
-#     logger.info(r.text)
-#     print("@"*80)
-#     print("@"*80)
-#     print("=H"*80)
-#     print("=H"*80)
-# 
-    ag_mode_from_fcs = sm.fcs_leaf( "ag-mode" , pa.fid)
-    domain_id_from_fcs = sm.fcs_leaf( "domain-id" , pa.fid)
-    domain_name_from_fcs = sm.fcs_leaf( "domain-name" , pa.fid)    
-    enabled_state_from_fcs = sm.fcs_leaf( "enabled-state" , pa.fid)    
-    fabric_name_from_fcs = sm.fcs_leaf( "fabric-user-friendly-name" ,  pa.fid)
-        
+    ip_addr_fcs                       =   sm.fcs_leaf("ip_address" , pa.fid)
+    model_from_fcs               =  sm.fcs_leaf("model" , pa.fid)
+    firmver_fcs                       =  sm.fcs_leaf("firmware_version", pa.fid)
+    vf_id_from_fcs                  =  sm.fcs_leaf("vf_id", pa.fid)
+    fabric_name_from_fcs    = sm.fcs_leaf( "fabric_user_friendly_name" ,  pa.fid)
+    ag_mode_from_fcs          = sm.fcs_leaf( "ag_mode" , pa.fid)
+    
+    
+    
+    
+    
 #  
 #         
 # 
@@ -363,62 +271,52 @@ def main():
 # 
     logger.info('@'*120)
     logger.info('@'*120)
-    logger.info("agmode value is  :  %s " %  ag_mode_from_fcs)
-    logger.info("domain id  value is  :  %s " %   domain_id_from_fcs)
-    logger.info("domain name value is  :  %s " %  domain_name_from_fcs)
-    logger.info("enabled state value is  :  %s " %  enabled_state_from_fcs)
-    logger.info("fabric name  value is  :  %s " %  fabric_name_from_fcs)     
+    logger.info("wwn from fcs  is   :  %s"  %  wwn_from_fcs)
+
+    logger.info("domain_id_from_fcs   :  %s " %  domain_id_from_fcs  )
+    logger.info("fcid_fcs value is  :  %s " %  fcid_fcs )
+    logger.info("fcid_hex_fcs  value is  :  %s " %  fcid_hex_fcs  )
+    logger.info("user_friendly_name_fcs value is  :  %s " %  user_friendly_name_fcs )
+    logger.info("enabled_state_from_fcs value is  :  %s " %  enabled_state_from_fcs )
+    logger.info("domain_name_from_fcs    value is  :  %s " %  domain_name_from_fcs  )
+    logger.info("principal_fcs   value is  :  %s " %  principal_fcs   )
+    
+    logger.info("ip_addr_fcs value is  :  %s " %  ip_addr_fcs )
+    
+    logger.info("model_from_fcs value is  :  %s " %   model_from_fcs)
+    
+    
+    logger.info("firmver_fcs value is  :  %s " %  firmver_fcs )
+    logger.info("vf_id_from_fcs value is  :  %s " %  vf_id_from_fcs )
+    logger.info("fabric_name_from_fcs  value is  :  %s " %  fabric_name_from_fcs )   
+    logger.info("ag_mode_from_fcs from fcs  is   :  %s"  %  ag_mode_from_fcs )
+    
     logger.info('END==='*20)
     logger.info('===END'*20)
  
-#  
-#  
-#  
-#  
  
  
-    # r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics"  % ( pa.ip) , headers=Auth_send)
-    # print("@"*80)
-    # print(r.text)
-    # logger.info(r.text)
-    # print("@"*80)
-    # print("@"*80)
-    # print("=H"*80)
-    # print("=H"*80)
-    # 
-    # prt = "0%2f23"
-    # # #####   
-    # # r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/%s/in-link-resets?vf-id=31" % (pa.ip, prt) , headers=Auth_send)
-    # #
-    # 
-    # port_address_error =  sm.fc_stats_leaf("address_errors",  wwn, pa.fid)
-    # 
-    # 
-    # 
-    # 
-    # logger.info('@'*120)
-    # logger.info('@'*120)
-    # logger.info("Address errors  on port  %s   :  %s " %  (prt, ag_mode_from_fcs))
-    # 
-    # logger.info('END==='*20)
-    # logger.info('===END'*20)
+###############################################################################
+###############################################################################
+####
+####
+####
+###############################################################################
+###############################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #switch_info_name  =  fc_switch_info("name" , pa.fid)
+    
+    
+    
+    
+    port_number_list = sm.port_numbers(pa.fid)
+    
+    
+    #fc_stat_leaf            =  sm.fc_stats_leaf("model" , pa.fid)
+    
+    port_err_counts =  sm.port_err_stats(0, 7,  pa.fid)
+        
+    print(port_err_counts)
 
     #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
     #print(r.status_code)
