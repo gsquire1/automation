@@ -85,17 +85,44 @@ import cofra
 ####
 #######################################################################################################################
 
+def msg(name=None):
+    """
+    """
+    
+    return(''' ./APM/flow_regression.py <filename>
+           
+           filename will include 
+           
+           ''')
+
+
 def parent_parser():
     """
        the parent parser to handle the main arguements 
        
     """
+    #pp = argparse.ArgumentParser(description='Add flows to a switch included in the setup file', usage=msg())
     pp = argparse.ArgumentParser(add_help=False)
+    # pp = argparse.ArgumentParser(add_help=False, formatter_class=argparse.RawDescriptionHelpFormatter,\
+    #                              description=""" csv file that has info for the test \n Chassisname,FID   \
+    #                 and is required to \
+    #                 to be in the /home/runfromhere/ini directory \n in this format \
+    #                 Chassisname,FID \
+    #                 stats_wedge,101  \
+    #                 stats_gen6_plut,101   """)
+  
     #pp.add_argument("--repeat", help="repeat repeat")
     #pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
     #pp.add_argument("ip", help="IP address of SUT")
     #pp.add_argument("user", help="username for SUT")
-    pp.add_argument("file", help="csv file that has info for the test \n Chassisname,FID ")
+    
+    pp.add_argument("file", help="csv file that has info for the test \n Chassisname,FID   \
+                    and is required to \
+                    to be in the /home/runfromhere/ini directory \n in this format \
+                    Chassisname,FID \
+                    stats_wedge,101  \
+                    stats_gen6_plut,101 ")
+    
     #pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
@@ -112,8 +139,8 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
     #parser.add_argument('-x', '--xtreme', action="store_true", help="Extremify")
     #parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
-    parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
-    parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
+    #parser.add_argument('-c',   '--chassis_name', type=str, help="Chassis Name in the SwitchMatrix file")
+    #parser.add_argument('-ip',  '--ipaddr',     help="IP address of target switch")
     #parser.add_argument('-cp',   '--cmdprompt', help="switch is already at command prompt")
     #parser.add_argument('-t',   '--switchtype', help="switch type number - required with -cp")
     #parser.add_argument('-s', '--suite', type=str, help="Suite file name")
@@ -363,6 +390,10 @@ def main():
      ####
      ######################################################################################################################
      ######################################################################################################################
+        print("#"*80)
+        print(user_name)
+        print(usr_psswd)
+        
         tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,usr_psswd)
         cons_out = anturlar.fos_cmd("setcontext %s " % target_fid)               ####   change to the fid given on the command 
         firmware_ver = anturlar.fos_cmd("firmwareshow")                          ####   send any command with anturlar.fos_cmd
@@ -390,7 +421,7 @@ def main():
 #######################################################################################################################
         cons_out = anturlar.fos_cmd("fosexec --fid all -cmd 'flow --deact all'")
         cons_out = anturlar.fos_cmd("flow --deact all")
-        cons_out = anturlar.fos_cmd("echo y | flow --delete all -force")   #### remove all flows
+        cons_out = anturlar.fos_cmd("flow --delete all -force")   #### remove all flows
         
         cons_out = anturlar.fos_cmd("flow --act sys_mon_all_fports")
         liabhar.JustSleep(360) 

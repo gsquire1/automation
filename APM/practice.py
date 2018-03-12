@@ -115,6 +115,21 @@ def parse_args(args):
 
     return(parser.parse_args())
 
+
+def pa_print(pa):
+        
+        print(pa)
+        print(pa.ip)
+        print(pa.fid)
+        print(pa.user)
+        print(pa.pw)
+        print(pa.quiet)
+        print(pa.verbose)
+        print(pa.cmdprompt)
+        print("@"*40)
+        print("="*80)
+        return(True)
+    
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -123,17 +138,8 @@ def main():
     
     
     pa = parse_args(sys.argv)
-    print(pa)
-    print(pa.ip)
-    print(pa.fid)
-    print(pa.user)
-    print(pa.pw)
-    print(pa.quiet)
-    print(pa.verbose)
-    print(pa.cmdprompt)
-    print("@"*40)
-    print("="*80)
-  
+    pa_print(pa)
+
 ###############################################################################
 ###############################################################################
 ####
@@ -161,7 +167,6 @@ def main():
 
     domain_id_from_fcs = sm.fcs_leaf( "domain_id" ,  pa.fid)
     
-
     logger.info('@'*120)
     logger.info('================ Start of Fabric Switch commands ===================')
     logger.info("from lib  :  %s  " % domain_id_from_fcs )
@@ -304,27 +309,97 @@ def main():
 ###############################################################################
 ###############################################################################
 
-    #switch_info_name  =  fc_switch_info("name" , pa.fid)
-    
-    
-    
     
     port_number_list = sm.port_numbers(pa.fid)
     
     
-    #fc_stat_leaf            =  sm.fc_stats_leaf("model" , pa.fid)
-    
     port_err_counts =  sm.port_err_stats(0, 7,  pa.fid)
         
-    print(port_err_counts)
+    #print(port_err_counts)
 
-    #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
-    #print(r.status_code)
+###############################################################################
+###############################################################################
+####
+####    MAPS Commands
+####
+###############################################################################
+###############################################################################
+    logger.info('=== MAPS Start ==='*6)
+    
+    #maps_switch_health                   =  sm.maps_commands("switch-status-policy-report")
+    #maps_power_supply_health      =  sm.maps_commands("power-supply-health")
+    
+    
+    
+    maps_monitor_sys_matrix         =  sm.maps_matrix()
+    ####   this will be all of the allowed settings
+    ####     
+   #logger.info("maps_switch_health     :    %s " %  maps_switch_health)
+    #logger.info("maps_power_supply_health     :    %s " %  maps_power_supply_health)
+    
+    logger.info("maps monitor system matrix    :  %s "  %  maps_monitor_sys_matrix )
+    
+    
+    logger.info('=== MAPS END  ==='*8) 
+     
         
-    r = sm.rest_logout(Auth_send)
+        
+        
+###############################################################################
+###############################################################################
+####
+####     END of Session    LOGOUT here
+####
+###############################################################################
+###############################################################################
+
+    r = sm.rest_logout()
     print(r.status_code)
     
     #sys.exit()
+    print("#"*80)
+    print("#"*80)
+    print("#"*80)
+    
+    print(maps_monitor_sys_matrix.text)
+    
+    
+    logger.info(type(maps_monitor_sys_matrix))
+    
+     
+    print("@"*80)
+    print("@"*80)
+    print("@"*80)
+    doc = maps_monitor_sys_matrix
+    done_list = []
+    word = "actions"
+    
+    
+    try:
+        done_list = getattr(doc.Response.monitoring_system_matrix, word).cdata
+        return(done_list)
+        
+        if type(doc.Response.fibrechannel_statistics is list ):
+            
+            for c in doc.Response.monitoring_system_matrix:
+                done_list.append(getattr(doc.Response.monitoring_system_matrix, word).cdata)
+            
+            print("using the if part ")
+            print(done_list)    
+        #    return(done_list)
+        else:
+            done_list = getattr(doc.Response.monitoring_system_matrix, word).cdata
+            print("using the else part")
+            print(done_list)
+
+    except AttributeError:
+        print("Error during untangle - None was returned")
+        done_list = "Untangle Error"
+     
+    print(done_list)
+    
+    
+    print("#"*80)
     
     
    

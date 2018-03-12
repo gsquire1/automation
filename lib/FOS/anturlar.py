@@ -2528,11 +2528,11 @@ def fos_cmd_regex(cmd, reg,dblevel=0):
         print(" in  fos_cmd_regex()    ")
         print("========================")
 
-def fos_cmd(cmd, dl=0):
+def fos_cmd(cmd, dl=10):
     global tn
     try: 
-        usrn = var.sw_user + '> '
-        usrn = usrn.encode()
+        #usrn = var.sw_user + '> '
+        #usrn = usrn.encode()
         telnet_closed = "telnet connection closed"
         telnet_closed = telnet_closed.encode()
         #traff_prompt = " ~]# "
@@ -2541,9 +2541,15 @@ def fos_cmd(cmd, dl=0):
         #traff_prompt = traff_prompt.encode()
         
         tn.set_debuglevel(10)
-        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        #reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
+        reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", b"admin>", telnet_closed ]
+        
         capture = ""
-        print(cmd)
+        # print("username in fos_cmd  anturlar ")
+        # #print("\n\n")
+        # #print(usrn)
+        # print(cmd)
+        # print("*=#"*80)
         tn.write(cmd.encode('ascii') + b"\n")
         
         #capture = tn.expect(reg_ex_list, 60)
@@ -2552,7 +2558,7 @@ def fos_cmd(cmd, dl=0):
         capture = capture.decode('ascii', 'ignore')
         #print("@@"*40)
         #print("CAPTURE\n\n")
-        print(capture, end="")
+        #print(capture, end="")
         return(capture)
  
     except EOFError:

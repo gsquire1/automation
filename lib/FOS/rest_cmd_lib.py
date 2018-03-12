@@ -31,6 +31,15 @@ logger.addHandler(ch)
 ###############################################################################
 ###############################################################################
 
+def  check_response_type(doc):
+    """
+    
+    """
+    
+
+    return(True)
+
+
 class rest_cfg:
 
     def __init__(self, pa):
@@ -89,14 +98,13 @@ class rest_cfg:
             sys.exit()
         return(Auth_send)        
 
-    def rest_logout(self, Auth_send):
+    def rest_logout(self, ):
         """
             logout of the current rest session
             
         """
-        logoutpath = "http://" + self.ip + "/rest/logout"
-        #r = requests.post("http://%s/rest/logout" % self.ip , headers=Auth_send)
-        r = (requests.post(logoutpath, headers=Auth_send))
+        #r = requests.post("http://%s/rest/logout" % pa.ip , headers=Auth_send)
+        r = requests.post("http://%s/rest/logout" % self.ip , headers=self.Auth)
         print(r.status_code)    
         if r.status_code == 204:
             print("successful logout\n\n")
@@ -352,7 +360,74 @@ class rest_cfg:
             r = requests.get(cmplt_path, headers=Auth_send)
             return(r)
         
+    def maps_matrix(self, fid = -1 ):
+        """
         
+        """
+        logger.info('Start of function maps commands   ')
+        
+        try:
+            if fid < 1 :
+                #r = requests.get("http://%s/rest/running/brocade-maps/%s" % (self.ip, word), headers=self.Auth)
+                r = requests.get("http://%s/rest/running/brocade-maps/monitoring-system-matrix" % (self.ip), headers=self.Auth)               
+            else:
+                r = requests.get("http://%s/rest/running/brocade-maps/monitoring-system-matrix/?vf-id=%s"  % (self.ip, self.fid) , headers=self.Auth)
+                
+            doc = untangle.parse(r.text)
+        
+            print("#"*80)
+            print("JSON"*40)
+            print(r.text)
+            print("@"*80)
+            
+        except TypeError:
+            print("logout ")
+            print("Possible error with the command ")
+            print("you did not get logged out of the session")
+            sys.exit()
+   
+   
+        logger.info("Monitoring Matrix ")
+        logger.info(r.text)
+        logger.info("Untangled doc")
+        logger.info(r)
+   
+   
+   
+        done_list = []
+        return(r)
+   
+   
+        try:
+            logger.info("Creating list of data")
+            logger.info(type(doc.Respnse.monitoring_system_matrix))
+            
+            if type(doc.Response.monitoring_system_matrix) is list:
+                logger.info("check of location  3")
+            
+                for c in doc.Response.monitoring_system_matrix:
+                    logger.info(c)
+                
+                    done_list.append(getattr(c, word).cdata)
+                print("using the if part ")
+                print(done_list)
+                return(done_list)
+            else:
+                done_list = getattr(doc.Response.monitoring_system_matrix, word).cdata
+                print("using the else part")
+                print(done_list)
+                return(done_list)
+            
+        except AttributeError:
+            print("Error during untangle - None was returned")
+            done = "None was returned  Untangle Error"
+        except:
+            print("Error in untagle" , sys.exc_info()[0] )
+            print("maps")
+            done_list = "Untangle Error see previous message for details"
+        logger.info('End of function   maps command  ')
+        return(done_list)
+                 
   
      
     def port_numbers(self, fid = -1):
@@ -393,24 +468,39 @@ class rest_cfg:
         print("#"*80)
         print(doc)
         print("@"*80)
-        print(r.text)
+        #print(r.text)
+        print(type(doc))
+        print(doc.cdata)
+        
+        if doc.cdata is None:
+            print("NONE")
+        print("&"*80)
+        
         
         done_list = []
         word = "name"
         
-        if type(doc.Response.fibrechannel_statistics is list ):
+        check_response_type(doc)
+        
+        try:
+            if type(doc.Response.fibrechannel_statistics ) is list :
             
-            for c in doc.Response.fibrechannel_statistics:
-                done_list.append(getattr(c, word).cdata)
+    
+                for c in doc.Response.fibrechannel_statistics:
+                    done_list.append(getattr(c, word).cdata)
+                
+                print("using the if part ")
+                print(done_list)    
+            #    return(done_list)
+            else:
+                done_list = getattr(doc.Response.fabric_switch, word).cdata
+                print("using the else part")
+                print(done_list)
+        except AttributeError:
+            print("Error during untangle - None was returned")
+            done_list = "Untangle Error  "
             
-            print("using the if part ")
-            print(done_list)    
-        #    return(done_list)
-        else:
-            done_list = getattr(doc.Response.fabric_switch, word).cdata
-            print("using the else part")
-            print(done_list)
- 
+            
         return(done_list)
             
     
@@ -425,10 +515,10 @@ class rest_cfg:
         try:
                 
             if fid < 1 :
-                r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/0%s36" % (self.ip, "%2f"), headers=self.Auth)
+                r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/0%s%s" % (self.ip, "%2f", port), headers=self.Auth)
             else:
                 #r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics?vf-id=%s/name/0%s7"  % (self.ip, self.fid, "%2f" ) , headers=self.Auth )
-                r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/0%s36?vf-id=%s"  % (self.ip, "%2f" ,self.fid) , headers=self.Auth )
+                r = requests.get("http://%s/rest/running/brocade-interface/fibrechannel-statistics/name/0%s%s?vf-id=%s"  % (self.ip, "%2f" ,port, self.fid) , headers=self.Auth )
      
      
             doc = untangle.parse(r.text)
@@ -447,18 +537,26 @@ class rest_cfg:
         done_list = []
         word = "name"
         
-        if type(doc.Response.fibrechannel_statistics is list ):
+        
+        try:
             
-            for c in doc.Response.fibrechannel_statistics:
-                done_list.append(getattr(c, word).cdata)
+            if type(doc.Response.fibrechannel_statistics is list ):
+                
+                for c in doc.Response.fibrechannel_statistics:
+                    done_list.append(getattr(c, word).cdata)
+                
+                print("using the if part ")
+                print(done_list)    
+            #    return(done_list)
+            else:
+                done_list = getattr(doc.Response.fabric_switch, word).cdata
+                print("using the else part")
+                print(done_list)
+     
+        except AttributeError:
+            print("Error during untangle - None was returned")
+            done_list = "Untangle Error"
             
-            print("using the if part ")
-            print(done_list)    
-        #    return(done_list)
-        else:
-            done_list = getattr(doc.Response.fabric_switch, word).cdata
-            print("using the else part")
-            print(done_list)
  
         return(done_list)
             
