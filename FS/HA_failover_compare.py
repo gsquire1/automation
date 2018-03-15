@@ -330,7 +330,7 @@ def console_info_from_ip(ipaddr):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -355,7 +355,7 @@ def console_info(chassis_name):
     
     """
 
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -393,7 +393,7 @@ def pwr_pole_info(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -471,7 +471,7 @@ def get_user_and_pass(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -495,7 +495,7 @@ def get_ip_from_file(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -692,8 +692,6 @@ def main():
     ipaddr_switch = get_ip_from_file(pa.chassis_name)
     # steps_to_run = pa.steps
 
-    # fid_to_compare = 128
-
     ###################################################################################################################
     # if the user does not enter a value for which steps to run prompt for user input value
     #
@@ -752,8 +750,7 @@ def main():
     #  call the failover function from cofra and send the number of failovers
     #
 
-    # original = capture_switch_info("switch_info_orig", pa.fid)  # Original File1
-    # compare = capture_switch_info("switch_info_compare", pa.fid)
+    capture_switch_info("switch_info_orig", pa.fid)  # Original File1
 
     # if steps_to_run == 1:
     #     print('\n\nFile written')
@@ -762,11 +759,10 @@ def main():
     g = pa.iterations
     while g > 0:
         tn = cofra.ha_failover(g)
-        liabhar.count_down(120)
-        # switch_info_compare = capture_switch_info("compare", fid_to_compare)  ###### File to compare after operations
-        # compare = capture_switch_info("switch_info_compare", pa.fid)  ###### File to compare after operations
-        orig = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_orig.txt" % ipaddr_switch
-        compare = "/home/RunFromHere/logs/Switch_Info_cudc%s_switch_info_compare.txt" % ipaddr_switch
+        liabhar.count_down(60)
+        capture_switch_info("switch_info_compare", pa.fid) # File to compare after operations
+        orig = "/home/runfromhere/logs/Switch_Info_cudc%s_switch_info_orig.txt" % ipaddr_switch
+        compare = "/home/runfromhere/logs/Switch_Info_cudc%s_switch_info_compare.txt" % ipaddr_switch
         diff_f = liabhar.file_diff(orig, compare)
         print(diff_f)
         g = g - 1
@@ -775,8 +771,7 @@ def main():
                                       "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint", "")
             cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
             sys.exit(1)
-    # cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
-    # sys.exit(0)
+
 
     ###################################################################################################################
     #
@@ -808,8 +803,6 @@ def main():
     # cons_out = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
 
     ###################################################################################################################
-    # path to the second file to compare
-    # switchdata_1 = "logs/Switch_Info_cudc%s_compare.txt" % ipaddr_switch
 
     liabhar.cls()
 
