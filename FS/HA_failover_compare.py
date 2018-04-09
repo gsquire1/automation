@@ -762,14 +762,17 @@ def main():
     capture_switch_info("switch_info_compare", pa.fid)  # File to compare after operations
     orig = "/home/runfromhere/logs/Switch_Info_cudc%s_switch_info_orig.txt" % ipaddr_switch
     compare = "/home/runfromhere/logs/Switch_Info_cudc%s_switch_info_compare.txt" % ipaddr_switch
-    diff_f = liabhar.file_diff(orig, compare)
+    diff_f = liabhar.file_diff(orig, compare, "HA_FAILOVER_DIFFERENCES")
     print(diff_f)
     # g = g-1
     if not diff_f:
         liabhar.email_sender_html(pa.email, pa.email,
-                                  "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint", "")
+                                  "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint.\
+                                  Look in logs for HA_FAILOVER_DIFFERENCES file", "")
+
         cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
-        sys.exit(1)
+        print("Support Save captured")
+        sys.exit(0)
 
     # g = pa.iterations
     # print(g)
