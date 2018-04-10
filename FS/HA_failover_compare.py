@@ -65,6 +65,9 @@ import cofra
 #
 ###############################################################################
 
+ftp_ip = "172.16.114.67"
+ftp_username = "ftp1"
+ftp_password = "ftp2"
 
 def user_start():
     go = False
@@ -770,7 +773,7 @@ def main():
                                   "HA Failover failed a checkpoint", "HA_Failover failed a checkpoint.\
                                   Look in logs for HA_FAILOVER_DIFFERENCES file", "")
 
-        cofra.DoSupportsave("172.16.114.67", "ftp1", "ftp2", pa.chassis_name)
+        cofra.DoSupportsave(ftp_ip, ftp_username, ftp_password, pa.chassis_name)
         print("Support Save captured")
         sys.exit(0)
 
