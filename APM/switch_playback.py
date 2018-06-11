@@ -880,7 +880,19 @@ def raritan(port, status, ip="10.39.36.112", user="user", pw="pass"):
         print("THIS PDU DOES NOT SUPPPORT CLI POWERCYCLING")
     
 def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY HERE
-    
+    print(switch_type)
+    print(type(switch_type))
+    switchlist = \
+        ['62', '64', '66', '71', '77', '83', '109', '118', '120', '121', '133', '141', '142', '148', '162', '165', '166'
+            , '170', '173', '178']
+    if switch_type not in switchlist:
+        print("@" * 40)
+        print("THE SWITCH SWBD number not found in load_kernel function of switch_playback.py. Cannot continue")
+        print("Exiting Script Now. The switch should be sitting at prom prompt")
+        print("@" * 40)
+        sys.exit(0)
+    else:
+        pass
     #reg_list = [ b"^=> "]
     reg_list =  [b"=>"]
     reg_bash = [ b".*?bash-2.04#", b".*?=> ", b"bash-2.04#"]
@@ -975,6 +987,47 @@ def load_kernel(switch_type, sw_ip, gateway_ip, frm_version): ###ADDED GATEWAY H
         print("\n\n")
         print(capture)
         print("Kernel  C "*8)
+        ####
+        nbt = "bootm 0x2000000 0x3000000 0xc00000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_bash_only)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  E "*8)
+
+    if switch_type == '178':  ####  A-Wing
+        nbt = "makesinrec 0x1000000 \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  A "*8)
+        ####
+        nbt = "tftpboot 0x2000000 awing/uImage \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  B "*8)
+        ####
+        nbt = "tftpboot 0x3000000 awing/ramdisk_v1.0.img \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  C "*8)
+        ####
+        nbt = "tftpboot 0xc00000 awing/silkworm_bd178.dtb \n"
+        tn.write(nbt.encode('ascii'))
+        capture = tn.expect(reg_list)
+        print("send the date   and look for =>")
+        print("\n\n")
+        print(capture)
+        print("Kernel  D "*8)
         ####
         nbt = "bootm 0x2000000 0x3000000 0xc00000 \n"
         tn.write(nbt.encode('ascii'))

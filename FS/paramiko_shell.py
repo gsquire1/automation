@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+""" This script will open a connection via ssh to switch and can issue multiple commands. SSH, by nature, only
+allows one command to be run per connection.I haven't figured out how to "exit" after commands have been sent."""
+
 
 # import telnetlib
 # import getpass
@@ -11,7 +14,6 @@ import logging
 import paramiko
 import re
 import threading
-from random import choice
 
 
 # import re
@@ -181,8 +183,6 @@ class SSHClient(object):
         self.connection.close()
 
 class SSH:
-    """his class will open a connection via ssh to switch and can issue multiple commands. SSH, by nature, only
-allows one command to be run per connection.I haven't figured out how to "exit" after commands have been sent."""
     shell = None
     client = None
     transport = None
@@ -533,134 +533,140 @@ def main():
     # steps_to_run = pa.steps
     # fid_to_compare = 128
     #################################### Sample Text ###############################################################
+    # ssh = SSHClient(ip, uname, pwd)
+    connection = SSH(ip, uname, pwd)
+    connection.openShell()
+    while True:
+        command = input('$ ')
+        if command.startswith(" "):
+            command = command[1:]
+        connection.sendShell(command)
 
-    ###############################################################
-    # Standard paramiko call used for testing:
-    # ssh = paramiko.SSHClient()
-    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    # try:
-    #     ssh.connect(ip, username=uname, password=pwd)
-    # except paramiko.SSHException:
-    #     print("Connection Failed")
-    #     sys.exit(0)
-    #
-    # stdin, stdout, stderr = ssh.exec_command("fosconfig --show")
-    # for line in stdout.readlines():
-    #     print(line.strip())
-    # ssh.close()
-    # sys.exit(0)
-    ##############################################################
+    SSH.closeConnection()
 
-    ssh = SSHClient(ip, uname, pwd)
-    # stdin, stdout, stderr = ssh.execute("date")
-    stdin, stdout, stderr = ssh.execute("fosconfig --show")
-    fosconfig = stdout.readlines()
-    for line in fosconfig:
-        logger.info("THIS IS FOSCONFIG CMD LINE OUTPUT %s" % line)
-        print(line.strip())
-    fosconfig = (str(fosconfig))
-    search = re.search('(?:Virtual Fabric:\D{0,6})([a-z]{0,8})', fosconfig, re.M | re.I)
-    logger.info("THIS IS SEARCH %s" % search)
-    print('THIS IS THE RESULT OF RE.SEARCH: %s ' % search.group(0))
-    a = search.group(0)
+
+    # ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute("fosconfig --show")
+    # fosconfig = ssh_stdout.readlines()
+    # fosconfig = (str(fosconfig))
+    # # print(fosconfig)
+    # # ssh.close()
+    # # sys.exit(0)
+    # # search = re.search('(?:Virtual Fabric:\\t\\t\\t)([a-z]{0,8})', fosconfig, re.M | re.I)
+    # search = re.search('(?:Virtual Fabric:\D{0,6})([a-z]{0,8})', fosconfig, re.M | re.I)
+    # logger.info("THIS IS SEARCH %s" % search)
+    # print('THIS IS THE RESULT OF RE.SEARCH: %s ' % search.group(0))
+    # a = search.group(0)
     # b = search.group(1)
-    # if 'enabled' in fosconfig:
-    if 'enabled' in a:
-        print('Virtual Fabrics are enabled')
-    else:
-        print("@" * 40)
-        print('Virtual fabrics are not enabled on this switch. Exiting script!')
-        print("@" * 40)
-        ssh.close()
-        sys.exit(0)
-    stdin, stdout, stderr = ssh.execute("lscfg --show -instance")
-    lscfg_instances = stdout.readlines()
-    lscfg_instances = (str(lscfg_instances))
-    ls = re.findall('([0-9]{1,3})(?=\()', lscfg_instances, re.M | re.I)
-    number = (len(ls))
-    print("@" * 40)
-    print('LOGICAL SWITCHES CONFIGURED ON THIS SWITCH CURRENTLY: %s' % number)
-    print('LOGICAL SWITCH INSTANCES ON THIS SWITCH CURRENTLY:%s' % ls)
-    print("@" * 40)
+    # #if 'enabled' in fosconfig:
+    # if 'enabled' in a:
+    #     print('true_dat')
+    # else:
+    #     print('false')
+    # ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute("lscfg --show")
+    # lscfg = ssh_stdout.readlines()
+    # print(lscfg)
     # ssh.close()
     # sys.exit(0)
-
-    ls_to_config = 16-number
-    fids = []
-    for x in range(ls_to_config):
-        fids.append(str(choice([i for i in range(2,128) if i not in ls])))
-    print(fids)
-    for i in fids:
-        stdin, stdout, stderr = ssh.execute("lscfg --create %s -force" % i)
-        time.sleep(60)
-        sync_output = []
-        for line in stdout:
-            print(line.strip('\n'))
-            logger.info("THIS IS CREATE LINE OUTPUT %s" % line)
-            sync_output.append(line.strip('\n'))
-            if ("About to create switch with fid=%s. Please wait..." % i) in sync_output:
-                print("logical switch %s created" % i)
-            else:
-                print(sync_output)
-                print("Logical switch %s NOT created" % i)
-                break
-    for i in fids:
-        stdin, stdout, stderr = ssh.execute("lscfg --delete %s -force" % i)
-        time.sleep(60)
-        sync_output = []
-        for line in stdout:
-            print(line.strip('\n'))
-            logger.info("THIS IS DELETE LINE OUTPUT %s" % line)
-            sync_output.append(line.strip('\n'))
-            if ("All active login sessions for FID %s have been terminated." % i) in sync_output:
-                print("logical switch %s deleted" % i)
-            else:
-                print(sync_output)
-                print("Logical switch %s NOT deleted" % i)
-                break
-    ssh.close()
-    sys.exit()
-
-    cmd1 = "lscfg --config %s -slot 12 -port 0-63 -force" % fid
-    stdin1, stdout1, stderr1 = ssh.exec_command(cmd1)
-    time.sleep(60)
-    sync_output = []
-    for line in stdout:
-        print(line.strip('\n'))
-        sync_output.append(line.strip('\n'))
-        if "Configuration change successful." in sync_output:
-            print("ports moved to newfid %s" % fid)
-        else:
-            # print(sync_output)
-            print("ports aren't moved")
-            break
+    #
+    #
+    # # for line in foscfg:
+    # #     if line != '':
+    # #         output = (line.strip('\n'))
+    # #         logger.info('   printing output')
+    # #         print(output)
+    # #     else:
+    # #         print('No information read from vf_capable function')
+    # # print(output)
+    # # search = re.search('(requires)', output, re.M | re.I)
+    # # logger.info(search)
+    # # if search is None:
+    # #     print("\n\n\nVF not enabled on this switch\n\n\n")
+    # #     return (False)
+    # # else:
+    # #     print("\n\n\nVF is enabled on this switch\n\n\n")
+    # #     return (True)
+    # # logger.info ("ssh succcessful. Closing connection")
+    # # ssh.close()
+    # # Example on how to print Human readable results:
+    # # print('\n\n'+ '='*20)
+    # # print("Switch Name :  %s" % initial_checks[0])
+    # # print("IP address :  %s" % initial_checks[1])
+    # # print("Chassis :  %s" % initial_checks[2])
+    # # print("VF enabled :  %s" % initial_checks[3])
+    # # print("FCR enabled :  %s" % initial_checks[4])
+    # # print("Base configured :  %s" % initial_checks[5])
+    # # print('='*20 + '\n\n')
+    # sys.exit(0)
+    #
+    # chassis = director(ip)
+    # if chassis:
+    #     print("Director")
+    # else:
+    #     print("Pizza Box")
+    #
+    # vf = vf_capable(ip)
+    # # vf = vf_capable_transport(ip)
+    # print("VFVFVFVF")
+    # print(vf)
+    # if vf:
+    #     print("VF Supported")
+    # else:
+    #     print("VF not supported. Please check you are trying the correct switch")
+    #     sys.exit(0)
+    # sys.exit(0)
+    # for i in range(0, 10):
+    #     print(i)
+    #     for fid in range(1, 9):
+    #         print(fid)
+    #         status = lscreate(fid, pa.ipaddr)
+    #         print(status)
+    #         if status:
+    #             time.sleep(15)
+    #             connect = check_ssh(pa.ipaddr, uname, pwd)
+    #             if connect:
+    #                 cmd = "setcontext %s" % fid
+    #             print("logged into ls %s" % fid)
+    #             # stdin, stdout, stderr = ssh.exec_command(cmd)
+    #             cmd1 = "lscfg --config %s -slot 12 -port 0-63 -force" % fid
+    #             stdin1, stdout1, stderr1 = ssh.exec_command(cmd1)
+    #             time.sleep(60)
+    #             sync_output = []
+    #             for line in stdout:
+    #                 print(line.strip('\n'))
+    #                 sync_output.append(line.strip('\n'))
+    #                 if "Configuration change successful." in sync_output:
+    #                     print("ports moved to newfid %s" % fid)
+    #         else:
+    #             # print(sync_output)
+    #             print("ports aren't moved")
+    #             break
     #         ssh.exec_command("setcontext %s" % fid)
     #         ssh.exec_command("switchdisable;switchenable")
     #         print("switch toggled")
     #         time.sleep(350)
-        # ssh.close()
-    # connect = check_ssh(ip, uname, pwd)
-    # # if connect == True:
-    # if connect:
-    #     print("Inside deffaultmove")
-    #     stdin2, stdout2, stderr2 = ssh.exec_command("lscfg --config 128 -slot 2 -port 0-47 -force")
-    #     time.sleep(10)
-    #     sync_output = []
-    #     for line in stdout2:
-    #         print(line.strip('\n'))
-    #         sync_output.append(line.strip('\n'))
-    #         if "Configuration change successful." in sync_output:
-    #             print("ports moved to default fid 128")
-    #         time.sleep(900)
-    #     else:
-    #         print(sync_output)
-    #         print("ports aren't moved")
-    # ssh.close()
-    #
-    # for fid in range(85, 95):
-    #     print(fid)
-    # # stat = lsdelete(fid)
-    # time.sleep(60)
+    #     ssh.close()
+    # # connect = check_ssh(ip, uname, pwd)
+    # # # if connect == True:
+    # # if connect:
+    # #     print("Inside deffaultmove")
+    # #     stdin2, stdout2, stderr2 = ssh.exec_command("lscfg --config 128 -slot 2 -port 0-47 -force")
+    # #     time.sleep(10)
+    # #     sync_output = []
+    # #     for line in stdout2:
+    # #         print(line.strip('\n'))
+    # #         sync_output.append(line.strip('\n'))
+    # #         if "Configuration change successful." in sync_output:
+    # #             print("ports moved to default fid 128")
+    # #         time.sleep(900)
+    # #     else:
+    # #         print(sync_output)
+    # #         print("ports aren't moved")
+    # # ssh.close()
+    # #
+    # # for fid in range(85, 95):
+    # #     print(fid)
+    # # # stat = lsdelete(fid)
+    # # time.sleep(60)
 
 
 if __name__ == "__main__":

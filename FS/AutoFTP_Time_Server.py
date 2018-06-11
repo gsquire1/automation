@@ -1,4 +1,4 @@
-#!/usr/bin/python3.4
+#!/usr/bin/env python3
 
 
 
@@ -82,7 +82,7 @@ def parse_args(args):
     verb_value = "99"
     parent_p = parent_parser()      
     parser = argparse.ArgumentParser(description = "PARSER", parents = [parent_p])
-    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file. Must use at least on IP or Chassis name")    
+    parser.add_argument('-csv', '--csvall', action="store_true", help="Gets all Switch IPs from SwitchMatrix file. Must use at least one IP or Chassis name")
     #parser.add_argument('-a', '--all', action="store_true", help="Gets all Switch IPs from SwitchMatrix file")
     parser.add_argument('-f', '--fabwide', action="store_true", help="Execute fabric wide")
     parser.add_argument('-c', '--chassis_name', help="Chassis Name in the SwitchMatrix file")
@@ -766,25 +766,33 @@ def main():
     #### pass ip(s)to login procedure
     #### and write the file
 
-    for i in ipaddr_switch:
-        try: ###New
+    ##################################################################################################
+    # Manual list of switches to run suppportftp against. Entire csv list is printed out above but the
+    # list below overwries it.
+    # This keeps bombing on AMP switch IP (not included below).
+    ##################################################################################################
+    ip_no_amp = ['10.38.36.240', '10.38.36.10', '10.38.36.33', '10.38.36.158', '10.38.36.249', '10.38.36.102',
+               '10.38.36.246', '10.38.36.250', '10.38.36.98', '10.38.36.125', '10.38.36.25', '10.38.36.24',
+               '10.38.36.111', '10.38.36.95', '10.38.36.85', '10.38.36.112']
+    for i in ip_no_amp:
+        try:
             tn = anturlar.connect_tel_noparse(i,user_name,usr_psswd)
-        except OSError: ##New
-            print("Switch %s not available" % i)  ##New
+        except OSError:
+            print("Switch %s not available" % i)
         nos = si.nos_check()
         if not nos:
-            anturlar.fos_cmd("supportftp -s -h 172.16.114.67 -u ftp1 -p ftp2 -d ssaves -l ftp")
+            anturlar.fos_cmd("supportftp -s -h 10.39.2.171 -u ftp1 -p ftp2 -d ssaves -l ftp")
             anturlar.fos_cmd("supportftp -e")
             anturlar.fos_cmd("supportftp -t 8")
             anturlar.fos_cmd("tsclockserver 10.38.2.80; tstimezone America/Denver")
-            #anturlar.fos_cmd("echo Y | reboot")
+            anturlar.fos_cmd("echo Y | reboot")
             #anturlar.fos_cmd("tsclockserver LOCL")
         else:
             print("\n"+"@"*40)
             print('\nTHIS IS A NOS SWITCH> SKIPPING')
             print("\n"+"@"*40)
             pass
-        tn = su.reboot_reconnect()
+        # tn = su.reboot_reconnect()
         anturlar.close_tel()
     sys.exit()
 
