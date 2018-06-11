@@ -3,7 +3,7 @@
 
 ###############################################################################
 ####
-####  net install a switch of any 
+####  
 ####
 ###############################################################################
 
@@ -320,7 +320,7 @@ def console_info_from_ip(ipaddr):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -345,7 +345,7 @@ def console_info(chassis_name):
     
     """
 
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -383,7 +383,7 @@ def pwr_pole_info(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -461,7 +461,7 @@ def get_user_and_pass(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     #switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -485,7 +485,7 @@ def get_ip_from_file(chassis_name):
     """
     
     """
-    switchmatrix = '/home/RunFromHere/ini/SwitchMatrix.csv'
+    switchmatrix = '/home/runfromhere/ini/SwitchMatrix.csv'
     # switchmatrix = 'ini/SwitchMatrix.csv'
     try:
         csv_file = csv.DictReader(open(switchmatrix, 'r'), delimiter=',', quotechar='"')
@@ -603,7 +603,7 @@ def capture_switch_info(extend_name="", fid=128):
     #######################################################################################################################
 
     # f = "%s%s%s" % ("logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
-    f = "%s%s%s" % ("/home/RunFromHere/logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
+    f = "%s%s%s" % ("/home/runfromhere/logs/Switch_Info_cudc", switch_ip, "_%s.txt" % extend_name)
     header = "%s%s%s%s" % ("\nSwitch_info_for_playback CAPTURE FILE \n", \
                            "", "", "==============================\n")
     ff = liabhar.FileStuff(f, 'w+b')  #### open the log file for writing
@@ -627,7 +627,7 @@ def capture_switch_info(extend_name="", fid=128):
     ff.write("Blades                   :  %s  \n" % blades)
 
     ff.write("LICENSE LIST             :  %s  \n" % license_list)
-    ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
+    #ff.write("SFP  INFO                :  %s  \n" % sfpinfo)
     ff.write("=" * 80)
     ff.write("\n")
     ff.write("MAPS POLICIES            :  %s  \n" % maps_policy_sum)
@@ -664,11 +664,9 @@ def main():
     #######################################################################################################################
     pa = parse_args(sys.argv)
     print(pa)
-    # print(pa.chassis_name)
     print(pa.ipaddr)
     print(pa.quiet)
     print(pa.verbose)
-    # print(pa.firmware)
     print(pa.cmdprompt)
     print("@" * 40)
 
@@ -698,7 +696,8 @@ def main():
     steps_to_run = pa.steps
 
     fid_to_compare = 128
-
+    fid_to_compare = pa.fid
+    
     ###################################################################################################################
     #### if the user does not enter a value for which steps to run prompt for user input value
     ####
@@ -713,12 +712,12 @@ def main():
     ####   configure some settings that are not defualt to confirm they remain after disruptions
     ####
     cons_out = send_cmd("creditrecovmode --cfg onLrThresh")
-    cons_out = send_cmd("creditrecovmode --cfg onLrThresh -lrtthreshold 7")
+    cons_out = send_cmd("creditrecovmode --cfg onLrThresh -lrthreshold 7")
     cons_out = send_cmd("creditrecovmode --fe_crdloss off")
     cons_out = send_cmd("creditrecovmode --be_crdloss off")
     cons_out = send_cmd("creditrecovmode --be_losync off")
     cons_out = send_cmd("creditrecovmode --fault edgeblade")
-
+    
     ###################################################################################################################
     ####
     ####   capture teh configuration file  if the user selected 1 or 3
@@ -734,14 +733,9 @@ def main():
     # switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % pa.ipaddr
 
     #switch_data_0 = "logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
-    switch_data_0 = "/home/RunFromHere/logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
+    switch_data_0 = "/home/runfromhere/logs/Switch_Info_cudc%s_compare_orig.txt" % ipaddr_switch
 
     liabhar.JustSleep(10)
-
-    ###################################################################################################################
-    #### this is how to reconnect with telnet
-    # print("reconnect via telnet")
-    # tn = anturlar.connect_tel_noparse(ipaddr_switch,user_name,"fibranne")
 
     ###################################################################################################################
     ###################################################################################################################
@@ -754,6 +748,9 @@ def main():
     ####
     ####  REBOOT and RECONNECT WAIT 60 SECONDS and CONTINUE
     ####
+    print("START Switch Update Class")
+    liabhar.JustSleep(10)
+    
     pp = cofra.SwitchUpdate()
     # tn = pp.reboot_reconnect()
 
@@ -763,9 +760,12 @@ def main():
     #### hafailover or hareboot on pizza box
     ####  call the failover function from cofra and send the number of failovers
     ####
-    tn = cofra.ha_failover(10)
+    print("START HA FAILOVER")
+    liabhar.JustSleep(10)
+    
+    tn = cofra.ha_failover(100)
 
-    liabhar.count_down(120)
+    liabhar.count_down(600)
 
     ###################################################################################################################
     ####
