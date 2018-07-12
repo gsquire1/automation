@@ -605,7 +605,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     pa = parse_args(sys.argv)
     if pa.verbose >=3:
         db=10
-    tn.set_debuglevel(db)                                   #### set the telnet debug level                        ####   
+    tn.set_debuglevel(db)  # set the telnet debug level ####
     
     if pa.verbose >=3:
         start_of_func_print("  env_variables")
@@ -628,7 +628,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     ####
     ###################################################################################################################
     reg_list = [b"=>"]
-    reg_list_done = [b"done",b"NVRAM..."]
+    reg_list_done = [b"done", b"NVRAM..."]
     reg_alive     = [b"is alive\r\n=>"]
     reg_bash = [ b"bash-2.04"]
     #### check if the switch is at the boot prompt
@@ -661,19 +661,26 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
         bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
     if swtype == '170':   ####  CHEWBACCA
         bootargs  = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
-        
-    ethrotate = "no"                                             ####  always set ethrotate to no                  ####
-    server_ip = "10.38.2.40"                        #### Set the TFTP server                                       ####
-                                                    #### So if server changes or multiple servers etc.             ####
-    ####  ethact default is ENET0                                                                                  ####
-    ####   for some switches is other values are needed and are set by switch type                                 ####
+    if swtype == '178':   #### A-Wing
+        # bootargs = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 quiet"
+        bootargs = "root=/dev/sda\$prt rootfstype=ext4 console=ttyS0,9600 rootdelay=5 pcie_ports=native quiet"
+    ethrotate = "no"                                # always set ethrotate to no                    ####
+    server_ip = "10.38.2.40"                        # Set the TFTP server                           ####
+                                                    # So if server changes or multiple servers etc. ####
+    ####  ethact default is ENET0                                                                   ####
+    ####   for some switches is other values are needed and are set by switch type                  ####
     ethact    = "ENET0"
-    if swtype == '162' or swtype == '148' or swtype == '170' or swtype == '173':     #### set the wedge and skybolt values for ethact ####  
+    if swtype == '162' or swtype == '148' or swtype == '170' or swtype == '173':     #### set the wedge and skybolt values for ethact ####
         ethact = "FM1@DTSEC2"
     
-    if swtype == '166' or swtype == '165':                   ####   ethprime is a new env variable and             ####
-        ethact = "FM2@DTSEC4"                                ####  "ethact =" between Allegiance                   ####
-        a = ("setenv ethprime FM2@DTSEC4 \n")                ####  and Wedge are different                         ####
+    if swtype == '166' or swtype == '165':                    # ethprime is a new env variable and     ####
+        ethact = "FM2@DTSEC4"                                 # "ethact =" between Allegiance & Wedge  ####
+        a = ("setenv ethprime FM2@DTSEC4 \n")                 # are different                          ####
+        tn.write(a.encode('ascii'))
+
+    if swtype == '178':                      # ethprime and ethact are new env variable for A-Wing     ####
+        ethact = "FM1@DTSEC4"
+        a = ("setenv ethprime FM1@DTSEC4 \n setenv ethact FM1@DTSEC4\n")
         tn.write(a.encode('ascii'))
 
         capture = tn.expect(reg_list)
@@ -692,7 +699,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     ###################################################################################################################
     ###################################################################################################################
     
-    if swtype == '162' or swtype == '165' or swtype == '166' :              ####  wedge requires a Enter command or ####
+    if swtype == '162' or swtype == '165' or swtype == '166' :             ####  wedge requires a Enter command or ####
         newline = "\n"                                                     ####  hangs at the prompt               ####
         tn.write(newline.encode('ascii'))                                  ####                                    ####
         capture = tn.expect(reg_list)
@@ -713,7 +720,7 @@ def env_variables(swtype, gateway_ip, db=0): #put new gateway variable here
     tn.write(a.encode('ascii'))
     capture = tn.expect(reg_list)
     if pa.verbose >=3:
-        print("send ethatc command   and look for =>")
+        print("send ethact command   and look for =>")
         print("\n\n")
         print(capture)
         print("E"*80)
@@ -1399,16 +1406,17 @@ def do_net_install(sw_info_filename):
     print("\n"*6)
     print("@"*40)
     print("Close Console sessions and login via telnet")
-    print("Sleep for a minute at line 1230")
+    print("Sleep for a minute at line 1409")
     print("\n"*6)     
 
     reg_list_after_reboot = [b"is in sync", b"initialization completed."]
-    cons_out = tn.expect(reg_list_after_reboot,900)
+    cons_out = tn.expect(reg_list_after_reboot, 900)
     print("\n"*4)
     print("&"*80)
     print(cons_out)
     print("\n"*4)
     print("&"*80)
+    
  
     liabhar.count_down(60)
     
