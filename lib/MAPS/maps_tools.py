@@ -346,7 +346,7 @@ def add_RoR_rules_on_each_rule():
                 cc.write("%s " % (cons_out))
                  
                  
-                ror_command = "mapsrule --createror RoR_rule_%s -monitor %s -timebase %s -op %s -value 1 -action %s -policy %s "  % ( numb, r, tb, operator, ac, policy )
+                ror_command = "mapsrule --createRoR RoR_rule_%s -monitor %s -timebase %s -op %s -value 1 -action %s -policy %s "  % ( numb, r, tb, operator, ac, policy )
                  
                 cons_out  =  anturlar.fos_cmd("%s" % ror_command)
                  
@@ -356,16 +356,6 @@ def add_RoR_rules_on_each_rule():
                     gg.write(",")
                     gg.write(message)
                     
-                    #gg.write("\n"*4)
-                    #gg.write("#"*80)
-                    #gg.write(cons_out)
-                    #gg.write("\n"*3)
-                    #gg.write(cmdprompt_only)
-                    #gg.write("\n"*2)
-                    #gg.write("@"*80)
-                    #gg.write("\n"*5)
-                    
-                 
                 cc.write("\n")
                 cc.write("-"*80)
                 cc.write("\n")
@@ -373,21 +363,37 @@ def add_RoR_rules_on_each_rule():
                 cc.write("\n")
                 cc.write("%s " % (cons_out)) 
                
-                cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+               
+               
+               
+               
+               ################################################################
+               ################################################################
+               ####
+               ####    delete the original rule from the maps policy
+               ####
+               ################################################################
+                # cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                # 
+                # if len(cons_out) >  cmdprompt_length:
+                #     message = cons_out.replace(cmdprompt_only, "")
+                #     gg.write("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                #     gg.write(",")
+                #     gg.write(message)
+                #     
+                # cc.write("\n")
+                # cc.write("-"*80)
+                # cc.write("\n")
+                # cc.write("%s " % ("mapspolicy --delrule %s -rulename %s " % ( policy, r)))
+                # cc.write("\n")
+                # cc.write("%s " % (cons_out)) 
                 
-                if len(cons_out) >  cmdprompt_length:
-                    message = cons_out.replace(cmdprompt_only, "")
-                    gg.write("mapspolicy --delrule %s -rulename %s " % ( policy, r))
-                    gg.write(",")
-                    gg.write(message)
-                    
-                cc.write("\n")
-                cc.write("-"*80)
-                cc.write("\n")
-                cc.write("%s " % ("mapspolicy --delrule %s -rulename %s " % ( policy, r)))
-                cc.write("\n")
-                cc.write("%s " % (cons_out)) 
-                
+                ###############################################################
+                ###############################################################
+                ####
+                ####   delete the RoR rule from the maps policy 
+                ####
+                ###############################################################
                 cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename RoR_rule_%s " % ( policy, numb))
                 
                 if len(cons_out) >  cmdprompt_length:
@@ -403,6 +409,12 @@ def add_RoR_rules_on_each_rule():
                 cc.write("\n")
                 cc.write("%s " % (cons_out))
                 
+                ###############################################################
+                ###############################################################
+                ####
+                ####   delete the ROR rule from the rule database
+                ####
+                ###############################################################
                 cons_out = anturlar.fos_cmd("mapsrule --delete RoR_rule_%s " % numb )
                 
                 if len(cons_out) >  cmdprompt_length:
@@ -418,6 +430,33 @@ def add_RoR_rules_on_each_rule():
                 cc.write("%s " % ("mapsrule --delete RoR_rule_%s " % numb))
                 cc.write("\n")
                 cc.write("%s " % (cons_out))   
+                    
+                    
+                    
+                ################################################################
+               ################################################################
+               ####
+               ####    delete the original rule from the maps policy
+               ####
+               ################################################################
+                cons_out = anturlar.fos_cmd("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                
+                if len(cons_out) >  cmdprompt_length:
+                    message = cons_out.replace(cmdprompt_only, "")
+                    gg.write("mapspolicy --delrule %s -rulename %s " % ( policy, r))
+                    gg.write(",")
+                    gg.write(message)
+                    
+                cc.write("\n")
+                cc.write("-"*80)
+                cc.write("\n")
+                cc.write("%s " % ("mapspolicy --delrule %s -rulename %s " % ( policy, r)))
+                cc.write("\n")
+                cc.write("%s " % (cons_out)) 
+                    
+                    
+                    
+                    
                     
                 numb += 1
     

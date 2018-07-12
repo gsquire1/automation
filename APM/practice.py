@@ -5,19 +5,24 @@ sys.path.append('/home/automation/lib/FOS')
 #sys.path.append('/home/automation/lib/MAPS')
 #sys.path.append('/home/automation/lib/NUTS_AND_BOLTS')
 
-
+import pprint
 import requests
-# import json
+import json
 # import  re
 # import os
 # import sys     
 # import time
+import xmltodict
 import untangle
 import logging
 
 import logging
 import argparse
 import rest_cmd_lib
+from lxml import etree as ET
+
+
+
 ###############################################################################
 ###############################################################################
 ####
@@ -45,16 +50,18 @@ logger.addHandler(ch)
 ####   END of configuring Logger     -  ii is before the first  function  to make it global
 ###############################################################################
 ###############################################################################
-
+####
+####   PARSER SECTION
+####
+###############################################################################
+###############################################################################
 
 def parent_parser():
     
     pp = argparse.ArgumentParser(add_help=False)
     pp.add_argument("ip", help="IP address of SUT")
-    #pp.add_argument("fid", type=int, default=-1, help="Choose the FID to operate on")
     pp.add_argument("user", help="username for SUT")
     pp.add_argument("pw", help="password of user")
-    
     group = pp.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
     group.add_argument("-q", "--quiet", action="store_true")
@@ -76,43 +83,18 @@ def parse_args(args):
     parser.add_argument('-ftp_p', '--ftp_password', help="ftp password of server to upload the config file")
     parser.add_argument("-cfg_p", "--config_path", help="the path of folder to upload the config file\nif left blank default ftp folder is used")
     
-    #parser.add_argument('-p', '--password', help="password")
-    #group = parser.add_mutually_exclusive_group()
-    #group.add_argument("-v", "--verbose", help="increase output verbosity", default=0, action="count")
-    #group.add_argument("-q", "--quiet", action="store_true")
-    #parser.add_argument('-ipf', '--ipfile', help="a file with a set of IP address")
-    #parser.add_argument("ip", help="IP address of SUT")
-    #parser.add_argument("user", help="username for SUT")
-    
     args = parser.parse_args()
     print(args)
     
     if args.fid > 128 or args.fid < 1:
+        print(args.fid)
+        
         if args.fid == -1:
             pass
         else:
             print("\n\nFID must be between 1 and 128  or blank for pizza box\n\n")
             sys.exit()
     
-    # if not args.chassis_name and not args.ipaddr:
-    #     print("Chassis Name or IP address is required")
-    #     sys.exit()
-    #     
-    # if args.cmdprompt and not args.switchtype:
-    #     print("To start at the command prompt the switch type is needed.")
-    #     sys.exit()
-    #     
-    # if not args.cmdprompt and args.switchtype:
-    #     print('To start at the command prompt both switch type and command prompt is requried')
-    #     sys.exit()
-    # #print("Connecting to IP :  " + args.ip)
-    # #print("user             :  " + args.user)
-    # #verbose    = args.verbose
-    # if not args.ftp_ipaddress or not args.ftp_username or not args.ftp_password:
-    #     print("ftp information is required")
-    #     sys.exit()
-     
-
     return(parser.parse_args())
 
 
@@ -131,6 +113,8 @@ def pa_print(pa):
         return(True)
     
 ###############################################################################
+###############################################################################
+####     END PARSER SECTION
 ###############################################################################
 ###############################################################################
 
@@ -173,7 +157,7 @@ def main():
     logger.info('End of domain-id command =====================================')
     logger.info('@'*120)
 
-    wwn_from_fabric_switch = sm.fs_leaf( "fcid" , pa.fid)
+    #wwn_from_fabric_switch = sm.fs_leaf( "fcid" , pa.fid)
     # chass_friendly_name_from_fabric_switch = sm.fs_leaf("chassis-user-friendly-name" , wwn, pa.fid)
     # friendly_name_from_fabric_switch  = sm.fs_leaf(  "switch-user-friendly-name" , wwn, pa.fid) 
     # pricipal_from_fabric_switch = sm.fs_leaf( "principal" , wwn, pa.fid)
@@ -197,11 +181,8 @@ def main():
     ipv6_addr_fs                    =   sm.fs_leaf("ipv6_address", pa.fid)
     principal_fs                      =   sm.fs_leaf("principal", pa.fid)
     
-    
-    
-    
+
     print("info from fabric switch leaf")
-    
     print("=SM"*24)
     print("=SM"*24)
     
@@ -228,7 +209,7 @@ def main():
     print("=T"*80)
     print("=T"*80)
  
-    test_error_message = sm.fs_leaf("jibberish" , 22) 
+    #SStest_error_message = sm.fs_leaf("jibberish" , 22) 
     print("=T"*80)
     print("=T"*80)
       
@@ -259,10 +240,6 @@ def main():
     fabric_name_from_fcs    = sm.fcs_leaf( "fabric_user_friendly_name" ,  pa.fid)
     ag_mode_from_fcs          = sm.fcs_leaf( "ag_mode" , pa.fid)
     
-    
-    
-    
-    
 #  
 #         
 # 
@@ -272,7 +249,7 @@ def main():
 # ####  log the results
 # ####
 # ###############################################################################
-# ###############################################################################
+# #########################indent######################################################
 # 
     logger.info('@'*120)
     logger.info('@'*120)
@@ -312,7 +289,6 @@ def main():
     
     port_number_list = sm.port_numbers(pa.fid)
     
-    
     port_err_counts =  sm.port_err_stats(0, 7,  pa.fid)
         
     #print(port_err_counts)
@@ -326,25 +302,38 @@ def main():
 ###############################################################################
     logger.info('=== MAPS Start ==='*6)
     
-    #maps_switch_health                   =  sm.maps_commands("switch-status-policy-report")
-    #maps_power_supply_health      =  sm.maps_commands("power-supply-health")
+    
+    maps_monitor_rules                     = sm.maps_rules()
+    maps_monitor_sspr                      = sm.maps_sspr()
+    maps_monitor_system_resource  = sm.maps_system_resource(pa.fid)
+    maps_monitor_config                   =  sm.maps_config()
+    maps_monitor_policy                    =   sm.maps_policy()
+    maps_monitor_sys_matrix            =  sm.maps_matrix()
+    maps_monitor_pause                    = sm.maps_pause_con()
+    maps_monitor_group                    = sm.maps_group()
+    maps_monitor_dashboard_rule   =  sm.maps_dashboard_rule()
+    maps_monitor_dashboard_misc   =   sm.maps_dashboard_misc()
     
     
-    
-    maps_monitor_sys_matrix         =  sm.maps_matrix()
     ####   this will be all of the allowed settings
     ####     
-   #logger.info("maps_switch_health     :    %s " %  maps_switch_health)
-    #logger.info("maps_power_supply_health     :    %s " %  maps_power_supply_health)
     
-    logger.info("maps monitor system matrix    :  %s "  %  maps_monitor_sys_matrix )
-    
-    
+    logger.info("maps monitor switch status policy    :  %s "  %  maps_monitor_sspr )
+    logger.info("maps monitor system Resource        :  %s "  %  maps_monitor_system_resource)    
+    logger.info("maps monitor system matrix    :  %s "  %  maps_monitor_pause)    
+    logger.info("maps monitor group                 :  %s "  %  maps_monitor_group)
+    logger.info("maps monitor Config                        :  %s "  %  maps_monitor_config )
+    logger.info("maps monitor dashboard rules          :  %s "  %  maps_monitor_dashboard_rule)
+    logger.info("maps monitor dashboard misc          :  %s "  %  maps_monitor_dashboard_misc)  
+    logger.info("maps monitor rules                          :  %s "  %  maps_monitor_rules )
+    logger.info("maps monitor policy                          :  %s "  %  maps_monitor_policy) 
+    logger.info("maps monitor system matrix            :  %s "  %  maps_monitor_sys_matrix )
+
+
     logger.info('=== MAPS END  ==='*8) 
-     
-        
-        
-        
+    logger.info("\n\n\n\n")
+    logger.info("@"*80)
+            
 ###############################################################################
 ###############################################################################
 ####
@@ -357,52 +346,133 @@ def main():
     print(r.status_code)
     
     #sys.exit()
-    print("#"*80)
-    print("#"*80)
-    print("#"*80)
-    
-    print(maps_monitor_sys_matrix.text)
     
     
-    logger.info(type(maps_monitor_sys_matrix))
-    
-     
-    print("@"*80)
-    print("@"*80)
-    print("@"*80)
-    doc = maps_monitor_sys_matrix
-    done_list = []
-    word = "actions"
-    
-    
-    try:
-        done_list = getattr(doc.Response.monitoring_system_matrix, word).cdata
-        return(done_list)
-        
-        if type(doc.Response.fibrechannel_statistics is list ):
-            
-            for c in doc.Response.monitoring_system_matrix:
-                done_list.append(getattr(doc.Response.monitoring_system_matrix, word).cdata)
-            
-            print("using the if part ")
-            print(done_list)    
-        #    return(done_list)
-        else:
-            done_list = getattr(doc.Response.monitoring_system_matrix, word).cdata
-            print("using the else part")
-            print(done_list)
+    ####################################
+    #####################################
+    ####   make the group into a dictionary
+    ####
+    ####
+    ####
 
-    except AttributeError:
-        print("Error during untangle - None was returned")
-        done_list = "Untangle Error"
+    print(maps_monitor_group)
      
-    print(done_list)
-    
-    
+    pprint.pprint(maps_monitor_group["Response"]['group'], indent=1)
+  
+    print(json.dumps(maps_monitor_group, indent=1))
+   
+   
+    print("&"*80)
+    print("#"*80)
+    print("&"*80)
+    print("#"*80)
+    print("&"*80)
+    print("#"*80)
+   
+ 
+    print(json.dumps(maps_monitor_rules, indent=2))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_sspr, indent=2))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_system_resource, indent=2))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_config, indent=2)) 
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_policy, indent=3 ))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_sys_matrix,  indent=2))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_pause , indent=2))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_group, indent=1))
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_dashboard_rule, indent=2))  
+    print("&"*80)
+    print("#"*80)
+    print(json.dumps(maps_monitor_dashboard_misc, indent=1))
+    print("&"*80)
     print("#"*80)
     
+    ###########################################################################
+    ###########################################################################
+    ####
+    ####  Print a Summary of MAPS Rest  
+    ####
+    ###########################################################################
+    ###########################################################################
     
-   
+    if 'Fail' in maps_monitor_rules :
+        print("MAPS Monitor Rules                          %s  "  % maps_monitor_rules )
+    else:
+        print("MAPS Monitor Rules                          PASS")
+ 
+ 
+    
+    if 'Fail' in maps_monitor_sspr :
+        print("MAPS Monitor Switch Status Policy           %s  " % maps_monitor_sspr )
+    else:
+        print("MAPS Monitor Switch Status Policy           PASS")
+    
+    if 'Fail' in maps_monitor_system_resource:
+        print("MAPS Monitor System Resource                %s  " % maps_monitor_system_resource)
+    else:
+        print("MAPS Monitor System Resource                PASS")
+    if 'Fail' in maps_monitor_config:
+        print("MAPS Monitor Config                         %s " %  maps_monitor_config)
+    else:
+        print("MAPS Monitor Config                         PASS")
+    
+    if 'Fail' in maps_monitor_policy:
+        print("MAPS Monitor Policy                         %s " % maps_monitor_policy)
+    else:
+        print("MAPS Monitor Policy                         PASS")
+    
+    if 'Fail' in maps_monitor_sys_matrix:
+        print("MAPS Monitor SYS Matrix                     %s  "  % maps_monitor_sys_matrix)
+    else:
+        print("MAPS Monitor SYS Matrix                     PASS")
+    if 'Fail' in maps_monitor_pause:
+        print("MAPS Monitor Pause                          %s   "  % maps_monitor_pause )
+    else:
+        print("MAPS Monitor Pause                          PASS")
+    
+    if 'Fail' in maps_monitor_group:
+        print("MAPS Monitor Group                          %s  "  %  maps_monitor_group)
+    else:
+        print("MAPS Monitor Group                          PASS")
+    
+    if 'Fail' in maps_monitor_dashboard_rule:
+        print("MAPS Monitor Dashboard Rule                 %s  "  %  maps_monitor_dashboard_rule)
+    else:
+        print("MAPS Montior Dashboard Rule                 PASS")
+    
+    if 'Fail' in maps_monitor_dashboard_misc:
+        print("MAPS Monitor Dashboard Misc                 %s   "   %  maps_monitor_dashboard_misc)
+    else:
+        print("MAPS Monitor Dashboard Misc                 PASS")
+    
+    
+    #print(json.dumps(maps_monitor_dashboard_rule, indent=2))  
+    #print(json.dumps(maps_monitor_dashboard_misc, indent=1))
+    print("&"*80)
+    print("#"*80)
+    print("&"*80)
+    print("#"*80)
+    
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+
 
 if __name__ == '__main__':
     
