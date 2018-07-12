@@ -216,7 +216,7 @@ class rest_cfg:
         
 
         print("\n\n\nDATA")
-        print(xml_body)
+        print(url)
         
         r = requests.post( url,  headers=self.Auth)
         #r = requests.post("http://%s/rest/running/brocade-maps" % (self.ip), params=data, headers=self.Auth)
