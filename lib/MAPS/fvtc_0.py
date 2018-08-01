@@ -1646,7 +1646,7 @@ def tc_01_01_06_07():
         Test Case   25.01.01.06_07
         Title:      MAPS Data Base Management
         Feature:    MAPS
-        Objective:  Verify 
+        Objective:  Verify Port stats by updating errors with the db command  
     """
     ###########################################################################
     ####  todo -
@@ -1665,141 +1665,120 @@ def tc_01_01_06_07():
     ###########################################################################
     #### start testing
     ####
-    #### create the object and clear stats
+    #### create the object  of MAPS and clear stats
     en = anturlar.Maps()
     statsclearcomplete = cofra.clear_stats()
-    
-    
+    ####  get the list of slots that are FC blades    
     slot_list = en.blades(True)
     if "not a" in slot_list:
         slot_list = [0]
-    print("slot list   %s " % slot_list )
-    
-    
+    #print("slot list   %s " % slot_list )  
     slot_list_len = (len(slot_list))
-    
     slot_list_of_ports = [0 for i in range(12)]
-    
-    #for s in range(slot_list_len):
-    #    
-    #    print(s)
-    #    slot_list_of_ports[s] = []
-    #    print("slot list  %s  "  % slot_list_of_ports[s])        
-    
-    
-    print("slot list length is   %s  " % slot_list_len)
-    print("slot list  0   %s " % slot_list[0])
-    #print("slot list  1  %s " % slot_list[1])
-    
-    
-    slot_core_list = en.blades(False,True)
-    print("core blades    % s  " % slot_core_list)
-    
-    ####
-    #fabmems = anturlar.fabric_members()
+####  list of core blades
+    #slot_core_list = en.blades(False,True)
+    #print("core blades    % s  " % slot_core_list)
+#### enable one of the MAPS Policies
     cmdrtn = anturlar.fos_cmd("mapspolicy --enable dflt_aggressive_policy")
     #cmdrtn = anturlar.fos_cmd("mapspolicy --enable Nervio_test_1")
-    cmdrtn = anturlar.fos_cmd("mapsdb --show all")
+    #cmdrtn = anturlar.fos_cmd("mapsdb --show all")
     #### 
-    #### add the slot numbers here
+#### get the port  numbers for each blade 
+#### add the ports to an array  that is the size of the length of the number
+####  slots .  reference will be by the order the slot is in the array
+####   example:  slot array [ 31  101  14]   ports for FID 14  would be
+####     slot_list_of_ports[2]
     for s in range(slot_list_len):
         slot_numb = int(slot_list[s])
-        
         bld_map = cofra.bladeportmap_Info(slot_numb)
-        print("\n\n\nBLADEPORTMAP INFO \n")
-        print(bld_map)
-        print("@"*80)
-        print("#"*80)
+        #print("\n\n\nBLADEPORTMAP INFO \n")
+        #print(bld_map)
+        #print("@"*80)
+        #print("#"*80)
         #### create a list of only in_sync ports
         #count_in_synce = 0
         in_sync_ports = []
         
         for i in bld_map:
+            #print("LOOKING FOR COLUMN 12  ")
+            #print(i)
             if "In_Sync" in (i[12]):
-                
                 in_sync_ports.append(i)
-        
-        slot_list_of_ports[s] = in_sync_ports    
-    
-    
-    print("#"*80)
-    print("#"*80)
-    print("#"*80)
-    
-    for s in range(slot_list_len):
-        print("\n\n")
-        print("slot list of ports %s  "  % slot_list_of_ports[s])  
-    
-    print("#"*80)
-    print("#"*80)
-    print("#"*80)
-    
+        slot_list_of_ports[s] = in_sync_ports
+###############################################################################
+####
+    #     
+    # print("#"*80)
+    # print("#"*80)
+    # print("#"*80)
+    # 
+    # for s in range(slot_list_len):
+    #     print("\n\n")
+    #     print("slot list of ports %s  "  % slot_list_of_ports[s])  
+    # 
+    # print("#"*80)
+    # print("#"*80)
+    # print("#"*80)
+    # 
     ###########################################################################
     ###########################################################################
-    cont = 0
-    
-    
+    cont = 0    
     slotpicklist = []
-    
     while cont <= 100000:
         cont +=1
-        
-        print("\n"*20) ; print("#"*80) ; print("#"*80) ; print("#"*80)
-        
+        #statsclearcomplete = cofra.clear_stats()
+        #print("\n"*20) ; print("#"*80) ; print("#"*80) ; print("#"*80)
         slot_list_len = (len(slot_list))
         ####pick a FC blade
-        print("SLOT LIST           %s  " % slot_list)
-        print("LENGTH of SLOT LIST  %s " % slot_list_len)
+        #print("SLOT LIST           %s  " % slot_list)
+        #print("LENGTH of SLOT LIST  %s " % slot_list_len)
         slot_to_add_err = ((liabhar.random_number_int(float(len(slot_list))))) -1
-        
+        #print("\ncheck slot number")
+        #print(slot_to_add_err)
+        #print("#"*80)
         if slot_to_add_err == -1 :
             slot_to_add_err = 0 
-        
-        print("random slot number  %s  " % slot_to_add_err)
-        
+        #print("\ncheck slot number AFTER CHECK FOR -1s")
+        #print(slot_to_add_err)
+        #print("#"*80)
+        #print("random slot number  %s  " % slot_to_add_err)
         slot_numb_holder = int(slot_list[slot_to_add_err])
-        print("slot number is      %s  " % slot_numb_holder)
+        #print("slot number is      %s  " % slot_numb_holder)
         slotpicklist.append(slot_numb_holder)
-        
-        print("the list of slots  is  %s  " % slotpicklist)
+        #print("the list of slots  is  %s  " % slotpicklist)
+        print("Wait for 10 seconds")
         liabhar.JustSleep(10)
-        
-        
-        print("#"*80)
-        print("#"*80)
-        print("#"*80)
-    
-        for s in range(slot_list_len):
-            print("\n\n")
-            print("slot list of ports %s  "  % slot_list_of_ports[s])  
-    
-    
-    
-        print("slot to add err value is  ")
-        print(slot_to_add_err)
-        print("slot list of ports value  ")
-        print(slot_list_of_ports[slot_to_add_err])
-        print(len(slot_list_of_ports[slot_to_add_err]))
-        
-        print("#"*80)
-        print("#"*80)
-        print("#"*80)
-        
-        #w = slot_list_of_ports[0]
-        #print(type(w))
-        #print(w)
-        #print((len(w)))
-        #
-        #
-        ####  if the list of ports in the slot is [] then skip
-        
-        ####  pick a port randomly 
-        #### 
-        #port_to_add_err = ((liabhar.random_number_int(float(len(in_sync_ports))))) - 1
-    
+        # 
+        # print("#"*80)
+        # print("#"*80)
+        # print("#"*80)
+        # 
+        # print("\n\n")
+        # print("#"*80)
+        # print("slot to add err value is  ")
+        # print(slot_to_add_err)
+        # print("slot numb holder value is    =========")
+        # print(slot_numb_holder)
+        # print("slot list of ports value  ")
+        # print(slot_list_of_ports[slot_to_add_err])
+        # print(len(slot_list_of_ports[slot_to_add_err]))
+        # 
+        # print("#"*80)
+        # print("#"*80)
+        # print("#"*80)
         port_to_add_err = ((liabhar.random_number_int(float(len(slot_list_of_ports[slot_to_add_err]))))) - 1
+        j=0
+        while j < 50:
+            j +=1
+            port_to_add_err = ((liabhar.random_number_int(float(len(slot_list_of_ports[slot_to_add_err]))))) - 1
+            print(port_to_add_err)
+            
+            
         print("\n\nPORT NUMBER TO ADD  %s  \n\n" % port_to_add_err)
         print("THE LENGTH OF the PORT LIST  %s   \n\n" % len(slot_list_of_ports[slot_to_add_err]))
+        print("THE LENGTH OF THE PORT LIST  using slot number holder  ")
+        print(slot_numb_holder)
+        
         #### pick and err type randomly
         multiplier = float(12) #### even though we are picking a number that is
         #### an integer the multiplier has to be a float 
@@ -1810,95 +1789,96 @@ def tc_01_01_06_07():
         #    i = in_sync_ports[port_to_add_err]
         #except IndexError:
         #    i = 0
-            
+        #x = int(slot_numb_holder)
+        print("looking for the port on Slot   ")
+        print(slot_to_add_err)
+        print(port_to_add_err)
         try:
             i = slot_list_of_ports[slot_to_add_err][port_to_add_err]
-            
+          #  i = slot_list_of_ports[x][port_to_add_err]
         except IndexError:
-            i = 0   
+            i = 999   
             print("could not capture the slot list of ports")
-            sys.exit()
-            
-            
-        chip_numb = i[8]
-        chip_id = i[11]
-        chip_port = i[4]
-        port_in_sync = i[12]
-        usr_port = i[1]
-        #### some debug info
-        print("\n\n\n")
-        print("="*80)
-        print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
-        print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
-        print("@"*80)
-        ####  get the port error list
-        port_los_error = cofra.PortStats()
-        coutr_to_incr_name = port_los_error[pck_rndm_err][0]
-        #coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
-
-        try:
-            coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
-            add_this = liabhar.random_number_int(25)
-            #coutr_to_incr_count = coutr_to_incr_count + 3
-            #coutr_to_incr_count += 21
-            coutr_to_incr_count += add_this
-        except ValueError:
-            #ras_count = re.compile('([\.\d+])([gkmt])')
-            #ras_count = ras_count.findall(coutr_to_incr_count)
-        
-            #print(ras_count)
-            coutr_to_incr_count = port_los_error[pck_rndm_err][1]
-            print("counter value is  %s  " % coutr_to_incr_count)
-            ras_count = re.compile('([\.\d]+)([gkmt])')
-            ras_count = ras_count.findall(coutr_to_incr_count)
-            print("ras count is  %s  " % ras_count )
-            print(type(ras_count))
-            current_count = ras_count[0][0]
-            current_multiplyer = ras_count[0][1]
-
-            print("\n\nCURRENT_COUNT  %s   " % current_count)
-            print(type(current_count))
-            
-            current_count = float(current_count)
-            print("\n\nCURRENT_COUNT  %s   " % current_count)
-            print(type(current_count))
-            #coutr_to_incr_count = ((current_count * 1001) + 1000)
-            #coutr_to_incr_count = (float(ras_count[0])*10.0)
-            print("\n\nNEW COUNTER VALUE IS   %s    \n\n" % coutr_to_incr_count)
-            
-            if 'k' in current_multiplyer:
-                print('K is the multiplyer ')
-                coutr_to_incr_count = ((current_count * 1001) + 1000)
-            
-            elif 'm' in current_multiplyer:
-                coutr_to_incr_count = ((current_count * 10001) + 10000 )
-            
-            else:
-                coutr_to_incr_count = 1
-                
-            coutr_to_incr_count = int(coutr_to_incr_count)
-
-        #### configure the db command
-        ####   db [slot/chip] stats set [chipport] [counter] [value]
-        db_cmd = "db %s/%s stats set %s %s %s" % (slot_numb, chip_numb, \
-                                                  chip_port, coutr_to_incr_name, coutr_to_incr_count)
-        
-        cmdrtn = anturlar.fos_cmd(db_cmd)
-
-    #### confirm if the port is still in_sync once errors are started
-    ####  code goes here
-        
-        print("MY RANDOM NUMBER   %s " % port_to_add_err)
-        print("ERR COUNTER TO INCRIMENT  %s  " % coutr_to_incr_name )
-        print("ERR COUNTER TO INCRIMENT   %s " % coutr_to_incr_count)
-        
-        cmdrtn = anturlar.fos_cmd("mapsdb --show all")
-        liabhar.JustSleep(10)
-        
-        print("\n\nMY RANDOM NUMBER port to add error   %s " % port_to_add_err)
-        print("ERR COUNTER TO INCRIMENT  counter to incr name  %s  " % coutr_to_incr_name )
-        print("ERR COUNTER TO INCRIMENT  counter to incr counter  %s " % coutr_to_incr_count)
-        liabhar.JustSleep(10)     
+        if i != 999 :
+          chip_numb = i[8]
+          chip_id = i[11]
+          chip_port = i[4]
+          port_in_sync = i[12]
+          usr_port = i[1]
+          #### some debug info
+          print("\n\n\n")
+          print("="*80)
+          print("CHIP #   CHIP-ID    CHIP PORT   STATE ")
+          print("%s         %s           %s         %s   " %( chip_numb, chip_id, chip_port, port_in_sync))
+          print("@"*80)
+          ####  get the port error list
+          port_los_error = cofra.PortStats()
+          coutr_to_incr_name = port_los_error[pck_rndm_err][0]
+          #coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
+          liabhar.JustSleep(10)
+          try:
+              coutr_to_incr_count = int(port_los_error[pck_rndm_err][1])
+              add_this = liabhar.random_number_int(25)
+              #coutr_to_incr_count = coutr_to_incr_count + 3
+              #coutr_to_incr_count += 21
+              coutr_to_incr_count += add_this
+          except ValueError:
+              #ras_count = re.compile('([\.\d+])([gkmt])')
+              #ras_count = ras_count.findall(coutr_to_incr_count)
+          
+              #print(ras_count)
+              coutr_to_incr_count = port_los_error[pck_rndm_err][1]
+              print("counter value is  %s  " % coutr_to_incr_count)
+              ras_count = re.compile('([\.\d]+)([gkmt])')
+              ras_count = ras_count.findall(coutr_to_incr_count)
+              print("ras count is  %s  " % ras_count )
+              print(type(ras_count))
+              current_count = ras_count[0][0]
+              current_multiplyer = ras_count[0][1]
+  
+              print("\n\nCURRENT_COUNT  %s   " % current_count)
+              print(type(current_count))
+              
+              current_count = float(current_count)
+              print("\n\nCURRENT_COUNT  %s   " % current_count)
+              print(type(current_count))
+              #coutr_to_incr_count = ((current_count * 1001) + 1000)
+              #coutr_to_incr_count = (float(ras_count[0])*10.0)
+              print("\n\nNEW COUNTER VALUE IS   %s    \n\n" % coutr_to_incr_count)
+              liabhar.JustSleep(10)     
+              if 'k' in current_multiplyer:
+                  print('K is the multiplyer ')
+                  coutr_to_incr_count = ((current_count * 1001) + 1000)
+              
+              elif 'm' in current_multiplyer:
+                  coutr_to_incr_count = ((current_count * 10001) + 10000 )
+              
+              else:
+                  coutr_to_incr_count = 1
+                  
+              coutr_to_incr_count = int(coutr_to_incr_count)
+  
+          #### configure the db command
+          ####   db [slot/chip] stats set [chipport] [counter] [value]
+          db_cmd = "db %s/%s stats set %s %s %s" % (slot_numb, chip_numb, \
+                                                    chip_port, coutr_to_incr_name, coutr_to_incr_count)
+          
+          cmdrtn = anturlar.fos_cmd(db_cmd)
+  
+      #### confirm if the port is still in_sync once errors are started
+      ####  code goes here
+          
+          print("MY RANDOM NUMBER   %s " % port_to_add_err)
+          print("ERR COUNTER TO INCRIMENT  %s  " % coutr_to_incr_name )
+          print("ERR COUNTER TO INCRIMENT   %s " % coutr_to_incr_count)
+          
+          cmdrtn = anturlar.fos_cmd("mapsdb --show all")
+          liabhar.JustSleep(10)
+          
+          print("\n\nMY RANDOM NUMBER port to add error   %s " % port_to_add_err)
+          print("ERR COUNTER TO INCRIMENT  counter to incr name  %s  " % coutr_to_incr_name )
+          print("ERR COUNTER TO INCRIMENT  counter to incr counter  %s " % coutr_to_incr_count)
+          liabhar.JustSleep(10)     
         
         
     return(0)
