@@ -219,7 +219,7 @@ class FabricInfo:
         return(ras_result)
 
 
-    def zone_info(self, zone_capture):
+    def zone_info(self, zone_capture, dbl=0):
         """
            return info all about the zones
            zone_capture needs to be a 1,2 or 3
@@ -234,7 +234,7 @@ class FabricInfo:
         effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \r\n\t]+')
         #effective = ('Effective configuration:\r\n\s[0-9a-zA-Z:;_, \n\t]+')
         global tn
-        tn.set_debuglevel(9)
+        tn.set_debuglevel(dbl)
         if zone_capture == 1:
             ras = re.compile(entire)
             a = ras.findall(capture_cmd)
@@ -2191,7 +2191,7 @@ def close_tel():
     tn.close()
     return 0
    
-def connect_tel(pa, pw):
+def connect_tel(pa, pw, dbl):
     global tn
     try:
         fid = pa.fid
@@ -2211,7 +2211,7 @@ def connect_tel(pa, pw):
         #print(usrname)
         #print(password)
         tn = telnetlib.Telnet(HOST)
-        tn.set_debuglevel(0)
+        tn.set_debuglevel(dbl)
         tn.read_until(b"login: ")
         tn.write(usrname.encode('ascii') + b"\n")
         if password:
@@ -2519,7 +2519,7 @@ def fos_cmd_regex(cmd, reg,dblevel=0):
         capture = capture[2]
         capture = capture.decode()
         print(capture, end="")
-        tn.set_debuglevel(0)
+        tn.set_debuglevel(dblevel)
         return(capture)
  
     except EOFError:
@@ -2528,7 +2528,7 @@ def fos_cmd_regex(cmd, reg,dblevel=0):
         print(" in  fos_cmd_regex()    ")
         print("========================")
 
-def fos_cmd(cmd, dl=10):
+def fos_cmd(cmd, dl=0):
     global tn
     try: 
         #usrn = var.sw_user + '> '
@@ -2540,7 +2540,7 @@ def fos_cmd(cmd, dl=10):
         #traff_prompt = "]# "
         #traff_prompt = traff_prompt.encode()
         
-        tn.set_debuglevel(10)
+        tn.set_debuglevel(dl)
         #reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", usrn, telnet_closed ]
         reg_ex_list = [b"login: ", b"Password: ", b"option :", b"root>", b"Forcing Failover ...", b"admin>", telnet_closed ]
         
@@ -2696,7 +2696,7 @@ def fos_cmd_regex_gen(cmd, reg,dblevel=0):
         capture = capture[2]
         capture = capture.decode()
         print(capture, end="")
-        tn.set_debuglevel(0)
+        tn.set_debuglevel(dblevel)
         return(capture)
  
     except EOFError:
@@ -2736,7 +2736,7 @@ def fos_cmd_regex_only(cmd, reg,dblevel=0):
         capture = capture[2]
         capture = capture.decode()
         print(capture, end="")
-        tn.set_debuglevel(0)
+        tn.set_debuglevel(dblevel)
         return(capture)
  
     except EOFError:
