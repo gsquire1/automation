@@ -15,10 +15,6 @@ import paramiko
 import re
 import threading
 import select
-
-
-# import re
-
 # import time
 
 #######################################################################################################################
@@ -93,7 +89,7 @@ def parent_parser():
     pp = argparse.ArgumentParser(add_help=False)
     # pp.add_argument("--repeat", help="repeat repeat")
     # pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-    # pp.add_argument("ip", help="IP address of SUT")
+    pp.add_argument("ip", help="IP address of SUT")
     # pp.add_argument("user", help="username for SUT")
     pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
     pp.add_argument('email', type=str, help="email address")
@@ -116,10 +112,10 @@ def parse_args():
     # parser.add_argument('-r', '--steps', type=int, help="Steps that will be executed")
     parser.add_argument('-i', '--iterations', type=int, default=1,
                         help="How many iterations will be run that will be executed")
-    parser.add_argument('-e_ip', '--edsim_ip', help="EDSIM IP")
-    parser.add_argument('-e_pid', '--edsim_pid', help="EDSIM PID")
-    parser.add_argument('-e_port', '--edsim_port', help="EDSIM Port number to be used")
-    parser.add_argument('-e_wwn', '--edsim_wwn', help="EDSIM WWN to be used")
+    # parser.add_argument('-e_ip', '--edsim_ip', help="EDSIM IP")
+    # parser.add_argument('-e_pid', '--edsim_pid', help="EDSIM PID")
+    # parser.add_argument('-e_port', '--edsim_port', help="EDSIM Port number to be used")
+    # parser.add_argument('-e_wwn', '--edsim_wwn', help="EDSIM WWN to be used")
 
     # parser.add_argument('-p', '--password', help="password")
     # group = parser.add_mutually_exclusive_group()
@@ -144,7 +140,7 @@ def parse_args():
     # if not args.cmdprompt and args.switchtype:
     #     print('To start at the command prompt both switch type and command prompt is requried')
     #     sys.exit()
-    print("Connecting to EDSIM :  " + args.edsim_ip)
+    # print("Connecting to EDSIM :  " + args.edsim_ip)
     # print("user             :  " + args.user)
     # verbose    = args.verbose
 
@@ -153,12 +149,13 @@ def parse_args():
 
 uname = "admin"
 pwd = "password"
+timeout = 30
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class SSHClient(object):
+class SSHClient():
 
     def __init__(self, host, username, password):
         self.connection = self.connect(host, username, password)
@@ -238,8 +235,6 @@ class SSH:
                 if(strdata.endswith("$ ")):
                     print("\n$ ", end = "")
 
-
-
 def issue_command(transport, pause, command):
     chan = transport.open_session()
     chan.exec_command(command)
@@ -265,16 +260,6 @@ def issue_command(transport, pause, command):
         stderr += chan.recv_stderr(buff_size)
 
     return exit_status, stdout, stderr
-
-# ssh = paramiko.SSHClient()
-# ssh.load_system_host_keys()
-# ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-# ssh.connect(host, port=22, username=username, password=password, timeout=3,)
-# transport = ssh.get_transport()
-# pause = 1
-
-# resp1 = issue_command(transport, pause, cmd1)
-
 
 def check_ssh(ip, user, pwd):
     global ssh
@@ -391,7 +376,7 @@ def lsdelete(fid):
     connect = check_ssh(ip, uname, pwd)
     if (connect == True):
         print("Inside lsdelete")
-        cmd = "lscfg --delete %s -force" % (fid)
+        cmd = "lscfg --delete %s -force" % fid
         stdin, stdout, stderr = ssh.exec_command(cmd)
         for line in stdout:
             print(line.strip('\n'))
@@ -501,6 +486,15 @@ def vf_capable_transport(ip):
 
     resp1 = issue_command(transport, pause, "lscfg --show")
 
+# def cfgsave():
+#     ssh = SSHClient.execute()
+#     stdin, stdout, stderr = ssh('cfgsave')
+#     stdin.write('y')
+#     stdin.write('\n')
+#     stdin.flush()
+#     result = stdout.read().decode('ascii').strip('\n')
+#     print(result)
+
 
 def main():
 
@@ -521,72 +515,385 @@ def main():
     # if user enter ip address then get the chassisname from the SwitchMatrix file
     # then get the info from the SwitchMatrix file using the Chassis Name
     #
-    #
-    #
     # if pa.ipaddr:
     #     print("do IP steps")
     #     pa.chassis_name = console_info_from_ip(pa.ipaddr)
-    ip = pa.edsim_ip
-    ssh = SSHClient(ip, uname, pwd) # ssh = SSHClient() class
-    # stdin, stdout, stderr = ssh.execute('date')
+    # ip = pa.ip
+
+    ssh = SSHClient(pa.ip, uname, pwd) # SSHClient() is a class
+
+    def cfgadd(cfg, zone):
+        stdin, stdout, stderr = ssh.execute('cfgadd %s,%s' % (cfg, zone))
+        result = stdout.read().decode('ascii').strip('\n')
+        print(result)
+
+    def cfgenable(cfg):
+        stdin, stdout, stderr = ssh.execute('cfgenable %s' % cfg)
+        stdin.write('y')
+        stdin.write('\n')
+        stdin.flush()
+        result = stdout.read().decode('ascii').strip('\n')
+        print(result)
+
+    def cfgremove(cfg, zone):
+        stdin, stdout, stderr = ssh.execute('cfgremove %s,%s' % (cfg, zone))
+        result = stdout.read().decode('ascii').strip('\n')
+        print(result)
+
+    def cfgsave():
+        stdin, stdout, stderr = ssh.execute('cfgsave')
+        stdin.write('y')
+        stdin.write('\n')
+        stdin.flush()
+        result = stdout.read().decode('ascii').strip('\n')
+        print(result)
+
+    def zonedelete(zone):
+        stdin, stdout, stderr = ssh.execute('zonedelete %s' % zone)
+        stdin.flush()
+        # stdin, stdout, stderr = ssh.execute('cfgsave')
+        # stdin.write('y')
+        # stdin.write('\n')
+        # stdin.flush()
+        result = stdout.readlines()
+        for line in result:
+            print(line.strip())
+    def zone_reset():
+        zonedelete('peer_test')
+        cfgremove('"FID_10"', '"peer_test"')
+        cfgenable("FID_10")
+
+    deadbeef = ['de:ad:be:ef:de:ad:be:ef', 'de:ad:de:ad:be:ef:be:ef']
+    dead1 = ['de:ad:be:ef:00:00:00:01', 'de:ad:be:ef:00:00:00:02', 'de:ad:be:ef:00:00:00:03',
+             'de:ad:be:ef:00:00:00:04', 'de:ad:be:ef:00:00:00:05']
+    di = "33,10;33,11;33,12"
+    di1 = "33,13;33,14;33,15"
+
+
+
+
+    logger.info("Test Case Step 1.1")
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -principal "00:02:00:00:00:01:00:01;%s;%s"'\
+                                        % (deadbeef[0], deadbeef[1]))
+    result1 = stdout.read().decode('ascii').strip('\n')
+    print(result1)
+    if 'Error: Invalid zone member' in result1:
+        print("Invalid Zone Member = PASSED")
+    else:
+        print('Script failed at adding invalid zone member')
+        ssh.close()
+        sys.exit(0)
+
+    logger.info("Test Case Step 1.3")
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -member "00:02:00:00:00:01:00:01;%s;%s"'\
+                                        %(deadbeef[0], deadbeef[1]))
+    result2 = stdout.read().decode('ascii').strip('\n')
+    print(type(result2))
+    print(result2)
+    if 'Error:' or 'Usage:' in result2:
+        print("No Principle member declared = PASSED")
+    else:
+        print('Script failed at adding member without having a "principal" declared ')
+        ssh.close()
+        sys.exit(0)
+
+    logger.info("Test Case Step 1.5")
+    stdin, stdout, stderr = ssh.execute('alicreate "peer_member", "00:02:00:00:00:01:00:01"')
+    result3 = stdout.read().decode('ascii').strip('\n')
+    if 'Error:' or "Usage:'" in result3:
+        print("alicreate using invalid member = PASSED")
+    else:
+        print('Script failed at adding member without having a "principal" declared ')
+        ssh.close()
+        sys.exit(0)
+
+    logger.info("Test Case Step 2.1")
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -principal "%s;%s"'\
+                                        % (deadbeef[0], deadbeef[1]))
+    check = stdout.readlines()
+    logger.info("ERROR_CHECK")
+    print(check)
+    if check:
+        print("zone create failed when it should've PASSED")
+        ssh.close()
+        sys.exit(0)
+    else:
+        cfgadd('"FID_10"', '"peer_test"')
+        cfgenable("FID_10")
+        cfgsave()
+
+    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    result5 = stdout.read().decode('utf-8')#.strip('\n')
+    # result5 = stdout.readlines()
+    print(result5)
+    effective = re.findall('(Effective configuration:[ ,:\()_A-Za-z0-9\s\t\n]+Cfg)', result5, flags=re.S | re.M)
+    if effective:
+        print(type(effective))
+        effective = str(effective)
+        print(effective)
+    else:
+        print("EFFECTIVE CONFIGURATION NOT FOUND")
+        ssh.close()
+        sys.exit(0)
+    # print(type(effective))
+    print(effective)
+    zone = re.findall(r'(peer_test\\t\\n[ ,:\\()_A-Za-z0-9\\s\\t\\n]+Cfg)', effective)
+    if not zone:
+        print("ZONE CONFIGURATION NOT FOUND")
+        ssh.close()
+        sys.exit(0)
+    # logger.info("PRINT ZONE AND ZONE TYPE")
+    zone = str(zone)
+    a = zone.replace('\\t', '')
+    a = a.replace('\\n', '')
+    a = a.replace('\\\\', '')
+    # print("ZONE_REPLACE")
+    # print(a)
+    prop_member = re.findall('(Property Member: 00:02:00:00:00:03:00:02)', zone)
+    if not prop_member:
+        print("PROPERTY MEMBER NOT FOUND")
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    print("PROPERTY MEMBER")
+    print(prop_member)
+    principal_member = re.findall('Principal Member\(s\):\\\\[a-z:]{0,23}\\\\[a-z:]{0,23}', a)
+    if not principal_member:
+        print("PRINCIPAL MEMBER NOT FOUND")
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    # print("PRINCIPAl MEMBER")
+    # print(type(principal_member))
+    # print(principal_member)
+    b = str(principal_member)
+
+    if deadbeef[0] and (deadbeef[1]) in b:
+        print("Step 2.1 Passed")
+    else:
+        print('Script failed at step 2.1 ')
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    # zone_reset()
+    # ssh.close()
+    # sys.exit(0)
+
+    logger.info("Test Case Step 3.1")
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone "peer_test" -principal %s' % (dead1[0]))
+    check = stdout.readlines()
+    logger.info("ERROR_CHECK")
+    print(check)
+    if check:
+        print("zone create failed when it should've PASSED")
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    else:
+        cfgsave()
+        cfgenable("FID_10")
+
+    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    result7 = stdout.read().decode('utf-8')
+    print(result7)
+    zone_reset()
+    ssh.close()
+    sys.exit(0)
+
+    if ' zone:\tpeer_test' and 'Property Member: 00:02:00:00:00:03:00:03' in result7:
+        print("Step 3.1 Passed")
+    else:
+        print('Script failed at step 3.1 ')
+        ssh.close()
+        sys.exit(0)
+
+    logger.info("Test Case Step 4.1")
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone "peer_test" -members "{a};{b};{c}"'
+                                        .format(a=(dead1[1]), b=(dead1[2]), c=(dead1[3])))
+    check = stdout.readlines()
+    logger.info("ERROR_CHECK")
+    print(check)
+    if check:
+        print("zone add failed when it should've PASSED")
+        ssh.close()
+        sys.exit(0)
+    else:
+        cfgsave()
+
+    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    # result9 = stdout.read().decode('ascii')# .strip('\n')
+    # print("RESULT9_RESULT9")
+    result9 = stdout.readlines()#.decode('ascii')# .strip('\n')
+    # print(result9)
+    if ' zone:\tpeer_test\t\n' and 'Property Member: 00:02:00:00:00:03:00:03'\
+        and 'Principal Member(s):\n'\
+        and '\t\t%s; %s; \n' % ((deadbeef[0]), (deadbeef[1]))\
+        and '\t\tde:ad:be:ef:00:00:00:01\n'\
+        and '   Peer Member(s):\n'\
+        and '\t\tde:ad:be:ef:00:00:00:02; de:ad:be:ef:00:00:00:03; \n'\
+        and '\t\tde:ad:be:ef:00:00:00:04\n' in result9:
+        print("Step 4.1 Passed")
+    else:
+        print("Step 4.1 Failed")
+        ssh.close()
+        sys.exit()
+    ssh.close()
+    sys.exit(0)
+
+    logger.info("Test Cases for Step 6")
+    stdin, stdout, stderr = ssh.execute('zoneadd "peer_test" -member "00:02:00:00:00:01:00:01;%s;%s"' \
+                                        % (deadbeef[0], deadbeef[1]))
+    result = stdout.read().decode('ascii').strip('\n')
+    print(result)
+    if 'Error:' or "Usage:'" in result2:
+        print("No Principle member declared = PASSED")
+    else:
+        print('Script failed at Step 6')
+        ssh.close()
+        sys.exit(0)
+
+    stdin, stdout, stderr = ssh.execute('zoneobjectreplace 00:02:00:00:00:03:00:03 00:02:00:00:00:04:00:04')
+    result = stdout.read().decode('ascii')
+    print(result)
+    if 'error:' in result:
+        print("Principle member cannot be modified = PASSED")
+    else:
+        print('Script failed at Step 6')
+        ssh.close()
+        sys.exit(0)
+    zonedelete('peer_test')
+
+    # logger.info("Test Cases for Step 8") # Step 7 is executed throughout this script to verify all other tests
+    # stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn", "%s;%s"' % (deadbeef[0], deadbeef[1]))
+    # stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn1", "%s;%s"' % (dead1[0], dead1[1]))
+    # stdin, stdout, stderr = ssh.execute('alicreate "ali_di", "%s"' % di)
+    # stdin, stdout, stderr = ssh.execute('alicreate "ali_di1", "%s"' % di1)
+    # cfgsave()
+    # # ssh.close()
+    # # sys.exit()
+    # stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "ali_test" -principal "ali_di" -members "ali_di1"')
+    # stdin, stdout, stderr = ssh.execute('cfgadd "FID_10", "ali_test"')
+    # cfgenable("FID_10")
+    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    # result10 = stdout.readlines()  # .decode('ascii')# .strip('\n')
+    result10 = stdout.read().decode('utf-8').strip('\n')
+    print("RESULT10_RESULT10")
+    print(result10)
+    print('AAAAAAAAAAAAAAAAAAAA')
+    a = result10.index(' zone:\tali_test\t\n')
+    print(a)
+    if (' zone:\tali_test\t\n' and '   Property Member: 00:02:00:00:00:02:00:03\n' and '   Created by: User\n' in result10):
+         # and '   Principal Member(s):\n' in result10:
+         # and '\t\t33,10\n'
+         # and '\t\t33,11\n'
+         # and '\t\t33,12\n')
+    #     and '   Peer Member(s):\n'\
+    #     and '\t\t33,13\n'\
+    #     and '\t\t33,14\n' \
+    #     and '\t\t33,15\n' in result10:
+        print("Principal = D,I and Members = D,I Passed")
+    else:
+        print("Principal = D,I and Members = D,I Failed")
+        ssh.close()
+        sys.exit()
+    ssh.close()
+    sys.exit()
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "ali_test1" -principal "ali_di" -members\
+     "33,13;33,14;33,15"')
+    stdin, stdout, stderr = ssh.execute('cfgadd "FID_10", "ali_test1"')
+    cfgenable("FID_10")
+
+    # for line in result:
+    #     if 'Error:' or "Usage:'" in line:
+    #         print("zone create failed when it should've PASSED")
+    #         ssh.close()
+    #         sys.exit(0)
+    #     else:
+    #         pass
+    # # stdin, stdout, stderr = ssh.execute('cfgshow')
+    # stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    # result = stdout.readlines()
+    # sync_output = []
+    # for line in result:
+    #     print(line)
+    #     sync_output.append(result)
+    #     # sync_output.append(line.strip('\t\n'))
+    # logger.info("PRINTING SYNC OUTPUT")
+    # print(sync_output)
+    ssh.close()
+    sys.exit()
+    # if ' zone:\tpeer_test' and 'de:ad:be:ef:de:ad:be:ef; de:ad:de:ad:be:ef:be:ef; 'and '10:00:00:04:05:06:07:08' \
+    #         in sync_output:
+    #     print("YES")
+    # else:
+    #     print("NO")
+    # stdin, stdout, stderr = ssh.execute('zonedelete peer_test')
+    # stdin.flush()
+    # stdin, stdout, stderr = ssh.execute('cfgsave')
+    # stdin.write('y')
+    # stdin.write('\n')
+    # stdin.flush()
+    # result = stdout.readlines()
+    # for line in result:
+    #     print(line.strip())
+
+
+    # for line in result4:
+        # print(line.strip('\n'))
+        # sync_output.append(line.strip())
+        #sync_output.append(line.strip('\n'))
+        # print(sync_output)
+        # if "Configuration change successful." in sync_output:
+        #     print("ports moved to newfid %s" % fid)
+        # else:
+        #     # print(sync_output)
+        #     print("ports aren't moved")
+    # for line in result4:
+    #     print(line.strip())
+        # if 'peer_test' in line:
+        #     print("YES")
+        # else:
+        #     print('NO')
+
+    # stdin, stdout, stderr = ssh.execute('cfgtransabort')
+    # checks = stdout.readlines()
+    # for line in checks:
+    #     print(line)
+
+    #     # logger.info("THIS IS ZONECREATE CMD LINE OUTPUT:  \n   %s" % line)
+    #     # print(line.strip())
+    #     if 'Error: Invalid zone member' in line:
+    #         print("Invalid Zone Member = PASSED")
+    #     else:
+    #         print('Script failed at adding invalid zone member')
+    #         ssh.close()
+    #         sys.exit(0)
+
+    # stdin, stdout, stderr = ssh.execute('switchshow')
     # stdin, stdout, stderr = ssh.execute('dsim --devshow')
-    stdin, stdout, stderr = ssh.execute('switchshow')
     # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "e100"' % pa.edsim_pid)
     # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
     # stdin, stdout, stderr = ssh.execute('dsim --fdmi dpa %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
     # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "F100"' % pa.edsim_pid)
     # fosconfig = stdout.readlines()
     # for line in fosconfig:
-    for line in stdout:
-        print(line.strip('\n'))
-        # alldata = sync_output.append(line.strip('\n'))
-        # print(sync_output)
-    # fosconfig = (str(fosconfig))
-    # print(alldata)
-        if "fdmi_host" in line:
-            print("It's there")
-        else:
-            print("NOPE")
-    ssh.close()
-    sys.exit(0)
-    ssh = SSHClient(ip, uname, pwd)
-    stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "F100"' % pa.edsim_pid)
-    fosconfig = stdout.readlines()
-    for line in fosconfig:
-        print(line.strip('\n'))
-    ssh.close()
-    sys.exit(0)
-    # cons_info = console_info(pa.chassis_name)
-    # console_ip = cons_info[0]
-    # console_port = cons_info[1]
-    # console_ip_bkup = cons_info[2]
-    # console_port_bkup = cons_info[3]
-    # power_pole_info = pwr_pole_info(pa.chassis_name)
-    # usr_pass = get_user_and_pass(pa.chassis_name)
-    # user_name = usr_pass[0]
-    # usr_psswd = usr_pass[1]
-    # ipaddr_switch = get_ip_from_file(pa.chassis_name)
-    # steps_to_run = pa.steps
-    # fid_to_compare = 128
+    #     print(line.strip('\n'))
+    # ssh.close()
+    # sys.exit(0)
+
     #################################### Sample Text ###############################################################
     # ssh = SSHClient(ip, uname, pwd)
-    connection = SSH(ip, uname, pwd)
-    connection.openShell()
+    # connection = SSH(ip, uname, pwd)
+    # connection.openShell()
     # THE BELOW WILL OPEN AN INTERACTIVE SHELL. DON'T KNOW HOW TO CLOSE IT???
     # while True:
     #     command = input('$ ')
     #     if command.startswith(" "):
     #         command = command[1:]
     #     connection.sendShell(command)
-
-
-    # ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute("fosconfig --show")
-    # fosconfig = ssh_stdout.readlines()
-    # fosconfig = (str(fosconfig))
-    # # print(fosconfig)
-    # # ssh.close()
-    # # sys.exit(0)
-    # # search = re.search('(?:Virtual Fabric:\\t\\t\\t)([a-z]{0,8})', fosconfig, re.M | re.I)
+    #
+    # search = re.search('(?:Virtual Fabric:\\t\\t\\t)([a-z]{0,8})', fosconfig, re.M | re.I)
     # search = re.search('(?:Virtual Fabric:\D{0,6})([a-z]{0,8})', fosconfig, re.M | re.I)
     # logger.info("THIS IS SEARCH %s" % search)
     # print('THIS IS THE RESULT OF RE.SEARCH: %s ' % search.group(0))
@@ -604,104 +911,57 @@ def main():
     # sys.exit(0)
     #
     #
-    # # for line in foscfg:
-    # #     if line != '':
-    # #         output = (line.strip('\n'))
-    # #         logger.info('   printing output')
-    # #         print(output)
-    # #     else:
-    # #         print('No information read from vf_capable function')
-    # # print(output)
-    # # search = re.search('(requires)', output, re.M | re.I)
-    # # logger.info(search)
-    # # if search is None:
-    # #     print("\n\n\nVF not enabled on this switch\n\n\n")
-    # #     return (False)
-    # # else:
-    # #     print("\n\n\nVF is enabled on this switch\n\n\n")
-    # #     return (True)
-    # # logger.info ("ssh succcessful. Closing connection")
-    # # ssh.close()
-    # # Example on how to print Human readable results:
-    # # print('\n\n'+ '='*20)
-    # # print("Switch Name :  %s" % initial_checks[0])
-    # # print("IP address :  %s" % initial_checks[1])
-    # # print("Chassis :  %s" % initial_checks[2])
-    # # print("VF enabled :  %s" % initial_checks[3])
-    # # print("FCR enabled :  %s" % initial_checks[4])
-    # # print("Base configured :  %s" % initial_checks[5])
-    # # print('='*20 + '\n\n')
+    # for line in foscfg:
+    #     if line != '':
+    #         output = (line.strip('\n'))
+    #         logger.info('   printing output')
+    #         print(output)
+    #     else:
+    #         print('No information read from vf_capable function')
+    # print(output)
+    # search = re.search('(requires)', output, re.M | re.I)
+    # logger.info(search)
+    # if search is None:
+    #     print("\n\n\nVF not enabled on this switch\n\n\n")
+    #     return (False)
+    # else:
+    #     print("\n\n\nVF is enabled on this switch\n\n\n")
+    #     return (True)
+    # logger.info ("ssh succcessful. Closing connection")
+    # ssh.close()
+    # Example on how to print Human readable results:
+    # print('\n\n'+ '='*20)
+    # print("Switch Name :  %s" % initial_checks[0])
+    # print("IP address :  %s" % initial_checks[1])
+    # print("Chassis :  %s" % initial_checks[2])
+    # print("VF enabled :  %s" % initial_checks[3])
+    # print("FCR enabled :  %s" % initial_checks[4])
+    # print("Base configured :  %s" % initial_checks[5])
+    # print('='*20 + '\n\n')
     # sys.exit(0)
     #
-    # chassis = director(ip)
-    # if chassis:
-    #     print("Director")
-    # else:
-    #     print("Pizza Box")
+    # connect = check_ssh(ip, uname, pwd)
+    # # if connect == True:
+    # if connect:
+    #     print("Inside deffaultmove")
+    #     stdin2, stdout2, stderr2 = ssh.exec_command("lscfg --config 128 -slot 2 -port 0-47 -force")
+    #     time.sleep(10)
+    #     sync_output = []
+    #     for line in stdout2:
+    #         print(line.strip('\n'))
+    #         sync_output.append(line.strip('\n'))
+    #         if "Configuration change successful." in sync_output:
+    #             print("ports moved to default fid 128")
+    #         time.sleep(900)
+    #     else:
+    #         print(sync_output)
+    #         print("ports aren't moved")
+    # ssh.close()
     #
-    # vf = vf_capable(ip)
-    # # vf = vf_capable_transport(ip)
-    # print("VFVFVFVF")
-    # print(vf)
-    # if vf:
-    #     print("VF Supported")
-    # else:
-    #     print("VF not supported. Please check you are trying the correct switch")
-    #     sys.exit(0)
-    # sys.exit(0)
-    # for i in range(0, 10):
-    #     print(i)
-    #     for fid in range(1, 9):
-    #         print(fid)
-    #         status = lscreate(fid, pa.ipaddr)
-    #         print(status)
-    #         if status:
-    #             time.sleep(15)
-    #             connect = check_ssh(pa.ipaddr, uname, pwd)
-    #             if connect:
-    #                 cmd = "setcontext %s" % fid
-    #             print("logged into ls %s" % fid)
-    #             # stdin, stdout, stderr = ssh.exec_command(cmd)
-    #             cmd1 = "lscfg --config %s -slot 12 -port 0-63 -force" % fid
-    #             stdin1, stdout1, stderr1 = ssh.exec_command(cmd1)
-    #             time.sleep(60)
-    #             sync_output = []
-    #             for line in stdout:
-    #                 print(line.strip('\n'))
-    #                 sync_output.append(line.strip('\n'))
-    #                 if "Configuration change successful." in sync_output:
-    #                     print("ports moved to newfid %s" % fid)
-    #         else:
-    #             # print(sync_output)
-    #             print("ports aren't moved")
-    #             break
-    #         ssh.exec_command("setcontext %s" % fid)
-    #         ssh.exec_command("switchdisable;switchenable")
-    #         print("switch toggled")
-    #         time.sleep(350)
-    #     ssh.close()
-    # # connect = check_ssh(ip, uname, pwd)
-    # # # if connect == True:
-    # # if connect:
-    # #     print("Inside deffaultmove")
-    # #     stdin2, stdout2, stderr2 = ssh.exec_command("lscfg --config 128 -slot 2 -port 0-47 -force")
-    # #     time.sleep(10)
-    # #     sync_output = []
-    # #     for line in stdout2:
-    # #         print(line.strip('\n'))
-    # #         sync_output.append(line.strip('\n'))
-    # #         if "Configuration change successful." in sync_output:
-    # #             print("ports moved to default fid 128")
-    # #         time.sleep(900)
-    # #     else:
-    # #         print(sync_output)
-    # #         print("ports aren't moved")
-    # # ssh.close()
-    # #
-    # # for fid in range(85, 95):
-    # #     print(fid)
-    # # # stat = lsdelete(fid)
-    # # time.sleep(60)
+    # for fid in range(85, 95):
+    #     print(fid)
+    # # stat = lsdelete(fid)
+    # time.sleep(60)
 
 
 if __name__ == "__main__":

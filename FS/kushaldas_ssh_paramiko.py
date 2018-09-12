@@ -16,6 +16,7 @@ Excecutes a command using paramiko and returns the result.
 
 import paramiko
 import logging
+import
 
 host = "10.39.36.112"
 port = (int(22))
@@ -26,7 +27,7 @@ bufsize=-1
 #key_filename=''
 timeout=30
 pkey=None
-####ATTEMPT AT LOGGING
+#### ATTEMPT AT LOGGING
 # #create logger for paramiko and set level
 # logger = logging.getLogger('paramiko')
 # logger.setLevel(logging.DEBUG)
