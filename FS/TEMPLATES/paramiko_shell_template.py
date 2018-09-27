@@ -92,7 +92,7 @@ def parent_parser():
     pp = argparse.ArgumentParser(add_help=False)
     # pp.add_argument("--repeat", help="repeat repeat")
     # pp.add_argument("firmware", help="firmware verison 8.1.0_bldxx")
-    # pp.add_argument("ip", help="IP address of SUT")
+    pp.add_argument("ip", help="IP address of SUT")
     # pp.add_argument("user", help="username for SUT")
     pp.add_argument("fid", type=int, default=0, help="Choose the FID to operate on")
     pp.add_argument('email', type=str, help="email address")
@@ -126,22 +126,24 @@ def parse_args():
     args = parser.parse_args()
     # print(args)
 
-    if not args.chassis_name and not args.ipaddr:
-        print("Chassis Name or IP address is required")
-        sys.exit()
+    # if not args.chassis_name and not args.ipaddr:
+    #     print("Chassis Name or IP address is required")
+    #     sys.exit()
+    #
+    # if args.cmdprompt and not args.switchtype:
+    #     print("To start at the command prompt the switch type is needed.")
+    #     sys.exit()
+    #
+    # if not args.cmdprompt and args.switchtype:
+    #     print('To start at the command prompt both switch type and command prompt is requried')
+    #     sys.exit()
+    # # print("Connecting to IP :  " + args.ip)
+    # # print("user             :  " + args.user)
+    # # verbose    = args.verbose
+    #
+    # return parser.parse_args()
 
-    if args.cmdprompt and not args.switchtype:
-        print("To start at the command prompt the switch type is needed.")
-        sys.exit()
-
-    if not args.cmdprompt and args.switchtype:
-        print('To start at the command prompt both switch type and command prompt is requried')
-        sys.exit()
-    # print("Connecting to IP :  " + args.ip)
-    # print("user             :  " + args.user)
-    # verbose    = args.verbose
-
-    return parser.parse_args()
+    return args
 
 
 uname = "admin"
@@ -183,6 +185,7 @@ class SSHClient(object):
         self.connection.close()
 
 class SSH:
+    # Initialize these variables for later use
     shell = None
     client = None
     transport = None
@@ -191,10 +194,17 @@ class SSH:
         # self.connection = self.connect(host, username, password)
 
     def __init__(self, host, username, password):
+        # Let the user know we're connecting to which server
         print("Connecting to server on ip", str(host) + ".")
+
+        # Creat a new SSH client
         self.client = paramiko.client.SSHClient()
+
+        # Have the script access  a server that's not yet in the known_hosts file
         self.client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
         self.client.connect(host, username=username, password=password, look_for_keys=False)
+
+        # Make the connection
         self.transport = paramiko.Transport((host, 22))
         self.transport.connect(username=username, password=password)
 
@@ -221,7 +231,7 @@ class SSH:
         global connection
         while True:
             # Print data when available
-            if self.shell != None and self.shell.recv_ready():
+            if self.shell is not None and self.shell.recv_ready():
                 alldata = self.shell.recv(1024)
                 while self.shell.recv_ready():
                     alldata += self.shell.recv(1024)
@@ -348,6 +358,21 @@ def get_ip_from_file(chassis_name):
             ip = (line['IP Address'])
 
     return pa.ipaddr
+
+
+def get_peer_zone_info(result):
+    effective = re.findall('(Effective configuration:[ ,:\()_A-Za-z0-9\s\t\n]+Cfg)', result, flags=re.S | re.M)
+    effective = str(effective)
+    # print(effective)
+    peer_zone = re.findall(r'(peer_test\\t\\n[ ,:\\()_A-Za-z0-9\\s\\t\\n]+Cfg)', effective)
+    if  not peer_zone:
+        print("EFFECTIVE CONFIGURATION NOT FOUND")
+        # zone_reset()
+        ssh.close()
+        sys.exit(0)
+    peer_zone = str(peer_zone)
+    print(peer_zone)
+    return peer_zone
 
 
 def lscreate(fid, ip):
@@ -498,14 +523,18 @@ def vf_capable_transport(ip):
 def main():
 
     pa = parse_args()
+    ip = pa.ip
+    print(ip)
+    print("@" * 40)
     print(pa)
+    print(pa.ip)
+    print("@" * 40)
     # print(pa.chassis_name)
-    print(pa.ipaddr)
+    # print(pa.ipaddr)
     # print(pa.quiet)
     # print(pa.verbose)
     # print(pa.firmware)
     # print(pa.cmdprompt)
-    print("@" * 40)
     # sys.exit(0)
 
     ###################################################################################################################
@@ -516,10 +545,10 @@ def main():
     #
     #
     #
-    if pa.ipaddr:
-        print("do IP steps")
-        pa.chassis_name = console_info_from_ip(pa.ipaddr)
-    ip = pa.ipaddr
+    # if pa.ipaddr:
+    #     print("do IP steps")
+    #     pa.chassis_name = console_info_from_ip(pa.ipaddr)
+    # ip = pa.ipaddr
     # cons_info = console_info(pa.chassis_name)
     # console_ip = cons_info[0]
     # console_port = cons_info[1]
@@ -534,17 +563,90 @@ def main():
     # fid_to_compare = 128
     #################################### Sample Text ###############################################################
     # ssh = SSHClient(ip, uname, pwd)
+    ip = pa.ip
     connection = SSH(ip, uname, pwd)
     connection.openShell()
+
     while True:
         command = input('$ ')
+        if command.startswith('exit'):
+            break
         if command.startswith(" "):
             command = command[1:]
         connection.sendShell(command)
 
-    SSH.closeConnection()
+    SSH.closeConnection(connection)
+    sys.exit(0)
 
+    # ssh = SSHClient(pa.ip, uname, pwd) # SSHClient() is a class
 
+    def cfgadd(cfg, zone):
+        stdin, stdout, stderr = ssh.execute('cfgadd %s,%s' % (cfg, zone))
+        result = stdout.read().decode('utf-8')
+        print(result)
+
+    def cfgenable(cfg):
+        stdin, stdout, stderr = ssh.execute('cfgenable %s' % cfg)
+        stdin.write('y')
+        stdin.write('\n')
+        stdin.flush()
+        result = stdout.read().decode('utf-8')
+        print(result)
+
+    def cfgremove(cfg, zone):
+        stdin, stdout, stderr = ssh.execute('cfgremove %s,%s' % (cfg, zone))
+        result = stdout.read().decode('utf-8')
+        print(result)
+
+    def cfgsave():
+        stdin, stdout, stderr = ssh.execute('cfgsave')
+        stdin.write('y')
+        stdin.write('\n')
+        stdin.flush()
+        result = stdout.read().decode('utf-8')
+        # result = stdout.read().decode('ascii').strip('\n')
+        print(result)
+
+    def zonedelete(zone):
+        stdin, stdout, stderr = ssh.execute('zonedelete %s' % zone)
+        stdin.flush()
+        # stdin, stdout, stderr = ssh.execute('cfgsave')
+        # stdin.write('y')
+        # stdin.write('\n')
+        # stdin.flush()
+        result = stdout.readlines()
+        for line in result:
+            print(line.strip())
+
+    def zone_reset():
+        zonedelete('peer_test')
+        cfgremove('"FID_10"', '"peer_test"')
+        cfgenable("FID_10")
+
+    deadbeef = ['de:ad:be:ef:de:ad:be:ef', 'de:ad:de:ad:be:ef:be:ef']
+    dead1 = ['de:ad:be:ef:00:00:00:01', 'de:ad:be:ef:00:00:00:02', 'de:ad:be:ef:00:00:00:03',
+             'de:ad:be:ef:00:00:00:04', 'de:ad:be:ef:00:00:00:05']
+    dead2 = ['de:ad:be:ef:00:00:00:06', 'de:ad:be:ef:00:00:00:07', 'de:ad:be:ef:00:00:00:08',
+             'de:ad:be:ef:00:00:00:09', 'de:ad:be:ef:00:00:00:10']
+    di = "33,10;33,11;33,12"
+    di1 = "33,13;33,14;33,15"
+    di2 = "33,16;33,17;33,18"
+
+    logger.info("Test Case Step 1.1")
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -principal "00:02:00:00:00:01:00:01;%s;%s"'\
+                                        % (deadbeef[0], deadbeef[1]))
+    result1 = stdout.read().decode('utf-8')
+    print(result1)
+    if 'Error: Invalid zone member' in result1:
+        print("Invalid Zone Member = PASSED")
+    else:
+        print('Script failed at adding invalid zone member')
+        ssh.close()
+        sys.exit(0)
+
+    logger.info("Test Case Step 1.3")
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "alias_test" -member "00:02:00:00:00:01:00:01;%s;%s"'\
+                                        %(deadbeef[0], deadbeef[1]))
     # ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute("fosconfig --show")
     # fosconfig = ssh_stdout.readlines()
     # fosconfig = (str(fosconfig))

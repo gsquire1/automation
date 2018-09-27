@@ -342,6 +342,21 @@ def get_ip_from_file(chassis_name):
     return pa.ipaddr
 
 
+def get_peer_zone_info(result):
+    effective = re.findall('(Effective configuration:[ ,:\()_A-Za-z0-9\s\t\n]+Cfg)', result, flags=re.S | re.M)
+    effective = str(effective)
+    # print(effective)
+    peer_zone = re.findall(r'(peer_test\\t\\n[ ,:\\()_A-Za-z0-9\\s\\t\\n]+Cfg)', effective)
+    if  not peer_zone:
+        print("EFFECTIVE CONFIGURATION NOT FOUND")
+        # zone_reset()
+        ssh.close()
+        sys.exit(0)
+    peer_zone = str(peer_zone)
+    print(peer_zone)
+    return peer_zone
+
+
 def lscreate(fid, ip):
     sync_output = []
     connect = check_ssh(ip, uname, pwd)
@@ -524,7 +539,7 @@ def main():
 
     def cfgadd(cfg, zone):
         stdin, stdout, stderr = ssh.execute('cfgadd %s,%s' % (cfg, zone))
-        result = stdout.read().decode('ascii').strip('\n')
+        result = stdout.read().decode('utf-8')
         print(result)
 
     def cfgenable(cfg):
@@ -532,12 +547,12 @@ def main():
         stdin.write('y')
         stdin.write('\n')
         stdin.flush()
-        result = stdout.read().decode('ascii').strip('\n')
+        result = stdout.read().decode('utf-8')
         print(result)
 
     def cfgremove(cfg, zone):
         stdin, stdout, stderr = ssh.execute('cfgremove %s,%s' % (cfg, zone))
-        result = stdout.read().decode('ascii').strip('\n')
+        result = stdout.read().decode('utf-8')
         print(result)
 
     def cfgsave():
@@ -545,7 +560,8 @@ def main():
         stdin.write('y')
         stdin.write('\n')
         stdin.flush()
-        result = stdout.read().decode('ascii').strip('\n')
+        result = stdout.read().decode('utf-8')
+        # result = stdout.read().decode('ascii').strip('\n')
         print(result)
 
     def zonedelete(zone):
@@ -558,6 +574,7 @@ def main():
         result = stdout.readlines()
         for line in result:
             print(line.strip())
+
     def zone_reset():
         zonedelete('peer_test')
         cfgremove('"FID_10"', '"peer_test"')
@@ -566,16 +583,16 @@ def main():
     deadbeef = ['de:ad:be:ef:de:ad:be:ef', 'de:ad:de:ad:be:ef:be:ef']
     dead1 = ['de:ad:be:ef:00:00:00:01', 'de:ad:be:ef:00:00:00:02', 'de:ad:be:ef:00:00:00:03',
              'de:ad:be:ef:00:00:00:04', 'de:ad:be:ef:00:00:00:05']
+    dead2 = ['de:ad:be:ef:00:00:00:06', 'de:ad:be:ef:00:00:00:07', 'de:ad:be:ef:00:00:00:08',
+             'de:ad:be:ef:00:00:00:09', 'de:ad:be:ef:00:00:00:10']
     di = "33,10;33,11;33,12"
     di1 = "33,13;33,14;33,15"
-
-
-
+    di2 = "33,16;33,17;33,18"
 
     logger.info("Test Case Step 1.1")
     stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -principal "00:02:00:00:00:01:00:01;%s;%s"'\
                                         % (deadbeef[0], deadbeef[1]))
-    result1 = stdout.read().decode('ascii').strip('\n')
+    result1 = stdout.read().decode('utf-8')
     print(result1)
     if 'Error: Invalid zone member' in result1:
         print("Invalid Zone Member = PASSED")
@@ -585,10 +602,9 @@ def main():
         sys.exit(0)
 
     logger.info("Test Case Step 1.3")
-    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -member "00:02:00:00:00:01:00:01;%s;%s"'\
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "alias_test" -member "00:02:00:00:00:01:00:01;%s;%s"'\
                                         %(deadbeef[0], deadbeef[1]))
-    result2 = stdout.read().decode('ascii').strip('\n')
-    print(type(result2))
+    result2 = stdout.read().decode('utf-8')
     print(result2)
     if 'Error:' or 'Usage:' in result2:
         print("No Principle member declared = PASSED")
@@ -599,7 +615,8 @@ def main():
 
     logger.info("Test Case Step 1.5")
     stdin, stdout, stderr = ssh.execute('alicreate "peer_member", "00:02:00:00:00:01:00:01"')
-    result3 = stdout.read().decode('ascii').strip('\n')
+    result3 = stdout.read().decode('utf-8')
+    print(result3)
     if 'Error:' or "Usage:'" in result3:
         print("alicreate using invalid member = PASSED")
     else:
@@ -622,62 +639,31 @@ def main():
         cfgenable("FID_10")
         cfgsave()
 
+    logger.info("Test Case Step 2.2")
     stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
-    result5 = stdout.read().decode('utf-8')#.strip('\n')
-    # result5 = stdout.readlines()
-    print(result5)
-    effective = re.findall('(Effective configuration:[ ,:\()_A-Za-z0-9\s\t\n]+Cfg)', result5, flags=re.S | re.M)
-    if effective:
-        print(type(effective))
-        effective = str(effective)
-        print(effective)
-    else:
-        print("EFFECTIVE CONFIGURATION NOT FOUND")
-        ssh.close()
-        sys.exit(0)
-    # print(type(effective))
-    print(effective)
-    zone = re.findall(r'(peer_test\\t\\n[ ,:\\()_A-Za-z0-9\\s\\t\\n]+Cfg)', effective)
-    if not zone:
+    result5 = stdout.read().decode('utf-8')
+    peer_test_zone = get_peer_zone_info(result5)
+
+    if not peer_test_zone:
         print("ZONE CONFIGURATION NOT FOUND")
         ssh.close()
         sys.exit(0)
-    # logger.info("PRINT ZONE AND ZONE TYPE")
-    zone = str(zone)
-    a = zone.replace('\\t', '')
-    a = a.replace('\\n', '')
-    a = a.replace('\\\\', '')
-    # print("ZONE_REPLACE")
-    # print(a)
-    prop_member = re.findall('(Property Member: 00:02:00:00:00:03:00:02)', zone)
-    if not prop_member:
+    peer_test_zone = str(peer_test_zone)
+    prop_member = 'Property Member: 00:02:00:00:00:03:00:02'
+    if prop_member in peer_test_zone:
+        print("Property Member Check Passed")
+    else:
         print("PROPERTY MEMBER NOT FOUND")
-        zone_reset()
-        ssh.close()
-        sys.exit(0)
-    print("PROPERTY MEMBER")
-    print(prop_member)
-    principal_member = re.findall('Principal Member\(s\):\\\\[a-z:]{0,23}\\\\[a-z:]{0,23}', a)
-    if not principal_member:
-        print("PRINCIPAL MEMBER NOT FOUND")
-        zone_reset()
-        ssh.close()
-        sys.exit(0)
-    # print("PRINCIPAl MEMBER")
-    # print(type(principal_member))
-    # print(principal_member)
-    b = str(principal_member)
 
-    if deadbeef[0] and (deadbeef[1]) in b:
+    # principal_member = re.findall('Principal Member\(s\):\\\\[a-z:]{0,23}\\\\[a-z:]{0,23}', peer_test_zone)
+
+    if deadbeef[0] and deadbeef[1] in peer_test_zone:
         print("Step 2.1 Passed")
     else:
         print('Script failed at step 2.1 ')
-        zone_reset()
+        # zone_reset()
         ssh.close()
         sys.exit(0)
-    # zone_reset()
-    # ssh.close()
-    # sys.exit(0)
 
     logger.info("Test Case Step 3.1")
     stdin, stdout, stderr = ssh.execute('zoneadd --peerzone "peer_test" -principal %s' % (dead1[0]))
@@ -695,15 +681,12 @@ def main():
 
     stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
     result7 = stdout.read().decode('utf-8')
-    print(result7)
-    zone_reset()
-    ssh.close()
-    sys.exit(0)
 
     if ' zone:\tpeer_test' and 'Property Member: 00:02:00:00:00:03:00:03' in result7:
         print("Step 3.1 Passed")
     else:
         print('Script failed at step 3.1 ')
+        # zone_reset()
         ssh.close()
         sys.exit(0)
 
@@ -715,33 +698,44 @@ def main():
     print(check)
     if check:
         print("zone add failed when it should've PASSED")
+        zone_reset()
         ssh.close()
         sys.exit(0)
     else:
         cfgsave()
+        cfgenable("FID_10")
 
     stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
-    # result9 = stdout.read().decode('ascii')# .strip('\n')
-    # print("RESULT9_RESULT9")
-    result9 = stdout.readlines()#.decode('ascii')# .strip('\n')
-    # print(result9)
-    if ' zone:\tpeer_test\t\n' and 'Property Member: 00:02:00:00:00:03:00:03'\
-        and 'Principal Member(s):\n'\
-        and '\t\t%s; %s; \n' % ((deadbeef[0]), (deadbeef[1]))\
-        and '\t\tde:ad:be:ef:00:00:00:01\n'\
-        and '   Peer Member(s):\n'\
-        and '\t\tde:ad:be:ef:00:00:00:02; de:ad:be:ef:00:00:00:03; \n'\
-        and '\t\tde:ad:be:ef:00:00:00:04\n' in result9:
-        print("Step 4.1 Passed")
-    else:
-        print("Step 4.1 Failed")
+    result9 = stdout.read().decode('utf-8')
+    peer_zone = get_peer_zone_info(result9)
+    if not peer_zone:
+        print("peer_zone CONFIGURATION NOT FOUND")
+        zone_reset()
         ssh.close()
-        sys.exit()
-    ssh.close()
-    sys.exit(0)
+        sys.exit(0)
+    peer_zone = str(peer_zone)
+    print(peer_zone)
+    substring = 'Property Member: 00:02:00:00:00:03:00:03'
+
+    a = peer_zone.find(substring)
+    b = peer_zone.find(deadbeef[0])
+    c = peer_zone.find(deadbeef[1])
+    d = peer_zone.find(dead1[0])
+    e = peer_zone.find(dead1[1])
+    f = peer_zone.find(dead1[2])
+    g = peer_zone.find(dead1[3])
+    members = [a, b, c, d, e, f, g]
+    for i in members:
+        if i is -1:
+            print(i)
+            zone_reset()
+            ssh.close()
+            sys.exit(0)
+    else:
+        print('STEP 4 PASSED')
 
     logger.info("Test Cases for Step 6")
-    stdin, stdout, stderr = ssh.execute('zoneadd "peer_test" -member "00:02:00:00:00:01:00:01;%s;%s"' \
+    stdin, stdout, stderr = ssh.execute('zoneadd "peer_test" -member "00:02:00:00:00:01:00:01;%s;%s"'
                                         % (deadbeef[0], deadbeef[1]))
     result = stdout.read().decode('ascii').strip('\n')
     print(result)
@@ -752,135 +746,137 @@ def main():
         ssh.close()
         sys.exit(0)
 
-    stdin, stdout, stderr = ssh.execute('zoneobjectreplace 00:02:00:00:00:03:00:03 00:02:00:00:00:04:00:04')
-    result = stdout.read().decode('ascii')
+    stdin, stdout, stderr = ssh.execute('zoneobjectreplace %s be:ef:be:ef:de:ad:de:ad' % deadbeef[0])
+    result = stdout.read().decode('utf-8')
     print(result)
     if 'error:' in result:
-        print("Principle member cannot be modified = PASSED")
+        print("Step 6.3, Zone Object Replace = Failed")
     else:
-        print('Script failed at Step 6')
+        print("Step 6.3, Zone Object Replace PASSED")
+
+    stdin, stdout, stderr = ssh.execute('zoneobjectreplace be:ef:be:ef:de:ad:de:ad %s' % deadbeef[0])
+    result = stdout.read().decode('utf-8')
+    if 'error:' in result:
+        print("Step 6.3, Zone Object put back = Failed")
+    else:
+        print("Step 6.3, Zone Object put back PASSED")
+
+    stdin, stdout, stderr = ssh.execute('zoneobjectreplace 00:02:00:00:00:03:00:03 00:02:00:00:00:04:00:04')
+    result = stdout.read().decode('utf-8')
+    print(result)
+    if 'error:' in result:
+        print('Step 6.4, Principle member cannot be modified = PASSED')
+    else:
+        print('Step 6.4, Script failed at Step 6.3')
+        zone_reset()
         ssh.close()
         sys.exit(0)
-    zonedelete('peer_test')
 
-    # logger.info("Test Cases for Step 8") # Step 7 is executed throughout this script to verify all other tests
-    # stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn", "%s;%s"' % (deadbeef[0], deadbeef[1]))
-    # stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn1", "%s;%s"' % (dead1[0], dead1[1]))
-    # stdin, stdout, stderr = ssh.execute('alicreate "ali_di", "%s"' % di)
-    # stdin, stdout, stderr = ssh.execute('alicreate "ali_di1", "%s"' % di1)
-    # cfgsave()
-    # # ssh.close()
-    # # sys.exit()
-    # stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "ali_test" -principal "ali_di" -members "ali_di1"')
-    # stdin, stdout, stderr = ssh.execute('cfgadd "FID_10", "ali_test"')
-    # cfgenable("FID_10")
-    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
-    # result10 = stdout.readlines()  # .decode('ascii')# .strip('\n')
-    result10 = stdout.read().decode('utf-8').strip('\n')
-    print("RESULT10_RESULT10")
-    print(result10)
-    print('AAAAAAAAAAAAAAAAAAAA')
-    a = result10.index(' zone:\tali_test\t\n')
-    print(a)
-    if (' zone:\tali_test\t\n' and '   Property Member: 00:02:00:00:00:02:00:03\n' and '   Created by: User\n' in result10):
-         # and '   Principal Member(s):\n' in result10:
-         # and '\t\t33,10\n'
-         # and '\t\t33,11\n'
-         # and '\t\t33,12\n')
-    #     and '   Peer Member(s):\n'\
-    #     and '\t\t33,13\n'\
-    #     and '\t\t33,14\n' \
-    #     and '\t\t33,15\n' in result10:
-        print("Principal = D,I and Members = D,I Passed")
+    logger.info("Test Cases for Step 8")  # Step 7 is executed throughout this script to verify all other tests
+
+    stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn", "%s;%s"' % (deadbeef[0], deadbeef[1]))
+    # result = stdout.read().decode('utf-8')
+    # print(result)
+    stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn1", "%s;%s"' % (dead1[0], dead1[1]))
+    stdin, stdout, stderr = ssh.execute('alicreate "ali_di", "%s"' % di)
+    stdin, stdout, stderr = ssh.execute('alicreate "ali_di1", "%s"' % di1)
+    stdin, stdout, stderr = ssh.execute('alicreate "ali_wwn_di", "%s;%s"' % (deadbeef[0], di))
+    cfgsave()
+    logger.info("Test Cases for Step 9")
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone peer_test -p "ali_wwn_di"')
+    result = stdout.read().decode('utf-8')
+    # print(result)
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone peer_test -m "ali_wwn_di"')
+    result_1 = stdout.read().decode('utf-8')
+    # print(result_1)
+    substring = 'Error: Members of alias "ali_wwn_di" can either be WWN or D,I: alias having mixed type of'
+    if substring in result and result_1:
+        print('Step 9, Mixed Alias Members in peer zone member = PASSED')
     else:
-        print("Principal = D,I and Members = D,I Failed")
+        print('Step 9, Script failed at Mixed Alias Members in peer zone member')
+        zone_reset()
         ssh.close()
-        sys.exit()
+        sys.exit(0)
+    logger.info("Test Cases for Step 10")
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone peer_test -m "ali_wwn"')
+    result = stdout.read().decode('utf-8')
+    # print(result)
+    stdin, stdout, stderr = ssh.execute('zoneadd --peerzone peer_test -p "ali_wwn"')
+    result1 = stdout.read().decode('utf-8')
+    # print(result1)
+    substring = 'Error: Duplicates member exists'
+    if substring in result and result_1:
+        print('Step 10, Duplicate Members in peer zone not allowed = PASSED')
+    else:
+        print('Step 10, Duplicate Members in peer zone not allowed = FAILED')
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    zone_reset()
+
+    logger.info('Test Cases for Step 11')
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -p "ali_wwn;11:22:33:44:55:66:77:88"' 
+                                        '-m "ali_wwn1;12:34:56:78:09:10:11:12"')
+    cfgsave()
+    result = stdout.read().decode('utf-8')
+    print(result)
+    if 'error:' in result:
+        print('Step 11.2 and 11.4, Alias Mix = FAILED')
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    else:
+        print('Step 11.2 and 11.4, Alias Mix = PASSED')
+    zone_reset()
+    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "peer_test" -p "ali_di;30,01;30,02" -m'
+                                        ' "ali_di1;30,3;30,4"')
+    cfgsave()
+    result = stdout.read().decode('utf-8')
+    print(result)
+    if 'error:' in result:
+        print('Step 11.1 and 11.3, Alias Mix = FAILED')
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    else:
+        print('Step 11.1 and 11.3, Alias Mix = PASSED')
+    cfgadd('FID_10', 'peer_test')
+    # result = stdout.read().decode('utf-8')
+    # print(result)
+    cfgenable('FID_10')
+    stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
+    result = stdout.read().decode('utf-8')
+    check = get_peer_zone_info(result)
+
+    logger.info('Test Cases for Step 13 and 14')
+    substring = 'Property Member: 00:02:00:00:00:02:03:05'
+    if substring in check:
+        print('Step 12 & 13, Variable Data Type = PASSED')
+    else:
+        print('Step 12 & 13, Variable Data Type = FAILED')
+        zone_reset()
+        ssh.close()
+        sys.exit(0)
+    logger.info('Test Cases for Steps 14-16 and 18 are verified in other areas in the script')
+    zone_reset()
+
+    stdin, stdout, stderr = ssh.execute('alidelete  ali_wwn') # , "%s;%s"' % (deadbeef[0], deadbeef[1]))
+    result = stdout.read().decode('utf-8')
+    print(result)
+    stdin, stdout, stderr = ssh.execute('alidelete  ali_wwn1') # , "%s;%s"' % (dead1[0], dead1[1]))
+    stdin, stdout, stderr = ssh.execute('alidelete  ali_di') # , "%s"' % di)
+    stdin, stdout, stderr = ssh.execute('alidelete  ali_di1') #, "%s"' % di1)
+    stdin, stdout, stderr = ssh.execute('alidelete  ali_wwn_di')
+    stdin, stdout, stderr = ssh.execute('alishow')
+    result = stdout.read().decode('utf-8')
+    print('END OF PEER ZONE SCRIPT REMEMBER TO RUN TRAFFIC AND CHECK RSCNs')
+    print(result)
+    cfgsave()
+    # zone_reset()
     ssh.close()
-    sys.exit()
-    stdin, stdout, stderr = ssh.execute('zonecreate --peerzone "ali_test1" -principal "ali_di" -members\
-     "33,13;33,14;33,15"')
-    stdin, stdout, stderr = ssh.execute('cfgadd "FID_10", "ali_test1"')
-    cfgenable("FID_10")
-
-    # for line in result:
-    #     if 'Error:' or "Usage:'" in line:
-    #         print("zone create failed when it should've PASSED")
-    #         ssh.close()
-    #         sys.exit(0)
-    #     else:
-    #         pass
-    # # stdin, stdout, stderr = ssh.execute('cfgshow')
-    # stdin, stdout, stderr = ssh.execute('zoneshow --peerzone all')
-    # result = stdout.readlines()
-    # sync_output = []
-    # for line in result:
-    #     print(line)
-    #     sync_output.append(result)
-    #     # sync_output.append(line.strip('\t\n'))
-    # logger.info("PRINTING SYNC OUTPUT")
-    # print(sync_output)
-    ssh.close()
-    sys.exit()
-    # if ' zone:\tpeer_test' and 'de:ad:be:ef:de:ad:be:ef; de:ad:de:ad:be:ef:be:ef; 'and '10:00:00:04:05:06:07:08' \
-    #         in sync_output:
-    #     print("YES")
-    # else:
-    #     print("NO")
-    # stdin, stdout, stderr = ssh.execute('zonedelete peer_test')
-    # stdin.flush()
-    # stdin, stdout, stderr = ssh.execute('cfgsave')
-    # stdin.write('y')
-    # stdin.write('\n')
-    # stdin.flush()
-    # result = stdout.readlines()
-    # for line in result:
-    #     print(line.strip())
+    sys.exit(0)
 
 
-    # for line in result4:
-        # print(line.strip('\n'))
-        # sync_output.append(line.strip())
-        #sync_output.append(line.strip('\n'))
-        # print(sync_output)
-        # if "Configuration change successful." in sync_output:
-        #     print("ports moved to newfid %s" % fid)
-        # else:
-        #     # print(sync_output)
-        #     print("ports aren't moved")
-    # for line in result4:
-    #     print(line.strip())
-        # if 'peer_test' in line:
-        #     print("YES")
-        # else:
-        #     print('NO')
-
-    # stdin, stdout, stderr = ssh.execute('cfgtransabort')
-    # checks = stdout.readlines()
-    # for line in checks:
-    #     print(line)
-
-    #     # logger.info("THIS IS ZONECREATE CMD LINE OUTPUT:  \n   %s" % line)
-    #     # print(line.strip())
-    #     if 'Error: Invalid zone member' in line:
-    #         print("Invalid Zone Member = PASSED")
-    #     else:
-    #         print('Script failed at adding invalid zone member')
-    #         ssh.close()
-    #         sys.exit(0)
-
-    # stdin, stdout, stderr = ssh.execute('switchshow')
-    # stdin, stdout, stderr = ssh.execute('dsim --devshow')
-    # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "e100"' % pa.edsim_pid)
-    # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
-    # stdin, stdout, stderr = ssh.execute('dsim --fdmi dpa %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
-    # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
-    # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "F100"' % pa.edsim_pid)
-    # fosconfig = stdout.readlines()
-    # for line in fosconfig:
-    #     print(line.strip('\n'))
-    # ssh.close()
-    # sys.exit(0)
 
     #################################### Sample Text ###############################################################
     # ssh = SSHClient(ip, uname, pwd)
@@ -892,6 +888,13 @@ def main():
     #     if command.startswith(" "):
     #         command = command[1:]
     #     connection.sendShell(command)
+    # stdin, stdout, stderr = ssh.execute('switchshow')
+    # stdin, stdout, stderr = ssh.execute('dsim --devshow')
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "e100"' % pa.edsim_pid)
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi dpa %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi gpat %s %s %s' % (pa.edsim_port, pa.edsim_pid, pa.edsim_wwn))
+    # stdin, stdout, stderr = ssh.execute('dsim --fdmi rpa %s "F100"' % pa.edsim_pid)
     #
     # search = re.search('(?:Virtual Fabric:\\t\\t\\t)([a-z]{0,8})', fosconfig, re.M | re.I)
     # search = re.search('(?:Virtual Fabric:\D{0,6})([a-z]{0,8})', fosconfig, re.M | re.I)
@@ -899,16 +902,6 @@ def main():
     # print('THIS IS THE RESULT OF RE.SEARCH: %s ' % search.group(0))
     # a = search.group(0)
     # b = search.group(1)
-    # #if 'enabled' in fosconfig:
-    # if 'enabled' in a:
-    #     print('true_dat')
-    # else:
-    #     print('false')
-    # ssh_stdin, ssh_stdout, ssh_stderr = ssh.execute("lscfg --show")
-    # lscfg = ssh_stdout.readlines()
-    # print(lscfg)
-    # ssh.close()
-    # sys.exit(0)
     #
     #
     # for line in foscfg:
@@ -939,29 +932,7 @@ def main():
     # print("Base configured :  %s" % initial_checks[5])
     # print('='*20 + '\n\n')
     # sys.exit(0)
-    #
-    # connect = check_ssh(ip, uname, pwd)
-    # # if connect == True:
-    # if connect:
-    #     print("Inside deffaultmove")
-    #     stdin2, stdout2, stderr2 = ssh.exec_command("lscfg --config 128 -slot 2 -port 0-47 -force")
-    #     time.sleep(10)
-    #     sync_output = []
-    #     for line in stdout2:
-    #         print(line.strip('\n'))
-    #         sync_output.append(line.strip('\n'))
-    #         if "Configuration change successful." in sync_output:
-    #             print("ports moved to default fid 128")
-    #         time.sleep(900)
-    #     else:
-    #         print(sync_output)
-    #         print("ports aren't moved")
-    # ssh.close()
-    #
-    # for fid in range(85, 95):
-    #     print(fid)
-    # # stat = lsdelete(fid)
-    # time.sleep(60)
+
 
 
 if __name__ == "__main__":
