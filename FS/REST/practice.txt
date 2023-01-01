@@ -1,5 +1,4 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@
 domain_id
 @@@@@@@@@@
 /rest/running/switch/fibrechannel-switch/name/
