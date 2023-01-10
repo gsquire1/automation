@@ -128,8 +128,8 @@
 #     index_count += 1
 
 # Zip
-mylist1 = [1, 2, 3]
-mylist2 = ['a', 'b', 'c']
+# mylist1 = [1, 2, 3]
+# mylist2 = ['a', 'b', 'c']
 # for item in zip(mylist1, mylist2):
 #     print(item)
 #
@@ -158,15 +158,78 @@ mylist2 = ['a', 'b', 'c']
 ######################
 
 # List Comprehensions
+# [element for element in 'string']
 
-mystring = 'hello'
-mylist = []
-for letter in mystring:
-    mylist.append(letter)
-print(mylist)
+# my_string = 'palisade'
+# wtf = []
+# for letter in my_string:
+#     wtf.append(letter)
+# print(wtf)
+#
+# wtf = [letter for letter in my_string]  # List Comprehension for above
+# print(wtf)
 
-mylist = [letter for letter in mylist]
-print(mylist)
+# mylist3 = []
+# for i in 'word':
+#     mylist3.append(i)
+#
+# mylist3 = [x for x in 'word']  # List Comprehension for above
+# print(mylist3)
 
-mylist = [x for x in "word"]
-print(mylist)
+# mylist4 = []
+# for i in range(1, 11):
+#     mylist4.append(i**2)
+# mylist4 = [num**2 for num in range(1, 11)] # List Comprehension for above
+# print(mylist4)
+
+# mylist5 = []
+# for num in range(0, 5):
+#     if num % 2 == 0:
+#         mylist5.append(num)
+# mylist5 = [num for num in range(0, 5) if num % 2 == 0] # List Comprehension for above with if statement
+# print(mylist5)
+
+celcius = [0, 10, 20, 34.5]
+# fahrenheit = []
+# for temp in celcius:
+#     fahrenheit.append(((9/5) * temp + 32))
+# fahrenheit = [((9/5) * temp + 32) for temp in celcius] # List Comprehension
+# print(fahrenheit)
+
+# ASSESSMENT CODE
+# st = 'Print only the words that start with s in this sentence'
+# for word in st.split():
+#     if word[0] == 's':
+#         print(word)
+#
+# even = [num for num in range(0, 11) if num % 2 == 0]
+# print(even)
+#
+# for num in range(0, 11, 2):
+#     print(num)
+
+# response = [num for num in range(0, 51) if num % 3 == 0]
+# print(response)
+
+# st = 'Print every word in this sentence that has an even number of letters'
+# for word in st.split():
+#     if len(word) % 2 == 0:
+#         print(word)
+
+# for i in range(0, 101):
+#     if i % 3 == 0 and i % 5 == 0:
+#         print("FizzBuzz")
+#     elif i % 3 == 0:
+#         print('Fizz')
+#     elif i % 5 == 0:
+#         print("Buzz")
+#     else:
+#         print(i)
+
+# st = 'Create a list of the first letters of every word in this string'
+# b = []
+# for a in st.split():
+#     b.append(a[0])
+# print(b)
+# m = [word[-1] for word in st.split()]
+# print(m)
