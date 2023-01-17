@@ -65,7 +65,7 @@
 
 # Iterate through dictionary using tuple unpacking
 
-# d = {'k1': 1, 'k2': 2, 'k3': 3}
+d = {'k1': 1, 'k2': 2, 'k3': 3}
 # for key, value in d.items():
 #     print(key)
 #     print(value)
@@ -189,35 +189,51 @@
 # mylist5 = [num for num in range(0, 5) if num % 2 == 0] # List Comprehension for above with if statement
 # print(mylist5)
 
-celcius = [0, 10, 20, 34.5]
-# fahrenheit = []
+# celcius = [0, 10, 20, 34.5]
+# Fahrenheit = []
 # for temp in celcius:
-#     fahrenheit.append(((9/5) * temp + 32))
-# fahrenheit = [((9/5) * temp + 32) for temp in celcius] # List Comprehension
-# print(fahrenheit)
+#     Fahrenheit.append(((9/5) * temp + 32))
+# fahrenheit = [((9/5) * i + 32) for i in celcius]  # List Comprehension for above auto append statement
+# print(Fahrenheit)
+
 
 # ASSESSMENT CODE
 # st = 'Print only the words that start with s in this sentence'
 # for word in st.split():
 #     if word[0] == 's':
 #         print(word)
-#
+# response = [i for i in st.split() if i[0] == 's'] # list comprehension adds to list auto as for loop is run
+# print(response)
+
 # even = [num for num in range(0, 11) if num % 2 == 0]
+# print('even')
 # print(even)
-#
+
+# odd = [num for num in range(0, 11) if num % 2]
+# print('odd')
+# print(odd)
+
 # for num in range(0, 11, 2):
 #     print(num)
+#
+# num = [x for x in range(0, 11) if x % 2 == 0]
+# print(num)
 
 # response = [num for num in range(0, 51) if num % 3 == 0]
 # print(response)
 
 # st = 'Print every word in this sentence that has an even number of letters'
-# for word in st.split():
-#     if len(word) % 2 == 0:
-#         print(word)
+# st1 = []
+# for i in st.split():
+#     if len(i) % 2 == 0:
+#         st1.append(i)
+# print(st1)
+#
+# st1 = [i for i in st.split() if len(i) % 2 == 0]
+# print(st1)
 
 # for i in range(0, 101):
-#     if i % 3 == 0 and i % 5 == 0:
+#     if i % 3 == 0 and i % 5 == 0:   # This first as either of bottom 2 will resolve and loop starts over
 #         print("FizzBuzz")
 #     elif i % 3 == 0:
 #         print('Fizz')
@@ -231,5 +247,66 @@ celcius = [0, 10, 20, 34.5]
 # for a in st.split():
 #     b.append(a[0])
 # print(b)
-# m = [word[-1] for word in st.split()]
-# print(m)
+#
+# b = [i[0] for i in st.split()]
+# print(b)
+# def even_check(number):
+#     return number % 2 == 0
+#
+#
+# answer = even_check(21)
+# print(answer)
+
+# Return True if ANY number is true in a list
+#
+# x = check_even(my_num_list)
+# print(x)
+#####################################
+
+# Tuple unpacking with Python Functions
+
+# stock_prices = [('AAPL', 200), ('GOOG', 400), ('MSFT', 100 )]
+#
+# for ticker, price in stock_prices:
+#     print(ticker, (price+(.1*price)))
+#    # print(price+(.1*price))
+
+# work_hours = [('Abbey', 100), ('Billy', 400), ('Cassie', 800)]
+#
+#
+# def employee_check(work_hours):
+#
+#     current_max = 0
+#     employee_of_the_month = ''
+#
+#     for emp, hours in work_hours:
+#         if hours > current_max:
+#             current_max = hours
+#             employee_of_the_month = emp
+#     return employee_of_the_month, current_max
+#
+# # tuple unpacking with a function call
+#
+#
+# name, hours = employee_check(work_hours)
+# print(name)
+# print(hours)
+##################################
+
+# 3 Cup Monte
+example = [1, 2, 3, 4, 5, 6, 7]
+
+from random import shuffle
+shuffle(example)
+print(example)
+
+def shuffle_list(example):
+    shuffle(example)
+    return example
+
+x = shuffle_list(example)
+print(x)
+
+mylist = [' ', 'O', ' ']
+x = shuffle_list(mylist)
+print(x)
