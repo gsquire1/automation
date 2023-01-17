@@ -293,20 +293,30 @@ d = {'k1': 1, 'k2': 2, 'k3': 3}
 # print(hours)
 ##################################
 
-# 3 Cup Monte
-example = [1, 2, 3, 4, 5, 6, 7]
-
+# 3 Cup Monte (Also in its own file)
 from random import shuffle
-shuffle(example)
-print(example)
-
-def shuffle_list(example):
-    shuffle(example)
-    return example
-
-x = shuffle_list(example)
-print(x)
 
 mylist = [' ', 'O', ' ']
-x = shuffle_list(mylist)
-print(x)
+shuffle(mylist)
+# print(mylist)
+
+
+# USER GUESS
+def player_guess():
+    guess = ''
+    while guess not in ['0', '1', '2']:
+        guess = input("Pick a number: 0, 1 or 2   ")
+    return int(guess)
+
+
+# CHECK GUESS
+def check_guess(mylist, guess):
+    if mylist[guess] == 'O':
+        print("Correct!")
+    else:
+        print("Wrong Guess")
+        print(mylist)
+
+
+guess = player_guess()
+check_guess(mylist, guess)
