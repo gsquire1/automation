@@ -1,6 +1,8 @@
 # Scratch file for learning
 # import random
 # Working with Files
+import sys
+
 
 # myfile = open('myfile.txt')
 # # print(myfile.read())
@@ -65,7 +67,7 @@
 
 # Iterate through dictionary using tuple unpacking
 
-d = {'k1': 1, 'k2': 2, 'k3': 3}
+# d = {'k1': 1, 'k2': 2, 'k3': 3}
 # for key, value in d.items():
 #     print(key)
 #     print(value)
@@ -293,30 +295,274 @@ d = {'k1': 1, 'k2': 2, 'k3': 3}
 # print(hours)
 ##################################
 
-# 3 Cup Monte (Also in its own file)
-from random import shuffle
+# # 3 Cup Monte (Also in its own file)
+# from random import shuffle
+#
+# mylist = [' ', 'O', ' ']
+# shuffle(mylist)
+# # print(mylist)
+#
+#
+# # USER GUESS
+# def player_guess():
+#     guess = ''
+#     while guess not in ['0', '1', '2']:
+#         guess = input("Pick a number: 0, 1 or 2   ")
+#     return int(guess)
+#
+#
+# # CHECK GUESS
+# def check_guess(mylist, guess):
+#     if mylist[guess] == 'O':
+#         print("Correct!")
+#     else:
+#         print("Wrong Guess")
+#         print(mylist)
+#
+#
+# guess = player_guess()
+# check_guess(mylist, guess)
+####################################
 
-mylist = [' ', 'O', ' ']
-shuffle(mylist)
-# print(mylist)
+# *arg & **kwargs
+# def myfunc1(*args):
+#     # Accepts arbitrary number of arguments into func and Returns 5% of the sum of them all
+#     # print(args)
+#     return sum(args) * .05  # double parenthesis as you have to pass in a tuple ()
+#
+#
+# myfunc1(40, 60, 100, 0, 250)
+#
+# def myfunc2(*args, **kwargs):
+#     print('I would like {} {}'.format(args[0], kwargs['food']))
+#
+#
+# myfunc2(10, 20, 30, fruit='orange', food='eggs', animal='dog')
+# # print(b)
+
+# Coding Exercise 19
+# def myfunc(*args):
+#     answer = []
+#     for i in args:
+#         if i % 2 == 0:
+#             answer.append(i)
+#     return answer
 
 
-# USER GUESS
-def player_guess():
-    guess = ''
-    while guess not in ['0', '1', '2']:
-        guess = input("Pick a number: 0, 1 or 2   ")
-    return int(guess)
+# x = myfunc(5, 6, 7, 8)
+# print(x)
+#######################
+
+# Coding Exercise 20
+# def myfunc(*args):
+#     print('1111111111111111')
+#     print(type(args))
+#     out = []
+#     args = (args[0])  # This was the missing link as it changed *args type from tuple to string
+#     print('2222222222222222')
+#     print(type(args))
+#     print(args)
+#     for i in range(len(args)):
+#         # print(i)
+#         if i % 2 == 0:
+#             out.append(args[i].lower())
+#         else:
+#             out.append(args[i].upper())
+#     return out
+#
+#
+# d = myfunc('Anthropomorphism')
+# print(d)
+########################
+
+# LESSER OF TWO EVENS: Write a function that returns the lesser of two given numbers if both numbers are even,
+# but returns the greater if one or both numbers are odd.
+
+# def lesser_of_two_evens(a, b):
+#     if a % 2 == 0 and b % 2 == 0:
+#         # Both numbers are even
+#         if a < b:
+#             return a
+#         else:
+#             return b
+#     else:  # a % 2 != 0 or b % 2 != 0:
+#         # One or both numbers are odd
+#         if a > b:
+#             return a
+#         else:
+#             return b
+
+# Using the min/max function:
+# def lesser_of_two_evens(a, b):
+#     # Are both numbers even
+#     if a % 2 == 0 and b % 2 == 0:
+#         return min(a, b)
+#     else:
+#         return max(a, b)
+#
+#
+# x = lesser_of_two_evens(7, 5)
+# print(x)
+########################
+
+# ANIMAL CRACKERS: Write a function takes a two-word string and returns True if both words begin with same letter
 
 
-# CHECK GUESS
-def check_guess(mylist, guess):
-    if mylist[guess] == 'O':
-        print("Correct!")
+# def animal_crackers(text):
+#     # [i for i in text.split() if i[0] == i[0]]
+#     # b = [i[0] for i in text.upper().split()]
+#     # if b[0] == b[1]:
+#     #     return True
+#     # else:
+#     #     return False
+#     wordlist = text.upper().split()
+#     return wordlist[0][0] == wordlist[1][0]
+#
+#
+# x = animal_crackers('Levelheaded Llama')
+# # x = animal_crackers('Crazy Kangaroo')
+# print(x)
+################################
+
+# MAKES TWENTY: Given two integers, return True if the sum of the integers is 20 or if one of the integers is 20.
+# If not, return False
+
+# def makes_twenty(n1, n2):
+#     if n1 + n2 == 20:
+#         return True
+#     elif (n1 == 20) or (n2 == 20):
+#         return True
+#     else:
+#         return False
+
+def makes_twenty(n1, n2):
+    if n1 + n2 == 20 or n1 == 20 or n2 == 20:
+        return True
     else:
-        print("Wrong Guess")
-        print(mylist)
+        return False
+
+# x = makes_twenty(20, 10)
+# x = makes_twenty(12, 8)
+# x = makes_twenty(2, 3)
+# print(x)
+#################################
 
 
-guess = player_guess()
-check_guess(mylist, guess)
+# Level 1 Problem: OLD MACDONALD - Write a function that capitalizes the first and fourth letters of a name
+
+# def old_macdonald(name):
+# out = name.capitalize().replace('d', 'D', 1)
+# return out
+#     first_half = name[:3].capitalize()
+#     second_half = name[3:].capitalize()
+#     return first_half + second_half
+#
+#
+# x = old_macdonald('macdonald')
+# print(x)
+################################
+
+# Level 1 Problem: MASTER YODA - Given a sentence, return a sentence with the words reversed
+
+
+# def master_yoda(text):
+#     y = (text.split())
+#     reverse_y = y[::-1]
+#     z = ' '.join(reverse_y)
+#     return z
+
+
+# x = master_yoda('I am home')
+# x = master_yoda('We are ready')
+# print(x)
+# master_yoda('I am home') --> 'home am I'
+# master_yoda('We are ready') --> 'ready are We'
+##############################
+
+# Level 1 Problem: ALMOST THERE - Given an integer n, return True if n is within 10 of either 100 or 200
+# NOTE: abs(num) returns the absolute value of a number
+
+# def almost_there(n):
+#     x = (abs(100-n) <= 10) or (abs(200-n) <= 10)
+#     return x
+#
+#
+# z = almost_there(209)
+# print(z)
+# almost_there(90)  # --> True
+# almost_there(104)  # --> True
+# almost_there(150)  # --> False
+# almost_there(209)  # --> True
+############################
+
+# Level 2 Problem: Given a list of ints, return True if the array contains a 3 next to a 3 somewhere
+
+# def has_33(nums):
+#     for i in range(0, len(nums)-1):
+#         if nums[i] == 3 and nums[i+1] == 3:
+#             return True
+#     return False
+
+# Check
+# x = has_33([1, 3, 3])
+# Check
+# x = has_33([1, 2, 3, 3])
+# Check
+# x = has_33([3, 1, 3, 1, 2, 3, 3])
+# print(x)
+##########################
+
+# Level 2 Problem: PAPER DOLL: Given a string, return a string where for every character in the original there are
+# three characters
+
+# def paper_doll(text):
+#     out = ''
+#     for i in text:
+#         out += i * 3
+#     return out
+
+# Check
+# x = paper_doll('Hello')
+# x = paper_doll('Mississippi')
+# print(x)
+############################
+
+# Level 2 Problem:BLACKJACK: Given three integers between 1 and 11, if their sum is less than or equal to 21, return
+# their sum. If their sum exceeds 21 and there's an eleven, reduce the total sum by 10. Finally, if the sum
+# (even after adjustment) exceeds 21, return 'BUST'
+
+def blackjack(a, b, c):
+    if sum([a, b, c]) <= 21:
+        return sum([a, b, c])
+    elif 11 in [a, b, c] and sum([a, b, c]) - 10 <= 21:
+        return sum([a, b, c]) - 10
+    else:
+        return 'BUST'
+
+
+# x = blackjack(5, 6, 7)
+x = blackjack(9, 9, 9)
+# x = blackjack(9, 9, 11)
+print(x)
+##########################
+# Level 2 Problem: SUMMER OF '69: Return the sum of the numbers in the array, except ignore sections of numbers
+# starting with a 6 and extending to the next 9 (every 6 will be followed by at least one 9). Return 0 for no numbers.
+
+def summer_69(arr):
+    pass
+
+
+# summer_69([1, 3, 5]) --> 9
+# summer_69([4, 5, 6, 7, 8, 9]) --> 9
+# summer_69([2, 1, 6, 9, 11]) --> 14
+# def summer_69(arr):
+#     pass
+# # Check
+# summer_69([1, 3, 5])
+# # Check
+# summer_69([4, 5, 6, 7, 8, 9])
+# # Check
+# summer_69([2, 1, 6, 9, 11])
+
+
+
