@@ -531,25 +531,43 @@ def makes_twenty(n1, n2):
 # their sum. If their sum exceeds 21 and there's an eleven, reduce the total sum by 10. Finally, if the sum
 # (even after adjustment) exceeds 21, return 'BUST'
 
-def blackjack(a, b, c):
-    if sum([a, b, c]) <= 21:
-        return sum([a, b, c])
-    elif 11 in [a, b, c] and sum([a, b, c]) - 10 <= 21:
-        return sum([a, b, c]) - 10
-    else:
-        return 'BUST'
+# def blackjack(a, b, c):
+#     if sum([a, b, c]) <= 21:
+#         return sum([a, b, c])
+#     elif 11 in [a, b, c] and sum([a, b, c]) - 10 <= 21:
+#         return sum([a, b, c]) - 10
+#     else:
+#         return 'BUST'
 
 
 # x = blackjack(5, 6, 7)
-x = blackjack(9, 9, 9)
+# x = blackjack(9, 9, 9)
 # x = blackjack(9, 9, 11)
-print(x)
+# print(x)
 ##########################
+# "WHILE" LOOPS, "WHILE NOT" LOOPS
 # Level 2 Problem: SUMMER OF '69: Return the sum of the numbers in the array, except ignore sections of numbers
 # starting with a 6 and extending to the next 9 (every 6 will be followed by at least one 9). Return 0 for no numbers.
 
 def summer_69(arr):
-    pass
+    total = 0  # total number placeholder (start at 0)
+    add = True  # Set up condition for while loop
+
+    for num in arr:
+        print(num)
+        while add:  # While add is true
+            if num != 6:
+                total += num
+                break
+            else:
+                add = False  # Change the condition
+        while not add:
+            if num != 9:
+                break
+            else:
+                add = True  # Change the condition
+                break
+    return total
 
 
 # summer_69([1, 3, 5]) --> 9
@@ -558,11 +576,23 @@ def summer_69(arr):
 # def summer_69(arr):
 #     pass
 # # Check
-# summer_69([1, 3, 5])
-# # Check
-# summer_69([4, 5, 6, 7, 8, 9])
-# # Check
-# summer_69([2, 1, 6, 9, 11])
+# x = summer_69([1, 3, 5])
+# x = summer_69([4, 5, 6, 7, 8, 9])
+# x = summer_69([2, 1, 6, 9, 11])
+# print(x)
+###########################
+# Challenging Problems:
+# SPY GAME: Write a function that takes in a list of int and ret True if it contains 007 in order
+def spy_games(nums):
+    pass
 
+# spy_game([1,2,4,0,0,7,5]) --> True
+# spy_game([1,0,2,4,0,5,7]) --> True
+# spy_game([1,7,2,0,4,5,0]) --> False
+
+# x = spy_game([1,2,4,0,0,7,5])
+# x = spy_game([1,0,2,4,0,5,7])
+# x = spy_game([1,7,2,0,4,5,0])
+print(x)
 
 
