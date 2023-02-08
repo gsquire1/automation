@@ -545,30 +545,28 @@ def makes_twenty(n1, n2):
 # x = blackjack(9, 9, 11)
 # print(x)
 ##########################
-# "WHILE" LOOPS, "WHILE NOT" LOOPS
+# Nested For Loop with "WHILE" LOOPS, "WHILE NOT" LOOPS
 # Level 2 Problem: SUMMER OF '69: Return the sum of the numbers in the array, except ignore sections of numbers
 # starting with a 6 and extending to the next 9 (every 6 will be followed by at least one 9). Return 0 for no numbers.
 
-def summer_69(arr):
-    total = 0  # total number placeholder (start at 0)
-    add = True  # Set up condition for while loop
-
-    for num in arr:
-        print(num)
-        while add:  # While add is true
-            if num != 6:
-                total += num
-                break
-            else:
-                add = False  # Change the condition
-        while not add:
-            if num != 9:
-                break
-            else:
-                add = True  # Change the condition
-                break
-    return total
-
+# def summer_69(arr):
+#     total = 0  # total number placeholder (start at 0)
+#     add = True  # Set up condition for while loop
+#     for num in arr:
+#         # print(num)
+#         while add:  # While add is true
+#             if num != 6:
+#                 total += num
+#                 break  # Breaks you out of WHILE loop returning you to FOR loop. Only connected to this while loop
+#             else:
+#                 add = False  # Sets add to FALSE thereby dropping into second while loop
+#         while not add:  # add Set to FALSE now
+#             if num != 9:  # Waiting for the next number to be 9. While still set to FALSE
+#                 break  # if not 9, break out of WHILE loop and continue with ???. Only connected to this while loop
+#             else:
+#                 add = True  # Reset to TRUE
+#                 break
+#         return total
 
 # summer_69([1, 3, 5]) --> 9
 # summer_69([4, 5, 6, 7, 8, 9]) --> 9
@@ -583,8 +581,17 @@ def summer_69(arr):
 ###########################
 # Challenging Problems:
 # SPY GAME: Write a function that takes in a list of int and ret True if it contains 007 in order
-def spy_games(nums):
-    pass
+
+
+# def spy_game(nums):
+#
+#     code = [0, 0, 7, 'x']   # use an outside data structure. Concurrent int ends with string 'x'
+#     for num in nums:        # iterate through
+#         if num == code[0]:  # looking for 1st int in list
+#             code.pop(0)     # once found, pop it off the list
+#
+#     return len(code) == 1   # made it thru looking for and found 0,0,7 in list. Return F if any int are still in list
+
 
 # spy_game([1,2,4,0,0,7,5]) --> True
 # spy_game([1,0,2,4,0,5,7]) --> True
@@ -593,6 +600,39 @@ def spy_games(nums):
 # x = spy_game([1,2,4,0,0,7,5])
 # x = spy_game([1,0,2,4,0,5,7])
 # x = spy_game([1,7,2,0,4,5,0])
-print(x)
+# print(x)
+##########################
+# COUNT PRIMES: Write a function that returns the number of prime numbers that exist up to and including a given number.
+# Treat 0 and 1 as not prime
 
+
+def count_primes(num):
+
+    # Check that the number is not a 0 or 1
+    if num < 2:
+        return 0
+    # Now we know the number is 2 or greater
+
+    # store our prime numbers
+    primes = [2]
+    # Counter going up to the input num
+    x = 3
+
+    # x is going through every number up to input num
+    while x <= num:
+        # Checks if x is prime
+        for y in range (3,x,2):
+            if x%y == 0:
+                x += 2
+                break
+        else:
+            primes.append(x)
+            x += 2
+    print(primes)
+    return len(primes)
+
+
+# Check
+z = count_primes(100)
+print(z)
 
