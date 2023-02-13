@@ -435,11 +435,11 @@ import sys
 #     else:
 #         return False
 
-def makes_twenty(n1, n2):
-    if n1 + n2 == 20 or n1 == 20 or n2 == 20:
-        return True
-    else:
-        return False
+# def makes_twenty(n1, n2):
+#     if n1 + n2 == 20 or n1 == 20 or n2 == 20:
+#         return True
+#     else:
+#         return False
 
 # x = makes_twenty(20, 10)
 # x = makes_twenty(12, 8)
@@ -605,34 +605,104 @@ def makes_twenty(n1, n2):
 # COUNT PRIMES: Write a function that returns the number of prime numbers that exist up to and including a given number.
 # Treat 0 and 1 as not prime
 
-
-def count_primes(num):
-
-    # Check that the number is not a 0 or 1
-    if num < 2:
-        return 0
-    # Now we know the number is 2 or greater
-
-    # store our prime numbers
-    primes = [2]
-    # Counter going up to the input num
-    x = 3
-
-    # x is going through every number up to input num
-    while x <= num:
-        # Checks if x is prime
-        for y in range (3,x,2):
-            if x%y == 0:
-                x += 2
-                break
-        else:
-            primes.append(x)
-            x += 2
-    print(primes)
-    return len(primes)
-
+# def count_primes(num):
+#
+#     # Check that the number is not a 0 or 1
+#     if num < 2:
+#         return 0
+#     # Now we know the number is 2 or greater
+#
+#     # store our prime numbers
+#     primes = [2]
+#     # Counter going up to the input num
+#     x = 3
+#
+#     # x is going through every number up to input num
+#     while x <= num:
+#         # Checks if x is prime
+#         for y in range (3,x,2):
+#             if x%y == 0:
+#                 x += 2
+#                 break
+#         else:
+#             primes.append(x)
+#             x += 2
+#     print(primes)
+#     return len(primes)
 
 # Check
-z = count_primes(100)
-print(z)
+# z = count_primes(100)
+# print(z)
+########################################################################################
+# Lambda expressions (aka anonymous function). Map and Filter - (built-in python functions that needed for lambda use.
+# Lambda expressions - a short way to declare small and anonymous functions (it is not necessary to provide a name for
+# lambda functions). Lambda functions behave just like regular functions declared with the def keyword. They come in
+# handy when you want to define a small function in a concise way.
+
+# MAP
+# my_nums = [1, 2, 3, 4, 5]
+#
+#
+# def square(num):
+#     return num ** 2
+
+# Map applies function (square) to every item in list (my_nums)
+# x = map(square, my_nums)  # returns memory space location <map at 0x2a72c>.
+# print(x)
+
+# Iterate through
+# for item in map(square, my_nums):
+#     print(item)
+
+# Produces a list
+# z = list(map(square, my_nums))  # Note that square does not need the parenthesis (). It is passed in as an argument.
+# print(z)
+
+
+# FILTER
+# my_nums = [1, 2, 3, 4, 5, 6]
+
+# def check_even(num):
+#     return num % 2 == 0
+
+
+# Filter "my_nums" using condition "check-even". Returning only the even numbers.
+# The condition has to return a boolean (T or F).
+
+# Iterate through
+# for n in filter(check_even, my_nums):  # Allows for iteration through
+#     print(n)
+
+# Returns a list
+# z = list(filter(check_even, my_nums))
+# print(z)
+
+# def square(num):
+#     result = num ** 2
+#     return result
+# Same as above
+# def square(num): return num ** 2
+# Same as above
+
+# list(map(lambda num : num **2, my_nums))
+
+# The same as above but uses lambda function
+
+# lambda arguments : expression
+# square = lambda x : x * x # returns square of x
+# print(square(5))  # 25
+# add = lambda x, y: x + y
+# print(add(3, 4))  # 7
+####################################
+# Nested Statements and Scope
+# LEGB RULE (order in which Python will look for the variable
+# L:Local - Names assigned in any way within a function (def or lambda), and not declared global in that function.
+# example: lambda num :num ** 2 => num is local
+
+# E:Enclosing function locals - Names in the local scope of any and all enclosing functions (def or lambda), from
+#   inner to outer.
+# example:
+# G: Global (module) - Names assigned at the top-level of a module file, or declared global in a def within the file.
+# B:Built-in (Python) - Names preassigned in the built-in names module: open, range, SyntaxError
+
 
