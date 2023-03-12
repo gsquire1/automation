@@ -23,7 +23,7 @@ import sys
 
 # If, Else, Elif
 
-# loc = 'Stor'
+# loc = 'Bank'
 # if loc == 'Auto Shop':
 #     print('Cars are cool!')
 # elif loc == 'Bank':
@@ -39,10 +39,10 @@ import sys
 # my_iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 # for i in my_iterable:
 #     if i % 2 == 0:
-#         print(i)
+#         print(f'Even NUmber: {i}')
 #     else:
 #         print(f'Odd Number: {i}')
-#
+
 # list_sum = 0
 # for i in my_iterable:
 #     list_sum = list_sum + i
@@ -50,8 +50,9 @@ import sys
 #
 # mystring = 'Hello World'
 # for _ in mystring:
-#     print('letter')
-
+#    # print('letter')
+#   # print(i)
+#
 # mylist = [(1, 2), (3, 4), (5, 6), (7, 8)]
 # print(len(mylist))
 #
@@ -74,17 +75,16 @@ import sys
 
 # for key in d.keys():
 #     print(key)
-
 # for value in d.values():
 #     print(value)
 
 # for a, b in d:
-#     print('X')
+#     # print('X')
 #     print(a, b)
-#     print('Y')
+#     # print('Y')
 #     print(a)
-#     print('Z')
-#     print(b)
+#     # print('Z')
+#     print(d['k3'])
 # print('ZZ')
 ##################
 
@@ -149,6 +149,7 @@ import sys
 # print(max(my_list))
 
 # Random
+import random
 # shuffle - this wasn't working when last used
 # mylist3 = {1, 2, 3, 4, 5}
 # from random import shuffle
@@ -160,7 +161,7 @@ import sys
 ######################
 
 # List Comprehensions
-# [element for element in 'string']
+# [expression element for element in 'string']
 
 # my_string = 'palisade'
 # wtf = []
@@ -204,7 +205,7 @@ import sys
 # for word in st.split():
 #     if word[0] == 's':
 #         print(word)
-# response = [i for i in st.split() if i[0] == 's'] # list comprehension adds to list auto as for loop is run
+# response = [i for i in st.split() if i[0] == 's']  # list comprehension adds to list auto as for loop is run
 # print(response)
 
 # even = [num for num in range(0, 11) if num % 2 == 0]
@@ -295,33 +296,33 @@ import sys
 # print(hours)
 ##################################
 
-# # 3 Cup Monte (Also in its own file)
-# from random import shuffle
-#
-# mylist = [' ', 'O', ' ']
-# shuffle(mylist)
-# # print(mylist)
-#
-#
-# # USER GUESS
-# def player_guess():
-#     guess = ''
-#     while guess not in ['0', '1', '2']:
-#         guess = input("Pick a number: 0, 1 or 2   ")
-#     return int(guess)
-#
-#
-# # CHECK GUESS
-# def check_guess(mylist, guess):
-#     if mylist[guess] == 'O':
-#         print("Correct!")
-#     else:
-#         print("Wrong Guess")
-#         print(mylist)
-#
-#
-# guess = player_guess()
-# check_guess(mylist, guess)
+# 3 Cup Monte (Also in its own file)
+from random import shuffle
+
+# Create the Cups and shuffle
+mylist = [' ', 'O', ' ']
+shuffle(mylist)
+
+# USER GUESS
+
+def player_guess():
+    guess = ''
+    while guess not in ['0', '1', '2']:
+        guess = input("Pick a number: 0, 1 or 2   ")
+    return int(guess)
+
+
+# CHECK GUESS
+def check_guess(mylist, guess):
+    if mylist[guess] == 'O':
+        print("Correct!")
+    else:
+        print("Wrong Guess")
+        print(mylist)
+
+
+guess = player_guess()
+check_guess(mylist, guess)
 ####################################
 
 # *arg & **kwargs
@@ -697,12 +698,150 @@ import sys
 # Nested Statements and Scope
 # LEGB RULE (order in which Python will look for the variable
 # L:Local - Names assigned in any way within a function (def or lambda), and not declared global in that function.
-# example: lambda num :num ** 2 => num is local
+#   example: lambda num :num ** 2 => num is local
 
 # E:Enclosing function locals - Names in the local scope of any and all enclosing functions (def or lambda), from
 #   inner to outer.
-# example:
+#   example:
 # G: Global (module) - Names assigned at the top-level of a module file, or declared global in a def within the file.
 # B:Built-in (Python) - Names preassigned in the built-in names module: open, range, SyntaxError
+
+# Global #####
+# name = 'THIS IS A GLOBAL STRING'
+#
+# def greet():
+#     # Enclosing #####
+#     name = 'Sammy'
+#     def hello():
+#         # Local #####
+#         name = 'Im a local'
+#         print('Hello '+name)
+#     hello()
+#
+# greet()
+#
+# print(name)
+#########################################
+# Methods and Functions Homework
+#########################################
+# Write a function that computes the volume of a sphere given its radius.
+# import math
+#
+#
+# def vol(rad):
+#
+#     volume = (4/3) * math.pi * (rad ** 3)
+#
+#     print(f'Volume of the sphere: ', volume)
+#
+# Check
+# vol(2)
+
+# Write a function that checks whether a number is in a given range (inclusive of high and low)
+# def ran_check(num, low, high):
+#     if num in range(low, high+1):  # "range" only goes up to (does not include) last number
+#         print(f'The number {num} is in the range of {low} to {high}!')
+#     else:
+#         print(f'The number {num} is NOT in the range of {low} to {high}!')
+
+# Check
+# ran_check(7,2,7)
+
+# Write a Python function that accepts a string and calculates the number of upper case letters and lower case letters.
+#
+# Sample String : 'Hello Mr. Rogers, how are you this fine Tuesday?'
+# Expected Output :
+# No. of Upper case characters : 4
+# No. of Lower case Characters : 33
+
+# Using Dictionaries
+# d = {'upper': 0, 'lower': 0}
+# string1 = 'Hello Mr. Rogers, how are you this fine Tuesday?'
+# for char in string1:
+#     if char.isupper():
+#         d['upper'] += 1
+#     elif char.islower():
+#         d['lower'] += 1
+# print(f'Upper = ', {d['upper'])}
+# print(f'Lower = ', {d['lower'])}
+
+# Without dictionaries
+
+# upper = 0
+# lower = 0
+# string1 = 'Hello Mr. Rogers, how are you this fine Tuesday?'
+# for char in string1:
+#     if char.isupper():
+#         upper += 1
+#     elif char.islower():
+#         lower += 1
+#     else:
+#         pass
+#
+# print(f'Upper = ', upper)
+# print(f'Lower = ', lower)
+
+# Write a Python function that takes a list and returns a new list with unique elements of the first list.
+
+# unique_list = ([1,1,1,1,2,2,3,3,3,3,4,5])
+# new_list = []
+#
+#
+# def unique(unique_list):
+#     # return list(set(list))
+#     for i in unique_list:
+#         if i not in new_list:
+#             new_list.append(i)
+#     return new_list
+#
+# x = unique(unique_list)
+# print(x)
+
+# Write a Python function to multiply all the numbers in a list.
+
+# def multiply(numbers):
+#     total = 1 # Because you are multiplying use a 1. If it was addition, start with a zero.
+#     for i in numbers:
+#         total = total * i
+#     return total
+#
+# multiply([1, 2, 3, -4])
+
+# Check
+# Sample List : [1, 2, 3, -4]
+# Expected Output : -24
+
+# Write a Python function that checks whether a word or phrase is palindrome or not.
+
+# def palindrome(s):
+#     c = s.replace(' ', '')
+#     d = c[::-1]
+#     if c == d:
+#         return True
+#     else:
+#         return False
+#
+#
+# z = palindrome('nurses run')
+# print(z)
+
+# Write a Python function to check whether a string is pangram or not.
+# (Assume the string passed in does not have any punctuation)
+
+# import string
+#
+# def ispangram(str1, alphabet=string.ascii_lowercase):
+#     # Create a set of the alphabet
+#     a = set(alphabet)
+#     # Remove any spaces and ensure all lowercase letters
+#     mod_string = str1.replace(' ', '').lower()
+#     b = set(mod_string)
+#     return a == b
+#
+# n = ispangram("The quick brown fox jumps over the lazy dog")
+# print(n)
+###############################
+
+
 
 
